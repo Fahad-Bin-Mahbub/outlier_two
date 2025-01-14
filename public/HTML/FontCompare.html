@@ -1,0 +1,2486 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>FontPairer - Professional Font & Color Comparison Tool</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Roboto:wght@300;400;500;700;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Lato:wght@300;400;700;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Merriweather:wght@300;400;700;900&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: "#2f27ce",
+							secondary: "#dddbff",
+							accent: "#443dff",
+							background: "#f8fafc",
+							customText: "#050316",
+						},
+						fontFamily: {
+							titillium: ["Titillium Web", "sans-serif"],
+							playfair: ["Playfair Display", "serif"],
+							roboto: ["Roboto", "sans-serif"],
+							opensans: ["Open Sans", "sans-serif"],
+							montserrat: ["Montserrat", "sans-serif"],
+							lato: ["Lato", "sans-serif"],
+							poppins: ["Poppins", "sans-serif"],
+							merriweather: ["Merriweather", "serif"],
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			:root {
+				--text: #050316;
+				--heading-color: rgb(17, 24, 39);
+				--background: #f8fafc;
+				--primary: #2f27ce;
+				--secondary: #dddbff;
+				--accent: #443dff;
+				--titillium: "Titillium Web", sans-serif;
+			}
+
+			body {
+				font-family: var(--titillium);
+				background-color: var(--background);
+				color: var(--text);
+				line-height: 1.6;
+				overflow-x: hidden;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 10px;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #b8b9ff;
+				border-radius: 10px;
+				transition: all 0.3s ease;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #443dff;
+			}
+
+			.subtitle {
+				font-family: var(--titillium);
+			}
+
+			.selection-title {
+				font-family: var(--titillium);
+			}
+
+			.gradient-line {
+				opacity: 0.4;
+				transition: opacity 0.3s ease;
+			}
+
+			.control-group:hover .gradient-line {
+				transition: opacity 0.3s ease;
+				opacity: 1;
+			}
+
+			.toggle-button {
+				background: #ecf0f1;
+				color: #2c3e50;
+				position: relative;
+				overflow: hidden;
+				font-family: var(--titillium);
+				transition: all 0.3s ease;
+			}
+
+			.toggle-button.active {
+				background: linear-gradient(to right, #3b82f6, #9333ea);
+				color: white;
+			}
+
+			.toggle-button:hover {
+				transform: scale(1.03);
+			}
+
+			.contrast-pass {
+				background: #27ae60;
+				color: white;
+			}
+
+			.contrast-warning {
+				background: #f39c12;
+				color: white;
+			}
+
+			.contrast-fail {
+				background: #e74c3c;
+				color: white;
+			}
+
+			.history-item {
+				padding: 15px;
+				background: #f8f9fa;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: all 0.5s ease-in-out;
+				border: 2px solid transparent;
+				position: relative;
+			}
+
+			.history-item:hover {
+				background: #cbdcfb59;
+				border-color: #cbdcfb9d;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+			}
+
+			.history-item-fonts {
+				font-weight: 600;
+				margin-bottom: 5px;
+				color: #2c3e50;
+			}
+
+			.history-item-details {
+				font-size: 12px;
+				color: #666;
+			}
+
+			.history-item-details.colors {
+				border-radius: 10px;
+				padding: 2px 6px;
+				margin-top: 5px;
+				width: fit-content;
+			}
+
+			.delete-comparison {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				width: 24px;
+				height: 24px;
+				border-radius: 50%;
+				background: rgba(231, 76, 60, 0.1);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 0;
+				transition: all 0.3s ease;
+			}
+
+			.history-item:hover .delete-comparison {
+				opacity: 1;
+			}
+
+			.delete-comparison:hover {
+				background: rgba(231, 76, 60, 0.2);
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.1);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			.spin-once {
+				animation: spin 0.5s ease-in-out;
+			}
+
+			.pulse {
+				animation: pulse 0.5s ease;
+			}
+
+			.no-history {
+				text-align: center;
+				color: #95a5a6;
+				padding: 30px;
+			}
+
+			.animated-bg {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: -1;
+				overflow: hidden;
+			}
+
+			.animated-bg .blob {
+				position: absolute;
+				border-radius: 50%;
+				filter: blur(60px);
+				opacity: 0.15;
+				animation: float 20s infinite ease-in-out;
+			}
+
+			.animated-bg .blob:nth-child(1) {
+				width: 300px;
+				height: 300px;
+				background-color: #3b82f6;
+				top: 10%;
+				left: -100px;
+				animation-delay: 0s;
+			}
+
+			.animated-bg .blob:nth-child(2) {
+				width: 350px;
+				height: 350px;
+				background-color: #9333ea;
+				top: 40%;
+				right: -150px;
+				animation-delay: -5s;
+			}
+
+			.animated-bg .blob:nth-child(3) {
+				width: 250px;
+				height: 250px;
+				background-color: #2563eb;
+				bottom: 10%;
+				left: 20%;
+				animation-delay: -10s;
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0) translateX(0);
+				}
+				25% {
+					transform: translateY(-40px) translateX(20px);
+				}
+				50% {
+					transform: translateY(0) translateX(40px);
+				}
+				75% {
+					transform: translateY(40px) translateX(20px);
+				}
+			}
+
+			.contrast-tips {
+				display: none;
+				margin-top: 12px;
+				font-size: 13px;
+				padding: 10px 14px;
+				border-radius: 8px;
+				background-color: rgba(0, 0, 0, 0.05);
+				border-left: 3px solid transparent;
+				word-wrap: break-word;
+				overflow-wrap: break-word;
+				line-height: 1.4;
+			}
+
+			.contrast-tips.show {
+				display: block !important;
+			}
+
+			.contrast-tips.warning {
+				border-left-color: #f39c12;
+				background-color: rgba(243, 156, 18, 0.1);
+			}
+
+			.contrast-tips.fail {
+				border-left-color: #e74c3c;
+				background-color: rgba(231, 76, 60, 0.1);
+			}
+
+			.mobile-sidebar {
+				position: fixed;
+				top: 0;
+				left: -100%;
+				width: 80%;
+				max-width: 300px;
+				height: 100vh;
+				background-color: white;
+				z-index: 100;
+				transition: left 0.3s ease-in-out;
+				box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+				overflow-y: auto;
+			}
+
+			.mobile-sidebar.open {
+				left: 0;
+			}
+
+			.sidebar-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				z-index: 99;
+				opacity: 0;
+				visibility: hidden;
+				transition: opacity 0.3s ease;
+			}
+
+			.sidebar-overlay.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.hamburger {
+				cursor: pointer;
+				width: 24px;
+				height: 24px;
+				position: relative;
+				transition: all 0.25s;
+			}
+
+			.hamburger-top,
+			.hamburger-middle,
+			.hamburger-bottom {
+				position: absolute;
+				width: 24px;
+				height: 2px;
+				top: 0;
+				left: 0;
+				background: #443dff;
+				transform: rotate(0);
+				transition: all 0.5s;
+			}
+
+			.hamburger-middle {
+				transform: translateY(7px);
+			}
+
+			.hamburger-bottom {
+				transform: translateY(14px);
+			}
+
+			.open .hamburger-top {
+				transform: rotate(45deg) translateY(6px) translateX(6px);
+			}
+
+			.open .hamburger-middle {
+				display: none;
+			}
+
+			.open .hamburger-bottom {
+				transform: rotate(-45deg) translateY(6px) translateX(-6px);
+			}
+
+			.custom-select-wrapper {
+				position: relative;
+				user-select: none;
+				width: 100%;
+			}
+
+			.custom-select {
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				border: 1px solid #e2e8f0;
+				border-radius: 0.375rem;
+				background-color: white;
+			}
+
+			.custom-select__trigger {
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0.5rem 1rem;
+				font-size: 1rem;
+				color: #4b5563;
+				background: #fff;
+				cursor: pointer;
+				border-radius: 0.375rem;
+			}
+
+			.custom-options {
+				position: absolute;
+				display: block;
+				top: 100%;
+				left: 0;
+				right: 0;
+				border: 1px solid #e2e8f0;
+				border-top: 0;
+				background: #fff;
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+				z-index: 10;
+				border-bottom-left-radius: 0.375rem;
+				border-bottom-right-radius: 0.375rem;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				max-height: 200px;
+				overflow-y: auto;
+				transition: all 0.3s;
+			}
+
+			.custom-select.open .custom-options {
+				opacity: 1;
+				visibility: visible;
+				pointer-events: all;
+			}
+
+			.custom-option {
+				position: relative;
+				display: block;
+				padding: 0.75rem 1rem;
+				font-size: 0.875rem;
+				color: #4b5563;
+				cursor: pointer;
+				transition: all 0.3s;
+			}
+
+			.custom-option:hover {
+				background-color: #f3f4f6;
+			}
+
+			.custom-option.selected {
+				color: #443dff;
+				background-color: #f1f1fe;
+			}
+
+			.arrow {
+				position: relative;
+				width: 12px;
+				height: 12px;
+			}
+
+			.arrow::before,
+			.arrow::after {
+				content: "";
+				position: absolute;
+				bottom: 0px;
+				width: 8px;
+				height: 2px;
+				background-color: #443dff;
+				transition: all 0.3s;
+			}
+
+			.arrow::before {
+				left: 0;
+				transform: rotate(45deg);
+			}
+
+			.arrow::after {
+				right: 0;
+				transform: rotate(-45deg);
+			}
+
+			.open .arrow::before {
+				transform: rotate(-45deg);
+			}
+
+			.open .arrow::after {
+				transform: rotate(45deg);
+			}
+
+			.modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				z-index: 1000;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.modal.active {
+				display: flex;
+			}
+
+			.modal-content {
+				background-color: white;
+				width: 90%;
+
+				max-width: 600px;
+				max-height: 80vh;
+				border-radius: 10px;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+				padding: 2rem;
+				position: relative;
+				transform: translateY(-20px);
+				opacity: 0;
+				transition: all 0.3s ease-out;
+				overflow-y: auto;
+			}
+
+			.modal.active .modal-content {
+				transform: translateY(0);
+				opacity: 1;
+			}
+
+			.modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 1.5rem;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid #e2e8f0;
+			}
+
+			.modal-close {
+				background: none;
+				border: none;
+				font-size: 1.5rem;
+				cursor: pointer;
+				color: #6b7280;
+				transition: color 0.3s ease;
+			}
+
+			.modal-close:hover {
+				color: #ef4444;
+			}
+
+			.feature-card {
+				transition: all 0.3s ease;
+			}
+
+			.feature-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+			}
+
+			@media (max-width: 640px) {
+				.contrast-tips {
+					font-size: 12px;
+					padding: 8px 10px;
+					margin-top: 8px;
+					width: 100%;
+					clear: both;
+				}
+
+				.control-row {
+					margin-bottom: 8px;
+				}
+
+				.footer-content {
+					display: grid;
+					grid-template-columns: 1fr 1fr;
+					gap: 20px;
+					text-align: center;
+				}
+
+				.footer-main {
+					grid-column: span 2;
+				}
+			}
+
+			@media (max-width: 640px) {
+				.header-title {
+					font-size: 1.75rem !important;
+					line-height: 2rem !important;
+				}
+
+				.external {
+					padding: 1rem !important;
+					margin-bottom: 1rem !important;
+				}
+
+				.internal {
+					padding: 1rem !important;
+				}
+
+				.subtitle {
+					font-size: 0.75rem !important;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="animated-bg">
+			<div class="blob"></div>
+			<div class="blob"></div>
+			<div class="blob"></div>
+		</div>
+
+		<div class="sidebar-overlay" id="sidebar-overlay"></div>
+		<div class="mobile-sidebar" id="mobile-sidebar">
+			<div class="p-4 border-b border-gray-100">
+				<div class="flex items-center justify-between">
+					<div class="flex items-center">
+						<svg
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							class="mr-2"
+						>
+							<path
+								d="M12 4V5M18 12H19M5 12H6M7.05 7.05L7.757 7.757M16.95 7.05L16.243 7.757"
+								stroke="#443dff"
+								stroke-width="2"
+								stroke-linecap="round"
+							/>
+							<path
+								d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
+								stroke="#443dff"
+								stroke-width="2"
+							/>
+							<path
+								d="M3 20H21"
+								stroke="#443dff"
+								stroke-width="2"
+								stroke-linecap="round"
+							/>
+						</svg>
+						<span class="font-bold text-lg text-gray-800">FontPairer</span>
+					</div>
+					<button id="close-sidebar" class="text-gray-500 hover:text-gray-800">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="24"
+							height="24"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<line x1="18" y1="6" x2="6" y2="18"></line>
+							<line x1="6" y1="6" x2="18" y2="18"></line>
+						</svg>
+					</button>
+				</div>
+			</div>
+			<nav class="p-4">
+				<ul class="space-y-4">
+					<li>
+						<a
+							href="#top"
+							class="block py-2 text-gray-700 hover:text-accent"
+							data-nav-link
+						>
+							Home
+						</a>
+					</li>
+					<li>
+						<a
+							href="#features"
+							class="block py-2 text-gray-700 hover:text-accent"
+							data-nav-link
+						>
+							Features
+						</a>
+					</li>
+					<li>
+						<a
+							href="#tool"
+							class="block py-2 text-gray-700 hover:text-accent"
+							data-nav-link
+						>
+							Comparison Tool
+						</a>
+					</li>
+					<li>
+						<a
+							href="#about"
+							class="block py-2 text-gray-700 hover:text-accent"
+							data-nav-link
+						>
+							About
+						</a>
+					</li>
+				</ul>
+			</nav>
+			<div class="p-4 mt-8 bg-gray-50">
+				<a
+					href="#tool"
+					class="block w-full bg-accent hover:bg-primary text-white text-center px-4 py-2 rounded-md font-medium transition-colors"
+					data-nav-link
+				>
+					Start Comparing
+				</a>
+			</div>
+		</div>
+
+		<header
+			id="top"
+			class="sticky top-0 z-50 bg-white shadow-md border-b border-gray-100"
+		>
+			<div
+				class="container max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-5 flex justify-between items-center"
+			>
+				<div class="flex items-center">
+					<div class="relative mr-3 hidden md:block">
+						<div
+							class="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-full blur-sm"
+						></div>
+
+						<div class="relative">
+							<svg
+								width="36"
+								height="36"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+								class="relative z-10"
+							>
+								<path
+									d="M12 4V5M18 12H19M5 12H6M7.05 7.05L7.757 7.757M16.95 7.05L16.243 7.757"
+									stroke="#443dff"
+									stroke-width="2"
+									stroke-linecap="round"
+								/>
+								<path
+									d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
+									stroke="#443dff"
+									stroke-width="2"
+								/>
+								<path
+									d="M3 20H21"
+									stroke="#443dff"
+									stroke-width="2"
+									stroke-linecap="round"
+								/>
+							</svg>
+						</div>
+					</div>
+
+					<svg
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						class="mr-2 md:hidden"
+					>
+						<path
+							d="M12 4V5M18 12H19M5 12H6M7.05 7.05L7.757 7.757M16.95 7.05L16.243 7.757"
+							stroke="#443dff"
+							stroke-width="2"
+							stroke-linecap="round"
+						/>
+						<path
+							d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z"
+							stroke="#443dff"
+							stroke-width="2"
+						/>
+						<path
+							d="M3 20H21"
+							stroke="#443dff"
+							stroke-width="2"
+							stroke-linecap="round"
+						/>
+					</svg>
+
+					<div class="flex flex-col">
+						<span
+							class="font-bold text-lg md:text-xl text-gray-800 font-titillium group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300"
+						>
+							FontPairer
+						</span>
+						<span class="hidden md:block text-xs text-gray-500"
+							>Design with confidence</span
+						>
+					</div>
+				</div>
+
+				<button
+					id="mobile-menu-button"
+					class="md:hidden flex items-center justify-center mt-2"
+				>
+					<div class="hamburger">
+						<span class="hamburger-top"></span>
+						<span class="hamburger-middle"></span>
+						<span class="hamburger-bottom"></span>
+					</div>
+				</button>
+
+				<nav class="hidden md:flex items-center space-x-8">
+					<a
+						href="#top"
+						class="text-gray-600 hover:text-accent transition-colors relative group py-2"
+					>
+						Home
+						<span
+							class="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"
+						></span>
+					</a>
+					<a
+						href="#features"
+						class="text-gray-600 hover:text-accent transition-colors relative group py-2"
+					>
+						Features
+						<span
+							class="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"
+						></span>
+					</a>
+					<a
+						href="#tool"
+						class="text-gray-600 hover:text-accent transition-colors relative group py-2"
+					>
+						Comparison Tool
+						<span
+							class="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"
+						></span>
+					</a>
+					<a
+						href="#about"
+						class="text-gray-600 hover:text-accent transition-colors relative group py-2"
+					>
+						About
+						<span
+							class="absolute bottom-0 left-0 w-0 h-0.5 bg-accent group-hover:w-full transition-all duration-300"
+						></span>
+					</a>
+				</nav>
+
+				<a
+					href="#tool"
+					class="hidden md:block bg-accent hover:bg-primary text-white px-4 md:px-6 py-1.5 md:py-2.5 rounded-md text-sm md:text-base font-medium transition-colors shadow-sm hover:shadow-md"
+				>
+					Start Comparing
+				</a>
+			</div>
+
+			<div
+				class="hidden md:block h-1 w-full bg-gradient-to-r from-blue-500 via-purple-600 to-blue-500 opacity-75"
+			></div>
+		</header>
+
+		<div class="container max-w-7xl mx-auto px-4 md:px-8">
+			<section class="py-8 md:py-16 relative">
+				<div class="max-w-3xl mx-auto text-center mb-8 md:mb-16">
+					<h1
+						class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 text-gray-900"
+					>
+						Font & Color
+						<span
+							class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-700"
+						>
+							Comparison Tool
+						</span>
+					</h1>
+					<p class="text-lg md:text-xl text-gray-600 mb-6">
+						Create stunning and accessible design combinations with our powerful
+						comparison tool
+					</p>
+					<div class="flex flex-wrap justify-center gap-4">
+						<a
+							href="#tool"
+							class="bg-accent hover:bg-primary text-white px-6 py-2.5 rounded-md font-medium transition-colors"
+						>
+							Get Started
+						</a>
+						<a
+							href="#features"
+							class="bg-white text-gray-800 border border-gray-300 px-6 py-2.5 rounded-md font-medium hover:bg-gray-50 transition-colors"
+						>
+							Learn More
+						</a>
+					</div>
+				</div>
+
+				<div class="hidden md:block relative w-3/4 mx-auto">
+					<div
+						class="absolute -right-8 -top-12 w-24 h-24 bg-blue-500/10 rounded-full"
+					></div>
+					<div
+						class="absolute -left-10 top-1/3 w-16 h-16 bg-purple-500/10 rounded-full"
+					></div>
+
+					<img
+						src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+						alt="Designer using font comparison tool"
+						class="w-full h-auto rounded-lg shadow-xl object-cover aspect-[16/9]"
+					/>
+				</div>
+			</section>
+
+			<section id="features" class="py-16 bg-gray-50 -mx-4 px-4">
+				<div class="max-w-7xl mx-auto">
+					<h2 class="text-3xl font-bold text-center mb-12">
+						Why Use FontPairer?
+					</h2>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+						<div class="feature-card bg-white p-6 rounded-lg shadow-md">
+							<div
+								class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4"
+							>
+								<svg
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M4 7H20"
+										stroke="#3B82F6"
+										stroke-width="2"
+										stroke-linecap="round"
+									/>
+									<path
+										d="M4 12H20"
+										stroke="#3B82F6"
+										stroke-width="2"
+										stroke-linecap="round"
+									/>
+									<path
+										d="M4 17H20"
+										stroke="#3B82F6"
+										stroke-width="2"
+										stroke-linecap="round"
+									/>
+								</svg>
+							</div>
+							<h3 class="text-xl font-semibold mb-2">Typography Comparison</h3>
+							<p class="text-gray-600">
+								Compare different font combinations side by side to find the
+								perfect pairing for your projects.
+							</p>
+						</div>
+
+						<div class="feature-card bg-white p-6 rounded-lg shadow-md">
+							<div
+								class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4"
+							>
+								<svg
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M12 5V19"
+										stroke="#8B5CF6"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M5 12H19"
+										stroke="#8B5CF6"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</div>
+							<h3 class="text-xl font-semibold mb-2">Accessibility Checker</h3>
+							<p class="text-gray-600">
+								Ensure your designs meet WCAG accessibility standards with our
+								built-in contrast checker.
+							</p>
+						</div>
+
+						<div class="feature-card bg-white p-6 rounded-lg shadow-md">
+							<div
+								class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4"
+							>
+								<svg
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M8 12H16"
+										stroke="#6366F1"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M12 16V8"
+										stroke="#6366F1"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+										stroke="#6366F1"
+										stroke-width="2"
+									/>
+								</svg>
+							</div>
+							<h3 class="text-xl font-semibold mb-2">Real-time Adjustments</h3>
+							<p class="text-gray-600">
+								Make real-time adjustments to font size, weight, and colors to
+								fine-tune your design choices.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="tool" class="pt-4 pb-16">
+				<div class="max-w-7xl mx-auto">
+					<div class="controls bg-white rounded-xl p-5 mb-5 shadow-md">
+						<div class="control-group mb-5">
+							<div
+								class="flex flex-col gap-1 md:gap-1 justify-center mb-3 md:mb-4"
+							>
+								<h3
+									class="selection-title font-semibold text-gray-800 text-lg md:text-xl"
+								>
+									Font Selection
+								</h3>
+								<div
+									class="gradient-line w-24 h-1 -mt-1 rounded bg-gradient-to-r from-blue-500 to-purple-600"
+								></div>
+							</div>
+							<div class="control-row flex flex-wrap gap-4">
+								<div
+									class="relative flex-1 min-w-[150px] custom-select-wrapper"
+								>
+									<div class="custom-select" id="customSelect1">
+										<div class="custom-select__trigger">
+											<span id="selectedFont1">Poppins</span>
+											<div class="arrow"></div>
+										</div>
+										<div class="custom-options">
+											<span class="custom-option selected" data-value="Poppins"
+												>Poppins</span
+											>
+											<span class="custom-option" data-value="Playfair Display"
+												>Playfair Display</span
+											>
+											<span class="custom-option" data-value="Roboto"
+												>Roboto</span
+											>
+											<span class="custom-option" data-value="Open Sans"
+												>Open Sans</span
+											>
+											<span class="custom-option" data-value="Montserrat"
+												>Montserrat</span
+											>
+											<span class="custom-option" data-value="Lato">Lato</span>
+											<span class="custom-option" data-value="Merriweather"
+												>Merriweather</span
+											>
+										</div>
+									</div>
+									<select id="font1" class="hidden">
+										<option value="Poppins">Poppins</option>
+										<option value="Playfair Display">Playfair Display</option>
+										<option value="Roboto">Roboto</option>
+										<option value="Open Sans">Open Sans</option>
+										<option value="Montserrat">Montserrat</option>
+										<option value="Lato">Lato</option>
+										<option value="Merriweather">Merriweather</option>
+									</select>
+								</div>
+								<div
+									class="relative flex-1 min-w-[150px] custom-select-wrapper"
+								>
+									<div class="custom-select" id="customSelect2">
+										<div class="custom-select__trigger">
+											<span id="selectedFont2">Montserrat</span>
+											<div class="arrow"></div>
+										</div>
+										<div class="custom-options">
+											<span class="custom-option" data-value="Poppins"
+												>Poppins</span
+											>
+											<span class="custom-option" data-value="Playfair Display"
+												>Playfair Display</span
+											>
+											<span class="custom-option" data-value="Roboto"
+												>Roboto</span
+											>
+											<span class="custom-option" data-value="Open Sans"
+												>Open Sans</span
+											>
+											<span
+												class="custom-option selected"
+												data-value="Montserrat"
+												>Montserrat</span
+											>
+											<span class="custom-option" data-value="Lato">Lato</span>
+											<span class="custom-option" data-value="Merriweather"
+												>Merriweather</span
+											>
+										</div>
+									</div>
+									<select id="font2" class="hidden">
+										<option value="Montserrat">Montserrat</option>
+										<option value="Poppins">Poppins</option>
+										<option value="Playfair Display">Playfair Display</option>
+										<option value="Roboto">Roboto</option>
+										<option value="Open Sans">Open Sans</option>
+										<option value="Lato">Lato</option>
+										<option value="Merriweather">Merriweather</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<hr class="my-6 bg-gray-200 h-[0.5px] w-full mx-auto" />
+
+						<div class="control-group mb-5">
+							<div
+								class="flex flex-col gap-1 md:gap-1 justify-center mb-3 md:mb-4"
+							>
+								<h3
+									class="selection-title font-semibold text-gray-800 text-lg md:text-xl"
+								>
+									Colors
+								</h3>
+								<div
+									class="gradient-line w-24 h-1 -mt-1 rounded bg-gradient-to-r from-blue-500 to-purple-600"
+								></div>
+							</div>
+							<div class="control-row flex flex-wrap gap-4">
+								<div
+									class="color-input-wrapper flex items-center gap-2.5 flex-1 min-w-[150px]"
+								>
+									<input
+										type="color"
+										id="textColor"
+										value="#333333"
+										class="w-[50px] h-[40px] border-0 rounded-lg cursor-pointer"
+									/>
+									<span class="font-medium">
+										Text:
+										<span
+											class="color-hex font-mono text-sm text-gray-600"
+											id="textColorHex"
+											>#333333</span
+										>
+									</span>
+								</div>
+								<div
+									class="color-input-wrapper flex items-center gap-2.5 flex-1 min-w-[150px]"
+								>
+									<input
+										type="color"
+										id="bgColor"
+										value="#ffffff"
+										class="w-[50px] h-[40px] border-0 rounded-lg cursor-pointer"
+									/>
+									<span class="font-medium">
+										Background:
+										<span
+											class="color-hex font-mono text-sm text-gray-600"
+											id="bgColorHex"
+											>#ffffff</span
+										>
+									</span>
+								</div>
+							</div>
+							<div class="contrast-tips mt-2" id="contrastTips"></div>
+						</div>
+
+						<hr class="my-6 bg-gray-200 h-[0.5px] w-full mx-auto" />
+
+						<div class="control-group mb-5">
+							<div
+								class="flex flex-col gap-1 md:gap-1 justify-center mb-3 md:mb-4"
+							>
+								<h3
+									class="selection-title font-semibold text-gray-800 text-lg md:text-xl"
+								>
+									Typography Settings
+								</h3>
+								<div
+									class="gradient-line w-24 h-1 -mt-1 rounded bg-gradient-to-r from-blue-500 to-purple-600"
+								></div>
+							</div>
+							<div class="control-row flex flex-wrap gap-4">
+								<div class="slider-group flex-1 min-w-[200px]">
+									<div class="slider-label flex justify-between mb-1.5 text-sm">
+										<span class="font-medium">Font Size</span>
+										<span id="fontSizeValue">16px</span>
+									</div>
+									<input
+										class="w-full h-1.5 bg-gray-200 rounded-md appearance-none cursor-pointer accent-purple-500"
+										type="range"
+										id="fontSize"
+										min="12"
+										max="48"
+										value="16"
+									/>
+								</div>
+								<div class="slider-group flex-1 min-w-[200px]">
+									<div class="slider-label flex justify-between mb-1.5 text-sm">
+										<span class="font-medium">Font Weight</span>
+										<span id="fontWeightValue">400</span>
+									</div>
+									<input
+										class="w-full h-1.5 bg-gray-200 rounded-md appearance-none cursor-pointer accent-blue-500"
+										type="range"
+										id="fontWeight"
+										min="300"
+										max="900"
+										step="100"
+										value="400"
+									/>
+								</div>
+							</div>
+							<div
+								class="mt-5 flex items-center justify-center gap-4 mb-5 button-group"
+							>
+								<button
+									class="toggle-button active px-5 py-2 border-0 rounded-lg font-medium cursor-pointer transition-all"
+									id="paragraphToggle"
+								>
+									Paragraph
+								</button>
+								<button
+									class="toggle-button px-5 py-2 border-0 rounded-lg font-medium cursor-pointer transition-all"
+									id="headlineToggle"
+								>
+									Headline
+								</button>
+							</div>
+						</div>
+
+						<div class="flex items-center gap-3 justify-end">
+							<div
+								class="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full text-xs md:text-sm transition-colors duration-300 bg-gray-100 hover:bg-gray-200 text-gray-800"
+								id="saveComparison"
+							>
+								<svg
+									id="saveIcon"
+									width="18px"
+									height="18px"
+									stroke-width="1.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+									color="#5368ee"
+								>
+									<path
+										d="M3 19V5C3 3.89543 3.89543 3 5 3H16.1716C16.702 3 17.2107 3.21071 17.5858 3.58579L20.4142 6.41421C20.7893 6.78929 21 7.29799 21 7.82843V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19Z"
+										stroke="#5368ee"
+										stroke-width="1.5"
+									></path>
+									<path
+										d="M8.6 9H15.4C15.7314 9 16 8.73137 16 8.4V3.6C16 3.26863 15.7314 3 15.4 3H8.6C8.26863 3 8 3.26863 8 3.6V8.4C8 8.73137 8.26863 9 8.6 9Z"
+										stroke="#5368ee"
+										stroke-width="1.5"
+									></path>
+									<path
+										d="M6 13.6V21H18V13.6C18 13.2686 17.7314 13 17.4 13H6.6C6.26863 13 6 13.2686 6 13.6Z"
+										stroke="#5368ee"
+										stroke-width="1.5"
+									></path>
+								</svg>
+								<span id="saveButtonText">Save Comparison</span>
+							</div>
+							<div
+								class="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-full text-xs md:text-sm transition-colors duration-300 bg-gray-100 hover:bg-gray-200 text-gray-800"
+								id="resetDefaults"
+							>
+								<svg
+									id="resetIcon"
+									width="18px"
+									height="18px"
+									stroke-width="1.5"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+									color="#5368ee"
+								>
+									<path
+										d="M6.67742 20.5673C2.53141 18.0212 0.758026 12.7584 2.71678 8.1439C4.87472 3.0601 10.7453 0.68822 15.8291 2.84617C20.9129 5.00412 23.2848 10.8747 21.1269 15.9585C20.2837 17.945 18.8736 19.5174 17.1651 20.5673"
+										stroke="#5368ee"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M17 16V20.4C17 20.7314 17.2686 21 17.6 21H22"
+										stroke="#5368ee"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M12 22.01L12.01 21.9989"
+										stroke="#5368ee"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+								</svg>
+								<span>Reset Defaults</span>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="comparison-panels grid grid-cols-1 md:grid-cols-2 gap-5 mb-7"
+					>
+						<div class="panel bg-white rounded-xl p-7 shadow-md" id="panel1">
+							<div class="panel-header flex justify-between items-center mb-5">
+								<span
+									class="font-name text-lg font-semibold text-gray-800"
+									id="fontName1"
+									>Poppins</span
+								>
+								<span
+									class="contrast-badge px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"
+									id="contrastBadge1"
+								>
+									<span class="contrast-ratio">21:1</span>
+								</span>
+							</div>
+							<div
+								class="sample-text transition-all duration-300"
+								id="sampleText1"
+							>
+								<p class="paragraph-text leading-relaxed">
+									The quick brown fox jumps over the lazy dog. This pangram
+									contains all letters of the alphabet, making it perfect for
+									displaying font characteristics. Notice how the letterforms,
+									spacing, and overall rhythm create a unique reading
+									experience.
+								</p>
+							</div>
+						</div>
+
+						<div class="panel bg-white rounded-xl p-7 shadow-md" id="panel2">
+							<div class="panel-header flex justify-between items-center mb-5">
+								<span
+									class="font-name text-lg font-semibold text-gray-800"
+									id="fontName2"
+									>Montserrat</span
+								>
+								<span
+									class="contrast-badge px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5"
+									id="contrastBadge2"
+								>
+									<span class="contrast-ratio">21:1</span>
+								</span>
+							</div>
+							<div
+								class="sample-text transition-all duration-300"
+								id="sampleText2"
+							>
+								<p class="paragraph-text leading-relaxed">
+									The quick brown fox jumps over the lazy dog. This pangram
+									contains all letters of the alphabet, making it perfect for
+									displaying font characteristics. Notice how the letterforms,
+									spacing, and overall rhythm create a unique reading
+									experience.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="accessibility-info mt-5 py-4 px-4 bg-gradient-to-r from-blue-500/20 to-purple-600/15 rounded-lg text-sm text-customText mb-5"
+					>
+						<strong>WCAG Contrast Guidelines:</strong>
+						AA Normal Text: 4.5:1 | AA Large Text: 3:1 | AAA Normal Text: 7:1 |
+						AAA Large Text: 4.5:1
+					</div>
+
+					<div class="history bg-white rounded-xl p-5 shadow-md">
+						<h2 class="font-semibold text-xl mb-4 text-gray-800">
+							Recent Comparisons
+						</h2>
+						<div class="history-items grid gap-2.5" id="historyItems">
+							<div class="no-history">No saved comparisons yet</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="about" class="pb-16">
+				<div
+					class="max-w-7xl mx-auto rounded-2xl bg-gradient-to-r from-blue-50 to-purple-50 p-8 shadow-lg"
+				>
+					<h2 class="text-3xl font-bold text-center mb-8">About FontPairer</h2>
+					<div class="max-w-3xl mx-auto text-center">
+						<p class="text-gray-600 mb-6">
+							FontPairer was created to help designers, developers, and content
+							creators make better typography decisions. Our tool simplifies the
+							process of finding perfect font combinations while ensuring
+							accessibility standards are met.
+						</p>
+						<p class="text-gray-600 mb-6">
+							Whether you're designing a website, creating marketing materials,
+							or working on any visual project, FontPairer helps you compare
+							fonts side by side and check contrast ratios for better
+							readability.
+						</p>
+						<div class="flex justify-center mt-8">
+							<a
+								href="#tool"
+								class="bg-accent hover:bg-primary text-white px-6 py-2.5 rounded-md font-medium transition-colors"
+								>Try it Now</a
+							>
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+
+		<footer class="bg-white border-t border-gray-200 py-10">
+			<div class="container max-w-7xl mx-auto px-4">
+				<div class="flex flex-wrap justify-between footer-content">
+					<div class="footer-main">
+						<div class="flex items-center mb-4 justify-center md:justify-start">
+							<div
+								class="w-8 h-8 rounded-md bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center text-white mr-2"
+							>
+								<svg
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M4 7H20M4 12H20M4 17H14"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+									/>
+								</svg>
+							</div>
+							<span class="font-bold text-gray-800 text-lg">FontPairer</span>
+						</div>
+						<p class="text-gray-600 mb-4 text-center md:text-left">
+							A powerful tool to help designers find perfect font combinations
+							and ensure accessibility standards are met.
+						</p>
+						<div class="flex space-x-4 justify-center md:justify-start">
+							<a
+								href="#"
+								class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+							>
+								<svg
+									width="16"
+									height="16"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+							>
+								<svg
+									width="16"
+									height="16"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-600 transition-colors"
+							>
+								<svg
+									width="16"
+									height="16"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+									/>
+								</svg>
+							</a>
+						</div>
+					</div>
+
+					<div class="text-center md:text-left">
+						<h3 class="text-lg font-semibold mb-4 text-gray-800">Resources</h3>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#"
+									data-modal="userGuideModal"
+									class="text-gray-600 hover:text-blue-600 transition-colors modal-trigger"
+									>User Guide</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									data-modal="fontBasicsModal"
+									class="text-gray-600 hover:text-blue-600 transition-colors modal-trigger"
+									>Font Basics</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									data-modal="accessibilityModal"
+									class="text-gray-600 hover:text-blue-600 transition-colors modal-trigger"
+									>Accessibility</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									data-modal="designTipsModal"
+									class="text-gray-600 hover:text-blue-600 transition-colors modal-trigger"
+									>Design Tips</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div class="text-center md:text-left">
+						<h3 class="text-lg font-semibold mb-4 text-gray-800">Company</h3>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#about"
+									class="text-gray-600 hover:text-blue-600 transition-colors"
+									>About</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									data-modal="contactModal"
+									class="text-gray-600 hover:text-blue-600 transition-colors modal-trigger"
+									>Contact</a
+								>
+							</li>
+
+							<li>
+								<a
+									href="#"
+									data-modal="supportModal"
+									class="text-gray-600 hover:text-blue-600 transition-colors modal-trigger"
+									>Support</a
+								>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div class="mt-10 pt-6 border-t border-gray-100">
+					<div class="flex flex-col md:flex-row justify-between items-center">
+						<p class="text-gray-500 text-sm mb-4 md:mb-0">
+							<span id="current-year"></span> Design Tools. Comparing in hands.
+						</p>
+						<div class="flex items-center text-sm text-gray-500">
+							<a
+								href="#"
+								data-modal="privacyModal"
+								class="hover:text-gray-700 transition-colors modal-trigger"
+								>Privacy</a
+							>
+							<span class="mx-2">•</span>
+							<a
+								href="#"
+								data-modal="termsModal"
+								class="hover:text-gray-700 transition-colors modal-trigger"
+								>Terms</a
+							>
+							<span class="mx-2">•</span>
+							<a
+								href="#"
+								data-modal="cookiesModal"
+								class="hover:text-gray-700 transition-colors modal-trigger"
+								>Cookies</a
+							>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<div class="modal" id="userGuideModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">User Guide</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<h4 class="font-semibold text-lg mb-3">
+						Getting Started with FontPairer
+					</h4>
+					<p class="mb-4">
+						Welcome to FontPairer! This guide will help you make the most of our
+						font comparison tool.
+					</p>
+
+					<h5 class="font-semibold mb-2">Step 1: Select Your Fonts</h5>
+					<p class="mb-3">
+						Choose two fonts from our dropdown menus to compare side by side.
+					</p>
+
+					<h5 class="font-semibold mb-2">Step 2: Customize Colors</h5>
+					<p class="mb-3">
+						Adjust text and background colors to see how they work together.
+					</p>
+
+					<h5 class="font-semibold mb-2">Step 3: Fine-tune Typography</h5>
+					<p class="mb-3">
+						Modify font size and weight to see different variations.
+					</p>
+
+					<h5 class="font-semibold mb-2">Step 4: Check Accessibility</h5>
+					<p class="mb-3">
+						Use our contrast ratio indicators to ensure your design meets
+						accessibility standards.
+					</p>
+
+					<h5 class="font-semibold mb-2">Step 5: Save Your Combinations</h5>
+					<p>
+						Click "Save Comparison" to store your favorite combinations for
+						future reference.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="fontBasicsModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Font Basics</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<h4 class="font-semibold text-lg mb-3">
+						Understanding Typography Fundamentals
+					</h4>
+					<p class="mb-4">
+						Typography is the art and technique of arranging type to make
+						written language legible, readable, and appealing.
+					</p>
+
+					<h5 class="font-semibold mb-2">Font Types</h5>
+					<p class="mb-3">
+						Learn about serif, sans-serif, monospace, and decorative fonts and
+						their best uses.
+					</p>
+
+					<h5 class="font-semibold mb-2">Font Pairing Principles</h5>
+					<p class="mb-3">
+						Discover complementary font combinations that create visual
+						hierarchy and harmony.
+					</p>
+
+					<h5 class="font-semibold mb-2">Typography Terminology</h5>
+					<p>
+						Understand terms like kerning, leading, tracking, and x-height to
+						better communicate about typography.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="accessibilityModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Accessibility</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<h4 class="font-semibold text-lg mb-3">
+						Making Typography Accessible
+					</h4>
+					<p class="mb-4">
+						Accessible design ensures content can be perceived, understood, and
+						navigated by all users, including those with disabilities.
+					</p>
+
+					<h5 class="font-semibold mb-2">WCAG Guidelines</h5>
+					<p class="mb-3">
+						Learn about Web Content Accessibility Guidelines and their
+						importance for typography.
+					</p>
+
+					<h5 class="font-semibold mb-2">Contrast Requirements</h5>
+					<p class="mb-3">
+						Understand the minimum contrast ratios needed for different text
+						sizes and accessibility levels.
+					</p>
+
+					<h5 class="font-semibold mb-2">Font Selection for Readability</h5>
+					<p>
+						Discover which fonts work best for users with reading difficulties
+						or visual impairments.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="designTipsModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Design Tips</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<h4 class="font-semibold text-lg mb-3">
+						Typography Design Best Practices
+					</h4>
+					<p class="mb-4">
+						Effective typography enhances readability and communicates your
+						message more effectively.
+					</p>
+
+					<h5 class="font-semibold mb-2">Visual Hierarchy</h5>
+					<p class="mb-3">
+						Learn how to guide users through content using font size, weight,
+						and spacing.
+					</p>
+
+					<h5 class="font-semibold mb-2">Consistent Typography Systems</h5>
+					<p class="mb-3">
+						Discover how to create cohesive typography that strengthens your
+						brand identity.
+					</p>
+
+					<h5 class="font-semibold mb-2">Mobile-Friendly Typography</h5>
+					<p>
+						Ensure your typography works well across all device sizes and screen
+						resolutions.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="contactModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Contact Us</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-4">
+						We'd love to hear from you! Whether you have questions, feedback, or
+						suggestions, our team is ready to help.
+					</p>
+
+					<form class="space-y-4">
+						<div>
+							<label
+								for="name"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Your Name</label
+							>
+							<input
+								type="text"
+								id="name"
+								name="name"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md"
+							/>
+						</div>
+						<div>
+							<label
+								for="email"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Email Address</label
+							>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md"
+							/>
+						</div>
+						<div>
+							<label
+								for="message"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Message</label
+							>
+							<textarea
+								id="message"
+								name="message"
+								rows="4"
+								class="w-full px-3 py-2 border border-gray-300 rounded-md"
+							></textarea>
+						</div>
+						<button
+							type="submit"
+							class="w-full bg-accent hover:bg-primary text-white py-2 rounded-md transition-colors"
+						>
+							Send Message
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="supportModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Support</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<h4 class="font-semibold text-lg mb-3">Help and Support Center</h4>
+					<p class="mb-4">
+						Find answers to common questions and get help with any issues you
+						might encounter.
+					</p>
+
+					<h5 class="font-semibold mb-2">Frequently Asked Questions</h5>
+					<p class="mb-3">
+						Browse our collection of frequently asked questions for quick
+						solutions to common issues.
+					</p>
+
+					<h5 class="font-semibold mb-2">Technical Support</h5>
+					<p class="mb-3">
+						If you're experiencing technical difficulties, our support team is
+						here to help.
+					</p>
+
+					<h5 class="font-semibold mb-2">Feature Requests</h5>
+					<p>
+						Have ideas for improving FontPairer? We'd love to hear your
+						suggestions!
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="privacyModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Privacy Policy</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-4">
+						This Privacy Policy explains how we collect, use, and protect your
+						personal information when you use our website.
+					</p>
+
+					<h5 class="font-semibold mb-2">Information Collection</h5>
+					<p class="mb-3">
+						We collect information you provide directly to us, as well as data
+						about how you use our website.
+					</p>
+
+					<h5 class="font-semibold mb-2">Data Usage</h5>
+					<p class="mb-3">
+						We use your information to provide and improve our services,
+						communicate with you, and ensure a better user experience.
+					</p>
+
+					<h5 class="font-semibold mb-2">Data Protection</h5>
+					<p>
+						We implement appropriate security measures to protect your personal
+						information from unauthorized access or disclosure.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="termsModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Terms of Service</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-4">
+						These Terms of Service govern your use of FontPairer and its related
+						services.
+					</p>
+
+					<h5 class="font-semibold mb-2">Acceptable Use</h5>
+					<p class="mb-3">
+						You agree to use our services only for lawful purposes and in
+						accordance with these Terms.
+					</p>
+
+					<h5 class="font-semibold mb-2">Limitation of Liability</h5>
+					<p>
+						We are not liable for any damages arising from your use or inability
+						to use our services.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal" id="cookiesModal">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h3 class="text-xl font-bold">Cookie Policy</h3>
+					<button class="modal-close">&times;</button>
+				</div>
+				<div class="modal-body">
+					<p class="mb-4">
+						This Cookie Policy explains how we use cookies and similar
+						technologies on our website.
+					</p>
+
+					<h5 class="font-semibold mb-2">What Are Cookies?</h5>
+					<p class="mb-3">
+						Cookies are small text files stored on your device that help us
+						improve your experience on our website.
+					</p>
+
+					<h5 class="font-semibold mb-2">How We Use Cookies</h5>
+					<p class="mb-3">
+						We use cookies to remember your preferences, analyze website
+						traffic, and personalize content.
+					</p>
+
+					<h5 class="font-semibold mb-2">Managing Cookies</h5>
+					<p>
+						You can control and manage cookies through your browser settings,
+						though this may affect your experience on our site.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const mobileMenuButton = document.getElementById("mobile-menu-button");
+			const closeSidebarButton = document.getElementById("close-sidebar");
+			const mobileSidebar = document.getElementById("mobile-sidebar");
+			const sidebarOverlay = document.getElementById("sidebar-overlay");
+			const navLinks = document.querySelectorAll("[data-nav-link]");
+
+			function toggleSidebar() {
+				mobileSidebar.classList.toggle("open");
+				sidebarOverlay.classList.toggle("active");
+				mobileMenuButton.classList.toggle("open");
+				document.body.classList.toggle("overflow-hidden");
+			}
+
+			mobileMenuButton.addEventListener("click", toggleSidebar);
+			closeSidebarButton.addEventListener("click", toggleSidebar);
+			sidebarOverlay.addEventListener("click", toggleSidebar);
+
+			navLinks.forEach((link) => {
+				link.addEventListener("click", () => {
+					mobileSidebar.classList.remove("open");
+					sidebarOverlay.classList.remove("active");
+					mobileMenuButton.classList.remove("open");
+					document.body.classList.remove("overflow-hidden");
+				});
+			});
+
+			document
+				.querySelectorAll(".custom-select-wrapper")
+				.forEach((selectWrapper) => {
+					const selectTrigger = selectWrapper.querySelector(
+						".custom-select__trigger"
+					);
+					const customSelect = selectWrapper.querySelector(".custom-select");
+					const options = selectWrapper.querySelectorAll(".custom-option");
+					const hiddenSelect = selectWrapper.querySelector("select");
+					const selectedValue = selectWrapper.querySelector(
+						".custom-select__trigger span"
+					);
+
+					selectTrigger.addEventListener("click", () => {
+						customSelect.classList.toggle("open");
+					});
+
+					document.addEventListener("click", (e) => {
+						if (!selectWrapper.contains(e.target)) {
+							customSelect.classList.remove("open");
+						}
+					});
+
+					options.forEach((option) => {
+						option.addEventListener("click", () => {
+							selectedValue.textContent = option.textContent;
+							hiddenSelect.value = option.getAttribute("data-value");
+
+							options.forEach((opt) => opt.classList.remove("selected"));
+							option.classList.add("selected");
+
+							customSelect.classList.remove("open");
+
+							const event = new Event("change");
+							hiddenSelect.dispatchEvent(event);
+						});
+					});
+				});
+
+			const font1Select = document.getElementById("font1");
+			const font2Select = document.getElementById("font2");
+			const customSelect1 = document.getElementById("customSelect1");
+			const customSelect2 = document.getElementById("customSelect2");
+			const selectedFont1 = document.getElementById("selectedFont1");
+			const selectedFont2 = document.getElementById("selectedFont2");
+
+			const textColorInput = document.getElementById("textColor");
+			const bgColorInput = document.getElementById("bgColor");
+			const fontSizeSlider = document.getElementById("fontSize");
+			const fontWeightSlider = document.getElementById("fontWeight");
+			const paragraphToggle = document.getElementById("paragraphToggle");
+			const headlineToggle = document.getElementById("headlineToggle");
+			const saveButton = document.getElementById("saveComparison");
+			const saveButtonText = document.getElementById("saveButtonText");
+			const saveIcon = document.getElementById("saveIcon");
+			const resetButton = document.getElementById("resetDefaults");
+			const resetIcon = document.getElementById("resetIcon");
+			const historyContainer = document.getElementById("historyItems");
+			const contrastTips = document.getElementById("contrastTips");
+
+			document.getElementById("current-year").textContent =
+				new Date().getFullYear();
+
+			const paragraphText =
+				"The quick brown fox jumps over the lazy dog. This pangram contains all letters of the alphabet, making it perfect for displaying font characteristics. Notice how the letterforms, spacing, and overall rhythm create a unique reading experience.";
+			const headlineText = "Design is Intelligence Made Visible";
+
+			let currentTextType = "paragraph";
+
+			function getContrastRatio(color1, color2) {
+				const rgb1 = hexToRgb(color1);
+				const rgb2 = hexToRgb(color2);
+
+				const l1 = getLuminance(rgb1);
+				const l2 = getLuminance(rgb2);
+
+				const lighter = Math.max(l1, l2);
+				const darker = Math.min(l1, l2);
+
+				return (lighter + 0.05) / (darker + 0.05);
+			}
+
+			function hexToRgb(hex) {
+				const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+				return result
+					? {
+							r: parseInt(result[1], 16),
+							g: parseInt(result[2], 16),
+							b: parseInt(result[3], 16),
+					  }
+					: null;
+			}
+
+			function getLuminance(rgb) {
+				const rsRGB = rgb.r / 255;
+				const gsRGB = rgb.g / 255;
+				const bsRGB = rgb.b / 255;
+
+				const r =
+					rsRGB <= 0.03928
+						? rsRGB / 12.92
+						: Math.pow((rsRGB + 0.055) / 1.055, 2.4);
+				const g =
+					gsRGB <= 0.03928
+						? gsRGB / 12.92
+						: Math.pow((gsRGB + 0.055) / 1.055, 2.4);
+				const b =
+					bsRGB <= 0.03928
+						? bsRGB / 12.92
+						: Math.pow((bsRGB + 0.055) / 1.055, 2.4);
+
+				return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+			}
+
+			function updateContrastBadges() {
+				const ratio = getContrastRatio(
+					textColorInput.value,
+					bgColorInput.value
+				);
+				const badges = [
+					document.getElementById("contrastBadge1"),
+					document.getElementById("contrastBadge2"),
+				];
+				const fontSize = parseInt(fontSizeSlider.value);
+				const isLargeText = fontSize >= 18;
+
+				badges.forEach((badge) => {
+					badge.querySelector(".contrast-ratio").textContent = `${ratio.toFixed(
+						1
+					)}:1`;
+
+					badge.classList.remove(
+						"contrast-pass",
+						"contrast-warning",
+						"contrast-fail"
+					);
+
+					if (ratio >= 7 || (isLargeText && ratio >= 4.5)) {
+						badge.classList.add("contrast-pass");
+					} else if (ratio >= 4.5 || (isLargeText && ratio >= 3)) {
+						badge.classList.add("contrast-warning");
+					} else {
+						badge.classList.add("contrast-fail");
+					}
+				});
+
+				contrastTips.classList.remove("show", "warning", "fail");
+
+				if (ratio < 4.5 && !isLargeText) {
+					contrastTips.classList.add("show", ratio < 3 ? "fail" : "warning");
+
+					if (ratio < 3) {
+						contrastTips.innerHTML =
+							"<strong>Poor contrast ratio:</strong> This combination fails WCAG AA standards. Try increasing the contrast between text and background colors. Consider using darker text on light backgrounds or lighter text on dark backgrounds.";
+					} else {
+						contrastTips.innerHTML =
+							"<strong>Moderate contrast concern:</strong> This combination meets WCAG AA standards for large text only. For normal text, consider increasing the contrast for better readability.";
+					}
+				}
+			}
+
+			function updatePanels() {
+				const panel1 = document.getElementById("panel1");
+				const panel2 = document.getElementById("panel2");
+				const fontSize = fontSizeSlider.value + "px";
+				const fontWeight = fontWeightSlider.value;
+				const textColor = textColorInput.value;
+				const bgColor = bgColorInput.value;
+
+				document.getElementById("fontName1").textContent = font1Select.value;
+				document.getElementById("fontName2").textContent = font2Select.value;
+
+				[panel1, panel2].forEach((panel, index) => {
+					const font = index === 0 ? font1Select.value : font2Select.value;
+					panel.style.backgroundColor = bgColor;
+					panel.style.color = textColor;
+
+					const sampleText = panel.querySelector(".sample-text");
+					sampleText.style.fontFamily = `'${font}', sans-serif`;
+					sampleText.style.fontSize = fontSize;
+					sampleText.style.fontWeight = fontWeight;
+				});
+
+				updateContrastBadges();
+
+				document.getElementById("textColorHex").textContent =
+					textColorInput.value;
+				document.getElementById("bgColorHex").textContent = bgColorInput.value;
+			}
+
+			function updateTextContent() {
+				const text =
+					currentTextType === "paragraph"
+						? `<p class="paragraph-text leading-relaxed">${paragraphText}</p>`
+						: `<h2 class="headline-text leading-tight mb-4">${headlineText}</h2>`;
+
+				document.getElementById("sampleText1").innerHTML = text;
+				document.getElementById("sampleText2").innerHTML = text;
+
+				updatePanels();
+			}
+
+			function saveComparison() {
+				const comparison = {
+					font1: font1Select.value,
+					font2: font2Select.value,
+					textColor: textColorInput.value,
+					bgColor: bgColorInput.value,
+					fontSize: fontSizeSlider.value,
+					fontWeight: fontWeightSlider.value,
+					textType: currentTextType,
+					timestamp: new Date().toISOString(),
+				};
+
+				let history = JSON.parse(
+					localStorage.getItem("fontComparisonHistory") || "[]"
+				);
+				history.unshift(comparison);
+				history = history.slice(0, 4);
+				localStorage.setItem("fontComparisonHistory", JSON.stringify(history));
+
+				loadHistory();
+
+				saveButtonText.textContent = "Saved Comparison!";
+				saveIcon.classList.add("pulse");
+				setTimeout(() => {
+					saveButtonText.textContent = "Save Comparison";
+					saveIcon.classList.remove("pulse");
+				}, 2000);
+			}
+
+			function loadHistory() {
+				const history = JSON.parse(
+					localStorage.getItem("fontComparisonHistory") || "[]"
+				);
+
+				if (history.length === 0) {
+					historyContainer.innerHTML =
+						'<div class="no-history">No saved comparisons yet</div>';
+					return;
+				}
+
+				historyContainer.innerHTML = history
+					.map((item, index) => {
+						const date = new Date(item.timestamp);
+						const dateStr =
+							date.toLocaleDateString() +
+							" " +
+							date.toLocaleTimeString([], {
+								hour: "2-digit",
+								minute: "2-digit",
+							});
+
+						return `
+                        <div class="history-item" data-index="${index}">
+                            <div class="history-item-fonts">${item.font1} vs ${item.font2}</div>
+                            <div class="history-item-details">
+                                ${item.fontSize}px • ${item.fontWeight} weight • ${item.textType} • ${dateStr}
+                            </div>
+                            <div style="color: ${item.textColor}; background: ${item.bgColor}; border: 1px solid ${item.textColor};" class="history-item-details colors"> Colors </div>
+                            <div class="delete-comparison" data-index="${index}">
+                                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#e74c3c">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                        </div>
+                        `;
+					})
+					.join("");
+
+				document.querySelectorAll(".history-item").forEach((item) => {
+					item.addEventListener("click", (e) => {
+						if (!e.target.closest(".delete-comparison")) {
+							const index = parseInt(item.dataset.index);
+							loadComparison(history[index]);
+						}
+					});
+				});
+
+				document.querySelectorAll(".delete-comparison").forEach((button) => {
+					button.addEventListener("click", (e) => {
+						e.stopPropagation();
+						const index = parseInt(button.dataset.index);
+						deleteComparison(index);
+					});
+				});
+			}
+
+			function deleteComparison(index) {
+				let history = JSON.parse(
+					localStorage.getItem("fontComparisonHistory") || "[]"
+				);
+				history.splice(index, 1);
+				localStorage.setItem("fontComparisonHistory", JSON.stringify(history));
+				loadHistory();
+			}
+
+			function loadComparison(comparison) {
+				font1Select.value = comparison.font1;
+				font2Select.value = comparison.font2;
+				selectedFont1.textContent = comparison.font1;
+				selectedFont2.textContent = comparison.font2;
+
+				document
+					.querySelectorAll("#customSelect1 .custom-option")
+					.forEach((opt) => {
+						opt.classList.toggle(
+							"selected",
+							opt.getAttribute("data-value") === comparison.font1
+						);
+					});
+				document
+					.querySelectorAll("#customSelect2 .custom-option")
+					.forEach((opt) => {
+						opt.classList.toggle(
+							"selected",
+							opt.getAttribute("data-value") === comparison.font2
+						);
+					});
+
+				textColorInput.value = comparison.textColor;
+				bgColorInput.value = comparison.bgColor;
+				fontSizeSlider.value = comparison.fontSize;
+				fontWeightSlider.value = comparison.fontWeight;
+
+				currentTextType = comparison.textType;
+				if (currentTextType === "paragraph") {
+					paragraphToggle.classList.add("active");
+					headlineToggle.classList.remove("active");
+				} else {
+					headlineToggle.classList.add("active");
+					paragraphToggle.classList.remove("active");
+				}
+
+				updateSliderValues();
+				updateTextContent();
+			}
+
+			function resetDefaults() {
+				font1Select.value = "Poppins";
+				font2Select.value = "Montserrat";
+				selectedFont1.textContent = "Poppins";
+				selectedFont2.textContent = "Montserrat";
+
+				document
+					.querySelectorAll("#customSelect1 .custom-option")
+					.forEach((opt) => {
+						opt.classList.toggle(
+							"selected",
+							opt.getAttribute("data-value") === "Poppins"
+						);
+					});
+				document
+					.querySelectorAll("#customSelect2 .custom-option")
+					.forEach((opt) => {
+						opt.classList.toggle(
+							"selected",
+							opt.getAttribute("data-value") === "Montserrat"
+						);
+					});
+
+				textColorInput.value = "#333333";
+				bgColorInput.value = "#ffffff";
+				fontSizeSlider.value = "16";
+				fontWeightSlider.value = "400";
+				currentTextType = "paragraph";
+				paragraphToggle.classList.add("active");
+				headlineToggle.classList.remove("active");
+
+				updateSliderValues();
+				updateTextContent();
+
+				resetIcon.classList.add("spin-once");
+
+				resetIcon.addEventListener(
+					"animationend",
+					() => {
+						resetIcon.classList.remove("spin-once");
+					},
+					{ once: true }
+				);
+			}
+
+			function updateSliderValues() {
+				document.getElementById("fontSizeValue").textContent =
+					fontSizeSlider.value + "px";
+				document.getElementById("fontWeightValue").textContent =
+					fontWeightSlider.value;
+			}
+
+			document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+				anchor.addEventListener("click", function (e) {
+					e.preventDefault();
+
+					const target = document.querySelector(this.getAttribute("href"));
+					if (target) {
+						window.scrollTo({
+							top: target.offsetTop - 80,
+							behavior: "smooth",
+						});
+					}
+				});
+			});
+
+			const modalTriggers = document.querySelectorAll(".modal-trigger");
+			const modals = document.querySelectorAll(".modal");
+			const modalCloseButtons = document.querySelectorAll(".modal-close");
+
+			modalTriggers.forEach((trigger) => {
+				trigger.addEventListener("click", (e) => {
+					e.preventDefault();
+					const modalId = trigger.getAttribute("data-modal");
+					const modal = document.getElementById(modalId);
+
+					if (modal) {
+						modal.classList.add("active");
+						document.body.style.overflow = "hidden";
+					}
+				});
+			});
+
+			modalCloseButtons.forEach((button) => {
+				button.addEventListener("click", () => {
+					const modal = button.closest(".modal");
+					modal.classList.remove("active");
+					document.body.style.overflow = "";
+				});
+			});
+
+			modals.forEach((modal) => {
+				modal.addEventListener("click", (e) => {
+					if (e.target === modal) {
+						modal.classList.remove("active");
+						document.body.style.overflow = "";
+					}
+				});
+			});
+
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape") {
+					modals.forEach((modal) => {
+						if (modal.classList.contains("active")) {
+							modal.classList.remove("active");
+							document.body.style.overflow = "";
+						}
+					});
+				}
+			});
+
+			font1Select.addEventListener("change", updatePanels);
+			font2Select.addEventListener("change", updatePanels);
+			textColorInput.addEventListener("input", updatePanels);
+			bgColorInput.addEventListener("input", updatePanels);
+			fontSizeSlider.addEventListener("input", () => {
+				updateSliderValues();
+				updatePanels();
+			});
+			fontWeightSlider.addEventListener("input", () => {
+				updateSliderValues();
+				updatePanels();
+			});
+
+			paragraphToggle.addEventListener("click", () => {
+				currentTextType = "paragraph";
+				paragraphToggle.classList.add("active");
+				headlineToggle.classList.remove("active");
+				updateTextContent();
+			});
+
+			headlineToggle.addEventListener("click", () => {
+				currentTextType = "headline";
+				headlineToggle.classList.add("active");
+				paragraphToggle.classList.remove("active");
+				updateTextContent();
+			});
+
+			saveButton.addEventListener("click", saveComparison);
+			resetButton.addEventListener("click", resetDefaults);
+
+			updateSliderValues();
+			updateTextContent();
+			loadHistory();
+		</script>
+	</body>
+</html>

@@ -1,0 +1,2860 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ProFinancial Timeline</title>
+		<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+		<style>
+			body {
+				font-family: "Inter", sans-serif;
+				scroll-behavior: smooth;
+			}
+
+			.dark body {
+				background-color: #121826;
+				color: #f0f4f8;
+			}
+			.dark nav {
+				background-color: #1e293b;
+				box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.2);
+			}
+			.dark .text-gray-800 {
+				color: #f0f4f8;
+			}
+			.dark .text-gray-700 {
+				color: #e2e8f0;
+			}
+			.dark .text-gray-600 {
+				color: #cbd5e1;
+			}
+			.dark .text-gray-500 {
+				color: #94a3b8;
+			}
+			.dark .bg-white {
+				background-color: #1e293b;
+			}
+			.dark .bg-gray-100 {
+				background-color: #0f172a;
+			}
+			.dark .bg-gray-50 {
+				background-color: #334155;
+			}
+			.dark .bg-gray-200 {
+				background-color: #334155;
+			}
+			.dark .hover\:bg-gray-100:hover {
+				background-color: #334155;
+			}
+			.dark .hover\:bg-gray-300:hover {
+				background-color: #475569;
+			}
+			.dark .border-gray-200 {
+				border-color: #334155;
+			}
+			.dark .border-gray-300 {
+				border-color: #475569;
+			}
+			.dark .shadow-md {
+				box-shadow: 0 4px 12px -1px rgba(0, 0, 0, 0.2),
+					0 2px 6px -1px rgba(0, 0, 0, 0.1);
+			}
+			.dark .shadow {
+				box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15),
+					0 1px 3px 0 rgba(0, 0, 0, 0.1);
+			}
+			.dark .shadow-lg {
+				box-shadow: 0 10px 18px -3px rgba(0, 0, 0, 0.2),
+					0 4px 8px -2px rgba(0, 0, 0, 0.1);
+			}
+			.dark .shadow-xl {
+				box-shadow: 0 20px 30px -5px rgba(0, 0, 0, 0.2),
+					0 10px 15px -5px rgba(0, 0, 0, 0.1);
+			}
+			.dark input,
+			.dark textarea,
+			.dark select {
+				background-color: #334155;
+				border-color: #475569;
+				color: #f0f4f8;
+			}
+			.dark input::placeholder,
+			.dark textarea::placeholder {
+				color: #94a3b8;
+			}
+			.dark input:focus,
+			.dark textarea:focus,
+			.dark select:focus {
+				border-color: #60a5fa;
+				outline-color: #60a5fa;
+			}
+			.dark .text-gray-900 {
+				color: #f8fafc;
+			}
+			.dark .popup > div {
+				background-color: #1e293b;
+				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3),
+					0 8px 10px -6px rgba(0, 0, 0, 0.2);
+			}
+			.dark .timeline-wrapper::-webkit-scrollbar-track {
+				background: #1e293b;
+			}
+			.dark .timeline-wrapper::-webkit-scrollbar-thumb {
+				background: #475569;
+			}
+			.dark .timeline-wrapper::-webkit-scrollbar-thumb:hover {
+				background: #64748b;
+			}
+			.dark .timeline-line {
+				background-color: #475569;
+			}
+			.dark .timeline-date-markers {
+				color: #94a3b8;
+			}
+			.dark .event {
+				background-color: #334155;
+			}
+			.dark .event h3 {
+				color: #f0f4f8;
+			}
+			.dark .event p {
+				color: #cbd5e1;
+			}
+			.dark .event .text-green-600 {
+				color: #4ade80;
+			}
+			.dark .event .text-red-600 {
+				color: #fb7185;
+			}
+			.dark .event .text-blue-500 {
+				color: #60a5fa;
+			}
+			.dark .border-green-300 {
+				border-color: #4ade80;
+			}
+			.dark .border-red-300 {
+				border-color: #fb7185;
+			}
+			.dark .text-green-500 {
+				color: #4ade80;
+			}
+			.dark .text-red-500 {
+				color: #fb7185;
+			}
+			.dark .text-blue-600 {
+				color: #60a5fa;
+			}
+			.dark .hover\:bg-blue-700:hover {
+				background-color: #1d4ed8;
+			}
+			.dark .hover\:bg-red-700:hover {
+				background-color: #b91c1c;
+			}
+			.dark .hover\:bg-green-700:hover {
+				background-color: #15803d;
+			}
+			.dark input[type="date"] {
+				color-scheme: dark;
+			}
+			.dark .validation-error {
+				color: #fb7185;
+			}
+			.dark input.invalid,
+			.dark textarea.invalid,
+			.dark select.invalid {
+				border-color: #fb7185 !important;
+				box-shadow: 0 0 0 1px #fb7185 !important;
+			}
+			.dark .past-event {
+				opacity: 0.75;
+			}
+			.dark .today-event {
+				border-color: #60a5fa !important;
+			}
+			.dark select {
+				background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+				background-repeat: no-repeat;
+				background-position: right 0.5rem center;
+				background-size: 1.5em 1.5em;
+				padding-right: 2.5rem;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				appearance: none;
+			}
+			.dark .filter-btn {
+				transition: all 0.2s ease-in-out;
+			}
+			.dark .filter-btn:not(.active) {
+				background-color: #334155;
+				color: #cbd5e1;
+			}
+			.dark .filter-btn:not(.active):hover {
+				background-color: #475569;
+			}
+			.dark .filter-btn.active {
+				background-color: #3b82f6;
+				color: white;
+			}
+
+			.dragging {
+				opacity: 0.5;
+				transform: scale(1.03);
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2),
+					0 4px 6px -2px rgba(0, 0, 0, 0.12);
+				cursor: grabbing !important;
+				z-index: 50;
+			}
+
+			.event {
+				cursor: grab;
+				transition: transform 0.2s ease-out, box-shadow 0.2s ease-out,
+					opacity 0.2s ease-out;
+			}
+
+			.event:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+			}
+
+			.drag-over {
+				background-color: rgba(66, 153, 225, 0.15);
+				border: 2px dashed #63b3ed !important;
+				transition: all 0.2s ease-in-out;
+			}
+
+			.event-drop-target {
+				position: relative;
+				border-left: 3px solid #3b82f6;
+				margin-left: -3px;
+				padding-left: 1px;
+			}
+
+			.event-drop-target::after {
+				content: "";
+				position: absolute;
+				left: -6px;
+				top: 50%;
+				transform: translateY(-50%);
+				width: 8px;
+				height: 8px;
+				background-color: #3b82f6;
+				border-radius: 50%;
+			}
+
+			.timeline-wrapper::-webkit-scrollbar {
+				height: 8px;
+			}
+			.timeline-wrapper::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 10px;
+			}
+			.timeline-wrapper::-webkit-scrollbar-thumb {
+				background: #a0aec0;
+				border-radius: 10px;
+			}
+			.timeline-wrapper::-webkit-scrollbar-thumb:hover {
+				background: #718096;
+			}
+
+			input[type="date"] {
+				color-scheme: light;
+			}
+
+			.validation-error {
+				color: #ef4444;
+				font-size: 0.8em;
+				margin-top: 0.25rem;
+				transition: all 0.2s ease;
+				animation: shake 0.5s ease-in-out;
+			}
+
+			@keyframes shake {
+				0%,
+				100% {
+					transform: translateX(0);
+				}
+				25% {
+					transform: translateX(-5px);
+				}
+				75% {
+					transform: translateX(5px);
+				}
+			}
+
+			input.invalid,
+			textarea.invalid,
+			select.invalid {
+				border-color: #ef4444 !important;
+				box-shadow: 0 0 0 1px #ef4444 !important;
+				animation: highlight 1s ease;
+			}
+
+			@keyframes highlight {
+				0%,
+				100% {
+					border-color: #ef4444;
+				}
+				50% {
+					border-color: #f87171;
+				}
+			}
+
+			.past-event {
+				opacity: 0.75;
+			}
+			.today-event {
+				border-width: 2px !important;
+				border-color: #3b82f6 !important;
+				position: relative;
+			}
+
+			.today-event::before {
+				content: "TODAY";
+				position: absolute;
+				top: -10px;
+				left: 50%;
+				transform: translateX(-50%);
+				background-color: #3b82f6;
+				color: white;
+				font-size: 0.6rem;
+				padding: 2px 6px;
+				border-radius: 10px;
+				font-weight: 600;
+			}
+
+			.timeline-date-markers {
+				position: absolute;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				display: flex;
+				justify-content: space-between;
+				padding: 0 10px;
+				font-size: 0.7rem;
+				pointer-events: none;
+				color: #6b7280;
+			}
+
+			#timeline {
+				position: relative;
+				min-height: 220px;
+				transition: min-height 0.3s ease;
+			}
+
+			@media (max-width: 640px) {
+				#timeline {
+					min-height: 260px;
+				}
+			}
+
+			.timeline-line {
+				position: absolute;
+				top: 50%;
+				left: 0.5rem;
+				right: 0.5rem;
+				height: 2px;
+				background-color: #cbd5e0;
+				transform: translateY(-50%);
+				z-index: 0;
+			}
+
+			.popup {
+				transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+				visibility: hidden;
+				background-color: rgba(0, 0, 0, 0.6);
+				backdrop-filter: blur(3px);
+			}
+
+			.popup.visible {
+				opacity: 1;
+				visibility: visible;
+				pointer-events: auto;
+			}
+
+			.popup > div {
+				transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+				opacity: 0;
+			}
+
+			.popup:not(.visible) > div {
+				transform: scale(0.95) translateY(10px);
+				opacity: 0;
+			}
+
+			.popup.visible > div {
+				transform: scale(1) translateY(0);
+				opacity: 1;
+			}
+
+			.chart-container {
+				height: 300px;
+				position: relative;
+				transition: height 0.3s ease;
+			}
+
+			@media (max-width: 640px) {
+				.chart-container {
+					height: 250px;
+				}
+			}
+
+			select {
+				background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+				background-repeat: no-repeat;
+				background-position: right 0.5rem center;
+				background-size: 1.5em 1.5em;
+				padding-right: 2.5rem;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				appearance: none;
+			}
+
+			#themeToggle i {
+				transition: transform 0.5s ease-in-out, opacity 0.3s ease-in-out;
+			}
+
+			.dark #themeToggle .fa-moon {
+				display: none;
+				transform: rotate(180deg);
+				opacity: 0;
+			}
+
+			.dark #themeToggle .fa-sun {
+				display: inline-block;
+				transform: rotate(0);
+				opacity: 1;
+			}
+
+			html:not(.dark) #themeToggle .fa-sun {
+				display: none;
+				transform: rotate(-180deg);
+				opacity: 0;
+			}
+
+			html:not(.dark) #themeToggle .fa-moon {
+				display: inline-block;
+				transform: rotate(0);
+				opacity: 1;
+			}
+
+			button {
+				position: relative;
+				overflow: hidden;
+			}
+
+			button:after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 5px;
+				height: 5px;
+				background: rgba(255, 255, 255, 0.5);
+				opacity: 0;
+				border-radius: 100%;
+				transform: scale(1, 1) translate(-50%, -50%);
+				transform-origin: 50% 50%;
+			}
+
+			@keyframes ripple {
+				0% {
+					transform: scale(0, 0);
+					opacity: 0.3;
+				}
+				100% {
+					transform: scale(20, 20);
+					opacity: 0;
+				}
+			}
+
+			button:focus:not(:active)::after {
+				animation: ripple 0.8s ease-out;
+			}
+
+			@media (max-width: 640px) {
+				.filter-btn {
+					padding: 0.4rem 0.75rem;
+					font-size: 0.75rem;
+				}
+
+				.event {
+					min-width: 110px !important;
+					padding: 0.75rem 0.5rem !important;
+				}
+
+				.popup > div {
+					max-width: 95% !important;
+					margin: 0.5rem !important;
+					padding: 1rem !important;
+				}
+
+				#timeline {
+					padding-top: 1.5rem;
+					padding-bottom: 1.5rem;
+				}
+
+				.popup-buttons {
+					flex-direction: column-reverse !important;
+				}
+
+				.popup-buttons > * {
+					width: 100% !important;
+					margin-top: 0.5rem !important;
+				}
+
+				.timeline-date-markers {
+					font-size: 0.6rem;
+				}
+
+				.widgets .widget {
+					padding: 0.75rem !important;
+				}
+			}
+
+			a:focus,
+			button:focus,
+			input:focus,
+			select:focus,
+			textarea:focus {
+				outline: 2px solid #3b82f6;
+				outline-offset: 2px;
+			}
+
+			.dark a:focus,
+			.dark button:focus,
+			.dark input:focus,
+			.dark select:focus,
+			.dark textarea:focus {
+				outline: 2px solid #60a5fa;
+				outline-offset: 2px;
+			}
+
+			.no-events-message {
+				padding: 2rem;
+				text-align: center;
+				background-color: rgba(243, 244, 246, 0.7);
+				border-radius: 0.5rem;
+				border: 1px dashed #d1d5db;
+				animation: fadeIn 0.5s ease-in-out;
+			}
+
+			.dark .no-events-message {
+				background-color: rgba(30, 41, 59, 0.7);
+				border: 1px dashed #475569;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.filter-btn {
+				transition: all 0.2s ease-in-out;
+			}
+
+			.filter-btn:not(.active) {
+				background-color: #e5e7eb;
+				color: #4b5563;
+			}
+
+			.filter-btn:not(.active):hover {
+				background-color: #d1d5db;
+			}
+
+			.filter-btn.active {
+				background-color: #3b82f6;
+				color: white;
+			}
+
+			.transition-all {
+				transition-property: all;
+				transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+				transition-duration: 300ms;
+			}
+		</style>
+	</head>
+	<body class="bg-gray-100 text-gray-900 transition-colors duration-300">
+		<nav class="bg-white shadow-md sticky top-0 z-50">
+			<div class="container mx-auto px-4 sm:px-6 lg:px-8">
+				<div
+					class="flex flex-wrap sm:flex-nowrap justify-between items-center h-auto sm:h-16 py-2 sm:py-0"
+				>
+					<div class="flex-shrink-0 flex items-center mb-2 sm:mb-0">
+						<i class="fas fa-chart-line text-2xl text-blue-600 mr-2"></i>
+						<span class="font-bold text-xl text-gray-800">ProFinance</span>
+					</div>
+					<div class="flex items-center space-x-1 sm:space-x-2 ml-auto">
+						<button
+							id="themeToggle"
+							aria-label="Toggle Dark/Light Mode"
+							title="Toggle Theme"
+							class="text-gray-500 hover:bg-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 rounded-full p-2 transition duration-200 ease-in-out"
+						>
+							<i class="fas fa-moon"></i>
+							<i class="fas fa-sun"></i>
+						</button>
+						<div class="relative">
+							<input
+								type="text"
+								id="searchEvents"
+								placeholder="Search..."
+								class="w-full sm:w-auto px-3 py-1.5 rounded-md border border-gray-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+								aria-label="Search events"
+							/>
+							<i
+								class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"
+							></i>
+						</div>
+						<button
+							id="addEvent"
+							title="Add Event"
+							class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full shadow transition duration-200 ease-in-out transform hover:scale-105"
+						>
+							<i class="fas fa-plus text-xs"></i>
+						</button>
+						<button
+							id="exportData"
+							aria-label="Export Data"
+							title="Export Data"
+							class="text-gray-600 hover:bg-gray-200 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 rounded-full p-2 transition duration-200 ease-in-out"
+						>
+							<i class="fas fa-download"></i>
+						</button>
+						<input
+							type="file"
+							id="importFile"
+							accept=".json,.csv"
+							class="hidden"
+						/>
+						<button
+							id="importData"
+							aria-label="Import Data"
+							title="Import Data"
+							class="text-gray-600 hover:bg-gray-200 hover:text-blue-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-blue-400 rounded-full p-2 transition duration-200 ease-in-out"
+						>
+							<i class="fas fa-upload"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<main class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+			<section class="text-center mb-8 sm:mb-12 pt-4 sm:pt-8">
+				<h1
+					class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-4"
+				>
+					Visualize Your Financial Journey
+				</h1>
+				<p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+					Track income, expenses, and financial goals with an interactive
+					timeline.
+				</p>
+				<div class="mt-6">
+					<button
+						id="getStartedBtn"
+						class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-300 ease-in-out transform hover:scale-105"
+					>
+						Get Started
+					</button>
+				</div>
+			</section>
+
+			<section class="mb-8 sm:mb-12">
+				<div
+					class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6"
+				>
+					<div
+						class="bg-white p-3 sm:p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg transform hover:-translate-y-1"
+					>
+						<i class="fas fa-users text-2xl sm:text-3xl text-blue-500 mb-3"></i>
+						<p class="text-xl sm:text-3xl font-semibold text-gray-800">
+							10,000+
+						</p>
+						<h3 class="text-xs sm:text-md text-gray-500">Active Users</h3>
+					</div>
+					<div
+						class="bg-white p-3 sm:p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg transform hover:-translate-y-1"
+					>
+						<i
+							class="fas fa-dollar-sign text-2xl sm:text-3xl text-green-500 mb-3"
+						></i>
+						<p class="text-xl sm:text-3xl font-semibold text-gray-800">$5M+</p>
+						<h3 class="text-xs sm:text-md text-gray-500">Tracked Annually</h3>
+					</div>
+					<div
+						class="bg-white p-3 sm:p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg transform hover:-translate-y-1"
+					>
+						<i
+							class="fas fa-calendar-check text-2xl sm:text-3xl text-purple-500 mb-3"
+						></i>
+						<p class="text-xl sm:text-3xl font-semibold text-gray-800">500K+</p>
+						<h3 class="text-xs sm:text-md text-gray-500">Events Logged</h3>
+					</div>
+					<div
+						class="bg-white p-3 sm:p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg transform hover:-translate-y-1"
+					>
+						<i
+							class="fas fa-star text-2xl sm:text-3xl text-yellow-500 mb-3"
+						></i>
+						<p class="text-xl sm:text-3xl font-semibold text-gray-800">4.8/5</p>
+						<h3 class="text-xs sm:text-md text-gray-500">User Rating</h3>
+					</div>
+				</div>
+			</section>
+
+			<section id="timelineSection" class="mb-8 sm:mb-12">
+				<div
+					class="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0"
+				>
+					<h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
+						Your Timeline
+					</h2>
+					<div class="flex space-x-2">
+						<button
+							id="filterPast"
+							class="filter-btn px-3 py-1 text-sm rounded-md"
+						>
+							Past
+						</button>
+						<button
+							id="filterAll"
+							class="filter-btn active px-3 py-1 text-sm rounded-md"
+						>
+							All
+						</button>
+						<button
+							id="filterFuture"
+							class="filter-btn px-3 py-1 text-sm rounded-md"
+						>
+							Future
+						</button>
+					</div>
+				</div>
+				<div
+					id="timelineWrapper"
+					class="timeline-wrapper bg-white rounded-lg shadow p-2 sm:p-4 overflow-x-auto relative border border-gray-200 min-h-[250px]"
+				>
+					<div
+						id="timeline"
+						class="timeline flex items-center min-h-[220px] p-2 relative whitespace-nowrap mb-4"
+					>
+						<div class="timeline-line"></div>
+					</div>
+					<div class="timeline-date-markers"></div>
+				</div>
+				<p class="text-sm text-gray-500 mt-2 text-center">
+					<i class="fas fa-info-circle mr-1"></i> Drag events with the same date
+					to reorder them.
+				</p>
+			</section>
+
+			<section class="mb-8 sm:mb-12">
+				<div
+					class="flex flex-col sm:flex-row justify-between items-center mb-4 space-y-2 sm:space-y-0"
+				>
+					<h2 class="text-xl sm:text-2xl font-semibold text-gray-800">
+						Key Metrics
+					</h2>
+					<div class="flex items-center space-x-2">
+						<span class="text-sm text-gray-500">View:</span>
+						<select
+							id="timeRangeSelector"
+							class="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 py-1.5 px-2"
+						>
+							<option value="30">Last 30 Days</option>
+							<option value="90">Last 3 Months</option>
+							<option value="180">Last 6 Months</option>
+							<option value="365">Last Year</option>
+							<option value="all">All Time</option>
+						</select>
+					</div>
+				</div>
+				<div class="widgets grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+					<div
+						class="widget bg-white p-4 sm:p-5 rounded-lg shadow transition duration-300 hover:shadow-lg"
+					>
+						<h3 class="text-sm font-medium text-gray-500 mb-1">
+							Total Net Amount
+						</h3>
+						<p id="totalSavings" class="text-xl sm:text-2xl font-semibold">
+							$0.00
+						</p>
+					</div>
+					<div
+						class="widget bg-white p-4 sm:p-5 rounded-lg shadow transition duration-300 hover:shadow-lg"
+					>
+						<h3 class="text-sm font-medium text-gray-500 mb-1">
+							Upcoming Events
+						</h3>
+						<p
+							id="upcomingEvents"
+							class="text-xl sm:text-2xl font-semibold text-gray-800"
+						>
+							0
+						</p>
+					</div>
+					<div
+						class="widget bg-white p-4 sm:p-5 rounded-lg shadow transition duration-300 hover:shadow-lg"
+					>
+						<h3 class="text-sm font-medium text-gray-500 mb-1">
+							Net Change (<span id="netChangeLabel">Last 30 Days</span>)
+						</h3>
+						<p
+							id="netChangeTimeRange"
+							class="text-xl sm:text-2xl font-semibold"
+						>
+							$0.00
+						</p>
+					</div>
+				</div>
+			</section>
+
+			<section class="mb-8 sm:mb-12">
+				<h2 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-4">
+					Historical Comparison
+				</h2>
+				<div class="widget bg-white p-4 sm:p-5 rounded-lg shadow">
+					<div
+						class="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-3 sm:space-y-0"
+					>
+						<div class="flex items-center space-x-2">
+							<span class="text-sm text-gray-500">Compare:</span>
+							<select
+								id="comparisonType"
+								class="text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 py-1.5 px-2"
+							>
+								<option value="monthly">Monthly</option>
+								<option value="quarterly">Quarterly</option>
+								<option value="yearly">Yearly</option>
+							</select>
+						</div>
+						<div
+							class="flex flex-wrap items-center space-x-2 justify-center sm:justify-start"
+						>
+							<div class="flex items-center">
+								<input
+									type="checkbox"
+									id="showIncome"
+									class="mr-1 rounded text-blue-600 focus:ring-blue-500"
+									checked
+								/>
+								<label for="showIncome" class="text-sm text-gray-700"
+									>Income</label
+								>
+							</div>
+							<div class="flex items-center ml-3">
+								<input
+									type="checkbox"
+									id="showExpenses"
+									class="mr-1 rounded text-blue-600 focus:ring-blue-500"
+									checked
+								/>
+								<label for="showExpenses" class="text-sm text-gray-700"
+									>Expenses</label
+								>
+							</div>
+							<div class="flex items-center ml-3">
+								<input
+									type="checkbox"
+									id="showNet"
+									class="mr-1 rounded text-blue-600 focus:ring-blue-500"
+									checked
+								/>
+								<label for="showNet" class="text-sm text-gray-700">Net</label>
+							</div>
+						</div>
+					</div>
+					<div class="chart-container">
+						<canvas id="historicalChart"></canvas>
+					</div>
+					<p
+						id="chartMessage"
+						class="text-center text-gray-500 mt-4"
+						style="display: none"
+					>
+						Not enough data for historical comparison.
+					</p>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+						<div class="bg-gray-50 p-3 rounded-lg">
+							<h3 class="text-sm font-medium text-gray-500 mb-2">
+								Total Income (<span class="comparison-period">period</span>)
+							</h3>
+							<p id="totalIncome" class="text-lg font-semibold text-green-600">
+								$0.00
+							</p>
+							<p id="incomeChange" class="text-xs mt-1 text-gray-600">
+								<span class="text-gray-500">vs prev: </span><span>N/A</span>
+							</p>
+						</div>
+						<div class="bg-gray-50 p-3 rounded-lg">
+							<h3 class="text-sm font-medium text-gray-500 mb-2">
+								Total Expenses (<span class="comparison-period">period</span>)
+							</h3>
+							<p id="totalExpenses" class="text-lg font-semibold text-red-600">
+								$0.00
+							</p>
+							<p id="expensesChange" class="text-xs mt-1 text-gray-600">
+								<span class="text-gray-500">vs prev: </span><span>N/A</span>
+							</p>
+						</div>
+						<div class="bg-gray-50 p-3 rounded-lg">
+							<h3 class="text-sm font-medium text-gray-500 mb-2">
+								Net Change (<span class="comparison-period">period</span>)
+							</h3>
+							<p id="periodNetChange" class="text-lg font-semibold">$0.00</p>
+							<p id="netChangePercent" class="text-xs mt-1 text-gray-600">
+								<span class="text-gray-500">vs prev: </span><span>N/A</span>
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="bg-white mt-8 sm:mt-16 border-t border-gray-200">
+			<div
+				class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-gray-500 text-sm"
+			>
+				&copy; <span id="footerYear"></span> ProFinance. All rights reserved.
+			</div>
+		</footer>
+
+		<div
+			id="eventPopup"
+			class="popup fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[1000] p-4 opacity-0 pointer-events-none"
+		>
+			<div class="bg-white rounded-lg shadow-xl w-full max-w-md p-4 sm:p-6 m-4">
+				<h2
+					id="popupTitle"
+					class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 text-center"
+				>
+					Event Details
+				</h2>
+				<form id="eventForm" novalidate>
+					<div class="mb-4">
+						<label
+							for="eventTitle"
+							class="block text-sm font-medium text-gray-700 mb-1"
+							>Title</label
+						>
+						<input
+							type="text"
+							id="eventTitle"
+							placeholder="e.g., Salary, Rent"
+							required
+							class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-sm"
+						/>
+					</div>
+					<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+						<div class="sm:col-span-1">
+							<label
+								for="eventDate"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Date</label
+							>
+							<input
+								type="date"
+								id="eventDate"
+								required
+								class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+							/>
+						</div>
+						<div class="sm:col-span-1">
+							<label
+								for="eventType"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Type</label
+							>
+							<select
+								id="eventType"
+								required
+								class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+							>
+								<option value="credit">Credit (+)</option>
+								<option value="debit">Debit (-)</option>
+							</select>
+						</div>
+						<div class="sm:col-span-1">
+							<label
+								for="eventAmount"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Amount ($)</label
+							>
+							<input
+								type="number"
+								id="eventAmount"
+								placeholder="e.g., 50.00"
+								step="0.01"
+								min="0"
+								required
+								class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-sm"
+							/>
+						</div>
+					</div>
+					<div class="mb-4">
+						<label
+							for="eventGoal"
+							class="block text-sm font-medium text-gray-700 mb-1"
+							>Goal (Optional)</label
+						>
+						<input
+							type="text"
+							id="eventGoal"
+							placeholder="e.g., Save for vacation"
+							class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 text-sm"
+						/>
+					</div>
+					<div class="mb-4">
+						<label
+							for="eventNotes"
+							class="block text-sm font-medium text-gray-700 mb-1"
+							>Notes</label
+						>
+						<textarea
+							id="eventNotes"
+							placeholder="Add any relevant notes..."
+							rows="3"
+							class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400 resize-vertical text-sm"
+						></textarea>
+					</div>
+					<div
+						class="popup-buttons flex flex-col sm:flex-row justify-between items-center mt-6 space-y-2 sm:space-y-0 sm:space-x-2"
+					>
+						<button
+							type="button"
+							id="deleteEvent"
+							aria-label="Delete Event"
+							title="Delete Event"
+							class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md shadow transition duration-200 ease-in-out flex items-center justify-center space-x-1 text-sm"
+							style="display: none"
+						>
+							<i class="fas fa-trash"></i>
+							<span>Delete</span>
+						</button>
+						<div class="w-full sm:w-auto flex space-x-2">
+							<button
+								type="button"
+								id="closePopup"
+								aria-label="Close Popup"
+								title="Close"
+								class="w-1/2 sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md shadow transition duration-200 ease-in-out text-sm"
+							>
+								Close
+							</button>
+							<button
+								type="submit"
+								id="saveEvent"
+								aria-label="Save Event"
+								title="Save Changes"
+								class="w-1/2 sm:w-auto bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md shadow transition duration-200 ease-in-out flex items-center justify-center space-x-1 text-sm"
+							>
+								<i class="fas fa-save"></i>
+								<span>Save</span>
+							</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<div
+			id="exportPopup"
+			class="popup fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[1000] p-4 opacity-0 pointer-events-none"
+		>
+			<div
+				class="bg-white rounded-lg shadow-xl w-full max-w-xs sm:max-w-md p-4 sm:p-6 m-4"
+			>
+				<h2
+					class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 text-center"
+				>
+					Export Data
+				</h2>
+				<div class="mb-6">
+					<p class="text-sm text-gray-600 mb-4 text-center">
+						Choose export format:
+					</p>
+					<div class="flex justify-center space-x-2 sm:space-x-4">
+						<button
+							id="exportJSON"
+							class="text-sm bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 sm:px-6 rounded-md shadow transition duration-200 ease-in-out"
+						>
+							JSON
+						</button>
+						<button
+							id="exportCSV"
+							class="text-sm bg-green-600 hover:bg-green-700 text-white py-2 px-4 sm:px-6 rounded-md shadow transition duration-200 ease-in-out"
+						>
+							CSV
+						</button>
+					</div>
+				</div>
+				<div class="flex justify-center mt-4">
+					<button
+						id="closeExportPopup"
+						class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md shadow transition duration-200 ease-in-out"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const state = {
+				events: [],
+				currentEventId: null,
+				draggedEventId: null,
+				filter: "all",
+				historicalChartInstance: null,
+				comparisonType: "monthly",
+				timeRange: "30",
+			};
+			const elements = {
+				html: document.documentElement,
+				body: document.body,
+				themeToggleBtn: document.getElementById("themeToggle"),
+				timeline: document.getElementById("timeline"),
+				timelineWrapper: document.getElementById("timelineWrapper"),
+				timelineLine: document.querySelector(".timeline-line"),
+				dateMarkers: document.querySelector(".timeline-date-markers"),
+				popup: document.getElementById("eventPopup"),
+				exportPopup: document.getElementById("exportPopup"),
+				popupForm: document.getElementById("eventForm"),
+				popupTitle: document.getElementById("popupTitle"),
+				eventTitle: document.getElementById("eventTitle"),
+				eventDate: document.getElementById("eventDate"),
+				eventType: document.getElementById("eventType"),
+				eventAmount: document.getElementById("eventAmount"),
+				eventGoal: document.getElementById("eventGoal"),
+				eventNotes: document.getElementById("eventNotes"),
+				totalSavings: document.getElementById("totalSavings"),
+				upcomingEvents: document.getElementById("upcomingEvents"),
+				netChangeTimeRange: document.getElementById("netChangeTimeRange"),
+				netChangeLabel: document.getElementById("netChangeLabel"),
+				addEventBtn: document.getElementById("addEvent"),
+				saveEventBtn: document.getElementById("saveEvent"),
+				deleteEventBtn: document.getElementById("deleteEvent"),
+				closePopupBtn: document.getElementById("closePopup"),
+				exportDataBtn: document.getElementById("exportData"),
+				exportJSONBtn: document.getElementById("exportJSON"),
+				exportCSVBtn: document.getElementById("exportCSV"),
+				closeExportPopupBtn: document.getElementById("closeExportPopup"),
+				importDataBtn: document.getElementById("importData"),
+				importFileEl: document.getElementById("importFile"),
+				searchEvents: document.getElementById("searchEvents"),
+				footerYear: document.getElementById("footerYear"),
+				getStartedBtn: document.getElementById("getStartedBtn"),
+				timelineSection: document.getElementById("timelineSection"),
+				filterPast: document.getElementById("filterPast"),
+				filterAll: document.getElementById("filterAll"),
+				filterFuture: document.getElementById("filterFuture"),
+				historicalChartCanvas: document.getElementById("historicalChart"),
+				chartMessage: document.getElementById("chartMessage"),
+				comparisonType: document.getElementById("comparisonType"),
+				timeRangeSelector: document.getElementById("timeRangeSelector"),
+				showIncome: document.getElementById("showIncome"),
+				showExpenses: document.getElementById("showExpenses"),
+				showNet: document.getElementById("showNet"),
+				totalIncome: document.getElementById("totalIncome"),
+				totalExpenses: document.getElementById("totalExpenses"),
+				periodNetChange: document.getElementById("periodNetChange"),
+				incomeChange: document.getElementById("incomeChange"),
+				expensesChange: document.getElementById("expensesChange"),
+				netChangePercent: document.getElementById("netChangePercent"),
+				comparisonPeriodEls: document.querySelectorAll(".comparison-period"),
+			};
+
+			function applyTheme(theme) {
+				if (theme === "dark") {
+					elements.html.classList.add("dark");
+				} else {
+					elements.html.classList.remove("dark");
+				}
+
+				setFilterActive(state.filter);
+			}
+
+			function toggleTheme() {
+				const currentTheme = elements.html.classList.contains("dark")
+					? "dark"
+					: "light";
+				const newTheme = currentTheme === "dark" ? "light" : "dark";
+				applyTheme(newTheme);
+				try {
+					localStorage.setItem("theme", newTheme);
+				} catch (e) {
+					console.warn("Could not save theme preference to localStorage");
+				}
+				renderHistoricalChart();
+			}
+
+			function loadTheme() {
+				let preferredTheme = "light";
+				try {
+					const storedTheme = localStorage.getItem("theme");
+
+					const prefersDark =
+						window.matchMedia &&
+						window.matchMedia("(prefers-color-scheme: dark)").matches;
+					preferredTheme = storedTheme || (prefersDark ? "dark" : "light");
+				} catch (e) {
+					console.warn("Could not load theme preference from localStorage");
+				}
+				applyTheme(preferredTheme);
+			}
+
+			function generateUniqueId() {
+				return Date.now() + Math.floor(Math.random() * 1000);
+			}
+
+			function loadEvents() {
+				const storedEvents = localStorage.getItem("financialEvents");
+				try {
+					const defaultEvents = [
+						{
+							id: generateUniqueId(),
+							title: "Paycheck",
+							date: "2025-04-15",
+							amount: 2500,
+							goal: "Monthly income",
+							notes: "Bi-weekly salary",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Rent",
+							date: "2025-05-01",
+							amount: -1200,
+							goal: "Housing expenses",
+							notes: "Monthly rent",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Groceries",
+							date: "2025-04-15",
+							amount: -150,
+							goal: "Food budget",
+							notes: "Weekly shopping",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Freelance",
+							date: "2025-05-10",
+							amount: 800,
+							goal: "Extra income",
+							notes: "Web design work",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Bonus",
+							date: "2025-03-15",
+							amount: 1000,
+							goal: "Extra income",
+							notes: "Performance bonus",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Utilities",
+							date: "2025-03-20",
+							amount: -200,
+							goal: "Housing expenses",
+							notes: "Monthly utilities",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Car Payment",
+							date: "2025-04-15",
+							amount: -350,
+							goal: "Transportation",
+							notes: "Monthly car payment",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Paycheck",
+							date: "2025-02-15",
+							amount: 2500,
+							goal: "Monthly income",
+							notes: "Bi-weekly salary",
+						},
+						{
+							id: generateUniqueId(),
+							title: "Groceries",
+							date: "2025-02-20",
+							amount: -180,
+							goal: "Food budget",
+							notes: "Weekly shopping",
+						},
+					];
+					const parsedEvents = storedEvents
+						? JSON.parse(storedEvents)
+						: defaultEvents;
+					if (!Array.isArray(parsedEvents))
+						throw new Error("Invalid data format");
+					state.events = parsedEvents
+						.map((event) => ({
+							id: event.id || generateUniqueId(),
+							title: String(event.title || "Untitled").substring(0, 50),
+							date: String(
+								event.date || new Date().toISOString().split("T")[0]
+							),
+							amount: Number(event.amount || 0),
+							goal: String(event.goal || "").substring(0, 100),
+							notes: String(event.notes || "").substring(0, 200),
+						}))
+						.filter(
+							(event) =>
+								event.date &&
+								!isNaN(new Date(event.date + "T00:00:00").getTime())
+						);
+				} catch (error) {
+					console.error("Error loading events:", error);
+					state.events = [];
+				}
+			}
+
+			function saveToLocalStorage() {
+				try {
+					localStorage.setItem("financialEvents", JSON.stringify(state.events));
+				} catch (error) {
+					console.error("Error saving events:", error);
+				}
+			}
+
+			function renderTimeline() {
+				elements.timeline
+					.querySelectorAll(".event, .no-events-message")
+					.forEach((el) => el.remove());
+				elements.dateMarkers.innerHTML = "";
+
+				let line = elements.timeline.querySelector(".timeline-line");
+				if (!line) {
+					line = document.createElement("div");
+					line.className = "timeline-line";
+					elements.timeline.insertBefore(line, elements.timeline.firstChild);
+					elements.timelineLine = line;
+				}
+
+				let filteredEvents = getFilteredAndSortedEvents();
+				if (filteredEvents.length > 0) {
+					const minDate = new Date(filteredEvents[0].date);
+					const maxDate = new Date(
+						filteredEvents[filteredEvents.length - 1].date
+					);
+					const dateRange = maxDate.getTime() - minDate.getTime();
+					const markerCount = Math.min(5, filteredEvents.length);
+					if (markerCount > 1 && dateRange >= 0) {
+						for (let i = 0; i < markerCount; i++) {
+							const markerRatio =
+								markerCount === 1 ? 0.5 : i / (markerCount - 1);
+							const markerDate = new Date(
+								minDate.getTime() + dateRange * markerRatio
+							);
+							const marker = document.createElement("div");
+							marker.textContent = markerDate.toLocaleDateString(undefined, {
+								month: "short",
+								day: "numeric",
+								year: "numeric",
+							});
+							elements.dateMarkers.appendChild(marker);
+						}
+					} else if (markerCount === 1) {
+						const marker = document.createElement("div");
+						marker.textContent = minDate.toLocaleDateString(undefined, {
+							month: "short",
+							day: "numeric",
+							year: "numeric",
+						});
+						elements.dateMarkers.appendChild(marker);
+					}
+				}
+
+				const fragment = document.createDocumentFragment();
+				filteredEvents.forEach((event) => {
+					fragment.appendChild(createEventElement(event));
+				});
+				elements.timeline.appendChild(fragment);
+
+				const searchTerm = elements.searchEvents.value.toLowerCase();
+				if (filteredEvents.length === 0) {
+					const noEvents = document.createElement("div");
+					noEvents.className =
+						"no-events-message w-full text-center py-8 text-gray-500 absolute inset-x-0 top-1/2 transform -translate-y-1/2";
+					noEvents.innerHTML = searchTerm
+						? '<i class="fas fa-search mb-2 text-xl"></i><br>No events found matching your search'
+						: state.filter !== "all"
+						? `<i class="fas fa-calendar-times mb-2 text-xl"></i><br>No ${state.filter} events found`
+						: '<i class="fas fa-calendar-plus mb-2 text-xl"></i><br>No events to display. Add your first event!';
+					elements.timeline.appendChild(noEvents);
+					if (line) line.style.display = "none";
+				} else {
+					if (line) line.style.display = "block";
+				}
+
+				requestAnimationFrame(() => {
+					updateWidgets();
+					renderHistoricalChart();
+				});
+				saveToLocalStorage();
+			}
+
+			function getFilteredAndSortedEvents() {
+				let filteredEvents = [...state.events];
+				const searchTerm = elements.searchEvents.value.toLowerCase();
+
+				if (searchTerm) {
+					filteredEvents = filteredEvents.filter(
+						(event) =>
+							event.title.toLowerCase().includes(searchTerm) ||
+							(event.notes && event.notes.toLowerCase().includes(searchTerm)) ||
+							(event.goal && event.goal.toLowerCase().includes(searchTerm))
+					);
+				}
+
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+
+				if (state.filter === "past") {
+					filteredEvents = filteredEvents.filter(
+						(event) => new Date(event.date + "T00:00:00") < today
+					);
+				} else if (state.filter === "future") {
+					filteredEvents = filteredEvents.filter(
+						(event) => new Date(event.date + "T00:00:00") >= today
+					);
+				}
+
+				filteredEvents.sort((a, b) => {
+					const dateA = new Date(a.date).getTime();
+					const dateB = new Date(b.date).getTime();
+					if (dateA !== dateB) {
+						return dateA - dateB;
+					}
+					const indexA = state.events.findIndex((e) => e.id === a.id);
+					const indexB = state.events.findIndex((e) => e.id === b.id);
+					return indexA - indexB;
+				});
+				return filteredEvents;
+			}
+
+			function getEventStatus(dateStr) {
+				const eventDate = new Date(dateStr);
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+				eventDate.setHours(0, 0, 0, 0);
+
+				if (eventDate.getTime() < today.getTime()) return "past-event";
+				if (eventDate.getTime() === today.getTime()) return "today-event";
+				return "future-event";
+			}
+
+			function createEventElement(event) {
+				const div = document.createElement("div");
+				const isCredit = event.amount >= 0;
+				const borderColor = isCredit ? "border-green-300" : "border-red-300";
+				const iconClass = isCredit
+					? "fa-piggy-bank text-green-500"
+					: "fa-money-bill-wave text-red-500";
+				const statusClass = getEventStatus(event.date);
+
+				div.className = `event relative inline-flex flex-col items-center justify-center min-w-[120px] sm:min-w-[150px] p-3 mx-2 bg-white rounded-lg shadow-md transition-all duration-200 ease-out border ${borderColor} ${statusClass}`;
+				div.draggable = true;
+				div.dataset.eventId = event.id;
+				div.dataset.eventDate = event.date;
+				div.innerHTML = `
+                <i class="fas ${iconClass} text-xl sm:text-2xl mb-2"></i>
+                <h3 class="text-xs sm:text-sm font-medium text-gray-800 truncate w-full" title="${
+									event.title
+								}">${event.title}</h3>
+                <p class="text-[10px] sm:text-xs text-gray-500">${new Date(
+									event.date
+								).toLocaleDateString(undefined, {
+									year: "numeric",
+									month: "short",
+									day: "numeric",
+								})}</p>
+                <p class="text-xs sm:text-sm font-semibold ${
+									isCredit ? "text-green-600" : "text-red-600"
+								}">${formatCurrency(event.amount)}</p>
+                ${
+									event.goal
+										? `<p class="text-[10px] sm:text-xs text-gray-500 mt-1 truncate w-full" title="${event.goal}"><i class="fas fa-bullseye mr-1 text-blue-500"></i>${event.goal}</p>`
+										: ""
+								}
+            `;
+				div.addEventListener("click", (e) => {
+					e.stopPropagation();
+					openPopup(event.id);
+				});
+				div.addEventListener("dragstart", (e) => {
+					state.draggedEventId = event.id;
+					e.target.classList.add("dragging");
+					e.dataTransfer.effectAllowed = "move";
+					e.dataTransfer.setData("text/plain", String(event.id));
+				});
+				div.addEventListener("dragend", (e) => {
+					e.target.classList.remove("dragging");
+					clearDropTargets();
+					state.draggedEventId = null;
+					if (elements.timelineWrapper)
+						elements.timelineWrapper.classList.remove("drag-over");
+				});
+
+				div.tabIndex = 0;
+				div.setAttribute("role", "button");
+				div.setAttribute(
+					"aria-label",
+					`${event.title} on ${new Date(event.date).toLocaleDateString()}, ${
+						isCredit ? "Credit" : "Debit"
+					} of ${formatCurrency(Math.abs(event.amount))}`
+				);
+				div.addEventListener("keydown", (e) => {
+					if (e.key === "Enter" || e.key === " ") {
+						e.preventDefault();
+						openPopup(event.id);
+					}
+				});
+
+				return div;
+			}
+
+			function formatCurrency(amount) {
+				return new Intl.NumberFormat("en-US", {
+					style: "currency",
+					currency: "USD",
+				}).format(amount);
+			}
+
+			function updateWidgets() {
+				const totalNet = state.events.reduce(
+					(acc, event) => acc + parseFloat(event.amount || 0),
+					0
+				);
+				elements.totalSavings.textContent = formatCurrency(totalNet);
+				elements.totalSavings.className = `text-xl sm:text-2xl font-semibold ${
+					totalNet >= 0
+						? elements.html.classList.contains("dark")
+							? "text-green-400"
+							: "text-green-600"
+						: elements.html.classList.contains("dark")
+						? "text-red-400"
+						: "text-red-600"
+				}`;
+
+				const today = new Date();
+				today.setHours(0, 0, 0, 0);
+				const upcomingCount = state.events.filter(
+					(event) => new Date(event.date + "T00:00:00") >= today
+				).length;
+				elements.upcomingEvents.textContent = upcomingCount;
+
+				const daysBack =
+					state.timeRange === "all" ? Infinity : parseInt(state.timeRange);
+				let label = "";
+				let rangeEvents = [];
+				const now = new Date();
+
+				if (daysBack === Infinity) {
+					label = "All Time";
+					rangeEvents = [...state.events];
+				} else {
+					const cutoffDate = new Date();
+					cutoffDate.setDate(now.getDate() - daysBack);
+					cutoffDate.setHours(0, 0, 0, 0);
+					label = `Last ${
+						daysBack === 90
+							? "3 Months"
+							: daysBack === 180
+							? "6 Months"
+							: daysBack === 365
+							? "Year"
+							: `${daysBack} Days`
+					}`;
+					rangeEvents = state.events.filter((event) => {
+						const eventDate = new Date(event.date + "T00:00:00");
+						return eventDate >= cutoffDate && eventDate <= now;
+					});
+				}
+
+				elements.netChangeLabel.textContent = label;
+				const netChange = rangeEvents.reduce(
+					(acc, event) => acc + parseFloat(event.amount || 0),
+					0
+				);
+				elements.netChangeTimeRange.textContent = formatCurrency(netChange);
+				elements.netChangeTimeRange.className = `text-xl sm:text-2xl font-semibold ${
+					netChange >= 0
+						? elements.html.classList.contains("dark")
+							? "text-green-400"
+							: "text-green-600"
+						: elements.html.classList.contains("dark")
+						? "text-red-400"
+						: "text-red-600"
+				}`;
+			}
+
+			function getComparableData() {
+				const today = new Date();
+				let data = [];
+				const groupingFn = (date) => {
+					if (state.comparisonType === "monthly") {
+						return `${date.getFullYear()}-${String(
+							date.getMonth() + 1
+						).padStart(2, "0")}`;
+					} else if (state.comparisonType === "quarterly") {
+						const quarter = Math.floor(date.getMonth() / 3) + 1;
+						return `${date.getFullYear()}-Q${quarter}`;
+					} else if (state.comparisonType === "yearly") {
+						return `${date.getFullYear()}`;
+					}
+					return null;
+				};
+				const labelFn = (key) => {
+					if (state.comparisonType === "monthly") {
+						const [year, month] = key.split("-");
+						return new Date(year, month - 1).toLocaleDateString("default", {
+							month: "short",
+							year: "numeric",
+						});
+					} else if (state.comparisonType === "quarterly") {
+						const [year, quarter] = key.split("-");
+						return `${quarter} ${year}`;
+					} else if (state.comparisonType === "yearly") {
+						return key;
+					}
+					return key;
+				};
+
+				const eventsByPeriod = {};
+				state.events.forEach((event) => {
+					const date = new Date(event.date);
+					const periodKey = groupingFn(date);
+					if (!periodKey) return;
+
+					if (!eventsByPeriod[periodKey]) {
+						eventsByPeriod[periodKey] = {
+							period: periodKey,
+							label: labelFn(periodKey),
+							income: 0,
+							expenses: 0,
+							net: 0,
+						};
+					}
+					if (event.amount > 0) {
+						eventsByPeriod[periodKey].income += event.amount;
+					} else {
+						eventsByPeriod[periodKey].expenses += Math.abs(event.amount);
+					}
+					eventsByPeriod[periodKey].net += event.amount;
+				});
+				data = Object.values(eventsByPeriod).sort((a, b) =>
+					a.period.localeCompare(b.period)
+				);
+
+				return data;
+			}
+
+			function renderHistoricalChart() {
+				if (!elements.historicalChartCanvas) return;
+				const ctx = elements.historicalChartCanvas.getContext("2d");
+				const comparableData = getComparableData();
+				const isDarkMode = elements.html.classList.contains("dark");
+				const gridColor = isDarkMode
+					? "rgba(255, 255, 255, 0.15)"
+					: "rgba(0, 0, 0, 0.1)";
+				const tickColor = isDarkMode ? "#cbd5e1" : "#4b5563";
+				const labelColor = isDarkMode ? "#f0f4f8" : "#1a202c";
+
+				if (state.historicalChartInstance) {
+					state.historicalChartInstance.destroy();
+					state.historicalChartInstance = null;
+				}
+
+				elements.comparisonPeriodEls.forEach((el) => {
+					el.textContent =
+						state.comparisonType.charAt(0).toUpperCase() +
+						state.comparisonType.slice(1);
+				});
+
+				if (comparableData.length > 0) {
+					const currentPeriod = comparableData[comparableData.length - 1];
+					const previousPeriod =
+						comparableData.length > 1
+							? comparableData[comparableData.length - 2]
+							: null;
+
+					elements.totalIncome.textContent = formatCurrency(
+						currentPeriod.income
+					);
+					elements.totalExpenses.textContent = formatCurrency(
+						currentPeriod.expenses
+					);
+					elements.periodNetChange.textContent = formatCurrency(
+						currentPeriod.net
+					);
+					elements.periodNetChange.className = `text-lg font-semibold ${
+						currentPeriod.net >= 0
+							? isDarkMode
+								? "text-green-400"
+								: "text-green-600"
+							: isDarkMode
+							? "text-red-400"
+							: "text-red-600"
+					}`;
+
+					const calculateChange = (current, previous) => {
+						if (previous === null || previous === undefined) return "N/A";
+						if (previous === 0) {
+							return current === 0 ? "0.0%" : current > 0 ? "+inf%" : "-inf%";
+						}
+						const change = ((current - previous) / Math.abs(previous)) * 100;
+						return `${change >= 0 ? "+" : ""}${change.toFixed(1)}%`;
+					};
+					const getChangeClass = (current, previous) => {
+						if (
+							previous === null ||
+							previous === undefined ||
+							current === previous
+						)
+							return isDarkMode ? "text-gray-400" : "text-gray-600";
+						return current >= previous
+							? isDarkMode
+								? "text-green-400"
+								: "text-green-600"
+							: isDarkMode
+							? "text-red-400"
+							: "text-red-600";
+					};
+					const getExpenseChangeClass = (current, previous) => {
+						if (
+							previous === null ||
+							previous === undefined ||
+							current === previous
+						)
+							return isDarkMode ? "text-gray-400" : "text-gray-600";
+						return current <= previous
+							? isDarkMode
+								? "text-green-400"
+								: "text-green-600"
+							: isDarkMode
+							? "text-red-400"
+							: "text-red-600";
+					};
+					elements.incomeChange.innerHTML = `<span class="${
+						isDarkMode ? "text-gray-500" : "text-gray-500"
+					}">vs prev: </span><span class="${getChangeClass(
+						currentPeriod.income,
+						previousPeriod?.income
+					)}">${calculateChange(
+						currentPeriod.income,
+						previousPeriod?.income
+					)}</span>`;
+					elements.expensesChange.innerHTML = `<span class="${
+						isDarkMode ? "text-gray-500" : "text-gray-500"
+					}">vs prev: </span><span class="${getExpenseChangeClass(
+						currentPeriod.expenses,
+						previousPeriod?.expenses
+					)}">${calculateChange(
+						currentPeriod.expenses,
+						previousPeriod?.expenses
+					)}</span>`;
+					elements.netChangePercent.innerHTML = `<span class="${
+						isDarkMode ? "text-gray-500" : "text-gray-500"
+					}">vs prev: </span><span class="${getChangeClass(
+						currentPeriod.net,
+						previousPeriod?.net
+					)}">${calculateChange(
+						currentPeriod.net,
+						previousPeriod?.net
+					)}</span>`;
+				} else {
+					elements.totalIncome.textContent = formatCurrency(0);
+					elements.totalExpenses.textContent = formatCurrency(0);
+					elements.periodNetChange.textContent = formatCurrency(0);
+					elements.periodNetChange.className = "text-lg font-semibold";
+					elements.incomeChange.innerHTML = `<span class="${
+						isDarkMode ? "text-gray-500" : "text-gray-500"
+					}">vs prev: </span><span>N/A</span>`;
+					elements.expensesChange.innerHTML = `<span class="${
+						isDarkMode ? "text-gray-500" : "text-gray-500"
+					}">vs prev: </span><span>N/A</span>`;
+					elements.netChangePercent.innerHTML = `<span class="${
+						isDarkMode ? "text-gray-500" : "text-gray-500"
+					}">vs prev: </span><span>N/A</span>`;
+				}
+
+				if (comparableData.length < 1) {
+					elements.historicalChartCanvas.style.display = "none";
+					elements.chartMessage.style.display = "block";
+					elements.chartMessage.textContent =
+						"Not enough data for historical comparison.";
+					return;
+				} else {
+					elements.historicalChartCanvas.style.display = "block";
+					elements.chartMessage.style.display = "none";
+				}
+
+				const incomeColor = isDarkMode
+					? "rgb(74, 222, 128)"
+					: "rgb(22, 163, 74)";
+				const incomeBackgroundColor = isDarkMode
+					? "rgba(74, 222, 128, 0.6)"
+					: "rgba(22, 163, 74, 0.6)";
+				const expenseColor = isDarkMode
+					? "rgb(251, 113, 133)"
+					: "rgb(225, 29, 72)";
+				const expenseBackgroundColor = isDarkMode
+					? "rgba(251, 113, 133, 0.6)"
+					: "rgba(225, 29, 72, 0.6)";
+				const netColor = isDarkMode ? "rgb(96, 165, 250)" : "rgb(37, 99, 235)";
+				const netBackgroundColor = isDarkMode
+					? "rgba(96, 165, 250, 0.6)"
+					: "rgba(37, 99, 235, 0.6)";
+
+				state.historicalChartInstance = new Chart(ctx, {
+					type: "bar",
+					data: {
+						labels: comparableData.map((d) => d.label),
+						datasets: [
+							{
+								label: "Income",
+								data: comparableData.map((d) => d.income),
+								backgroundColor: incomeBackgroundColor,
+								borderColor: incomeColor,
+								borderWidth: 1,
+								hidden: !elements.showIncome.checked,
+								order: 2,
+							},
+							{
+								label: "Expenses",
+								data: comparableData.map((d) => d.expenses),
+								backgroundColor: expenseBackgroundColor,
+								borderColor: expenseColor,
+								borderWidth: 1,
+								hidden: !elements.showExpenses.checked,
+								order: 2,
+							},
+							{
+								label: "Net",
+								data: comparableData.map((d) => d.net),
+								backgroundColor: netBackgroundColor,
+								borderColor: netColor,
+								borderWidth: 2,
+								hidden: !elements.showNet.checked,
+								type: "line",
+								order: 1,
+								tension: 0.1,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									color: tickColor,
+									callback: function (value) {
+										return formatCurrency(value);
+									},
+								},
+								grid: {
+									color: gridColor,
+									drawBorder: false,
+								},
+							},
+							x: {
+								ticks: {
+									color: tickColor,
+									maxRotation: 45,
+									minRotation: 0,
+								},
+								grid: {
+									color: gridColor,
+									display: false,
+								},
+							},
+						},
+						plugins: {
+							legend: {
+								display: false,
+							},
+							tooltip: {
+								backgroundColor: isDarkMode ? "#334155" : "#fff",
+								titleColor: isDarkMode ? "#f0f4f8" : "#1a202c",
+								bodyColor: isDarkMode ? "#f0f4f8" : "#1a202c",
+								borderColor: isDarkMode ? "#475569" : "#e5e7eb",
+								borderWidth: 1,
+								padding: 10,
+								cornerRadius: 6,
+								callbacks: {
+									label: function (context) {
+										const value = context.parsed?.y;
+										return `${context.dataset.label}: ${
+											value !== undefined ? formatCurrency(value) : "N/A"
+										}`;
+									},
+								},
+							},
+						},
+						animation: {
+							duration: 1000,
+							easing: "easeOutQuart",
+						},
+					},
+				});
+			}
+
+			function openPopup(eventId = null) {
+				elements.popupForm.reset();
+				clearValidationErrors();
+
+				if (eventId !== null && eventId !== undefined) {
+					state.currentEventId = eventId;
+					const event = state.events.find((e) => e.id == eventId);
+					if (event) {
+						elements.popupTitle.textContent = "Edit Event";
+						elements.eventTitle.value = event.title;
+						elements.eventDate.value = event.date;
+						elements.eventType.value = event.amount >= 0 ? "credit" : "debit";
+						elements.eventAmount.value = Math.abs(event.amount);
+						elements.eventGoal.value = event.goal || "";
+						elements.eventNotes.value = event.notes || "";
+						elements.deleteEventBtn.style.display = "flex";
+					} else {
+						console.error("Event not found for ID:", eventId);
+						state.currentEventId = null;
+						return;
+					}
+				} else {
+					state.currentEventId = null;
+					elements.popupTitle.textContent = "Add New Event";
+					elements.eventDate.value = new Date().toISOString().split("T")[0];
+					elements.eventType.value = "credit";
+					elements.deleteEventBtn.style.display = "none";
+				}
+
+				elements.popup.classList.add("visible");
+				setTimeout(() => elements.eventTitle.focus(), 50);
+			}
+
+			function closePopup() {
+				elements.popup.classList.remove("visible");
+				clearValidationErrors();
+				state.currentEventId = null;
+			}
+
+			function validateForm() {
+				clearValidationErrors();
+				let isValid = true;
+
+				if (!elements.eventTitle.value.trim()) {
+					addValidationError(elements.eventTitle, "Please enter a title");
+					isValid = false;
+				}
+				if (
+					!elements.eventDate.value ||
+					isNaN(new Date(elements.eventDate.value).getTime())
+				) {
+					addValidationError(elements.eventDate, "Please enter a valid date");
+					isValid = false;
+				}
+				const amountValue = parseFloat(elements.eventAmount.value);
+				if (isNaN(amountValue) || amountValue <= 0) {
+					addValidationError(
+						elements.eventAmount,
+						"Please enter a valid positive amount"
+					);
+					isValid = false;
+				}
+				return isValid;
+			}
+
+			function clearValidationErrors() {
+				elements.popupForm
+					.querySelectorAll(".validation-error")
+					.forEach((el) => el.remove());
+				elements.popupForm
+					.querySelectorAll(".invalid")
+					.forEach((el) => el.classList.remove("invalid"));
+			}
+
+			function addValidationError(element, message) {
+				element.classList.add("invalid");
+				const error = document.createElement("div");
+				error.className = "validation-error";
+				error.textContent = message;
+				element.parentNode.insertBefore(error, element.nextSibling);
+			}
+
+			function saveEvent() {
+				if (!validateForm()) return;
+				const amount =
+					parseFloat(elements.eventAmount.value) *
+					(elements.eventType.value === "credit" ? 1 : -1);
+				const eventData = {
+					id:
+						state.currentEventId !== null
+							? state.currentEventId
+							: generateUniqueId(),
+					title: elements.eventTitle.value.trim(),
+					date: elements.eventDate.value,
+					amount: amount,
+					goal: elements.eventGoal.value.trim(),
+					notes: elements.eventNotes.value.trim(),
+				};
+				if (state.currentEventId !== null) {
+					const eventIndex = state.events.findIndex(
+						(e) => e.id == state.currentEventId
+					);
+					if (eventIndex >= 0) {
+						state.events[eventIndex] = eventData;
+					} else {
+						console.error("Event to edit not found, adding as new.");
+						state.events.push(eventData);
+					}
+				} else {
+					state.events.push(eventData);
+				}
+
+				closePopup();
+				renderTimeline();
+
+				const successToast = document.createElement("div");
+				successToast.className =
+					"fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-[2000] flex items-center";
+				successToast.innerHTML = `<i class="fas fa-check-circle mr-2"></i> ${
+					state.currentEventId !== null
+						? "Event updated successfully"
+						: "Event added successfully"
+				}`;
+				document.body.appendChild(successToast);
+
+				setTimeout(() => {
+					successToast.style.opacity = "0";
+					successToast.style.transition = "opacity 0.5s ease-out";
+					setTimeout(() => successToast.remove(), 500);
+				}, 2000);
+			}
+
+			function deleteEvent() {
+				if (state.currentEventId === null) return;
+
+				const confirmDialog = document.createElement("div");
+				confirmDialog.className =
+					"fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[2000] p-4";
+				confirmDialog.style.backdropFilter = "blur(3px)";
+				confirmDialog.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-sm w-full p-6 transform transition-all">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Confirm Deletion</h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Are you sure you want to delete this event? This action cannot be undone.</p>
+                    <div class="flex justify-end space-x-3">
+                        <button id="cancelDelete" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-md transition duration-200">Cancel</button>
+                        <button id="confirmDelete" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition duration-200">Delete</button>
+                    </div>
+                </div>
+            `;
+
+				document.body.appendChild(confirmDialog);
+
+				document
+					.getElementById("cancelDelete")
+					.addEventListener("click", () => {
+						confirmDialog.style.opacity = "0";
+						confirmDialog.style.transition = "opacity 0.3s ease-out";
+						setTimeout(() => confirmDialog.remove(), 300);
+					});
+
+				document
+					.getElementById("confirmDelete")
+					.addEventListener("click", () => {
+						const idToDelete = state.currentEventId;
+						state.events = state.events.filter((e) => e.id != idToDelete);
+						closePopup();
+						renderTimeline();
+						confirmDialog.remove();
+
+						const deleteToast = document.createElement("div");
+						deleteToast.className =
+							"fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-[2000] flex items-center";
+						deleteToast.innerHTML = `<i class="fas fa-trash mr-2"></i> Event deleted successfully`;
+						document.body.appendChild(deleteToast);
+
+						setTimeout(() => {
+							deleteToast.style.opacity = "0";
+							deleteToast.style.transition = "opacity 0.5s ease-out";
+							setTimeout(() => deleteToast.remove(), 500);
+						}, 2000);
+					});
+			}
+
+			function openExportPopup() {
+				elements.exportPopup.classList.add("visible");
+			}
+
+			function closeExportPopup() {
+				elements.exportPopup.classList.remove("visible");
+			}
+
+			function exportEvents(format) {
+				if (state.events.length === 0) {
+					alert("No events to export.");
+					closeExportPopup();
+					return;
+				}
+
+				let content, filename, mimeType;
+				if (format === "json") {
+					content = JSON.stringify(state.events, null, 2);
+					filename = "financial-events.json";
+					mimeType = "application/json";
+				} else if (format === "csv") {
+					const headers = ["id", "title", "date", "amount", "goal", "notes"];
+					const rows = state.events.map((event) =>
+						headers
+							.map(
+								(header) =>
+									`"${String(event[header] ?? "").replace(/"/g, '""')}"`
+							)
+							.join(",")
+					);
+					content = [headers.join(","), ...rows].join("\n");
+					filename = "financial-events.csv";
+					mimeType = "text/csv;charset=utf-8;";
+				} else {
+					return;
+				}
+
+				const blob = new Blob([content], { type: mimeType });
+				const link = document.createElement("a");
+				link.href = URL.createObjectURL(blob);
+				link.download = filename;
+				link.style.display = "none";
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+				URL.revokeObjectURL(link.href);
+				closeExportPopup();
+
+				const exportToast = document.createElement("div");
+				exportToast.className =
+					"fixed bottom-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-[2000] flex items-center";
+				exportToast.innerHTML = `<i class="fas fa-download mr-2"></i> Events exported as ${format.toUpperCase()}`;
+				document.body.appendChild(exportToast);
+
+				setTimeout(() => {
+					exportToast.style.opacity = "0";
+					exportToast.style.transition = "opacity 0.5s ease-out";
+					setTimeout(() => exportToast.remove(), 500);
+				}, 2000);
+			}
+
+			function importEvents(file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					try {
+						let importedEvents;
+						if (
+							file.type === "application/json" ||
+							file.name.endsWith(".json")
+						) {
+							importedEvents = JSON.parse(e.target.result);
+						} else if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+							importedEvents = parseCSV(e.target.result);
+						} else {
+							throw new Error("Unsupported file format. Use JSON or CSV.");
+						}
+
+						if (!Array.isArray(importedEvents))
+							throw new Error("Invalid data format in imported file");
+						const validEvents = importedEvents
+							.map((event) => ({
+								id: event.id || generateUniqueId(),
+								title: String(event.title || "Untitled").substring(0, 50),
+								date: String(event.date || ""),
+								amount: Number(event.amount || 0),
+								goal: String(event.goal || "").substring(0, 100),
+								notes: String(event.notes || "").substring(0, 200),
+							}))
+							.filter(
+								(event) =>
+									event.title &&
+									event.date &&
+									!isNaN(event.amount) &&
+									!isNaN(new Date(event.date + "T00:00:00").getTime())
+							);
+
+						if (validEvents.length === 0)
+							throw new Error("No valid events found in the imported file");
+
+						const confirmDialog = document.createElement("div");
+						confirmDialog.className =
+							"fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-[2000] p-4";
+						confirmDialog.style.backdropFilter = "blur(3px)";
+						confirmDialog.innerHTML = `
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6 transform transition-all">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Import Confirmation</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">You're about to import ${validEvents.length} events.</p>
+                            <p class="text-gray-600 dark:text-gray-300 mb-6">Would you like to replace all existing events or merge with your current data?</p>
+                            <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-3">
+                                <button id="cancelImport" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 rounded-md transition duration-200">Cancel</button>
+                                <button id="mergeImport" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition duration-200">Merge Data</button>
+                                <button id="replaceImport" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition duration-200">Replace All</button>
+                            </div>
+                        </div>
+                    `;
+
+						document.body.appendChild(confirmDialog);
+
+						document
+							.getElementById("cancelImport")
+							.addEventListener("click", () => {
+								confirmDialog.style.opacity = "0";
+								confirmDialog.style.transition = "opacity 0.3s ease-out";
+								setTimeout(() => confirmDialog.remove(), 300);
+							});
+
+						document
+							.getElementById("mergeImport")
+							.addEventListener("click", () => {
+								const existingIds = new Set(state.events.map((e) => e.id));
+								const newEvents = validEvents.filter(
+									(e) => !existingIds.has(e.id)
+								);
+								state.events = [...state.events, ...newEvents];
+								renderTimeline();
+
+								confirmDialog.remove();
+								showToast(
+									`Imported and merged ${newEvents.length} new events.`,
+									"success"
+								);
+							});
+
+						document
+							.getElementById("replaceImport")
+							.addEventListener("click", () => {
+								state.events = validEvents;
+								renderTimeline();
+								confirmDialog.remove();
+								showToast(
+									`Successfully imported ${validEvents.length} events.`,
+									"success"
+								);
+							});
+					} catch (error) {
+						console.error("Error importing events:", error);
+						showToast(`Import failed: ${error.message}`, "error");
+					} finally {
+						elements.importFileEl.value = "";
+					}
+				};
+				reader.onerror = () => {
+					showToast("Error reading file", "error");
+					elements.importFileEl.value = "";
+				};
+				reader.readAsText(file);
+			}
+
+			function showToast(message, type = "info") {
+				const toast = document.createElement("div");
+				let bgColor, icon;
+
+				switch (type) {
+					case "success":
+						bgColor = "bg-green-600";
+						icon = "fa-check-circle";
+						break;
+					case "error":
+						bgColor = "bg-red-600";
+						icon = "fa-exclamation-circle";
+						break;
+					case "warning":
+						bgColor = "bg-yellow-500";
+						icon = "fa-exclamation-triangle";
+						break;
+					default:
+						bgColor = "bg-blue-600";
+						icon = "fa-info-circle";
+				}
+
+				toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-4 py-3 rounded-lg shadow-lg z-[2000] flex items-center opacity-0 transition-opacity duration-300`;
+				toast.innerHTML = `<i class="fas ${icon} mr-2"></i> ${message}`;
+				document.body.appendChild(toast);
+
+				setTimeout(() => {
+					toast.style.opacity = "1";
+				}, 10);
+
+				setTimeout(() => {
+					toast.style.opacity = "0";
+					setTimeout(() => toast.remove(), 300);
+				}, 3000);
+			}
+
+			function parseCSV(csvText) {
+				try {
+					const lines = csvText.trim().split("\n");
+					if (lines.length < 2)
+						throw new Error(
+							"CSV must have a header row and at least one data row."
+						);
+
+					const headers = lines[0].split(",").map((h) => {
+						h = h.trim();
+
+						return h.replace(/^["'](.*)["']$/, "$1").toLowerCase();
+					});
+
+					const idIndex = headers.indexOf("id");
+					const titleIndex = headers.indexOf("title");
+					const dateIndex = headers.indexOf("date");
+					const amountIndex = headers.indexOf("amount");
+					const goalIndex = headers.indexOf("goal");
+					const notesIndex = headers.indexOf("notes");
+
+					if (titleIndex === -1 || dateIndex === -1 || amountIndex === -1) {
+						throw new Error("CSV must include title, date, and amount columns");
+					}
+
+					return lines
+						.slice(1)
+						.map((line) => {
+							if (!line.trim()) return null;
+
+							const values = [];
+							let inQuotes = false;
+							let currentValue = "";
+
+							for (let i = 0; i < line.length; i++) {
+								const char = line[i];
+
+								if (char === '"' && (i === 0 || line[i - 1] !== "\\")) {
+									inQuotes = !inQuotes;
+								} else if (char === "," && !inQuotes) {
+									values.push(currentValue);
+									currentValue = "";
+								} else {
+									currentValue += char;
+								}
+							}
+
+							values.push(currentValue);
+
+							values.forEach((val, i) => {
+								values[i] = val.trim().replace(/^["'](.*)["']$/, "$1");
+							});
+
+							const event = {};
+							event.id =
+								idIndex !== -1 && values[idIndex]
+									? parseInt(values[idIndex], 10) || generateUniqueId()
+									: generateUniqueId();
+							event.title =
+								titleIndex !== -1
+									? values[titleIndex] || "Untitled"
+									: "Untitled";
+							event.date = dateIndex !== -1 ? values[dateIndex] || "" : "";
+							event.amount =
+								amountIndex !== -1
+									? parseFloat(values[amountIndex].replace(/[^-0-9.]/g, "")) ||
+									  0
+									: 0;
+							event.goal = goalIndex !== -1 ? values[goalIndex] || "" : "";
+							event.notes = notesIndex !== -1 ? values[notesIndex] || "" : "";
+
+							return event;
+						})
+						.filter(
+							(event) =>
+								event !== null &&
+								event.title &&
+								event.date &&
+								!isNaN(event.amount)
+						);
+				} catch (error) {
+					console.error("CSV parsing error:", error);
+					throw new Error(`CSV parsing error: ${error.message}`);
+				}
+			}
+
+			function setFilterActive(filter) {
+				elements.filterPast.className = `filter-btn px-3 py-1 text-sm rounded-md ${
+					filter === "past" ? "active" : ""
+				}`;
+				elements.filterAll.className = `filter-btn px-3 py-1 text-sm rounded-md ${
+					filter === "all" ? "active" : ""
+				}`;
+				elements.filterFuture.className = `filter-btn px-3 py-1 text-sm rounded-md ${
+					filter === "future" ? "active" : ""
+				}`;
+			}
+
+			function debounce(func, wait) {
+				let timeout;
+				return function executedFunction(...args) {
+					const later = () => {
+						clearTimeout(timeout);
+						func(...args);
+					};
+					clearTimeout(timeout);
+					timeout = setTimeout(later, wait);
+				};
+			}
+
+			function clearDropTargets() {
+				elements.timeline
+					.querySelectorAll(".event-drop-target")
+					.forEach((el) => el.classList.remove("event-drop-target"));
+			}
+
+			function getDragAfterElement(container, x) {
+				const draggableElements = [
+					...container.querySelectorAll(".event:not(.dragging)"),
+				];
+				return draggableElements.reduce(
+					(closest, child) => {
+						const box = child.getBoundingClientRect();
+						const offset = x - box.left - box.width / 2;
+						if (offset < 0 && offset > closest.offset) {
+							return { offset: offset, element: child };
+						} else {
+							return closest;
+						}
+					},
+					{ offset: Number.NEGATIVE_INFINITY }
+				).element;
+			}
+
+			function addRippleEffect(button) {
+				button.addEventListener("click", function (e) {
+					const ripple = document.createElement("span");
+					ripple.classList.add("ripple");
+					this.appendChild(ripple);
+
+					const rect = button.getBoundingClientRect();
+					const size = Math.max(rect.width, rect.height);
+					const x = e.clientX - rect.left - size / 2;
+					const y = e.clientY - rect.top - size / 2;
+
+					ripple.style.width = ripple.style.height = `${size}px`;
+					ripple.style.left = `${x}px`;
+					ripple.style.top = `${y}px`;
+
+					setTimeout(() => {
+						ripple.remove();
+					}, 600);
+				});
+			}
+
+			function initEventListeners() {
+				elements.themeToggleBtn.addEventListener("click", toggleTheme);
+
+				elements.addEventBtn.addEventListener("click", () => openPopup());
+				elements.closePopupBtn.addEventListener("click", closePopup);
+				elements.popupForm.addEventListener("submit", (e) => {
+					e.preventDefault();
+					saveEvent();
+				});
+				elements.deleteEventBtn.addEventListener("click", deleteEvent);
+
+				document.addEventListener("click", (e) => {
+					if (
+						elements.popup.classList.contains("visible") &&
+						!elements.popup.querySelector("div").contains(e.target) &&
+						!e.target.closest(".event") &&
+						e.target !== elements.addEventBtn
+					) {
+						closePopup();
+					}
+					if (
+						elements.exportPopup.classList.contains("visible") &&
+						!elements.exportPopup.querySelector("div").contains(e.target) &&
+						e.target !== elements.exportDataBtn
+					) {
+						closeExportPopup();
+					}
+				});
+
+				elements.popup
+					.querySelector("div")
+					.addEventListener("click", (e) => e.stopPropagation());
+				elements.exportPopup
+					.querySelector("div")
+					.addEventListener("click", (e) => e.stopPropagation());
+
+				elements.exportDataBtn.addEventListener("click", openExportPopup);
+				elements.exportJSONBtn.addEventListener("click", () =>
+					exportEvents("json")
+				);
+				elements.exportCSVBtn.addEventListener("click", () =>
+					exportEvents("csv")
+				);
+				elements.closeExportPopupBtn.addEventListener(
+					"click",
+					closeExportPopup
+				);
+				elements.importDataBtn.addEventListener("click", () =>
+					elements.importFileEl.click()
+				);
+				elements.importFileEl.addEventListener("change", (e) => {
+					if (e.target.files.length > 0) {
+						importEvents(e.target.files[0]);
+					}
+				});
+
+				elements.searchEvents.addEventListener(
+					"input",
+					debounce(() => {
+						renderTimeline();
+
+						const searchTerm = elements.searchEvents.value.trim();
+						if (searchTerm) {
+							const filteredCount =
+								elements.timeline.querySelectorAll(".event").length;
+							if (filteredCount > 0) {
+								showToast(`Found ${filteredCount} matching events`, "info");
+							}
+						}
+					}, 300)
+				);
+
+				elements.filterPast.addEventListener("click", () => {
+					state.filter = "past";
+					setFilterActive("past");
+					renderTimeline();
+					showToast("Showing past events", "info");
+				});
+
+				elements.filterAll.addEventListener("click", () => {
+					state.filter = "all";
+					setFilterActive("all");
+					renderTimeline();
+				});
+
+				elements.filterFuture.addEventListener("click", () => {
+					state.filter = "future";
+					setFilterActive("future");
+					renderTimeline();
+					showToast("Showing future events", "info");
+				});
+
+				elements.timeRangeSelector.addEventListener("change", () => {
+					state.timeRange = elements.timeRangeSelector.value;
+					updateWidgets();
+
+					const rangeText =
+						elements.timeRangeSelector.options[
+							elements.timeRangeSelector.selectedIndex
+						].text;
+					showToast(`Showing data for ${rangeText}`, "info");
+				});
+
+				elements.comparisonType.addEventListener("change", () => {
+					state.comparisonType = elements.comparisonType.value;
+					renderHistoricalChart();
+
+					const typeText =
+						elements.comparisonType.options[
+							elements.comparisonType.selectedIndex
+						].text;
+					showToast(`Showing ${typeText.toLowerCase()} comparison`, "info");
+				});
+
+				elements.showIncome.addEventListener("change", () => {
+					if (state.historicalChartInstance) {
+						state.historicalChartInstance.setDatasetVisibility(
+							0,
+							elements.showIncome.checked
+						);
+						state.historicalChartInstance.update();
+					}
+				});
+
+				elements.showExpenses.addEventListener("change", () => {
+					if (state.historicalChartInstance) {
+						state.historicalChartInstance.setDatasetVisibility(
+							1,
+							elements.showExpenses.checked
+						);
+						state.historicalChartInstance.update();
+					}
+				});
+
+				elements.showNet.addEventListener("change", () => {
+					if (state.historicalChartInstance) {
+						state.historicalChartInstance.setDatasetVisibility(
+							2,
+							elements.showNet.checked
+						);
+						state.historicalChartInstance.update();
+					}
+				});
+
+				elements.getStartedBtn.addEventListener("click", () => {
+					elements.timelineSection.scrollIntoView({ behavior: "smooth" });
+					showToast("Scroll down to view your timeline", "info");
+				});
+
+				document.addEventListener("keydown", (e) => {
+					if (e.key === "Escape") {
+						if (elements.popup.classList.contains("visible")) closePopup();
+						if (elements.exportPopup.classList.contains("visible"))
+							closeExportPopup();
+					}
+
+					if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+						e.preventDefault();
+						openPopup();
+					}
+				});
+
+				if (elements.timeline) {
+					elements.timeline.addEventListener("dragover", (e) => {
+						e.preventDefault();
+						const draggingElement = document.querySelector(".dragging");
+						if (!draggingElement) return;
+
+						const afterElement = getDragAfterElement(
+							elements.timeline,
+							e.clientX
+						);
+						clearDropTargets();
+
+						const draggedDate = draggingElement.dataset.eventDate;
+						let allowDrop = false;
+
+						if (afterElement) {
+							const targetDate = afterElement.dataset.eventDate;
+							if (draggedDate === targetDate) {
+								afterElement.classList.add("event-drop-target");
+								allowDrop = true;
+							}
+						} else {
+							const lastElement = elements.timeline.querySelector(
+								".event:not(.dragging):last-child"
+							);
+							if (
+								lastElement &&
+								draggedDate === lastElement.dataset.eventDate
+							) {
+								allowDrop = true;
+							} else if (!lastElement) {
+								allowDrop = true;
+							} else {
+								let lastSameDate = false;
+								const events = elements.timeline.querySelectorAll(
+									".event:not(.dragging)"
+								);
+								for (let i = events.length - 1; i >= 0; i--) {
+									if (events[i].dataset.eventDate === draggedDate) {
+										lastSameDate = true;
+										break;
+									}
+								}
+								allowDrop = lastSameDate;
+							}
+						}
+
+						if (allowDrop) {
+							e.dataTransfer.dropEffect = "move";
+							if (elements.timelineWrapper)
+								elements.timelineWrapper.classList.add("drag-over");
+						} else {
+							e.dataTransfer.dropEffect = "none";
+							if (elements.timelineWrapper)
+								elements.timelineWrapper.classList.remove("drag-over");
+						}
+					});
+
+					elements.timeline.addEventListener("dragleave", (e) => {
+						if (!elements.timeline.contains(e.relatedTarget)) {
+							clearDropTargets();
+							if (elements.timelineWrapper)
+								elements.timelineWrapper.classList.remove("drag-over");
+						}
+					});
+
+					elements.timeline.addEventListener("drop", (e) => {
+						e.preventDefault();
+						clearDropTargets();
+						if (elements.timelineWrapper)
+							elements.timelineWrapper.classList.remove("drag-over");
+						const draggedId = e.dataTransfer.getData("text/plain");
+
+						if (!draggedId) {
+							console.error("No dragged event ID found in dataTransfer");
+							state.draggedEventId = null;
+							return;
+						}
+
+						const draggedEventIndex = state.events.findIndex(
+							(ev) => ev.id == draggedId
+						);
+						if (draggedEventIndex === -1) {
+							console.error(
+								"Dragged event not found in state array:",
+								draggedId
+							);
+							state.draggedEventId = null;
+							return;
+						}
+
+						const draggedEvent = state.events[draggedEventIndex];
+						const afterElement = getDragAfterElement(
+							elements.timeline,
+							e.clientX
+						);
+						let targetIndex = -1;
+
+						if (afterElement) {
+							const targetId = afterElement.dataset.eventId;
+							const targetEvent = state.events.find((ev) => ev.id == targetId);
+							if (targetEvent && targetEvent.date === draggedEvent.date) {
+								targetIndex = state.events.findIndex((ev) => ev.id == targetId);
+							} else {
+								console.warn("Cannot drop: Events must have the same date.");
+								state.draggedEventId = null;
+								return;
+							}
+						} else {
+							let lastValidIndex = -1;
+							for (let i = state.events.length - 1; i >= 0; i--) {
+								if (state.events[i].date === draggedEvent.date) {
+									lastValidIndex = i;
+									break;
+								}
+							}
+
+							if (
+								lastValidIndex !== -1 &&
+								state.events[lastValidIndex].id !== draggedId
+							) {
+								targetIndex = lastValidIndex + 1;
+							} else if (
+								lastValidIndex === draggedEventIndex &&
+								state.events.length === 1
+							) {
+								targetIndex = draggedEventIndex;
+							} else if (lastValidIndex !== -1) {
+								targetIndex = lastValidIndex + 1;
+							} else {
+								console.warn("Cannot determine drop position at the end.");
+								state.draggedEventId = null;
+								return;
+							}
+						}
+
+						if (targetIndex !== -1 && targetIndex !== draggedEventIndex) {
+							const [movedEvent] = state.events.splice(draggedEventIndex, 1);
+							const adjustedTargetIndex =
+								targetIndex > draggedEventIndex ? targetIndex - 1 : targetIndex;
+							state.events.splice(adjustedTargetIndex, 0, movedEvent);
+							renderTimeline();
+							showToast("Event order updated", "success");
+						}
+
+						state.draggedEventId = null;
+					});
+				}
+
+				const observer = new MutationObserver((mutations) => {
+					mutations.forEach((mutation) => {
+						if (
+							mutation.type === "childList" &&
+							mutation.addedNodes.length > 0
+						) {
+							const eventNodes = Array.from(mutation.addedNodes).filter(
+								(node) =>
+									node.nodeType === 1 && node.classList.contains("event")
+							);
+
+							if (eventNodes.length > 0) {
+								const announcement = document.createElement("div");
+								announcement.setAttribute("role", "status");
+								announcement.setAttribute("aria-live", "polite");
+								announcement.className = "sr-only";
+								announcement.textContent = `Timeline updated with ${eventNodes.length} events`;
+								document.body.appendChild(announcement);
+
+								setTimeout(() => {
+									announcement.remove();
+								}, 3000);
+							}
+						}
+					});
+				});
+
+				observer.observe(elements.timeline, { childList: true });
+			}
+
+			function init() {
+				loadTheme();
+				setFilterActive(state.filter);
+				if (elements.footerYear)
+					elements.footerYear.textContent = new Date().getFullYear();
+
+				const loadingOverlay = document.createElement("div");
+				loadingOverlay.className =
+					"fixed inset-0 bg-white dark:bg-gray-900 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500";
+				loadingOverlay.innerHTML = `
+                <div class="w-16 h-16 relative">
+                    <div class="absolute top-0 left-0 w-full h-full border-4 border-blue-200 dark:border-blue-900 rounded-full"></div>
+                    <div class="absolute top-0 left-0 w-full h-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin"></div>
+                </div>
+                <p class="mt-4 text-lg text-gray-700 dark:text-gray-300">Loading your financial timeline...</p>
+            `;
+				document.body.appendChild(loadingOverlay);
+
+				setTimeout(() => {
+					loadEvents();
+					renderTimeline();
+					initEventListeners();
+
+					loadingOverlay.style.opacity = "0";
+					setTimeout(() => {
+						loadingOverlay.remove();
+
+						showToast("Welcome to your Financial Timeline!", "success");
+					}, 500);
+				}, 800);
+
+				if (window.innerWidth < 640) {
+					setTimeout(() => {
+						showToast(
+							"Tip: Rotate your device for a better timeline view",
+							"info"
+						);
+					}, 2000);
+				}
+
+				document.querySelectorAll("button").forEach((button) => {
+					if (
+						!button.classList.contains("filter-btn") &&
+						!button.id.includes("theme")
+					) {
+						addRippleEffect(button);
+					}
+				});
+			}
+
+			document.addEventListener("DOMContentLoaded", init);
+		</script>
+	</body>
+</html>
