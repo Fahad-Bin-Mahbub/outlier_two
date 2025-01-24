@@ -1,0 +1,3419 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CompareWise | Product Comparison Tool</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+			:root {
+				--primary: #4f46e5;
+				--primary-light: #6366f1;
+				--primary-dark: #4338ca;
+				--secondary: #0ea5e9;
+				--secondary-light: #38bdf8;
+				--accent: #f59e0b;
+				--success: #10b981;
+				--danger: #ef4444;
+				--warning: #f59e0b;
+				--info: #3b82f6;
+
+				--dark: #1e293b;
+				--medium: #64748b;
+				--light: #f1f5f9;
+				--white: #ffffff;
+
+				--bg-color: #f8fafc;
+				--card-bg: var(--white);
+				--header-bg: var(--white);
+				--footer-bg: var(--dark);
+				--border-color: #e2e8f0;
+
+				--body-font: "Poppins", sans-serif;
+				--heading-color: var(--dark);
+				--body-color: #334155;
+
+				--spacing-xs: 0.25rem;
+				--spacing-sm: 0.5rem;
+				--spacing-md: 1rem;
+				--spacing-lg: 1.5rem;
+				--spacing-xl: 2rem;
+				--spacing-xxl: 3rem;
+
+				--radius-sm: 0.25rem;
+				--radius-md: 0.5rem;
+				--radius-lg: 0.75rem;
+				--radius-xl: 1rem;
+				--radius-full: 9999px;
+
+				--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+				--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+				--shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+					0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+				--transition-fast: 150ms ease;
+				--transition-normal: 250ms ease;
+				--transition-slow: 350ms ease;
+
+				--z-header: 100;
+				--z-modal: 200;
+				--z-toast: 300;
+			}
+
+			*,
+			*::before,
+			*::after {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			html {
+				font-size: 16px;
+				scroll-behavior: smooth;
+			}
+
+			body {
+				font-family: var(--body-font);
+				color: var(--body-color);
+				background-color: var(--bg-color);
+				line-height: 1.6;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			a {
+				text-decoration: none;
+				color: var(--primary);
+				transition: color var(--transition-fast);
+			}
+
+			a:hover {
+				color: var(--primary-light);
+			}
+
+			ul,
+			ol {
+				list-style: none;
+			}
+
+			img {
+				max-width: 100%;
+				height: auto;
+			}
+
+			button,
+			input,
+			select,
+			textarea {
+				font-family: inherit;
+				font-size: inherit;
+			}
+
+			button {
+				cursor: pointer;
+				border: none;
+				background: none;
+			}
+
+			main {
+				flex: 1;
+				padding: var(--spacing-xl) 0;
+			}
+
+			.container {
+				width: 100%;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 var(--spacing-lg);
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				color: var(--heading-color);
+				font-weight: 600;
+				line-height: 1.3;
+			}
+
+			h1 {
+				font-size: 2rem;
+				margin-bottom: var(--spacing-md);
+			}
+
+			h2 {
+				font-size: 1.75rem;
+				margin-bottom: var(--spacing-md);
+			}
+
+			h3 {
+				font-size: 1.25rem;
+				margin-bottom: var(--spacing-sm);
+			}
+
+			p {
+				margin-bottom: var(--spacing-md);
+			}
+
+			.tagline {
+				color: var(--medium);
+				font-size: 0.85rem;
+				margin-bottom: 0;
+			}
+
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.625rem 1.25rem;
+				border-radius: var(--radius-md);
+				font-weight: 500;
+				transition: all var(--transition-normal);
+				gap: var(--spacing-sm);
+			}
+
+			.btn i {
+				font-size: 1rem;
+			}
+
+			.primary-btn {
+				background-color: var(--primary);
+				color: var(--white);
+			}
+
+			.primary-btn:hover {
+				background-color: var(--primary-dark);
+				color: var(--white);
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-md);
+			}
+
+			.primary-btn:active {
+				transform: translateY(0);
+			}
+
+			.secondary-btn {
+				background-color: var(--light);
+				color: var(--dark);
+			}
+
+			.secondary-btn:hover {
+				background-color: var(--border-color);
+				transform: translateY(-2px);
+			}
+
+			.view-btn {
+				background-color: var(--white);
+				border: 1px solid var(--border-color);
+				padding: 0.5rem 1rem;
+			}
+
+			.view-btn.active,
+			.view-btn:hover {
+				background-color: var(--primary-light);
+				color: var(--white);
+				border-color: var(--primary-light);
+			}
+
+			.filter-btn {
+				background-color: var(--primary);
+				color: var(--white);
+				padding: 0.5rem 1.25rem;
+			}
+
+			.filter-btn:hover {
+				background-color: var(--primary-dark);
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.compare-btn {
+				background-color: var(--secondary);
+				color: var(--white);
+			}
+
+			.compare-btn:hover:not([disabled]) {
+				background-color: var(--primary);
+				transform: translateY(-2px);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.compare-btn[disabled] {
+				background-color: var(--border-color);
+				color: var(--medium);
+				cursor: not-allowed;
+			}
+
+			.site-header {
+				background-color: var(--header-bg);
+				box-shadow: var(--shadow-sm);
+				padding: var(--spacing-md) 0;
+				position: sticky;
+				top: 0;
+				z-index: var(--z-header);
+			}
+
+			.header-container {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.logo-section {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--primary);
+			}
+
+			.logo i {
+				color: var(--accent);
+			}
+
+			.search-section {
+				flex: 1;
+				max-width: 500px;
+				margin: 0 var(--spacing-xl);
+			}
+
+			.search-form {
+				display: flex;
+				position: relative;
+			}
+
+			.search-form input {
+				width: 100%;
+				padding: 0.75rem 1rem 0.75rem 2.5rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--radius-full);
+				transition: border-color var(--transition-fast),
+					box-shadow var(--transition-fast);
+			}
+
+			.search-form input:focus {
+				outline: none;
+				border-color: var(--primary-light);
+				box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+			}
+
+			.search-form button {
+				position: absolute;
+				left: 0.75rem;
+				top: 50%;
+				transform: translateY(-50%);
+				color: var(--medium);
+				font-size: 1rem;
+			}
+
+			.user-section {
+				position: relative;
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-lg);
+			}
+
+			.comparison-count,
+			.notifications {
+				position: relative;
+				font-size: 1.25rem;
+				color: var(--medium);
+				cursor: pointer;
+				transition: color var(--transition-fast);
+			}
+
+			.comparison-count:hover,
+			.notifications:hover {
+				color: var(--primary);
+			}
+
+			.badge {
+				position: absolute;
+				top: -8px;
+				right: -8px;
+				background-color: var(--danger);
+				color: white;
+				font-size: 0.7rem;
+				min-width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--radius-full);
+				padding: 0 var(--spacing-xs);
+			}
+
+			.user-profile {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+				cursor: pointer;
+				position: relative;
+			}
+
+			.avatar {
+				width: 40px;
+				height: 40px;
+				border-radius: var(--radius-full);
+				overflow: hidden;
+				background-color: var(--primary-light);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.avatar img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+			}
+
+			.user-info {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-xs);
+			}
+
+			.user-name {
+				font-weight: 500;
+			}
+
+			.page-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				margin-bottom: var(--spacing-xl);
+			}
+
+			.title-section p {
+				margin-bottom: 0;
+				color: var(--medium);
+			}
+
+			.view-controls {
+				display: flex;
+				gap: var(--spacing-sm);
+			}
+
+			.filter-section {
+				background-color: var(--white);
+				border-radius: var(--radius-lg);
+				padding: var(--spacing-lg);
+				margin-bottom: var(--spacing-xl);
+				box-shadow: var(--shadow-sm);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--spacing-lg);
+			}
+
+			.filter-container {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-xl);
+				flex: 1;
+			}
+
+			.category-filter,
+			.price-filter,
+			.rating-filter {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+			}
+
+			.category-filter label,
+			.price-filter label,
+			.rating-filter label {
+				font-weight: 500;
+				min-width: 90px;
+			}
+
+			.category-filter select {
+				padding: 0.5rem var(--spacing-lg) 0.5rem var(--spacing-md);
+				border: 1px solid var(--border-color);
+				border-radius: var(--radius-md);
+				background-color: var(--white);
+				min-width: 180px;
+				appearance: none;
+				background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+				background-repeat: no-repeat;
+				background-position: right 0.75rem center;
+				background-size: 16px;
+			}
+
+			.category-filter select:focus {
+				outline: none;
+				border-color: var(--primary-light);
+				box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+			}
+
+			.range-slider {
+				position: relative;
+				width: 200px;
+			}
+
+			.price-range {
+				width: 100%;
+				height: 6px;
+				-webkit-appearance: none;
+				appearance: none;
+				background: linear-gradient(
+					to right,
+					var(--primary-light),
+					var(--secondary)
+				);
+				outline: none;
+				border-radius: var(--radius-full);
+			}
+
+			.price-range::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: var(--white);
+				border: 2px solid var(--primary);
+				cursor: pointer;
+				transition: all var(--transition-fast);
+			}
+
+			.price-range::-webkit-slider-thumb:hover {
+				transform: scale(1.2);
+			}
+
+			.price-value {
+				font-size: 0.875rem;
+				color: var(--medium);
+				margin-top: var(--spacing-xs);
+				display: block;
+			}
+
+			.star-rating {
+				display: flex;
+				gap: 2px;
+			}
+
+			.star-rating i {
+				color: #d1d5db;
+				cursor: pointer;
+				transition: color var(--transition-fast);
+			}
+
+			.star-rating i:hover,
+			.star-rating i.active {
+				color: var(--warning);
+			}
+
+			.products-section {
+				margin-bottom: var(--spacing-xxl);
+			}
+
+			.comparison-alert {
+				background-color: var(--light);
+				border-radius: var(--radius-md);
+				padding: var(--spacing-md) var(--spacing-lg);
+				margin-bottom: var(--spacing-lg);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.alert-content {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+			}
+
+			.alert-content i {
+				color: var(--info);
+				font-size: 1.25rem;
+			}
+
+			.products-container {
+				display: grid;
+				gap: var(--spacing-lg);
+				transition: all var(--transition-normal);
+			}
+
+			.grid-view {
+				grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			}
+
+			.list-view {
+				grid-template-columns: 1fr;
+			}
+
+			.product-card {
+				background-color: var(--card-bg);
+				border-radius: var(--radius-lg);
+				overflow: hidden;
+				box-shadow: var(--shadow-sm);
+				transition: transform var(--transition-normal),
+					box-shadow var(--transition-normal), border-color 0.3s ease;
+				position: relative;
+				border: 1px solid transparent;
+			}
+
+			.product-card:hover {
+				transform: translateY(-8px);
+				box-shadow: var(--shadow-lg);
+				border-color: var(--primary-light);
+			}
+
+			.product-card.selected {
+				border: 2px solid var(--primary);
+				box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+			}
+
+			.product-card.selected::before {
+				content: "✓";
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				width: 26px;
+				height: 26px;
+				background-color: var(--primary);
+				color: white;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 14px;
+				font-weight: bold;
+				z-index: 10;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+				animation: pulse 1s ease-in-out;
+			}
+
+			.grid-view .product-card {
+				display: flex;
+				flex-direction: column;
+				background: linear-gradient(
+					to bottom,
+					var(--card-bg) 0%,
+					var(--light) 100%
+				);
+			}
+
+			.list-view .product-card {
+				display: grid;
+				grid-template-columns: 200px 1fr 180px;
+				align-items: center;
+			}
+
+			.product-image {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.grid-view .product-image {
+				height: 220px;
+			}
+
+			.product-image {
+				position: relative;
+				overflow: hidden;
+				background: rgba(255, 255, 255, 0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.grid-view .product-image::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 30px;
+				background: linear-gradient(to top, var(--card-bg), transparent);
+				z-index: 1;
+			}
+
+			.list-view .product-image::after {
+				border-radius: var(--radius-lg);
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				/* width: 100%; */
+				height: 30px;
+				z-index: 1;
+			}
+
+			.product-card:hover .product-image img {
+				transform: scale(1.08);
+				border-radius: var(--radius-lg);
+			}
+
+			.product-badge {
+				position: absolute;
+				top: 10px;
+				left: 10px;
+				background-color: var(--accent);
+				color: white;
+				font-size: 0.75rem;
+				padding: 4px 12px;
+				border-radius: var(--radius-full);
+				font-weight: 600;
+				letter-spacing: 0.5px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				z-index: 2;
+			}
+
+			.grid-view .product-info {
+				padding: var(--spacing-lg);
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-sm);
+				flex: 1;
+				position: relative;
+				z-index: 2;
+			}
+
+			.product-category {
+				font-size: 0.75rem;
+				color: var(--medium);
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				font-weight: 500;
+				background: rgba(79, 70, 229, 0.1);
+				display: inline-flex;
+				padding: 2px 8px;
+				border-radius: var(--radius-full);
+				margin-bottom: 4px;
+				width: fit-content;
+				align-items: center;
+			}
+			.product-rating {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-xs);
+				margin: 4px 0;
+			}
+
+			.rating-stars i {
+				color: var(--warning);
+				font-size: 0.875rem;
+				margin-right: 1px;
+			}
+
+			.list-view .product-info {
+				padding: var(--spacing-lg);
+				display: grid;
+				gap: var(--spacing-sm);
+			}
+
+			.product-title {
+				font-weight: 600;
+				font-size: 1.1rem;
+				margin-bottom: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				transition: color var(--transition-normal);
+			}
+
+			.product-card:hover .product-title {
+				color: var(--primary);
+			}
+
+			.grid-view .product-title {
+				-webkit-line-clamp: 2;
+			}
+
+			.list-view .product-title {
+				-webkit-line-clamp: 1;
+			}
+
+			.rating-stars {
+				display: flex;
+				gap: 2px;
+			}
+
+			.rating-stars i {
+				color: var(--warning);
+				font-size: 0.875rem;
+			}
+
+			.rating-count {
+				font-size: 0.875rem;
+				color: var(--medium);
+			}
+
+			.product-price {
+				font-weight: 700;
+				font-size: 1.25rem;
+				color: var(--primary);
+				margin-top: auto;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.price-original {
+				text-decoration: line-through;
+				color: var(--medium);
+				font-size: 0.875rem;
+				font-weight: 400;
+				position: relative;
+			}
+
+			.price-original::after {
+				content: "";
+				position: absolute;
+				width: 100%;
+				height: 1px;
+				background-color: var(--danger);
+				top: 50%;
+				left: 0;
+				transform: rotate(-5deg);
+			}
+			.price-original {
+				text-decoration: line-through;
+				color: var(--medium);
+				font-size: 0.875rem;
+				margin-left: var(--spacing-sm);
+			}
+
+			.list-view .product-actions {
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-sm);
+				padding-right: var(--spacing-lg);
+			}
+
+			.add-compare-btn {
+				padding: 0.5rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--radius-md);
+				color: var(--medium);
+				font-weight: 500;
+				transition: all var(--transition-fast);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: var(--spacing-xs);
+			}
+
+			.grid-view .add-compare-btn {
+				flex: 1;
+			}
+
+			.add-compare-btn:hover {
+				border-color: var(--primary);
+				color: var(--primary);
+				background-color: rgba(79, 70, 229, 0.05);
+			}
+
+			.add-compare-btn.selected {
+				background-color: var(--primary);
+				color: white;
+				border-color: var(--primary);
+				animation: pulse 0.3s ease-in-out;
+			}
+
+			.grid-view .product-actions {
+				padding: 0 var(--spacing-lg) var(--spacing-lg);
+				display: flex;
+				justify-content: space-between;
+				gap: var(--spacing-md);
+			}
+
+			.quick-view-btn {
+				font-size: 1.25rem;
+				color: var(--medium);
+				transition: all var(--transition-fast);
+				padding: 0.5rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--radius-md);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 40px;
+			}
+
+			.quick-view-btn:hover {
+				color: var(--primary);
+				border-color: var(--primary);
+				background-color: rgba(79, 70, 229, 0.05);
+				transform: translateY(-2px);
+			}
+
+			.grid-view .add-compare-btn {
+				flex: 3;
+			}
+
+			.comparison-modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: var(--z-modal);
+				opacity: 0;
+				visibility: hidden;
+				transition: opacity var(--transition-normal),
+					visibility var(--transition-normal);
+			}
+
+			.comparison-modal.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-content {
+				background-color: var(--white);
+				border-radius: var(--radius-lg);
+				width: 90%;
+				max-width: 1000px;
+				max-height: 90vh;
+				display: flex;
+				flex-direction: column;
+				box-shadow: var(--shadow-xl);
+				transform: translateY(20px);
+				opacity: 0;
+				transition: transform var(--transition-normal),
+					opacity var(--transition-normal);
+				overflow: hidden;
+			}
+
+			.comparison-modal.active .modal-content {
+				transform: translateY(0);
+				opacity: 1;
+			}
+			.quick-view-modal.active .modal-content {
+				transform: translateY(0);
+				opacity: 1;
+			}
+			.modal-header {
+				padding: var(--spacing-lg);
+				border-bottom: 1px solid var(--border-color);
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.modal-header h2 {
+				margin-bottom: 0;
+			}
+
+			.close-modal {
+				font-size: 1.5rem;
+				color: var(--medium);
+				transition: color var(--transition-fast);
+			}
+
+			.close-modal:hover {
+				color: var(--danger);
+			}
+
+			.modal-body {
+				padding: var(--spacing-lg);
+				overflow-y: auto;
+			}
+
+			.comparison-table-container {
+				overflow-x: auto;
+			}
+
+			.comparison-table {
+				width: 100%;
+				border-collapse: separate;
+				border-spacing: 0;
+			}
+
+			.comparison-table th,
+			.comparison-table td {
+				padding: var(--spacing-md);
+				text-align: left;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.comparison-table th {
+				background-color: var(--light);
+				position: sticky;
+				top: 0;
+				z-index: 1;
+			}
+
+			.comparison-table th:first-child,
+			.comparison-table td:first-child {
+				background-color: var(--light);
+				font-weight: 500;
+				position: sticky;
+				left: 0;
+				z-index: 2;
+			}
+
+			.comparison-table th:first-child {
+				z-index: 3;
+			}
+
+			.comparison-table tr:nth-child(even) td {
+				background-color: rgba(241, 245, 249, 0.5);
+			}
+
+			.image-row td:not(:first-child) {
+				text-align: center;
+			}
+
+			.image-row img {
+				max-width: 120px;
+				max-height: 120px;
+				object-fit: contain;
+			}
+
+			.modal-footer {
+				padding: var(--spacing-lg);
+				border-top: 1px solid var(--border-color);
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--spacing-md);
+			}
+
+			.site-footer {
+				background-color: var(--footer-bg);
+				color: var(--light);
+				padding: var(--spacing-xxl) 0 var(--spacing-lg);
+				margin-top: var(--spacing-xxl);
+			}
+
+			.footer-content {
+				display: grid;
+				grid-template-columns: 1fr 2fr 1fr;
+				gap: var(--spacing-xl);
+				margin-bottom: var(--spacing-xl);
+			}
+
+			.footer-logo {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--white);
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.footer-logo i {
+				color: var(--accent);
+			}
+
+			.footer-links {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: var(--spacing-lg);
+			}
+
+			.link-group h3 {
+				color: var(--white);
+				margin-bottom: var(--spacing-md);
+				font-size: 1.1rem;
+			}
+
+			.link-group ul {
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-sm);
+			}
+
+			.link-group a {
+				color: var(--light);
+				transition: color var(--transition-fast);
+			}
+
+			.link-group a:hover {
+				color: var(--secondary-light);
+			}
+
+			.footer-newsletter h3 {
+				color: var(--white);
+				margin-bottom: var(--spacing-xs);
+			}
+
+			.footer-newsletter p {
+				font-size: 0.875rem;
+				margin-bottom: var(--spacing-md);
+			}
+
+			.newsletter-form {
+				display: flex;
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.newsletter-form input {
+				flex: 1;
+				padding: 0.75rem var(--spacing-md);
+				border: none;
+				border-radius: var(--radius-md) 0 0 var(--radius-md);
+				background-color: rgba(255, 255, 255, 0.1);
+				color: var(--white);
+			}
+
+			.newsletter-form input::placeholder {
+				color: rgba(255, 255, 255, 0.6);
+			}
+
+			.newsletter-form input:focus {
+				outline: none;
+				background-color: rgba(255, 255, 255, 0.15);
+			}
+
+			.newsletter-form button {
+				padding: 0.75rem var(--spacing-lg);
+				background-color: var(--primary);
+				color: var(--white);
+				border-radius: 0 var(--radius-md) var(--radius-md) 0;
+				transition: background-color var(--transition-fast);
+			}
+
+			.newsletter-form button:hover {
+				background-color: var(--primary-dark);
+			}
+
+			.social-links {
+				display: flex;
+				gap: var(--spacing-md);
+			}
+
+			.social-links a {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				background-color: rgba(255, 255, 255, 0.1);
+				color: var(--white);
+				transition: all var(--transition-fast);
+			}
+
+			.social-links a:hover {
+				background-color: var(--primary);
+				transform: translateY(-3px);
+			}
+
+			.footer-bottom {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding-top: var(--spacing-lg);
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				font-size: 0.875rem;
+			}
+
+			.footer-bottom p {
+				margin-bottom: 0;
+			}
+
+			.app-links {
+				display: flex;
+				gap: var(--spacing-md);
+			}
+
+			.app-links a {
+				color: var(--light);
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-xs);
+			}
+
+			.app-links a:hover {
+				color: var(--secondary-light);
+			}
+
+			.toast-container {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: var(--z-toast);
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-sm);
+			}
+
+			.toast {
+				min-width: 300px;
+				padding: var(--spacing-md) var(--spacing-lg);
+				border-radius: var(--radius-md);
+				background-color: var(--white);
+				box-shadow: var(--shadow-lg);
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-md);
+				transform: translateX(100%);
+				opacity: 0;
+				animation: slideIn 0.3s forwards, fadeOut 0.3s forwards 3s;
+			}
+
+			.toast-success {
+				border-left: 4px solid var(--success);
+			}
+
+			.toast-success i {
+				color: var(--success);
+			}
+
+			.toast-error {
+				border-left: 4px solid var(--danger);
+			}
+
+			.toast-error i {
+				color: var(--danger);
+			}
+
+			.toast-info {
+				border-left: 4px solid var(--info);
+			}
+
+			.toast-info i {
+				color: var(--info);
+			}
+
+			.toast-warning {
+				border-left: 4px solid var(--warning);
+			}
+
+			.toast-warning i {
+				color: var(--warning);
+			}
+
+			.toast-icon {
+				font-size: 1.5rem;
+			}
+
+			.toast-content {
+				flex: 1;
+			}
+
+			.toast-title {
+				font-weight: 500;
+				margin-bottom: 2px;
+			}
+
+			.toast-message {
+				font-size: 0.875rem;
+				color: var(--medium);
+			}
+
+			.close-toast {
+				color: var(--medium);
+				font-size: 1rem;
+				transition: color var(--transition-fast);
+			}
+
+			.close-toast:hover {
+				color: var(--dark);
+			}
+
+			.user-dropdown {
+				position: absolute;
+				top: 100%;
+				right: 0;
+				margin-top: 0.75rem;
+				width: 320px;
+				background-color: var(--card-bg);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-xl);
+				z-index: var(--z-header);
+				overflow: hidden;
+				opacity: 0;
+				visibility: hidden;
+				transform: translateY(-10px);
+				transition: all var(--transition-normal);
+				border: 1px solid var(--border-color);
+			}
+
+			.user-profile {
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+				cursor: pointer;
+				position: relative;
+			}
+			.user-dropdown {
+				position: absolute;
+				top: calc(100% + 10px);
+				right: 0;
+				width: 320px;
+				background-color: var(--card-bg);
+				border-radius: var(--radius-lg);
+				box-shadow: var(--shadow-xl);
+				z-index: var(--z-header);
+				overflow: hidden;
+				opacity: 0;
+				visibility: hidden;
+				transform: translateY(-10px);
+				transition: all var(--transition-normal);
+				border: 1px solid var(--border-color);
+			}
+
+			.user-dropdown::before {
+				content: "";
+				position: absolute;
+				top: -10px;
+				right: 20px;
+				width: 0;
+				height: 0;
+				border-left: 10px solid transparent;
+				border-right: 10px solid transparent;
+				border-bottom: 10px solid var(--card-bg);
+				z-index: 1;
+			}
+
+			.user-dropdown::after {
+				content: "";
+				position: absolute;
+				top: -11px;
+				right: 20px;
+				width: 0;
+				height: 0;
+				border-left: 10px solid transparent;
+				border-right: 10px solid transparent;
+				border-bottom: 10px solid var(--border-color);
+				z-index: 0;
+			}
+
+			.user-dropdown.active {
+				opacity: 1;
+				visibility: visible;
+				transform: translateY(0);
+			}
+
+			.dropdown-tabs {
+				display: flex;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.dropdown-tab {
+				flex: 1;
+				padding: var(--spacing-md);
+				text-align: center;
+				background: none;
+				color: var(--medium);
+				border: none;
+				cursor: pointer;
+				transition: all var(--transition-fast);
+				position: relative;
+			}
+
+			.dropdown-tab.active::after {
+				content: "";
+				position: absolute;
+				bottom: -1px;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background-color: var(--primary);
+			}
+			.dropdown-tab.active {
+				color: var(--primary);
+				border-bottom: 2px solid var(--primary);
+				background-color: rgba(99, 102, 241, 0.05);
+			}
+
+			.dropdown-tab i {
+				margin-right: var(--spacing-xs);
+			}
+
+			.logout-tab {
+				color: var(--danger);
+			}
+
+			.logout-tab:hover {
+				color: var(--danger);
+				background-color: rgba(239, 68, 68, 0.05);
+			}
+
+			.dropdown-content {
+				padding: var(--spacing-lg);
+			}
+
+			.dropdown-panel {
+				display: none;
+			}
+
+			.dropdown-panel.active {
+				display: block;
+			}
+
+			.user-info-large {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--spacing-sm);
+			}
+
+			.avatar-large {
+				width: 80px;
+				height: 80px;
+				border-radius: 50%;
+				overflow: hidden;
+				margin-bottom: var(--spacing-sm);
+			}
+
+			.edit-profile-btn {
+				margin-top: var(--spacing-sm);
+			}
+
+			.saved-comparisons-list {
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-md);
+				margin-top: var(--spacing-md);
+				max-height: 300px;
+				overflow-y: auto;
+			}
+
+			.saved-comparison-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: var(--spacing-sm);
+				border-radius: var(--radius-md);
+				border: 1px solid var(--border-color);
+			}
+
+			.comparison-date {
+				font-size: 0.8rem;
+				color: var(--medium);
+			}
+
+			.saved-comparison-actions {
+				display: flex;
+				gap: var(--spacing-xs);
+			}
+
+			.view-saved-btn {
+				background-color: var(--primary-light);
+				color: var(--white);
+				padding: 0.3rem 0.6rem;
+				font-size: 0.85rem;
+			}
+
+			.delete-saved-btn {
+				color: var(--danger);
+				padding: 0.3rem;
+				font-size: 0.85rem;
+			}
+
+			.settings-options {
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-md);
+				margin-top: var(--spacing-md);
+			}
+
+			.setting-option {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.toggle-switch {
+				position: relative;
+				display: inline-block;
+				width: 44px;
+				height: 24px;
+			}
+
+			.toggle-switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.toggle-slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: var(--border-color);
+				transition: var(--transition-normal);
+				border-radius: 34px;
+			}
+
+			.toggle-slider:before {
+				position: absolute;
+				content: "";
+				height: 18px;
+				width: 18px;
+				left: 3px;
+				bottom: 3px;
+				background-color: white;
+				transition: var(--transition-normal);
+				border-radius: 50%;
+			}
+
+			input:checked + .toggle-slider {
+				background-color: var(--primary);
+			}
+
+			input:checked + .toggle-slider:before {
+				transform: translateX(20px);
+			}
+
+			.quick-view-modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: var(--z-modal);
+				opacity: 0;
+				visibility: hidden;
+				transition: opacity var(--transition-normal),
+					visibility var(--transition-normal);
+			}
+
+			.quick-view-modal.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.quick-view-grid {
+				display: grid;
+				grid-template-columns: 1fr 1.5fr;
+				gap: var(--spacing-lg);
+			}
+
+			.quick-view-image {
+				position: relative;
+				background-color: var(--light);
+				border-radius: var(--radius-md);
+				padding: var(--spacing-lg);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.quick-view-image img {
+				max-width: 100%;
+				max-height: 300px;
+				object-fit: contain;
+			}
+
+			.quick-view-details {
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-md);
+			}
+
+			.product-brand {
+				color: var(--medium);
+				font-size: 0.9rem;
+			}
+
+			.quick-view-price {
+				margin: var(--spacing-sm) 0;
+				display: flex;
+				align-items: center;
+				gap: var(--spacing-sm);
+			}
+
+			.discount-badge {
+				background-color: var(--success);
+				color: white;
+				padding: 0.25rem 0.5rem;
+				border-radius: var(--radius-sm);
+				font-size: 0.8rem;
+				font-weight: 500;
+			}
+
+			.product-specs-summary {
+				margin-top: var(--spacing-md);
+				border-top: 1px solid var(--border-color);
+				padding-top: var(--spacing-md);
+			}
+
+			.specs-list {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: var(--spacing-sm);
+				margin-top: var(--spacing-sm);
+			}
+
+			.specs-list li {
+				display: flex;
+				gap: var(--spacing-xs);
+			}
+
+			.specs-list li span {
+				font-weight: 500;
+				color: var(--medium);
+			}
+
+			.theme-toggle {
+				margin: 0 var(--spacing-md);
+			}
+
+			#theme-toggle-btn {
+				background: none;
+				border: none;
+				font-size: 1.25rem;
+				color: var(--medium);
+				cursor: pointer;
+				transition: color var(--transition-fast);
+				position: relative;
+				width: 24px;
+				height: 24px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#theme-toggle-btn:hover {
+				color: var(--primary);
+			}
+
+			#theme-toggle-btn .light-icon,
+			#theme-toggle-btn .dark-icon {
+				position: absolute;
+				transition: opacity var(--transition-normal),
+					transform var(--transition-normal);
+			}
+
+			#theme-toggle-btn .dark-icon {
+				opacity: 0;
+				transform: rotate(-30deg) scale(0);
+			}
+
+			.add-to-compare-btn.selected {
+				background-color: var(--primary);
+			}
+
+			body.dark-mode {
+				--bg-color: #1a1a2e;
+				--card-bg: #16213e;
+				--header-bg: #0f3460;
+				--footer-bg: #0a1128;
+				--border-color: #2a3855;
+
+				--heading-color: #e2e8f0;
+				--body-color: #cbd5e1;
+				--medium: #94a3b8;
+				--light: #e2e8f0;
+
+				color-scheme: dark;
+			}
+
+			body.dark-mode #theme-toggle-btn .light-icon {
+				opacity: 0;
+				transform: rotate(30deg) scale(0);
+			}
+
+			body.dark-mode #theme-toggle-btn .dark-icon {
+				opacity: 1;
+				transform: rotate(0) scale(1);
+				color: var(--secondary-light);
+			}
+
+			body.dark-mode .logo,
+			body.dark-mode .footer-logo {
+				color: var(--white);
+			}
+
+			body.dark-mode .search-form input {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: var(--light);
+				border-color: rgba(255, 255, 255, 0.2);
+			}
+
+			body.dark-mode .search-form input::placeholder {
+				color: var(--medium);
+			}
+
+			body.dark-mode .toast {
+				background-color: var(--card-bg);
+				color: var(--light);
+			}
+
+			body.dark-mode .toast-message {
+				color: var(--light);
+			}
+
+			body.dark-mode .comparison-table th:first-child,
+			body.dark-mode .comparison-table td:first-child {
+				background-color: rgba(22, 33, 62, 0.8);
+			}
+
+			body.dark-mode .comparison-table th {
+				background-color: rgba(22, 33, 62, 0.8);
+			}
+
+			body.dark-mode .comparison-alert {
+				background-color: rgba(59, 130, 246, 0.1);
+			}
+
+			body.dark-mode .view-btn {
+				background-color: rgba(255, 255, 255, 0.1);
+				border-color: rgba(255, 255, 255, 0.2);
+				color: var(--light);
+			}
+
+			body.dark-mode .view-btn.active,
+			body.dark-mode .view-btn:hover {
+				background-color: var(--primary);
+				border-color: var(--primary);
+			}
+
+			body.dark-mode .add-compare-btn {
+				border-color: rgba(255, 255, 255, 0.2);
+				color: var(--light);
+			}
+
+			body.dark-mode .add-compare-btn.selected {
+				background-color: var(--primary);
+				color: white;
+			}
+
+			body.dark-mode .quick-view-btn {
+				color: var(--light);
+			}
+
+			body.dark-mode .secondary-btn {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: var(--light);
+			}
+
+			body.dark-mode .secondary-btn:hover {
+				background-color: rgba(255, 255, 255, 0.2);
+			}
+
+			body.dark-mode .star-rating i:not(.active) {
+				color: rgba(255, 255, 255, 0.2);
+			}
+
+			body.dark-mode .comparison-modal .modal-content,
+			body.dark-mode .quick-view-modal .modal-content,
+			body.dark-mode .user-dropdown {
+				background-color: var(--card-bg);
+				color: var(--light);
+			}
+
+			body.dark-mode select,
+			body.dark-mode input {
+				background-color: var(--card-bg);
+				color: var(--light);
+				border-color: rgba(255, 255, 255, 0.2);
+			}
+
+			body.dark-mode select option {
+				background-color: var(--card-bg);
+			}
+
+			body.dark-mode .quick-view-image {
+				background-color: rgba(255, 255, 255, 0.05);
+			}
+
+			body.dark-mode .price-original {
+				color: var(--medium);
+			}
+
+			body.dark-mode .compare-btn[disabled] {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: var(--medium);
+			}
+
+			body.dark-mode .dropdown-tab {
+				color: var(--light);
+			}
+
+			body.dark-mode .dropdown-tabs {
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+
+			body.dark-mode .dropdown-tab.active {
+				border-color: var(--primary);
+			}
+
+			body.dark-mode .saved-comparison-item {
+				border-color: rgba(255, 255, 255, 0.1);
+			}
+
+			body.dark-mode .filter-section {
+				background-color: var(--card-bg);
+			}
+
+			body.dark-mode .product-card {
+				background-color: var(--card-bg);
+			}
+			body.dark-mode .grid-view .product-card {
+				background: linear-gradient(
+					to bottom,
+					var(--card-bg) 0%,
+					rgba(22, 33, 62, 0.7) 100%
+				);
+			}
+
+			body.dark-mode .product-category {
+				color: var(--medium);
+			}
+
+			body.dark-mode .product-price {
+				color: var(--secondary-light);
+			}
+
+			body.dark-mode .comparison-modal.active .modal-content,
+			body.dark-mode .quick-view-modal.active .modal-content {
+				color: var(--light);
+			}
+
+			body.dark-mode .modal-header,
+			body.dark-mode .modal-footer {
+				border-color: var(--border-color);
+			}
+
+			body.dark-mode .comparison-table tr:nth-child(even) td {
+				background-color: rgba(255, 255, 255, 0.05);
+			}
+
+			.product-card,
+			.modal-content,
+			.user-dropdown,
+			input,
+			select,
+			button {
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				appearance: none;
+			}
+
+			button:focus,
+			input:focus,
+			select:focus {
+				outline: 2px solid var(--primary);
+				outline-offset: 2px;
+			}
+
+			.toggle-switch input:focus + .toggle-slider {
+				box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.4);
+			}
+
+			.product-stock {
+				margin-top: 8px;
+			}
+
+			.in-stock {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				color: var(--success);
+				font-weight: 500;
+				font-size: 0.9rem;
+			}
+
+			.out-of-stock {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				color: var(--danger);
+				font-weight: 500;
+				font-size: 0.9rem;
+			}
+
+			.in-stock i,
+			.out-of-stock i {
+				font-size: 1rem;
+			}
+
+			.in-stock {
+				background-color: rgba(16, 185, 129, 0.1);
+				padding: 4px 8px;
+				border-radius: var(--radius-md);
+			}
+
+			.out-of-stock {
+				background-color: rgba(239, 68, 68, 0.1);
+				padding: 4px 8px;
+				border-radius: var(--radius-md);
+			}
+
+			.comparison-table .in-stock,
+			.comparison-table .out-of-stock {
+				display: inline-flex;
+			}
+
+			@keyframes slideIn {
+				from {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeOut {
+				0% {
+					opacity: 1;
+				}
+				90% {
+					opacity: 1;
+					transform: translateX(0);
+				}
+				100% {
+					opacity: 0;
+					transform: translateX(100%);
+				}
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+			@keyframes pulse {
+				0% {
+					transform: scale(0.5);
+					opacity: 0;
+				}
+				50% {
+					transform: scale(1.2);
+				}
+				100% {
+					transform: scale(1);
+					opacity: 1;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.user-dropdown {
+					width: 280px;
+					right: -70px;
+				}
+
+				.user-dropdown:after {
+					content: "";
+					position: absolute;
+					top: -10px;
+					right: 80px;
+					width: 0;
+					height: 0;
+					border-left: 10px solid transparent;
+					border-right: 10px solid transparent;
+					border-bottom: 10px solid var(--card-bg);
+				}
+
+				.quick-view-modal .modal-content,
+				.comparison-modal .modal-content {
+					max-height: 80vh;
+					width: 95%;
+				}
+
+				.quick-view-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.quick-view-image {
+					height: 250px;
+				}
+			}
+
+			@media (max-width: 1200px) {
+				.footer-content {
+					grid-template-columns: 1fr 2fr;
+				}
+
+				.footer-newsletter {
+					grid-column: span 2;
+					margin-top: var(--spacing-lg);
+				}
+			}
+
+			@media (max-width: 992px) {
+				.header-container {
+					flex-wrap: wrap;
+				}
+
+				.logo-section {
+					margin-bottom: var(--spacing-md);
+				}
+
+				.search-section {
+					order: 3;
+					margin: var(--spacing-md) 0 0;
+					max-width: 100%;
+					width: 100%;
+				}
+
+				.filter-container {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: var(--spacing-md);
+				}
+
+				.filter-section {
+					flex-direction: column;
+					align-items: stretch;
+				}
+
+				.category-filter,
+				.price-filter,
+				.rating-filter {
+					width: 100%;
+				}
+
+				.range-slider {
+					width: 100%;
+				}
+
+				.footer-content {
+					grid-template-columns: 1fr;
+					gap: var(--spacing-xl);
+				}
+
+				.footer-links {
+					grid-template-columns: repeat(2, 1fr);
+				}
+
+				.footer-newsletter {
+					grid-column: auto;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.page-header {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: var(--spacing-md);
+				}
+
+				.list-view .product-card {
+					grid-template-columns: 1fr;
+				}
+
+				.list-view .product-image {
+					height: 200px;
+					border-radius: var(--radius-lg);
+				}
+
+				.list-view .product-actions {
+					padding: 0 var(--spacing-lg) var(--spacing-lg);
+					flex-direction: row;
+					justify-content: space-between;
+				}
+
+				.comparison-alert {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: var(--spacing-md);
+				}
+
+				.footer-bottom {
+					flex-direction: column;
+					gap: var(--spacing-md);
+					text-align: center;
+				}
+
+				.app-links {
+					justify-content: center;
+				}
+			}
+
+			@media (max-width: 576px) {
+				.user-section {
+					gap: var(--spacing-md);
+				}
+
+				.user-info {
+					display: none;
+				}
+
+				.footer-links {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<header class="site-header">
+			<div class="container header-container">
+				<div class="logo-section">
+					<a href="#" class="logo">
+						<i class="fas fa-balance-scale-right"></i>
+						<span>CompareWise</span>
+					</a>
+					<p class="tagline">Smart choices, informed decisions</p>
+				</div>
+
+				<div class="search-section">
+					<form class="search-form">
+						<input type="text" placeholder="Search products to compare..." />
+						<button type="submit">
+							<i class="fas fa-search"></i>
+						</button>
+					</form>
+				</div>
+
+				<div class="user-section">
+					<div class="comparison-count">
+						<i class="fas fa-exchange-alt"></i>
+						<span class="count">0</span>
+					</div>
+					<div class="notifications">
+						<i class="fas fa-bell"></i>
+						<span class="badge">3</span>
+					</div>
+					<div class="theme-toggle">
+						<button id="theme-toggle-btn">
+							<i class="fas fa-sun light-icon"></i>
+							<i class="fas fa-moon dark-icon"></i>
+						</button>
+					</div>
+					<div class="user-profile">
+						<div class="avatar">
+							<img
+								src="https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg?semt=ais_hybrid"
+								alt="User Avatar"
+							/>
+						</div>
+						<div class="user-info">
+							<span class="user-name">John Doe</span>
+							<i class="fas fa-chevron-down"></i>
+						</div>
+						<div class="user-dropdown" id="user-dropdown">
+							<div class="dropdown-tabs">
+								<button class="dropdown-tab active" data-tab="profile">
+									<i class="fas fa-user"></i> Profile
+								</button>
+								<button class="dropdown-tab" data-tab="saved">
+									<i class="fas fa-save"></i> Saved
+								</button>
+								<button class="dropdown-tab" data-tab="settings">
+									<i class="fas fa-cog"></i> Settings
+								</button>
+								<button class="dropdown-tab logout-tab">
+									<i class="fas fa-sign-out-alt"></i> Logout
+								</button>
+							</div>
+
+							<div class="dropdown-content">
+								<div class="dropdown-panel active" id="profile-panel">
+									<div class="user-info-large">
+										<div class="avatar-large">
+											<img
+												src="https://img.freepik.com/premium-vector/man-avatar-profile-picture-isolated-background-avatar-profile-picture-man_1293239-4841.jpg?semt=ais_hybrid"
+												alt="User Avatar"
+											/>
+										</div>
+										<h3>John Doe</h3>
+										<p>john.doe@example.com</p>
+										<button class="btn secondary-btn edit-profile-btn">
+											<i class="fas fa-pencil-alt"></i> Edit Profile
+										</button>
+									</div>
+								</div>
+
+								<div class="dropdown-panel" id="saved-panel">
+									<h3>Saved Comparisons</h3>
+									<div class="saved-comparisons-list">
+										<div class="saved-comparison-item">
+											<div class="saved-comparison-info">
+												<h4>Electronics Comparison</h4>
+												<span class="comparison-date">Apr 1, 2025</span>
+											</div>
+											<div class="saved-comparison-actions">
+												<button class="btn view-saved-btn">View</button>
+												<button class="btn delete-saved-btn">
+													<i class="fas fa-trash"></i>
+												</button>
+											</div>
+										</div>
+										<div class="saved-comparison-item">
+											<div class="saved-comparison-info">
+												<h4>Smartphone Comparison</h4>
+												<span class="comparison-date">Mar 28, 2025</span>
+											</div>
+											<div class="saved-comparison-actions">
+												<button class="btn view-saved-btn">View</button>
+												<button class="btn delete-saved-btn">
+													<i class="fas fa-trash"></i>
+												</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="dropdown-panel" id="settings-panel">
+									<h3>Settings</h3>
+									<div class="settings-options">
+										<div class="setting-option">
+											<span>Dark Mode</span>
+											<label class="toggle-switch">
+												<input type="checkbox" id="dark-mode-toggle" />
+												<span class="toggle-slider"></span>
+											</label>
+										</div>
+										<div class="setting-option">
+											<span>Email Notifications</span>
+											<label class="toggle-switch">
+												<input
+													type="checkbox"
+													id="notification-toggle"
+													checked
+												/>
+												<span class="toggle-slider"></span>
+											</label>
+										</div>
+										<div class="setting-option">
+											<span>Default View</span>
+											<select id="default-view-select">
+												<option value="grid">Grid</option>
+												<option value="list">List</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<main>
+			<div class="container">
+				<section class="page-header">
+					<div class="title-section">
+						<h1>Product Comparison</h1>
+						<p>
+							Compare features, prices, and reviews across multiple products
+						</p>
+					</div>
+					<div class="view-controls">
+						<button class="btn view-btn active" data-view="grid">
+							<i class="fas fa-th-large"></i> Grid
+						</button>
+						<button class="btn view-btn" data-view="list">
+							<i class="fas fa-list"></i> List
+						</button>
+					</div>
+				</section>
+
+				<section class="filter-section">
+					<div class="filter-container">
+						<div class="category-filter">
+							<label>Category:</label>
+							<select id="category-select">
+								<option value="all">All Categories</option>
+								<option value="electronics">Electronics</option>
+								<option value="appliances">Home Appliances</option>
+								<option value="computers">Computers & Laptops</option>
+								<option value="mobile">Mobile Phones</option>
+								<option value="audio">Audio & Headphones</option>
+							</select>
+						</div>
+						<div class="price-filter">
+							<label>Price Range:</label>
+							<div class="range-slider">
+								<input
+									type="range"
+									min="0"
+									max="2000"
+									value="2000"
+									class="price-range"
+									id="price-range"
+								/>
+								<span class="price-value"
+									>$0 - $<span id="max-price">2000</span></span
+								>
+							</div>
+						</div>
+						<div class="rating-filter">
+							<label>Min Rating:</label>
+							<div class="star-rating" id="min-rating">
+								<i class="fas fa-star active"></i>
+								<i class="fas fa-star"></i>
+								<i class="fas fa-star"></i>
+								<i class="fas fa-star"></i>
+								<i class="fas fa-star"></i>
+							</div>
+						</div>
+					</div>
+					<button class="btn filter-btn">
+						<i class="fas fa-filter"></i> Apply Filters
+					</button>
+				</section>
+
+				<section class="products-section">
+					<div class="comparison-alert">
+						<div class="alert-content">
+							<i class="fas fa-info-circle"></i>
+							<span>Select 2-4 products to compare</span>
+						</div>
+						<button class="btn compare-btn" disabled>
+							Compare Selected (<span class="selected-count">0</span>)
+						</button>
+					</div>
+
+					<div
+						class="products-container grid-view"
+						id="products-container"
+					></div>
+				</section>
+
+				<div class="comparison-modal" id="comparison-modal">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h2>Product Comparison</h2>
+							<button class="close-modal">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+						<div class="modal-body">
+							<div class="comparison-table-container">
+								<table class="comparison-table" id="comparison-table">
+									<thead>
+										<tr>
+											<th>Specification</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr class="image-row">
+											<td>Image</td>
+										</tr>
+										<tr>
+											<td>Name</td>
+										</tr>
+										<tr>
+											<td>Price</td>
+										</tr>
+										<tr>
+											<td>Rating</td>
+										</tr>
+										<tr>
+											<td>Brand</td>
+										</tr>
+										<tr>
+											<td>Category</td>
+										</tr>
+										<tr>
+											<td>In Stock</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn secondary-btn close-modal-btn">Close</button>
+							<button class="btn primary-btn save-comparison-btn">
+								<i class="fas fa-save"></i> Save Comparison
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="quick-view-modal" id="quick-view-modal">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h2>Product Details</h2>
+							<button class="close-modal">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+						<div class="modal-body">
+							<div class="quick-view-content"></div>
+						</div>
+						<div class="modal-footer">
+							<button class="btn secondary-btn close-modal-btn">Close</button>
+							<button class="btn primary-btn add-to-compare-btn">
+								<i class="fas fa-exchange-alt"></i> Add to Compare
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<div class="footer-content">
+					<div class="footer-logo">
+						<i class="fas fa-balance-scale-right"></i>
+						<span>CompareWise</span>
+					</div>
+					<div class="footer-links">
+						<div class="link-group">
+							<h3>Company</h3>
+							<ul>
+								<li><a href="#">About Us</a></li>
+								<li><a href="#">Careers</a></li>
+								<li><a href="#">Blog</a></li>
+								<li><a href="#">Press</a></li>
+							</ul>
+						</div>
+						<div class="link-group">
+							<h3>Support</h3>
+							<ul>
+								<li><a href="#">Contact Us</a></li>
+								<li><a href="#">Help Center</a></li>
+								<li><a href="#">FAQs</a></li>
+								<li><a href="#">Community</a></li>
+							</ul>
+						</div>
+						<div class="link-group">
+							<h3>Legal</h3>
+							<ul>
+								<li><a href="#">Terms of Service</a></li>
+								<li><a href="#">Privacy Policy</a></li>
+								<li><a href="#">Cookie Policy</a></li>
+								<li><a href="#">Compliance</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="footer-newsletter">
+						<h3>Subscribe to our newsletter</h3>
+						<p>Get the latest product updates and deals</p>
+						<form class="newsletter-form">
+							<input type="email" placeholder="Your email address" />
+							<button type="submit">Subscribe</button>
+						</form>
+						<div class="social-links">
+							<a href="#"><i class="fab fa-facebook-f"></i></a>
+							<a href="#"><i class="fab fa-twitter"></i></a>
+							<a href="#"><i class="fab fa-instagram"></i></a>
+							<a href="#"><i class="fab fa-linkedin-in"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<p>&copy; 2025 CompareWise. All rights reserved.</p>
+					<div class="app-links">
+						<a href="#"><i class="fab fa-apple"></i> App Store</a>
+						<a href="#"><i class="fab fa-google-play"></i> Google Play</a>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<div class="toast-container" id="toast-container"></div>
+		<script>
+			const productsContainer = document.getElementById("products-container");
+			const comparisonModal = document.getElementById("comparison-modal");
+			const comparisonTable = document.getElementById("comparison-table");
+			const compareBtn = document.querySelector(".compare-btn");
+			const selectedCountSpan = document.querySelector(".selected-count");
+			const categorySelect = document.getElementById("category-select");
+			const priceRange = document.getElementById("price-range");
+			const maxPriceSpan = document.getElementById("max-price");
+			const minRating = document.getElementById("min-rating");
+			const filterBtn = document.querySelector(".filter-btn");
+			const viewBtns = document.querySelectorAll(".view-btn");
+			const toastContainer = document.getElementById("toast-container");
+
+			let products = [];
+			let selectedProducts = [];
+			let currentView = "grid";
+			let currentCategory = "all";
+			let currentMaxPrice = 2000;
+			let currentMinRating = 1;
+
+			document.addEventListener("DOMContentLoaded", () => {
+				fetchProducts();
+				initEventListeners();
+				initThemeToggle();
+				initUserProfileDropdown();
+				initSearchFunctionality();
+				initQuickViewFunctionality();
+
+				const savedView = localStorage.getItem("defaultView");
+				if (savedView) {
+					toggleView(savedView);
+				}
+			});
+
+			function fetchProducts() {
+				setTimeout(() => {
+					products = generateMockProducts(20);
+					renderProducts();
+					showToast(
+						"success",
+						"Data Loaded",
+						"Product data has been successfully loaded"
+					);
+				}, 500);
+			}
+
+			function generateMockProducts(count) {
+				const categories = [
+					"electronics",
+					"appliances",
+					"computers",
+					"mobile",
+					"audio",
+				];
+				const brands = [
+					"TechPro",
+					"ElectraHome",
+					"DigiMax",
+					"SonicWave",
+					"PowerGear",
+					"SmartLife",
+				];
+				const mockProducts = [];
+
+				const categoryImages = {
+					electronics:
+						"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+					appliances:
+						"https://images.unsplash.com/photo-1588854337236-6889d631faa8",
+					computers:
+						"https://images.unsplash.com/photo-1515378960530-7c0da6231fb1",
+					mobile:
+						"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
+					audio: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e",
+				};
+
+				for (let i = 1; i <= count; i++) {
+					const category =
+						categories[Math.floor(Math.random() * categories.length)];
+					const brand = brands[Math.floor(Math.random() * brands.length)];
+					const rating = (Math.random() * 4 + 1).toFixed(1);
+					const price = Math.floor(Math.random() * 1900) + 100;
+					const discountPercent =
+						Math.random() > 0.7 ? Math.floor(Math.random() * 30) + 5 : 0;
+					const originalPrice =
+						discountPercent > 0
+							? Math.floor(price / (1 - discountPercent / 100))
+							: 0;
+					const reviewCount = Math.floor(Math.random() * 500) + 10;
+					const inStock = Math.random() > 0.2;
+					const isBestseller = Math.random() > 0.8;
+
+					const specs = {
+						display:
+							category === "mobile" || category === "computers"
+								? ['6.5" AMOLED', '5.8" LCD', '6.1" OLED', '6.7" LED'][
+										Math.floor(Math.random() * 4)
+								  ]
+								: "N/A",
+						processor:
+							category === "computers" || category === "mobile"
+								? ["Octa-core 2.5GHz", "Hexa-core 2.8GHz", "Quad-core 3.0GHz"][
+										Math.floor(Math.random() * 3)
+								  ]
+								: "N/A",
+						memory:
+							category === "computers" || category === "mobile"
+								? ["4GB", "6GB", "8GB", "12GB", "16GB"][
+										Math.floor(Math.random() * 5)
+								  ]
+								: "N/A",
+						storage:
+							category === "computers" ||
+							category === "mobile" ||
+							category === "electronics"
+								? ["64GB", "128GB", "256GB", "512GB", "1TB"][
+										Math.floor(Math.random() * 5)
+								  ]
+								: "N/A",
+						battery:
+							category === "mobile"
+								? ["3500mAh", "4000mAh", "4500mAh", "5000mAh"][
+										Math.floor(Math.random() * 4)
+								  ]
+								: "N/A",
+						camera:
+							category === "mobile"
+								? ["12MP+8MP", "48MP+12MP+5MP", "64MP+16MP+2MP"][
+										Math.floor(Math.random() * 3)
+								  ]
+								: "N/A",
+						weight: `${(Math.random() * 3 + 0.5).toFixed(2)}kg`,
+						dimensions: `${Math.floor(
+							Math.random() * 30 + 10
+						)}cm x ${Math.floor(Math.random() * 20 + 5)}cm x ${Math.floor(
+							Math.random() * 10 + 1
+						)}cm`,
+						warranty: ["1 Year", "2 Years", "3 Years", "5 Years"][
+							Math.floor(Math.random() * 4)
+						],
+					};
+
+					mockProducts.push({
+						id: i,
+						name: `${brand} ${getProductTypeName(category)} ${Math.floor(
+							Math.random() * 1000
+						)}`,
+						category: category,
+						brand: brand,
+						price: price,
+						originalPrice: originalPrice,
+						discountPercent: discountPercent,
+						rating: parseFloat(rating),
+						reviewCount: reviewCount,
+						inStock: inStock,
+						isBestseller: isBestseller,
+						image: categoryImages[category],
+						specs: specs,
+					});
+				}
+
+				return mockProducts;
+			}
+
+			function getProductTypeName(category) {
+				switch (category) {
+					case "electronics":
+						return ["Smart TV", "Game Console", "Camera", "Drone"][
+							Math.floor(Math.random() * 4)
+						];
+					case "appliances":
+						return [
+							"Refrigerator",
+							"Washing Machine",
+							"Microwave",
+							"Air Conditioner",
+						][Math.floor(Math.random() * 4)];
+					case "computers":
+						return ["Laptop", "Desktop", "Tablet", "Monitor"][
+							Math.floor(Math.random() * 4)
+						];
+					case "mobile":
+						return ["Smartphone", "Smartwatch", "Tablet"][
+							Math.floor(Math.random() * 3)
+						];
+					case "audio":
+						return ["Headphones", "Speaker", "Earbuds", "Sound System"][
+							Math.floor(Math.random() * 4)
+						];
+					default:
+						return "Product";
+				}
+			}
+
+			function initThemeToggle() {
+				const themeToggleBtn = document.getElementById("theme-toggle-btn");
+				const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+				const savedTheme = localStorage.getItem("theme");
+				if (savedTheme === "dark") {
+					document.body.classList.add("dark-mode");
+					if (darkModeToggle) darkModeToggle.checked = true;
+				}
+
+				themeToggleBtn.addEventListener("click", () => {
+					const isDarkMode = document.body.classList.toggle("dark-mode");
+
+					if (darkModeToggle) darkModeToggle.checked = isDarkMode;
+
+					localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+
+					showToast(
+						"success",
+						isDarkMode ? "Dark Mode" : "Light Mode",
+						`${isDarkMode ? "Dark" : "Light"} mode has been enabled`
+					);
+				});
+
+				if (darkModeToggle) {
+					darkModeToggle.addEventListener("change", () => {
+						const isDarkMode = darkModeToggle.checked;
+						document.body.classList.toggle("dark-mode", isDarkMode);
+						localStorage.setItem("theme", isDarkMode ? "dark" : "light");
+					});
+				}
+			}
+
+			function initEventListeners() {
+				viewBtns.forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const view = btn.getAttribute("data-view");
+						toggleView(view);
+					});
+				});
+
+				filterBtn.addEventListener("click", applyFilters);
+
+				priceRange.addEventListener("input", () => {
+					currentMaxPrice = priceRange.value;
+					maxPriceSpan.textContent = currentMaxPrice;
+				});
+
+				const stars = minRating.querySelectorAll("i");
+				stars.forEach((star, index) => {
+					star.addEventListener("click", () => {
+						stars.forEach((s, i) => {
+							if (i <= index) {
+								s.classList.add("active");
+							} else {
+								s.classList.remove("active");
+							}
+						});
+						currentMinRating = index + 1;
+					});
+				});
+
+				compareBtn.addEventListener("click", openComparisonModal);
+
+				document
+					.querySelectorAll(".close-modal, .close-modal-btn")
+					.forEach((btn) => {
+						btn.addEventListener("click", closeComparisonModal);
+					});
+
+				categorySelect.addEventListener("change", () => {
+					currentCategory = categorySelect.value;
+				});
+				initSearchFunctionality();
+				initUserProfileDropdown();
+				initQuickViewFunctionality();
+
+				document
+					.querySelector(".save-comparison-btn")
+					.addEventListener("click", saveComparison);
+			}
+
+			function initQuickViewFunctionality() {
+				const quickViewModal = document.getElementById("quick-view-modal");
+				const quickViewContent = document.querySelector(".quick-view-content");
+
+				document.addEventListener("click", (e) => {
+					const quickViewBtn = e.target.closest(".quick-view-btn");
+
+					if (quickViewBtn) {
+						const productCard = quickViewBtn.closest(".product-card");
+						const productId = parseInt(productCard.getAttribute("data-id"));
+						const product = products.find((p) => p.id === productId);
+
+						if (product) {
+							quickViewContent.innerHTML = createQuickViewHTML(product);
+							quickViewModal.classList.add("active");
+							document.body.style.overflow = "hidden";
+
+							const addToCompareBtn = quickViewModal.querySelector(
+								".add-to-compare-btn"
+							);
+							const isSelected = selectedProducts.some(
+								(p) => p.id === product.id
+							);
+
+							addToCompareBtn.innerHTML = isSelected
+								? '<i class="fas fa-minus-circle"></i> Remove from Compare'
+								: '<i class="fas fa-exchange-alt"></i> Add to Compare';
+
+							addToCompareBtn.classList.toggle("selected", isSelected);
+
+							addToCompareBtn.setAttribute("data-product-id", product.id);
+						}
+					}
+				});
+
+				const addToCompareBtn = quickViewModal.querySelector(
+					".add-to-compare-btn"
+				);
+				if (addToCompareBtn) {
+					addToCompareBtn.addEventListener("click", (e) => {
+						const productId = parseInt(
+							e.currentTarget.getAttribute("data-product-id")
+						);
+						toggleProductSelection(productId);
+						quickViewModal.classList.remove("active");
+						document.body.style.overflow = "";
+					});
+				}
+
+				document
+					.querySelectorAll(
+						"#quick-view-modal .close-modal, #quick-view-modal .close-modal-btn"
+					)
+					.forEach((btn) => {
+						btn.addEventListener("click", () => {
+							quickViewModal.classList.remove("active");
+							document.body.style.overflow = "";
+						});
+					});
+			}
+
+			function saveComparison() {
+				const comparisonName = prompt(
+					"Enter a name for this comparison:",
+					"My Comparison"
+				);
+				if (comparisonName) {
+					const newComparison = {
+						name: comparisonName,
+						date: new Date().toLocaleDateString("en-US", {
+							year: "numeric",
+							month: "short",
+							day: "numeric",
+						}),
+						products: selectedProducts,
+					};
+
+					const savedComparisonsList = document.querySelector(
+						".saved-comparisons-list"
+					);
+					const newComparisonElement = document.createElement("div");
+					newComparisonElement.className = "saved-comparison-item";
+					newComparisonElement.innerHTML = `
+            <div class="saved-comparison-info">
+                <h4>${comparisonName}</h4>
+                <span class="comparison-date">${newComparison.date}</span>
+            </div>
+            <div class="saved-comparison-actions">
+                <button class="btn view-saved-btn">View</button>
+                <button class="btn delete-saved-btn">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        `;
+
+					savedComparisonsList.prepend(newComparisonElement);
+					showToast(
+						"success",
+						"Comparison Saved",
+						"Your product comparison has been saved successfully"
+					);
+
+					newComparisonElement
+						.querySelector(".view-saved-btn")
+						.addEventListener("click", () => {
+							selectedProducts = newComparison.products;
+							updateComparisonUI();
+							renderProducts();
+							openComparisonModal();
+							const userDropdown = document.getElementById("user-dropdown");
+							userDropdown.classList.remove("active");
+						});
+
+					newComparisonElement
+						.querySelector(".delete-saved-btn")
+						.addEventListener("click", () => {
+							if (
+								confirm(
+									"Are you sure you want to delete this saved comparison?"
+								)
+							) {
+								newComparisonElement.remove();
+								showToast(
+									"info",
+									"Comparison Deleted",
+									"Your saved comparison has been deleted"
+								);
+							}
+						});
+				}
+			}
+
+			function createQuickViewHTML(product) {
+				return `
+    <div class="quick-view-grid">
+      <div class="quick-view-image">
+        <img src="${product.image}" alt="${product.name}">
+        ${
+					product.isBestseller
+						? '<span class="product-badge">Bestseller</span>'
+						: ""
+				}
+      </div>
+      <div class="quick-view-details">
+        <div class="product-category">${product.category}</div>
+        <h2 class="product-title">${product.name}</h2>
+        <div class="product-brand">By ${product.brand}</div>
+        <div class="product-rating">
+          <div class="rating-stars">
+            ${createStarRating(product.rating)}
+          </div>
+          <span class="rating-count">(${product.reviewCount} reviews)</span>
+        </div>
+        <div class="product-price quick-view-price">
+          $${product.price.toFixed(2)}
+          ${
+						product.discountPercent > 0
+							? `<span class="price-original">$${product.originalPrice.toFixed(
+									2
+							  )}</span>
+             <span class="discount-badge">-${product.discountPercent}%</span>`
+							: ""
+					}
+        </div>
+        <div class="product-availability">
+          ${
+						product.inStock
+							? '<span class="in-stock"><i class="fas fa-check-circle"></i> In Stock</span>'
+							: '<span class="out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</span>'
+					}
+        </div>
+        
+        <div class="product-specs-summary">
+          <h3>Key Specifications</h3>
+          <ul class="specs-list">
+            ${Object.entries(product.specs)
+							.filter(([key, value]) => value !== "N/A")
+							.map(
+								([key, value]) =>
+									`<li><span>${formatSpecName(key)}:</span> ${value}</li>`
+							)
+							.join("")}
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+			}
+
+			function toggleView(view) {
+				currentView = view;
+
+				viewBtns.forEach((btn) => {
+					if (btn.getAttribute("data-view") === view) {
+						btn.classList.add("active");
+					} else {
+						btn.classList.remove("active");
+					}
+				});
+
+				productsContainer.className = `products-container ${view}-view`;
+
+				renderProducts();
+			}
+
+			function applyFilters() {
+				const filteredProducts = products.filter((product) => {
+					if (
+						currentCategory !== "all" &&
+						product.category !== currentCategory
+					) {
+						return false;
+					}
+
+					if (product.price > currentMaxPrice) {
+						return false;
+					}
+
+					if (product.rating < currentMinRating) {
+						return false;
+					}
+
+					return true;
+				});
+
+				if (filteredProducts.length === 0) {
+					showToast(
+						"info",
+						"No Results",
+						"No products match your filter criteria"
+					);
+				} else {
+					showToast(
+						"success",
+						"Filters Applied",
+						`Showing ${filteredProducts.length} products`
+					);
+				}
+
+				renderProducts(filteredProducts);
+			}
+
+			function initSearchFunctionality() {
+				const searchInput = document.querySelector(".search-form input");
+				const searchForm = document.querySelector(".search-form");
+				const searchButton = document.querySelector(".search-form button");
+
+				function debounce(func, delay) {
+					let timeoutId;
+					return function (...args) {
+						clearTimeout(timeoutId);
+						timeoutId = setTimeout(() => func.apply(this, args), delay);
+					};
+				}
+
+				const filterProducts = (searchTerm) => {
+					const filteredProducts = products.filter((product) => {
+						return (
+							product.name.toLowerCase().includes(searchTerm) ||
+							product.brand.toLowerCase().includes(searchTerm) ||
+							product.category.toLowerCase().includes(searchTerm)
+						);
+					});
+					renderProducts(filteredProducts);
+					if (searchTerm !== "") {
+						if (filteredProducts.length === 0) {
+							showToast(
+								"info",
+								"No Results",
+								`No products match "${searchTerm}"`
+							);
+						} else {
+							showToast(
+								"success",
+								"Search Results",
+								`Found ${filteredProducts.length} products for "${searchTerm}"`
+							);
+						}
+					}
+				};
+
+				const debouncedFilter = debounce(filterProducts, 300);
+
+				searchInput.addEventListener("input", () => {
+					const searchTerm = searchInput.value.trim().toLowerCase();
+					if (searchTerm === "") {
+						renderProducts(products);
+					} else {
+						debouncedFilter(searchTerm);
+					}
+				});
+
+				searchInput.addEventListener("input", () => {
+					if (searchInput.value.trim() !== "") {
+						searchButton.innerHTML = '<i class="fas fa-times"></i>';
+						searchButton.setAttribute("type", "button");
+					} else {
+						searchButton.innerHTML = '<i class="fas fa-search"></i>';
+						searchButton.setAttribute("type", "submit");
+					}
+				});
+
+				searchButton.addEventListener("click", () => {
+					if (searchButton.getAttribute("type") === "button") {
+						searchInput.value = "";
+						searchButton.innerHTML = '<i class="fas fa-search"></i>';
+						searchButton.setAttribute("type", "submit");
+						renderProducts(products);
+					}
+				});
+			}
+
+			function initUserProfileDropdown() {
+				const userProfile = document.querySelector(".user-profile");
+				const userDropdown = document.getElementById("user-dropdown");
+				const dropdownTabs = document.querySelectorAll(".dropdown-tab");
+				const dropdownPanels = document.querySelectorAll(".dropdown-panel");
+
+				userProfile.addEventListener("click", function (e) {
+					e.stopPropagation();
+					userDropdown.classList.toggle("active");
+				});
+
+				document.addEventListener("click", function (e) {
+					if (
+						userDropdown.classList.contains("active") &&
+						!userProfile.contains(e.target)
+					) {
+						userDropdown.classList.remove("active");
+					}
+				});
+
+				dropdownTabs.forEach(function (tab) {
+					tab.addEventListener("click", function (e) {
+						e.stopPropagation();
+
+						if (tab.classList.contains("logout-tab")) {
+							showToast(
+								"info",
+								"Logged Out",
+								"You have been successfully logged out"
+							);
+							setTimeout(function () {
+								window.location.reload();
+							}, 1500);
+							return;
+						}
+
+						const tabId = tab.getAttribute("data-tab");
+
+						dropdownTabs.forEach((t) => t.classList.remove("active"));
+						tab.classList.add("active");
+
+						dropdownPanels.forEach((panel) => panel.classList.remove("active"));
+						document.getElementById(`${tabId}-panel`).classList.add("active");
+					});
+				});
+			}
+
+			function renderProducts(productsToRender = products) {
+				productsContainer.innerHTML = "";
+
+				productsToRender.forEach((product) => {
+					const isSelected = selectedProducts.some((p) => p.id === product.id);
+					const productCard = document.createElement("div");
+					productCard.className = `product-card${
+						isSelected ? " selected" : ""
+					}`;
+					productCard.setAttribute("data-id", product.id);
+
+					if (currentView === "grid") {
+						productCard.innerHTML = createGridProductHTML(product, isSelected);
+					} else {
+						productCard.innerHTML = createListProductHTML(product, isSelected);
+					}
+
+					productsContainer.appendChild(productCard);
+				});
+
+				document.querySelectorAll(".add-compare-btn").forEach((btn) => {
+					btn.addEventListener("click", (e) => {
+						const productId = parseInt(
+							e.currentTarget.closest(".product-card").getAttribute("data-id")
+						);
+						toggleProductSelection(productId);
+					});
+				});
+			}
+
+			function createGridProductHTML(product, isSelected) {
+				return `
+			     <div class="product-image">
+			         <img src="${product.image}" alt="${product.name}">
+			         ${
+									product.isBestseller
+										? '<span class="product-badge">Bestseller</span>'
+										: ""
+								}
+			     </div>
+			     <div class="product-info">
+			         <div class="product-category">${product.category}</div>
+			         <h3 class="product-title">${product.name}</h3>
+			         <div class="product-rating">
+			             <div class="rating-stars">
+			                 ${createStarRating(product.rating)}
+			             </div>
+			             <span class="rating-count">(${product.reviewCount})</span>
+			         </div>
+			         <div class="product-price">
+			             $${product.price.toFixed(2)}
+			             ${
+											product.discountPercent > 0
+												? `<span class="price-original">$${product.originalPrice.toFixed(
+														2
+												  )}</span>`
+												: ""
+										}
+			         </div>
+			     </div>
+			     <div class="product-actions">
+			         <button class="add-compare-btn${isSelected ? " selected" : ""}">
+			             <i class="fas fa-exchange-alt"></i>
+			             ${isSelected ? "Remove" : "Compare"}
+			         </button>
+			         <button class="quick-view-btn">
+			             <i class="fas fa-eye"></i>
+			         </button>
+			     </div>
+			 `;
+			}
+
+			function createListProductHTML(product, isSelected) {
+				return `
+			     <div class="product-image">
+			         <img src="${product.image}" alt="${product.name}">
+			         ${
+									product.isBestseller
+										? '<span class="product-badge">Bestseller</span>'
+										: ""
+								}
+			     </div>
+			     <div class="product-info">
+			         <div class="product-category">${product.category}</div>
+			         <h3 class="product-title">${product.name}</h3>
+			         <div class="product-rating">
+			             <div class="rating-stars">
+			                 ${createStarRating(product.rating)}
+			             </div>
+			             <span class="rating-count">(${product.reviewCount})</span>
+			         </div>
+			         <p class="product-specs">
+			             <strong>Brand:</strong> ${product.brand} •
+			             <strong>Storage:</strong> ${
+											product.specs.storage !== "N/A"
+												? product.specs.storage
+												: "N/A"
+										} •
+			             <strong>Warranty:</strong> ${product.specs.warranty}
+			         </p>
+			         <div class="product-stock">
+			             ${
+											product.inStock
+												? '<span class="in-stock"><i class="fas fa-check-circle"></i> In Stock</span>'
+												: '<span class="out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</span>'
+										}
+			         </div>
+			     </div>
+			     <div class="product-actions">
+			         <div class="product-price">
+			             $${product.price.toFixed(2)}
+			             ${
+											product.discountPercent > 0
+												? `<span class="price-original">$${product.originalPrice.toFixed(
+														2
+												  )}</span>`
+												: ""
+										}
+			         </div>
+			         <button class="add-compare-btn${isSelected ? " selected" : ""}">
+			             <i class="fas fa-exchange-alt"></i>
+			             ${isSelected ? "Remove" : "Compare"}
+			         </button>
+			         <button class="quick-view-btn">
+			             <i class="fas fa-eye"></i>
+			         </button>
+			     </div>
+			 `;
+			}
+
+			function createStarRating(rating) {
+				let starsHtml = "";
+				for (let i = 1; i <= 5; i++) {
+					if (i <= Math.floor(rating)) {
+						starsHtml += '<i class="fas fa-star"></i>';
+					} else if (i - 0.5 <= rating) {
+						starsHtml += '<i class="fas fa-star-half-alt"></i>';
+					} else {
+						starsHtml += '<i class="far fa-star"></i>';
+					}
+				}
+				return starsHtml;
+			}
+
+			function toggleProductSelection(productId) {
+				const productIndex = selectedProducts.findIndex(
+					(p) => p.id === productId
+				);
+
+				if (productIndex === -1) {
+					if (selectedProducts.length >= 4) {
+						showToast(
+							"warning",
+							"Maximum Reached",
+							"You can compare up to 4 products at once"
+						);
+						return;
+					}
+
+					const product = products.find((p) => p.id === productId);
+					selectedProducts.push(product);
+					showToast(
+						"success",
+						"Product Added",
+						`${product.name} added to comparison`
+					);
+				} else {
+					const removedProduct = selectedProducts[productIndex];
+					selectedProducts.splice(productIndex, 1);
+					showToast(
+						"info",
+						"Product Removed",
+						`${removedProduct.name} removed from comparison`
+					);
+				}
+
+				updateComparisonUI();
+				renderProducts();
+			}
+
+			function updateComparisonUI() {
+				selectedCountSpan.textContent = selectedProducts.length;
+
+				document.querySelector(".comparison-count .count").textContent =
+					selectedProducts.length;
+
+				if (selectedProducts.length >= 2) {
+					compareBtn.removeAttribute("disabled");
+				} else {
+					compareBtn.setAttribute("disabled", true);
+				}
+			}
+
+			function openComparisonModal() {
+				if (selectedProducts.length < 2) {
+					showToast(
+						"warning",
+						"Not Enough Products",
+						"Please select at least 2 products to compare"
+					);
+					return;
+				}
+
+				buildComparisonTable();
+
+				comparisonModal.classList.add("active");
+				document.body.style.overflow = "hidden";
+			}
+
+			function closeComparisonModal() {
+				comparisonModal.classList.remove("active");
+				document.body.style.overflow = "";
+			}
+
+			function buildComparisonTable() {
+				const allSpecs = [
+					"image",
+					"name",
+					"price",
+					"rating",
+					"brand",
+					"category",
+					"inStock",
+				];
+
+				selectedProducts.forEach((product) => {
+					Object.keys(product.specs).forEach((spec) => {
+						if (!allSpecs.includes(spec)) {
+							allSpecs.push(spec);
+						}
+					});
+				});
+
+				const thead = comparisonTable.querySelector("thead tr");
+				thead.innerHTML = "<th>Specification</th>";
+
+				selectedProducts.forEach((product) => {
+					thead.innerHTML += `<th>${product.name}</th>`;
+				});
+
+				const tbody = comparisonTable.querySelector("tbody");
+				tbody.innerHTML = "";
+
+				const imageRow = document.createElement("tr");
+				imageRow.className = "image-row";
+				imageRow.innerHTML = "<td>Image</td>";
+
+				selectedProducts.forEach((product) => {
+					imageRow.innerHTML += `<td><img src="${product.image}" alt="${product.name}"></td>`;
+				});
+
+				tbody.appendChild(imageRow);
+
+				allSpecs.forEach((spec) => {
+					if (spec === "image") return;
+
+					const row = document.createElement("tr");
+					row.innerHTML = `<td>${formatSpecName(spec)}</td>`;
+
+					selectedProducts.forEach((product) => {
+						let value = "";
+
+						if (spec === "name") {
+							value = product.name;
+						} else if (spec === "price") {
+							value = `$${product.price.toFixed(2)}`;
+							if (product.discountPercent > 0) {
+								value += `<br><span class="price-original">$${product.originalPrice.toFixed(
+									2
+								)}</span>`;
+							}
+						} else if (spec === "rating") {
+							value = `
+			                 <div class="rating-stars">
+			                     ${createStarRating(product.rating)}
+			                 </div>
+			                 <span class="rating-count">(${product.reviewCount})</span>
+			             `;
+						} else if (spec === "brand") {
+							value = product.brand;
+						} else if (spec === "category") {
+							value =
+								product.category.charAt(0).toUpperCase() +
+								product.category.slice(1);
+						} else if (spec === "inStock") {
+							value = product.inStock
+								? '<span class="in-stock"><i class="fas fa-check-circle"></i> Yes</span>'
+								: '<span class="out-of-stock"><i class="fas fa-times-circle"></i> No</span>';
+						} else {
+							value = product.specs[spec] || "N/A";
+						}
+
+						row.innerHTML += `<td>${value}</td>`;
+					});
+
+					tbody.appendChild(row);
+				});
+			}
+
+			function formatSpecName(spec) {
+				if (spec === "inStock") return "In Stock";
+
+				return spec
+					.replace(/([A-Z])/g, " $1")
+					.replace(/^./, (str) => str.toUpperCase());
+			}
+
+			function showToast(type, title, message) {
+				const toast = document.createElement("div");
+				toast.className = `toast toast-${type}`;
+
+				toast.innerHTML = `
+			     <div class="toast-icon">
+			         <i class="fas ${getToastIcon(type)}"></i>
+			     </div>
+			     <div class="toast-content">
+			         <div class="toast-title">${title}</div>
+			         <div class="toast-message">${message}</div>
+			     </div>
+			     <button class="close-toast">
+			         <i class="fas fa-times"></i>
+			     </button>
+			 `;
+
+				toastContainer.appendChild(toast);
+
+				toast.querySelector(".close-toast").addEventListener("click", () => {
+					toast.remove();
+				});
+
+				setTimeout(() => {
+					toast.remove();
+				}, 5000);
+			}
+
+			function getToastIcon(type) {
+				switch (type) {
+					case "success":
+						return "fa-check-circle";
+					case "error":
+						return "fa-times-circle";
+					case "warning":
+						return "fa-exclamation-triangle";
+					case "info":
+						return "fa-info-circle";
+					default:
+						return "fa-info-circle";
+				}
+			}
+		</script>
+		<script src="script.js"></script>
+	</body>
+</html>
