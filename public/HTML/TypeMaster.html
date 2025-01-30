@@ -1,0 +1,3524 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+		/>
+		<meta name="mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta
+			name="apple-mobile-web-app-status-bar-style"
+			content="black-translucent"
+		/>
+		<title>TypeMaster | The Ultimate Typing Experience</title>
+		<meta
+			name="description"
+			content="Experience the ultimate typing challenge with TypeMaster Pro - featuring advanced gameplay, stunning visuals, and professional-grade features."
+		/>
+		<meta
+			name="keywords"
+			content="typing game, typing test, WPM, typing speed, keyboard skills, typing practice"
+		/>
+		<meta name="author" content="TypeMaster Pro" />
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				darkMode: "class",
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								50: "#f0f9ff",
+								100: "#e0f2fe",
+								200: "#bae6fd",
+								300: "#7dd3fc",
+								400: "#38bdf8",
+								500: "#0ea5e9",
+								600: "#0284c7",
+								700: "#0369a1",
+								800: "#075985",
+								900: "#0c4a6e",
+							},
+							secondary: {
+								50: "#f5f3ff",
+								100: "#ede9fe",
+								200: "#ddd6fe",
+								300: "#c4b5fd",
+								400: "#a78bfa",
+								500: "#8b5cf6",
+								600: "#7c3aed",
+								700: "#6d28d9",
+								800: "#5b21b6",
+								900: "#4c1d95",
+							},
+							success: {
+								50: "#ecfdf5",
+								100: "#d1fae5",
+								200: "#a7f3d0",
+								300: "#6ee7b7",
+								400: "#34d399",
+								500: "#10b981",
+								600: "#059669",
+								700: "#047857",
+								800: "#065f46",
+								900: "#064e3b",
+							},
+							danger: {
+								50: "#fef2f2",
+								100: "#fee2e2",
+								200: "#fecaca",
+								300: "#fca5a5",
+								400: "#f87171",
+								500: "#ef4444",
+								600: "#dc2626",
+								700: "#b91c1c",
+								800: "#991b1b",
+								900: "#7f1d1d",
+							},
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			:root {
+				--primary-gradient: linear-gradient(135deg, #1d4ed8 0%, #7e22ce 100%);
+				--secondary-gradient: linear-gradient(135deg, #be123c 0%, #a21caf 100%);
+				--accent-gradient: linear-gradient(135deg, #1e40af 0%, #0e7490 100%);
+				--success-gradient: linear-gradient(135deg, #047857 0%, #059669 100%);
+				--danger-gradient: linear-gradient(135deg, #b91c1c 0%, #c2410c 100%);
+				--glass-bg: rgba(15, 23, 42, 0.7);
+				--glass-border: rgba(30, 41, 59, 0.5);
+				--text-primary: #f8fafc;
+				--text-secondary: rgba(226, 232, 240, 0.8);
+				--shadow-color: rgba(0, 0, 0, 0.5);
+				--bg-primary: #020617;
+				--bg-secondary: #0f172a;
+
+				--neon-glow: 0 0 10px rgba(30, 64, 175, 0.8),
+					0 0 20px rgba(30, 64, 175, 0.5);
+				--premium-glass: rgba(2, 6, 23, 0.8);
+				--premium-border: rgba(30, 41, 59, 0.3);
+				--title-gradient: linear-gradient(135deg, #f8fafc 10%, #64748b 90%);
+				--heart-color-lost: #6b7280;
+			}
+
+			body {
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+				background: var(--bg-primary);
+				min-height: 100vh;
+				overflow: hidden;
+				position: relative;
+				transition: background 0.3s ease, color 0.3s ease;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 10px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: linear-gradient(
+					135deg,
+					rgba(59, 130, 246, 0.6) 0%,
+					rgba(139, 92, 246, 0.6) 100%
+				);
+				border-radius: 10px;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: linear-gradient(
+					135deg,
+					rgba(59, 130, 246, 0.8) 0%,
+					rgba(139, 92, 246, 0.8) 100%
+				);
+			}
+
+			* {
+				scrollbar-width: thin;
+				scrollbar-color: rgba(59, 130, 246, 0.6) rgba(255, 255, 255, 0.05);
+			}
+
+			body::before {
+				content: "";
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: var(--primary-gradient);
+				opacity: 0.7;
+				z-index: -2;
+				transition: opacity 0.5s ease;
+			}
+
+			body::after {
+				content: "";
+				position: fixed;
+				top: -50%;
+				left: -50%;
+				width: 200%;
+				height: 200%;
+				background: radial-gradient(
+					circle,
+					transparent 20%,
+					var(--bg-secondary) 80%
+				);
+				opacity: 0.7;
+				z-index: -1;
+				transition: opacity 0.5s ease;
+			}
+
+			.particles {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				overflow: hidden;
+				z-index: 1;
+			}
+
+			.particle {
+				position: absolute;
+				width: 2px;
+				height: 2px;
+				background: rgba(255, 255, 255, 0.5);
+				border-radius: 50%;
+				animation: float 20s infinite linear;
+				box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+			}
+
+			.particle:nth-child(even) {
+				width: 3px;
+				height: 3px;
+				animation-duration: 25s;
+				background: rgba(168, 192, 255, 0.5);
+			}
+
+			.particle:nth-child(3n) {
+				animation-duration: 30s;
+				background: rgba(255, 168, 226, 0.5);
+			}
+
+			@keyframes float {
+				from {
+					transform: translateY(100vh) translateX(0) scale(0);
+					opacity: 0;
+				}
+				10% {
+					opacity: 1;
+					transform: translateY(90vh) translateX(10px) scale(1);
+				}
+				90% {
+					opacity: 1;
+					transform: translateY(10vh) translateX(80px) scale(1);
+				}
+				to {
+					transform: translateY(-10vh) translateX(100px) scale(0);
+					opacity: 0;
+				}
+			}
+
+			.bg-orb {
+				position: fixed;
+				border-radius: 50%;
+				filter: blur(60px);
+				opacity: 0.4;
+				animation: orb-float 20s infinite ease-in-out;
+				z-index: 0;
+			}
+
+			.bg-orb:nth-child(1) {
+				width: 600px;
+				height: 600px;
+				background: var(--accent-gradient);
+				top: -200px;
+				left: -200px;
+				animation-duration: 25s;
+			}
+
+			.bg-orb:nth-child(2) {
+				width: 400px;
+				height: 400px;
+				background: var(--secondary-gradient);
+				bottom: -150px;
+				right: -150px;
+				animation-duration: 30s;
+				animation-delay: -5s;
+			}
+
+			.bg-orb:nth-child(3) {
+				width: 300px;
+				height: 300px;
+				background: var(--success-gradient);
+				top: 50%;
+				left: 50%;
+				animation-duration: 35s;
+				animation-delay: -10s;
+			}
+
+			@keyframes orb-float {
+				0%,
+				100% {
+					transform: translate(0, 0) scale(1);
+				}
+				25% {
+					transform: translate(50px, -50px) scale(1.1);
+				}
+				50% {
+					transform: translate(-30px, 30px) scale(0.9);
+				}
+				75% {
+					transform: translate(30px, 50px) scale(1.05);
+				}
+			}
+
+			.container {
+				position: relative;
+				width: 100%;
+				max-width: 1400px;
+				height: 100vh;
+				margin: 0 auto;
+				padding: 20px;
+				display: flex;
+				gap: 30px;
+				align-items: center;
+				justify-content: center;
+				z-index: 2;
+			}
+
+			.game-area {
+				flex: 1;
+				max-width: 900px;
+				height: 90vh;
+				background: var(--glass-bg);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				border-radius: 30px;
+				border: 1px solid var(--glass-border);
+				box-shadow: 0 20px 70px -10px rgba(0, 0, 0, 0.3),
+					0 10px 40px -10px rgba(0, 0, 0, 0.2),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+				position: relative;
+				overflow: hidden;
+				transition: all 0.3s ease;
+			}
+
+			.game-area::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: radial-gradient(
+					circle at 20% 80%,
+					rgba(120, 119, 198, 0.1) 0%,
+					transparent 50%
+				);
+				pointer-events: none;
+			}
+
+			.score-panel {
+				width: 260px;
+				height: 90vh;
+				background: var(--glass-bg);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				border-radius: 24px;
+				border: 1px solid var(--glass-border);
+				box-shadow: 0 20px 70px -10px rgba(0, 0, 0, 0.3),
+					0 10px 40px -10px rgba(0, 0, 0, 0.2),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+				padding: 25px;
+				animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+				z-index: 3;
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+				overflow: hidden;
+				box-sizing: border-box;
+			}
+
+			@keyframes slideIn {
+				from {
+					transform: translateX(100px) scale(0.9);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0) scale(1);
+					opacity: 1;
+				}
+			}
+
+			.score-item {
+				margin: 0;
+				padding: 16px;
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 16px;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+				height: 65px;
+				box-sizing: border-box;
+				flex-shrink: 0;
+			}
+
+			.score-item::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.1),
+					transparent
+				);
+				transition: left 0.5s ease;
+			}
+
+			.score-item:hover::before {
+				left: 100%;
+			}
+
+			.score-item:hover {
+				transform: translateX(-5px);
+				background: rgba(255, 255, 255, 0.08);
+				box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+			}
+
+			.score-label {
+				font-size: 12px;
+				font-weight: 500;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				color: var(--text-secondary);
+			}
+
+			.score-value {
+				font-size: 28px;
+				font-weight: 700;
+				background: linear-gradient(135deg, #fff, #e0e0e0);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+				font-family: var(--mono-font);
+			}
+
+			.input-area-wrapper {
+				border-top: 2px dashed rgba(255, 255, 255, 0.18);
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				padding: 10px;
+			}
+
+			.input-area {
+				background: rgba(10, 10, 10, 0.6);
+				backdrop-filter: blur(30px) saturate(180%);
+				-webkit-backdrop-filter: blur(30px) saturate(180%);
+				padding: 40px;
+				border-radius: 22px 22px;
+				border-top: 1px solid var(--glass-border);
+				box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+				z-index: 20;
+			}
+
+			#word-input {
+				width: 100%;
+				padding: 20px 30px;
+				font-size: 18px;
+				font-weight: 500;
+				border: 2px solid transparent;
+				border-radius: 20px;
+				background: rgba(255, 255, 255, 0.08);
+				backdrop-filter: blur(10px);
+				color: white;
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				letter-spacing: 0.5px;
+			}
+
+			#word-input::placeholder {
+				color: rgba(255, 255, 255, 0.4);
+				font-weight: 400;
+			}
+
+			#word-input:focus {
+				outline: none;
+				transform: translateY(-2px);
+				border-color: rgba(168, 192, 255, 0.5);
+				background: rgba(255, 255, 255, 0.12);
+				box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3),
+					0 0 0 2px rgba(168, 192, 255, 0.3),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+			}
+
+			.falling-word {
+				position: absolute;
+				color: white;
+				font-size: 18px;
+				font-weight: 600;
+				padding: 12px 24px;
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.15) 0%,
+					rgba(255, 255, 255, 0.05) 100%
+				);
+				backdrop-filter: blur(10px) saturate(180%);
+				-webkit-backdrop-filter: blur(10px) saturate(180%);
+				border-radius: 16px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+
+				cursor: default;
+				letter-spacing: 0.5px;
+				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+				animation: word-appear 0.4s ease-out;
+				z-index: 5;
+			}
+
+			@keyframes word-appear {
+				from {
+					opacity: 0;
+					transform: scale(0.8) rotate(-5deg);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1) rotate(0deg);
+				}
+			}
+
+			.falling-word:hover {
+				transform: scale(1.05);
+				box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2),
+					0 0 20px rgba(168, 192, 255, 0.3);
+			}
+
+			.falling-word.danger {
+				background: linear-gradient(
+					135deg,
+					rgba(255, 107, 107, 0.4) 0%,
+					rgba(255, 71, 87, 0.3) 100%
+				);
+				border-color: rgba(255, 107, 107, 0.5);
+				animation: danger-pulse 0.5s infinite;
+				box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3),
+					0 0 40px rgba(255, 107, 107, 0.4),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+			}
+
+			@keyframes danger-pulse {
+				0%,
+				100% {
+					transform: scale(1);
+					filter: brightness(1);
+				}
+				50% {
+					transform: scale(1.08);
+					filter: brightness(1.2);
+				}
+			}
+
+			.power-ups {
+				position: absolute;
+				top: 30px;
+				left: 30px;
+				display: flex;
+				gap: 15px;
+				z-index: 10;
+			}
+
+			.power-ups-right {
+				position: absolute;
+				top: 30px;
+				right: 30px;
+				display: flex;
+				gap: 15px;
+				z-index: 10;
+			}
+
+			.power-up-indicator {
+				padding: 12px 24px;
+				background: rgba(255, 255, 255, 0.08);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				border-radius: 50px;
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				color: white;
+				font-size: 13px;
+				font-weight: 500;
+				opacity: 0.6;
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.power-up-indicator:hover {
+				opacity: 0.8;
+				transform: translateY(-2px);
+				box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+			}
+
+			.power-up-indicator.active {
+				opacity: 1;
+				background: var(--success-gradient);
+				border-color: transparent;
+				animation: power-glow 2s infinite ease-in-out;
+				transform: scale(1.05);
+				box-shadow: 0 8px 32px rgba(67, 233, 123, 0.4),
+					0 0 60px rgba(67, 233, 123, 0.3);
+			}
+
+			@keyframes power-glow {
+				0%,
+				100% {
+					box-shadow: 0 8px 32px rgba(67, 233, 123, 0.4),
+						0 0 60px rgba(67, 233, 123, 0.3);
+					transform: scale(1.05);
+				}
+				50% {
+					box-shadow: 0 12px 40px rgba(67, 233, 123, 0.6),
+						0 0 80px rgba(67, 233, 123, 0.5);
+					transform: scale(1.08);
+				}
+			}
+
+			.game-over {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, 0.8);
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				animation: fadeIn 0.3s ease-out;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			.game-over-content {
+				background: linear-gradient(
+					135deg,
+					rgba(20, 20, 20, 0.9) 0%,
+					rgba(30, 30, 30, 0.9) 100%
+				);
+				backdrop-filter: blur(30px) saturate(180%);
+				-webkit-backdrop-filter: blur(30px) saturate(180%);
+				border-radius: 30px;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				padding: 60px;
+				text-align: center;
+				color: white;
+				box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5),
+					0 15px 40px rgba(0, 0, 0, 0.3),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+				animation: modalSlide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+				min-width: 400px;
+			}
+
+			@keyframes modalSlide {
+				from {
+					transform: translateY(50px) scale(0.9);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0) scale(1);
+					opacity: 1;
+				}
+			}
+
+			.game-over h2 {
+				font-size: 42px;
+				font-weight: 800;
+				margin-bottom: 30px;
+				background: var(--primary-gradient);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-transform: uppercase;
+				letter-spacing: 2px;
+			}
+
+			.final-score {
+				font-size: 72px;
+				font-weight: 900;
+				margin: 30px 0;
+				background: linear-gradient(135deg, #fff, #a8c0ff);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-shadow: 0 4px 20px rgba(168, 192, 255, 0.3);
+				animation: scoreGlow 2s ease-in-out infinite;
+			}
+
+			@keyframes scoreGlow {
+				0%,
+				100% {
+					filter: brightness(1);
+				}
+				50% {
+					filter: brightness(1.2);
+				}
+			}
+
+			.game-over p {
+				font-size: 16px;
+				margin: 10px 0;
+				color: var(--text-secondary);
+				font-weight: 500;
+			}
+
+			.play-again-btn {
+				padding: 18px 50px;
+				font-size: 16px;
+				font-weight: 600;
+				font-family: var(--btn-font);
+				border: none;
+				border-radius: 50px;
+				background: var(--primary-gradient);
+				color: white;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				margin-top: 30px;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3),
+					inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+				position: relative;
+				overflow: hidden;
+			}
+			.play-again-btn.setting-btn {
+				margin-top: 10px;
+				padding: 6px 20px;
+				font-size: 12px;
+				background: var(--accent-gradient);
+			}
+
+			.play-again-btn::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.2);
+				transition: left 0.3s ease;
+			}
+
+			.play-again-btn:hover::before {
+				left: 100%;
+			}
+
+			.play-again-btn:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4),
+					inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+			}
+
+			.start-screen {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100vh;
+				background: linear-gradient(
+					135deg,
+					rgba(15, 23, 42, 0.95) 0%,
+					rgba(30, 41, 59, 0.95) 50%,
+					rgba(15, 23, 42, 0.95) 100%
+				);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				overflow-y: auto;
+				padding: 20px;
+			}
+
+			.start-screen-header {
+				background: rgba(15, 23, 42, 0.95);
+			}
+
+			.start-content {
+				background: linear-gradient(
+					135deg,
+					rgba(15, 23, 42, 0.95) 0%,
+					rgba(30, 41, 59, 0.95) 100%
+				);
+				backdrop-filter: blur(30px) saturate(180%);
+				-webkit-backdrop-filter: blur(30px) saturate(180%);
+				border-radius: 24px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				padding: 40px 30px;
+				text-align: center;
+				color: #ffffff;
+				box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6),
+					0 15px 40px rgba(0, 0, 0, 0.4),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+				max-width: 90vw;
+				width: 100%;
+				max-width: 800px;
+				max-height: 90vh;
+				overflow-y: auto;
+			}
+
+			.timer-selection {
+				margin: 20px 0;
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.06) 0%,
+					rgba(255, 255, 255, 0.02) 100%
+				);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				border-radius: 20px;
+				padding: 24px;
+				border: 1px solid rgba(255, 255, 255, 0.12);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+			}
+
+			.timer-selection h3 {
+				margin-bottom: 18px;
+				color: var(--text-primary);
+				font-weight: 700;
+				font-size: 1.2rem;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				background: var(--success-gradient);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+
+			.timer-options {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+				gap: 12px;
+				justify-content: center;
+			}
+
+			.timer-option {
+				padding: 16px 20px;
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.08) 0%,
+					rgba(255, 255, 255, 0.03) 100%
+				);
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				border: 2px solid rgba(255, 255, 255, 0.12);
+				border-radius: 16px;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				font-weight: 600;
+				color: var(--text-primary);
+				position: relative;
+				overflow: hidden;
+				text-align: center;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.timer-option::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.1),
+					transparent
+				);
+				transition: left 0.5s ease;
+			}
+
+			.timer-option:hover::before {
+				left: 100%;
+			}
+
+			.timer-option:hover {
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.15) 0%,
+					rgba(255, 255, 255, 0.08) 100%
+				);
+				transform: translateY(-3px) scale(1.02);
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2),
+					0 0 20px rgba(59, 130, 246, 0.3);
+				border-color: rgba(59, 130, 246, 0.4);
+			}
+
+			.timer-option.selected {
+				background: var(--primary-gradient);
+				border-color: transparent;
+				box-shadow: 0 10px 25px rgba(14, 165, 233, 0.4),
+					0 0 30px rgba(14, 165, 233, 0.3);
+				transform: scale(1.05);
+				color: white;
+			}
+
+			.difficulty-selection {
+				margin: 20px 0;
+			}
+
+			.difficulty-option {
+				padding: 20px 16px;
+				background: rgba(255, 255, 255, 0.05);
+				border: 2px solid rgba(255, 255, 255, 0.1);
+				border-radius: 16px;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				text-align: center;
+				color: var(--text-primary);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.difficulty-option::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.1),
+					transparent
+				);
+				transition: left 0.5s ease;
+			}
+
+			.difficulty-option:hover::before {
+				left: 100%;
+			}
+
+			.difficulty-option:hover {
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.15) 0%,
+					rgba(255, 255, 255, 0.08) 100%
+				);
+				transform: translateY(-3px) scale(1.02);
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2),
+					0 0 20px rgba(139, 92, 246, 0.3);
+				border-color: rgba(139, 92, 246, 0.4);
+			}
+
+			.difficulty-option.selected {
+				background: var(--secondary-gradient);
+				border-color: transparent;
+				box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4),
+					0 0 30px rgba(139, 92, 246, 0.3);
+				transform: scale(1.05);
+				color: white;
+			}
+
+			.difficulty-option i {
+				display: block;
+				margin-bottom: 8px;
+			}
+
+			.timer-display {
+				position: absolute;
+				top: 30px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.1) 0%,
+					rgba(255, 255, 255, 0.05) 100%
+				);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				border-radius: 50px;
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				padding: 12px 40px;
+				color: white;
+				font-size: 32px;
+				font-weight: 700;
+				font-variant-numeric: tabular-nums;
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+				display: none;
+				letter-spacing: 2px;
+				z-index: 10;
+				animation: timerSlide 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+			}
+
+			@keyframes timerSlide {
+				from {
+					transform: translateX(-50%) translateY(-20px) scale(0.9);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(-50%) translateY(0) scale(1);
+					opacity: 1;
+				}
+			}
+
+			.timer-display.warning {
+				background: var(--danger-gradient);
+				border-color: transparent;
+				animation: timer-warning 0.5s infinite;
+				box-shadow: 0 8px 32px rgba(250, 112, 154, 0.4),
+					0 0 60px rgba(250, 112, 154, 0.3);
+			}
+
+			@keyframes timer-warning {
+				0%,
+				100% {
+					transform: translateX(-50%) scale(1);
+					filter: brightness(1);
+				}
+				50% {
+					transform: translateX(-50%) scale(1.05);
+					filter: brightness(1.3);
+				}
+			}
+
+			.start-content h1 {
+				font-size: 42px;
+				margin-bottom: 20px;
+				background: linear-gradient(45deg, #fff, #f0f0f0);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.instructions {
+				margin: 20px 0;
+				line-height: 1.6;
+				opacity: 0.9;
+			}
+
+			.power-up-info {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 10px;
+				padding: 15px;
+				margin: 20px 0;
+				text-align: left;
+			}
+
+			.power-up-info h3 {
+				margin-bottom: 10px;
+				color: #76ff88;
+			}
+
+			.power-up-item {
+				margin: 5px 0;
+				font-size: 14px;
+			}
+
+			.start-btn {
+				padding: 20px 60px;
+				font-size: 18px;
+				font-weight: 700;
+				font-family: var(--btn-font);
+				border: none;
+				border-radius: 50px;
+				background: var(--primary-gradient);
+				color: white;
+				cursor: pointer;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				text-transform: uppercase;
+				letter-spacing: 1.5px;
+				box-shadow: 0 15px 40px rgba(14, 165, 233, 0.4),
+					0 8px 20px rgba(0, 0, 0, 0.3),
+					inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+				position: relative;
+				overflow: hidden;
+				margin-top: 30px;
+				min-width: 200px;
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+			}
+
+			.start-btn::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.2);
+				transition: left 0.3s ease;
+			}
+
+			.start-btn:hover::before {
+				left: 100%;
+			}
+
+			.start-btn:hover {
+				transform: translateY(-5px) scale(1.05);
+				box-shadow: 0 20px 50px rgba(14, 165, 233, 0.6),
+					0 10px 25px rgba(0, 0, 0, 0.4),
+					inset 0 0 0 2px rgba(255, 255, 255, 0.25),
+					0 0 40px rgba(14, 165, 233, 0.4);
+			}
+
+			.start-btn:active {
+				transform: translateY(-1px) scale(1);
+			}
+
+			.lives {
+				display: flex;
+				gap: 15px;
+				background: rgba(255, 255, 255, 0.08);
+				backdrop-filter: blur(20px);
+				padding: 10px 20px;
+				border-radius: 50px;
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+				margin-top: auto;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.heart {
+				font-size: 24px;
+				color: #f43f5e;
+				filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.6));
+				-webkit-text-stroke: 1px white;
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				animation: heartBeat 2s ease-in-out infinite;
+			}
+			.dark .heart {
+				-webkit-text-stroke: 0;
+			}
+
+			@keyframes heartBeat {
+				0%,
+				100% {
+					transform: scale(1);
+				}
+				10% {
+					transform: scale(1.1);
+				}
+				20% {
+					transform: scale(1);
+				}
+			}
+
+			.heart.lost {
+				opacity: 0.3;
+				transform: scale(0.7);
+				color: var(--heart-color-lost);
+				filter: drop-shadow(0 0 5px rgba(107, 114, 128, 0.3));
+				animation: none;
+			}
+
+			@media (max-width: 1200px) {
+				.container {
+					flex-direction: column;
+					gap: 20px;
+					padding: 15px;
+					align-items: stretch;
+				}
+
+				.score-panel {
+					width: 100%;
+					height: auto;
+					max-width: 600px;
+					display: grid;
+					grid-template-columns: repeat(3, 1fr);
+					gap: 15px;
+					padding: 20px;
+					align-self: center;
+				}
+
+				.game-area {
+					height: 70vh;
+				}
+
+				.score-item {
+					margin: 0;
+					padding: 15px;
+					text-align: center;
+				}
+
+				.score-label {
+					margin-bottom: 5px;
+					display: block;
+					font-size: 11px;
+				}
+
+				.score-value {
+					font-size: 20px;
+				}
+
+				.skill-meter {
+					padding: 15px;
+					margin: 10px 0;
+				}
+
+				.skill-label {
+					font-size: 14px;
+				}
+
+				.skill-value {
+					font-size: 16px;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.start-screen {
+					padding: 10px;
+				}
+
+				.start-content {
+					padding: 30px 20px;
+					max-width: 95vw;
+				}
+
+				.container {
+					flex-direction: column;
+					gap: 12px;
+				}
+
+				.game-area {
+					height: 70vh;
+					min-height: 450px;
+					border-radius: 20px;
+					order: 1;
+				}
+
+				.score-panel {
+					height: auto;
+					min-height: 200px;
+					max-height: 25vh;
+					width: 100%;
+					max-width: 100%;
+					padding: 15px;
+					gap: 8px;
+					display: flex;
+					flex-direction: column;
+					overflow-y: auto;
+					order: 2;
+				}
+
+				.score-item {
+					padding: 12px;
+					height: 55px;
+					flex-shrink: 0;
+				}
+
+				.skill-meter {
+					padding: 12px;
+					margin: 0;
+					height: 65px;
+					flex-shrink: 0;
+				}
+
+				.skill-value {
+					font-size: 20px;
+				}
+
+				.skill-label {
+					font-size: 11px;
+				}
+
+				.falling-word {
+					font-size: 16px;
+					padding: 10px 20px;
+				}
+
+				#word-input {
+					font-size: 16px;
+					padding: 16px 24px;
+				}
+
+				.input-area {
+					padding: 25px 15px;
+				}
+
+				.power-ups {
+					top: 15px;
+					left: 15px;
+					flex-direction: column;
+					gap: 8px;
+				}
+
+				.power-ups-right {
+					top: 15px;
+					right: 15px;
+					flex-direction: column;
+					gap: 8px;
+				}
+
+				.power-up-indicator {
+					padding: 8px 16px;
+					font-size: 11px;
+				}
+
+				.timer-display {
+					top: 15px;
+					font-size: 22px;
+					padding: 8px 24px;
+				}
+
+				.heart {
+					font-size: 22px;
+				}
+
+				.start-content h1 {
+					font-size: 2.5rem;
+					line-height: 1.2;
+				}
+
+				.game-over-content {
+					padding: 25px 15px;
+					margin: 10px;
+					max-width: 95%;
+					border-radius: 20px;
+				}
+
+				.game-over h2 {
+					font-size: 24px;
+					margin-bottom: 15px;
+				}
+
+				.final-score {
+					font-size: 42px;
+					margin: 15px 0;
+				}
+
+				.stats-grid {
+					grid-template-columns: repeat(2, 1fr);
+					gap: 10px;
+					margin: 15px 0;
+				}
+
+				.stat-item {
+					padding: 12px;
+					font-size: 14px;
+				}
+
+				.start-btn,
+				.play-again-btn {
+					padding: 16px 40px;
+					font-size: 16px;
+					min-width: 180px;
+				}
+
+				.difficulty-option,
+				.timer-option {
+					padding: 12px 16px;
+				}
+
+				.floating-action-btn {
+					width: 50px;
+					height: 50px;
+					bottom: 20px;
+					right: 20px;
+					font-size: 20px;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.container {
+					padding: 8px;
+					gap: 8px;
+					flex-direction: column;
+				}
+
+				.game-area {
+					height: 65vh;
+					min-height: 400px;
+					border-radius: 16px;
+					order: 1;
+				}
+
+				.score-panel {
+					height: auto;
+					min-height: 180px;
+					max-height: 25vh;
+					padding: 12px;
+					gap: 6px;
+					order: 2;
+					overflow-y: auto;
+				}
+
+				.score-item {
+					padding: 10px;
+					height: 50px;
+					font-size: 14px;
+				}
+
+				.skill-meter {
+					padding: 10px;
+					height: 60px;
+				}
+
+				.skill-value {
+					font-size: 18px;
+				}
+
+				.skill-label {
+					font-size: 10px;
+				}
+
+				.start-content {
+					padding: 20px 15px;
+					margin: 10px;
+				}
+
+				.start-content h1 {
+					font-size: 2rem;
+					margin-bottom: 15px;
+				}
+
+				.difficulty-grid {
+					grid-template-columns: 1fr;
+					gap: 10px;
+				}
+
+				.timer-grid {
+					grid-template-columns: repeat(2, 1fr);
+					gap: 8px;
+				}
+
+				.difficulty-option,
+				.timer-option {
+					padding: 10px 12px;
+					font-size: 14px;
+				}
+
+				.start-btn,
+				.play-again-btn {
+					padding: 14px 32px;
+					font-size: 15px;
+					min-width: 160px;
+				}
+
+				.falling-word {
+					font-size: 14px;
+					padding: 8px 16px;
+				}
+
+				#word-input {
+					font-size: 16px;
+					padding: 14px 20px;
+					border-radius: 16px;
+				}
+
+				.input-area {
+					padding: 20px 12px;
+				}
+
+				.power-up-indicator {
+					padding: 6px 12px;
+					font-size: 10px;
+				}
+
+				.timer-display {
+					font-size: 20px;
+					padding: 6px 20px;
+				}
+
+				.heart {
+					font-size: 20px;
+				}
+
+				.toast {
+					min-width: 280px;
+					max-width: 90vw;
+					margin-right: 10px;
+				}
+
+				.bg-orb:nth-child(1) {
+					width: 250px;
+					height: 250px;
+				}
+
+				.bg-orb:nth-child(2) {
+					width: 180px;
+					height: 180px;
+				}
+
+				.bg-orb:nth-child(3) {
+					width: 120px;
+					height: 120px;
+				}
+			}
+
+			@media (max-width: 360px) {
+				.container {
+					padding: 5px;
+					gap: 6px;
+				}
+
+				.game-area {
+					height: 60vh;
+					min-height: 380px;
+				}
+
+				.start-content {
+					padding: 15px 10px;
+					margin: 5px;
+				}
+
+				.start-content h1 {
+					font-size: 1.8rem;
+				}
+
+				.score-panel {
+					padding: 10px;
+					gap: 5px;
+					min-height: 160px;
+					max-height: 30vh;
+				}
+
+				.score-item {
+					padding: 8px;
+					height: 45px;
+				}
+
+				.skill-meter {
+					padding: 8px;
+					height: 55px;
+				}
+
+				.skill-value {
+					font-size: 16px;
+				}
+
+				.difficulty-option,
+				.timer-option {
+					padding: 8px 10px;
+					font-size: 13px;
+				}
+
+				.start-btn,
+				.play-again-btn {
+					padding: 12px 28px;
+					font-size: 14px;
+					min-width: 140px;
+				}
+			}
+
+			@media (hover: none) and (pointer: coarse) {
+				.difficulty-option:hover,
+				.timer-option:hover,
+				.start-btn:hover,
+				.play-again-btn:hover {
+					transform: none;
+				}
+
+				.difficulty-option:active,
+				.timer-option:active,
+				.start-btn:active,
+				.play-again-btn:active {
+					transform: scale(0.98);
+					transition: transform 0.1s ease;
+				}
+
+				.skill-meter:hover {
+					transform: none;
+				}
+
+				.score-item:hover {
+					transform: none;
+				}
+
+				.difficulty-option,
+				.timer-option {
+					min-height: 44px;
+				}
+
+				.start-btn,
+				.play-again-btn {
+					min-height: 48px;
+				}
+			}
+
+			.loading-screen {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: #0a0a0a;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 9999;
+				transition: opacity 0.5s ease;
+			}
+
+			.loading-screen.loaded {
+				opacity: 0;
+			}
+
+			.loading-content {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 30px;
+			}
+
+			.logo-container {
+				margin-bottom: 20px;
+			}
+
+			@keyframes glow {
+				0%,
+				100% {
+					filter: drop-shadow(0 0 10px rgba(168, 192, 255, 0.3));
+				}
+				50% {
+					filter: drop-shadow(0 0 20px rgba(168, 192, 255, 0.6));
+				}
+			}
+
+			.loading-bar-container {
+				width: 300px;
+				height: 6px;
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 10px;
+				overflow: hidden;
+			}
+
+			.loading-bar {
+				height: 100%;
+				width: 0;
+				background: var(--accent-gradient);
+				border-radius: 10px;
+				transition: width 0.3s ease;
+			}
+
+			.loading-text {
+				color: var(--text-secondary);
+				font-size: 14px;
+				letter-spacing: 1px;
+			}
+
+			.confetti-container {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				pointer-events: none;
+				z-index: 2000;
+			}
+
+			.confetti {
+				position: absolute;
+				top: -10px;
+				width: 10px;
+				height: 20px;
+				opacity: 0.8;
+				animation: confetti-fall linear;
+			}
+
+			@keyframes confetti-fall {
+				0% {
+					transform: translateY(0) rotate(0deg) scale(1);
+				}
+				25% {
+					transform: translateY(25vh) rotate(90deg) scale(0.9);
+				}
+				50% {
+					transform: translateY(50vh) rotate(180deg) scale(1.1);
+				}
+				75% {
+					transform: translateY(75vh) rotate(270deg) scale(0.9);
+				}
+				100% {
+					transform: translateY(100vh) rotate(360deg) scale(0.8);
+					opacity: 0;
+				}
+			}
+
+			.toast-container {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				z-index: 2000;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.toast {
+				background: linear-gradient(
+					135deg,
+					rgba(30, 30, 30, 0.95) 0%,
+					rgba(40, 40, 40, 0.95) 100%
+				);
+				backdrop-filter: blur(20px);
+				border-radius: 12px;
+				padding: 16px 20px;
+				color: white;
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+					inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+				transform: translateX(400px);
+				opacity: 0;
+				transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+				min-width: 300px;
+				max-width: 400px;
+			}
+
+			.toast.show {
+				transform: translateX(0);
+				opacity: 1;
+			}
+
+			.toast.success {
+				border-left: 4px solid #10b981;
+			}
+
+			.toast.error {
+				border-left: 4px solid #ef4444;
+			}
+
+			.toast.info {
+				border-left: 4px solid #64748b;
+			}
+
+			.toast-header {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-weight: 600;
+				margin-bottom: 5px;
+			}
+
+			.toast-body {
+				font-size: 14px;
+				opacity: 0.9;
+			}
+
+			.progress-container {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 8px;
+				height: 6px;
+				overflow: hidden;
+				position: relative;
+				margin-top: 8px;
+			}
+
+			.progress-bar {
+				height: 100%;
+				background: linear-gradient(90deg, #10b981, #34d399);
+				border-radius: 8px;
+				transition: width 0.3s ease;
+				position: relative;
+			}
+
+			.progress-bar::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.3),
+					transparent
+				);
+				animation: progress-shine 2s infinite;
+			}
+
+			@keyframes progress-shine {
+				0% {
+					transform: translateX(-100%);
+				}
+				100% {
+					transform: translateX(100%);
+				}
+			}
+
+			.skill-meter {
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 16px;
+				padding: 16px;
+				margin: 0;
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				height: 85px;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+				box-sizing: border-box;
+				flex-shrink: 0;
+			}
+
+			.skill-meter::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.1),
+					transparent
+				);
+				transition: left 0.5s ease;
+			}
+
+			.skill-meter:hover::before {
+				left: 100%;
+			}
+
+			.skill-meter:hover {
+				transform: translateX(-5px);
+				background: rgba(255, 255, 255, 0.08);
+				box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+			}
+
+			.skill-label {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 8px;
+				font-weight: 600;
+				color: var(--text-primary);
+				font-size: 12px;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.skill-value {
+				font-size: 24px;
+				font-weight: 700;
+				background: linear-gradient(135deg, #fff, #e0e0e0);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-shadow: 0 2px 10px rgba(255, 255, 255, 0.2);
+				font-family: var(--mono-font);
+			}
+
+			.bg-glass {
+				background: var(--glass-bg);
+				backdrop-filter: blur(20px) saturate(180%);
+				-webkit-backdrop-filter: blur(20px) saturate(180%);
+				border: 1px solid var(--glass-border);
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+			}
+
+			.bg-glass-light {
+				background: rgba(255, 255, 255, 0.03);
+				backdrop-filter: blur(5px);
+				-webkit-backdrop-filter: blur(5px);
+				border: 1px solid rgba(255, 255, 255, 0.05);
+			}
+
+			.text-gradient {
+				background: var(--title-gradient);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+
+			.glow-effect {
+				box-shadow: var(--neon-glow);
+			}
+
+			.hover-scale {
+				transition: transform 0.3s ease;
+			}
+
+			.hover-scale:hover {
+				transform: scale(1.05);
+			}
+
+			.hover-glow:hover {
+				box-shadow: var(--neon-glow);
+			}
+		</style>
+	</head>
+	<body>
+		<div class="loading-screen" id="loading-screen">
+			<div class="loading-content">
+				<div class="logo-container">
+					<h1
+						class="text-4xl md:text-5xl font-black mb-3 tracking-tight animate__animated animate__fadeInDown animate__delay-200ms"
+						style="
+							background: linear-gradient(
+								135deg,
+								#ffffff 0%,
+								#64748b 50%,
+								#78716c 100%
+							);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							background-clip: text;
+							font-family: var(--btn-font);
+							text-shadow: 0 0 30px rgba(100, 116, 139, 0.3);
+						"
+					>
+						TypeMaster
+					</h1>
+					<div
+						class="logo-subtitle"
+						style="
+							text-align: center;
+							margin-top: 10px;
+							color: var(--text-secondary);
+							font-family: var(--btn-font);
+							font-weight: 500;
+							letter-spacing: 1px;
+						"
+					>
+						The Ultimate Typing Experience
+					</div>
+				</div>
+				<div class="loading-bar-container">
+					<div class="loading-bar"></div>
+				</div>
+				<div class="loading-text">Loading experience...</div>
+			</div>
+		</div>
+
+		<div class="bg-orb"></div>
+		<div class="bg-orb"></div>
+		<div class="bg-orb"></div>
+
+		<div class="particles" id="particles"></div>
+
+		<div class="toast-container" id="toast-container"></div>
+
+		<div class="confetti-container" id="confetti-container"></div>
+
+		<div class="container">
+			<div class="game-area" id="game-area">
+				<div class="timer-display" id="timer-display">0:00</div>
+
+				<div class="power-ups">
+					<div class="power-up-indicator" id="slow-indicator">
+						<i class="fas fa-clock"></i> Slow Motion
+					</div>
+					<div class="power-up-indicator" id="clear-indicator">
+						<i class="fas fa-bomb"></i> Clear All
+					</div>
+				</div>
+
+				<div class="power-ups-right">
+					<div class="power-up-indicator" id="boost-indicator">
+						<i class="fas fa-bolt"></i> Speed Boost
+					</div>
+					<div class="power-up-indicator" id="shield-indicator">
+						<i class="fas fa-shield-alt"></i> Shield
+					</div>
+				</div>
+
+				<div
+					id="dead-line"
+					class="absolute inset-x-0 top-0 bg-red-500/20"
+				></div>
+
+				<div class="input-area-wrapper" id="input-container">
+					<div class="input-area">
+						<input
+							type="text"
+							id="word-input"
+							placeholder="Type the falling words..."
+							autocomplete="off"
+						/>
+					</div>
+				</div>
+			</div>
+			<div class="score-panel overflow-y-auto">
+				<div class="score-item hover-scale">
+					<span class="score-label">Score</span>
+					<span class="score-value" id="score">0</span>
+				</div>
+				<div class="score-item hover-scale">
+					<span class="score-label">Words</span>
+					<span class="score-value" id="words-typed">0</span>
+				</div>
+				<div class="score-item hover-scale">
+					<span class="score-label">Combo</span>
+					<span class="score-value" id="combo">0</span>
+				</div>
+
+				<div class="skill-meter" style="margin-top: auto">
+					<div class="skill-label">
+						<span><i class="fas fa-tachometer-alt"></i> WPM</span>
+						<span class="skill-value" id="wpm">0</span>
+					</div>
+					<div class="progress-container">
+						<div class="progress-bar" id="wpm-progress" style="width: 0%"></div>
+					</div>
+				</div>
+
+				<div class="skill-meter">
+					<div class="skill-label">
+						<span><i class="fas fa-bullseye"></i> Accuracy</span>
+						<span class="skill-value" id="accuracy">100%</span>
+					</div>
+					<div class="progress-container">
+						<div
+							class="progress-bar"
+							id="accuracy-progress"
+							style="width: 100%"
+						></div>
+					</div>
+				</div>
+
+				<div class="skill-meter">
+					<div class="skill-label">
+						<span><i class="fas fa-fire"></i> Streak</span>
+						<span class="skill-value" id="streak">0</span>
+					</div>
+					<div class="progress-container">
+						<div
+							class="progress-bar"
+							id="streak-progress"
+							style="width: 0%"
+						></div>
+					</div>
+				</div>
+
+				<div class="lives">
+					<div class="heart"><i class="fas fa-heart"></i></div>
+					<div class="heart"><i class="fas fa-heart"></i></div>
+					<div class="heart"><i class="fas fa-heart"></i></div>
+				</div>
+			</div>
+		</div>
+		<div class="start-screen" id="start-screen">
+			<div class="start-content" id="start-content">
+				<div class="text-center mb-6">
+					<h1
+						class="text-4xl md:text-5xl font-black mb-3 tracking-tight animate__animated animate__fadeInDown animate__delay-200ms"
+						style="
+							background: linear-gradient(
+								135deg,
+								#ffffff 0%,
+								#64748b 50%,
+								#78716c 100%
+							);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							background-clip: text;
+							font-family: var(--btn-font);
+							text-shadow: 0 0 30px rgba(100, 116, 139, 0.3);
+						"
+					>
+						TypeMaster
+					</h1>
+					<p
+						class="text-lg md:text-xl animate__animated animate__fadeIn animate__delay-400ms"
+						style="color: #e2e8f0; font-weight: 500"
+					>
+						The Ultimate Typing Experience
+					</p>
+				</div>
+
+				<div
+					class="instructions rounded-xl p-6 mb-5 shadow-lg animate__animated animate__fadeIn animate__delay-600ms"
+					style="
+						background: linear-gradient(
+							135deg,
+							rgba(30, 41, 59, 0.9) 0%,
+							rgba(15, 23, 42, 0.9) 100%
+						);
+						backdrop-filter: blur(20px) saturate(180%);
+						border: 1px solid rgba(255, 255, 255, 0.25);
+					"
+				>
+					<div class="flex items-center justify-center gap-3 mb-5">
+						<i class="fas fa-keyboard text-2xl" style="color: #64748b"></i>
+						<h3
+							class="text-xl font-bold"
+							style="
+								color: #ffffff;
+								font-family: var(--btn-font);
+								letter-spacing: 0.5px;
+							"
+						>
+							How to Play
+						</h3>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+						<div
+							class="flex items-start gap-4 p-3 rounded-lg"
+							style="background: rgba(255, 255, 255, 0.05)"
+						>
+							<i
+								class="fas fa-arrow-down mt-1 text-lg"
+								style="color: #64748b; min-width: 20px"
+							></i>
+							<span
+								style="color: #f1f5f9; line-height: 1.5; text-align: justify"
+								>Type falling words before they reach the bottom of the
+								screen</span
+							>
+						</div>
+						<div
+							class="flex items-start gap-4 p-3 rounded-lg"
+							style="background: rgba(255, 255, 255, 0.05)"
+						>
+							<i
+								class="fas fa-bolt mt-1 text-lg"
+								style="color: #fbbf24; min-width: 20px"
+							></i>
+							<span
+								style="color: #f1f5f9; line-height: 1.5; text-align: justify"
+								>Game speed increases as you progress through levels</span
+							>
+						</div>
+						<div
+							class="flex items-start gap-4 p-3 rounded-lg"
+							style="background: rgba(255, 255, 255, 0.05)"
+						>
+							<i
+								class="fas fa-heart mt-1 text-lg"
+								style="color: #f87171; min-width: 20px"
+							></i>
+							<span
+								style="color: #f1f5f9; line-height: 1.5; text-align: justify"
+								>You have 3 lives - don't let words fall to the bottom!</span
+							>
+						</div>
+						<div
+							class="flex items-start gap-4 p-3 rounded-lg"
+							style="background: rgba(255, 255, 255, 0.05)"
+						>
+							<i
+								class="fas fa-trophy mt-1 text-lg"
+								style="color: #fbbf24; min-width: 20px"
+							></i>
+							<span
+								style="color: #f1f5f9; line-height: 1.5; text-align: justify"
+								>Build combos by typing consecutive words for higher
+								scores</span
+							>
+						</div>
+					</div>
+				</div>
+				<div
+					class="power-up-info rounded-xl p-5 shadow-lg animate__animated animate__fadeIn animate__delay-1200ms"
+					style="
+						background: linear-gradient(
+							135deg,
+							rgba(30, 41, 59, 0.8) 0%,
+							rgba(15, 23, 42, 0.8) 100%
+						);
+						backdrop-filter: blur(20px) saturate(180%);
+						border: 1px solid rgba(255, 255, 255, 0.2);
+					"
+				>
+					<h3
+						class="text-xl font-bold mb-4 text-center"
+						style="
+							font-family: var(--btn-font);
+							color: #ffffff;
+							letter-spacing: 0.5px;
+						"
+					>
+						<i class="fas fa-magic mr-2" style="color: #64748b"></i>Power-ups &
+						Special Commands
+					</h3>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div
+							class="power-up-item flex items-center gap-4 p-5 rounded-lg hover-scale"
+							style="
+								background: rgba(30, 41, 59, 0.7);
+								border: 1px solid rgba(255, 255, 255, 0.2);
+								color: #ffffff;
+							"
+						>
+							<i
+								class="fas fa-clock text-3xl"
+								style="color: #64748b; min-width: 40px"
+							></i>
+							<div class="flex-1">
+								<div class="font-semibold text-base mb-2">Slow Motion</div>
+								<div class="text-sm mb-2" style="color: #cbd5e1">
+									Type
+									<span
+										class="px-3 py-1 rounded"
+										style="
+											background: rgba(107, 114, 128, 0.3);
+											color: #d1d5db;
+											font-family: var(--mono-font);
+											font-weight: 600;
+										"
+										>SLOW</span
+									>
+								</div>
+								<div class="text-sm" style="color: #64748b; line-height: 1.4">
+									Slows down time for 5 seconds
+								</div>
+							</div>
+						</div>
+						<div
+							class="power-up-item flex items-center gap-4 p-5 rounded-lg hover-scale"
+							style="
+								background: rgba(30, 41, 59, 0.7);
+								border: 1px solid rgba(255, 255, 255, 0.2);
+								color: #ffffff;
+							"
+						>
+							<i
+								class="fas fa-bomb text-3xl"
+								style="color: #f87171; min-width: 40px"
+							></i>
+							<div class="flex-1">
+								<div class="font-semibold text-base mb-2">Clear All</div>
+								<div class="text-sm mb-2" style="color: #cbd5e1">
+									Type
+									<span
+										class="px-3 py-1 rounded"
+										style="
+											background: rgba(239, 68, 68, 0.3);
+											color: #fecaca;
+											font-family: var(--mono-font);
+											font-weight: 600;
+										"
+										>CLEAR</span
+									>
+								</div>
+								<div class="text-sm" style="color: #64748b; line-height: 1.4">
+									Removes all words from screen
+								</div>
+							</div>
+						</div>
+						<div
+							class="power-up-item flex items-center gap-4 p-5 rounded-lg hover-scale"
+							style="
+								background: rgba(30, 41, 59, 0.7);
+								border: 1px solid rgba(255, 255, 255, 0.2);
+								color: #ffffff;
+							"
+						>
+							<i
+								class="fas fa-bolt text-3xl"
+								style="color: #fbbf24; min-width: 40px"
+							></i>
+							<div class="flex-1">
+								<div class="font-semibold text-base mb-2">Speed Boost</div>
+								<div class="text-sm mb-2" style="color: #cbd5e1">
+									Type
+									<span
+										class="px-3 py-1 rounded"
+										style="
+											background: rgba(251, 191, 36, 0.3);
+											color: #fde68a;
+											font-family: var(--mono-font);
+											font-weight: 600;
+										"
+										>BOOST</span
+									>
+								</div>
+								<div class="text-sm" style="color: #64748b; line-height: 1.4">
+									Double points for 10 seconds
+								</div>
+							</div>
+						</div>
+						<div
+							class="power-up-item flex items-center gap-4 p-5 rounded-lg hover-scale"
+							style="
+								background: rgba(30, 41, 59, 0.7);
+								border: 1px solid rgba(255, 255, 255, 0.2);
+								color: #ffffff;
+							"
+						>
+							<i
+								class="fas fa-shield-alt text-3xl"
+								style="color: #34d399; min-width: 40px"
+							></i>
+							<div class="flex-1">
+								<div class="font-semibold text-base mb-2">Shield</div>
+								<div class="text-sm mb-2" style="color: #cbd5e1">
+									Type
+									<span
+										class="px-3 py-1 rounded"
+										style="
+											background: rgba(52, 211, 153, 0.3);
+											color: #a7f3d0;
+											font-family: var(--mono-font);
+											font-weight: 600;
+										"
+										>SHIELD</span
+									>
+								</div>
+								<div class="text-sm" style="color: #64748b; line-height: 1.4">
+									Protects from next miss
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="difficulty-selection rounded-xl p-5 mb-5 shadow-lg animate__animated animate__fadeIn animate__delay-800ms"
+					style="
+						background: linear-gradient(
+							135deg,
+							rgba(30, 41, 59, 0.8) 0%,
+							rgba(15, 23, 42, 0.8) 100%
+						);
+						backdrop-filter: blur(20px) saturate(180%);
+						border: 1px solid rgba(255, 255, 255, 0.2);
+					"
+				>
+					<h3
+						class="text-xl font-bold mb-4 text-center"
+						style="
+							font-family: var(--btn-font);
+							color: #ffffff;
+							letter-spacing: 0.5px;
+						"
+					>
+						<i class="fas fa-cog mr-2" style="color: #64748b"></i>Select
+						Difficulty
+					</h3>
+					<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+						<div
+							class="difficulty-option"
+							data-difficulty="easy"
+							onclick="selectDifficulty('easy')"
+							style="color: #ffffff"
+						>
+							<i
+								class="fas fa-seedling text-xl mb-2"
+								style="color: #34d399"
+							></i>
+							<div class="font-semibold">Easy</div>
+							<div class="text-xs" style="color: #cbd5e1">Relaxed pace</div>
+						</div>
+						<div
+							class="difficulty-option selected"
+							data-difficulty="normal"
+							onclick="selectDifficulty('normal')"
+							style="color: #ffffff"
+						>
+							<i
+								class="fas fa-balance-scale text-xl mb-2"
+								style="color: #64748b"
+							></i>
+							<div class="font-semibold">Normal</div>
+							<div class="text-xs" style="color: #cbd5e1">Balanced</div>
+						</div>
+						<div
+							class="difficulty-option"
+							data-difficulty="hard"
+							onclick="selectDifficulty('hard')"
+							style="color: #ffffff"
+						>
+							<i class="fas fa-fire text-xl mb-2" style="color: #fb923c"></i>
+							<div class="font-semibold">Hard</div>
+							<div class="text-xs" style="color: #cbd5e1">Fast paced</div>
+						</div>
+						<div
+							class="difficulty-option"
+							data-difficulty="expert"
+							onclick="selectDifficulty('expert')"
+							style="color: #ffffff"
+						>
+							<i class="fas fa-skull text-xl mb-2" style="color: #f87171"></i>
+							<div class="font-semibold">Expert</div>
+							<div class="text-xs" style="color: #cbd5e1">Extreme</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="timer-selection rounded-xl p-5 mb-5 shadow-lg animate__animated animate__fadeIn animate__delay-1000ms"
+					style="
+						background: linear-gradient(
+							135deg,
+							rgba(30, 41, 59, 0.8) 0%,
+							rgba(15, 23, 42, 0.8) 100%
+						);
+						backdrop-filter: blur(20px) saturate(180%);
+						border: 1px solid rgba(255, 255, 255, 0.2);
+					"
+				>
+					<h3
+						class="text-xl font-bold mb-4 text-center"
+						style="
+							font-family: var(--btn-font);
+							color: #ffffff;
+							letter-spacing: 0.5px;
+						"
+					>
+						<i class="fas fa-clock mr-2" style="color: #64748b"></i>Game
+						Duration
+					</h3>
+					<div class="timer-options">
+						<div
+							class="timer-option"
+							data-time="30"
+							onclick="selectTimer(30)"
+							style="color: #ffffff"
+						>
+							<i class="fas fa-bolt mb-2" style="color: #fbbf24"></i>
+							<div class="font-semibold">30s</div>
+							<div class="text-xs" style="color: #cbd5e1">Quick</div>
+						</div>
+						<div
+							class="timer-option"
+							data-time="60"
+							onclick="selectTimer(60)"
+							style="color: #ffffff"
+						>
+							<i class="fas fa-clock mb-2" style="color: #64748b"></i>
+							<div class="font-semibold">1m</div>
+							<div class="text-xs" style="color: #cbd5e1">Standard</div>
+						</div>
+						<div
+							class="timer-option"
+							data-time="120"
+							onclick="selectTimer(120)"
+							style="color: #ffffff"
+						>
+							<i class="fas fa-hourglass-half mb-2" style="color: #78716c"></i>
+							<div class="font-semibold">2m</div>
+							<div class="text-xs" style="color: #cbd5e1">Extended</div>
+						</div>
+						<div
+							class="timer-option selected"
+							data-time="0"
+							onclick="selectTimer(0)"
+							style="color: #ffffff"
+						>
+							<i class="fas fa-infinity mb-2" style="color: #34d399"></i>
+							<div class="font-semibold">∞</div>
+							<div class="text-xs" style="color: #cbd5e1">Endless</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="text-center mt-6">
+					<button
+						class="start-btn animate__animated animate__pulse animate__infinite animate__slow hover-scale"
+						onclick="startGame()"
+					>
+						<span class="relative z-10 flex items-center justify-center gap-3">
+							<i class="fas fa-play"></i>
+							Start Game
+							<i class="fas fa-rocket"></i>
+						</span>
+					</button>
+					<p class="text-sm opacity-60 mt-4">
+						Press
+						<kbd
+							style="
+								background: rgba(255, 255, 255, 0.1);
+								padding: 4px 8px;
+								border-radius: 4px;
+								font-size: 12px;
+							"
+							>Enter</kbd
+						>
+						or click to begin
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Game Over Modal -->
+		<div class="game-over" id="game-over">
+			<div class="game-over-content">
+				<h2>Game Over!</h2>
+				<div class="final-score" id="final-score">0</div>
+				<p>Words Typed: <span id="final-words">0</span></p>
+				<p>Max Combo: <span id="final-combo">0</span></p>
+				<p id="game-mode-display" style="margin-top: 10px; opacity: 0.8"></p>
+				<div class="flex flex-col items-center">
+					<button class="play-again-btn" onclick="resetGame()">
+						Play Again
+					</button>
+					<button
+						class="play-again-btn setting-btn size-fit"
+						onclick="resetGame(true)"
+					>
+						<i class="fas fa-gear"></i> Settings
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const MAX_HEART = 3;
+			const DANGER_ZONE = 150; // Distance from the bottom where words become dangerous
+			const SPAWN_POSITION = 150; // Initial position of the words from top
+			const SPAWN_TRIGGER_DISTANCE = 100; // Distance from the spawn line to trigger a new word spawn
+
+			let score = 0;
+			let wordsTyped = 0;
+			let combo = 0;
+			let maxCombo = 0;
+			let lives = MAX_HEART;
+			let gameActive = false;
+			let fallSpeed = 1;
+			let slowMotionActive = false;
+			let slowMotionTimer = null;
+			let gameLoopId = null;
+			let selectedTime = 0;
+			let timeRemaining = 0;
+			let timerInterval = null;
+			let browserIsActive = true;
+
+			// Use wordsOnScreenDuration instead of gameStartTime for WPM calculation because there's a situation where the words is empty on the screen
+			let wordsOnScreenDuration = 0;
+			let isTypingTimerActive = false;
+			let lastPauseTime = 0;
+
+			let confettiActive = false;
+			let selectedDifficulty = "normal"; //easy, normal, hard, expert
+
+			let gameStartTime = 0;
+			let totalKeystrokes = 0;
+			let correctKeystrokes = 0;
+			let currentStreak = 0;
+			let maxStreak = 0;
+			let wpm = 0;
+			let accuracy = 100;
+
+			// Power-up states
+			let speedBoostActive = false;
+			let shieldActive = false;
+			let speedBoostTimer = null;
+
+			const gameArea = document.getElementById("game-area");
+			const inputArea = document.getElementById("input-container");
+			let bottomLimit = gameArea.offsetHeight - inputArea.offsetHeight;
+			let wordStartingPosition = gameArea.offsetHeight - SPAWN_POSITION;
+			let spawnTriggerLine = 0;
+
+			// Enhanced achievements
+			let achievements = {
+				wordmaster: false, // Type 50+ words
+				speedster: false, // Reach level 5
+				combo10: false, // Get 10+ combo
+				perfectGame: false, // Complete a timed game without losing lives
+				speedDemon: false, // Reach 60+ WPM
+				accuracy100: false, // Maintain 100% accuracy for 1 minute
+				streakMaster: false, // Get 25+ streak
+				powerUser: false, // Use all power-ups in one game
+			};
+
+			// Difficulty settings
+			const difficultySettings = {
+				easy: { fallSpeed: 0.8, scoreMultiplier: 0.8 },
+				normal: { fallSpeed: 1, scoreMultiplier: 1 },
+				hard: { fallSpeed: 1.3, scoreMultiplier: 1.2 },
+				expert: { fallSpeed: 1.6, scoreMultiplier: 1.5 },
+			};
+
+			// Enhanced Word Lists by Difficulty
+			const wordLists = {
+				easy: [
+					"cat",
+					"dog",
+					"run",
+					"jump",
+					"play",
+					"fun",
+					"sun",
+					"moon",
+					"star",
+					"tree",
+					"book",
+					"pen",
+					"car",
+					"bus",
+					"home",
+					"love",
+					"happy",
+					"smile",
+					"laugh",
+					"dance",
+				],
+				normal: [
+					"javascript",
+					"typing",
+					"game",
+					"code",
+					"function",
+					"variable",
+					"array",
+					"object",
+					"string",
+					"number",
+					"boolean",
+					"loop",
+					"class",
+					"method",
+					"promise",
+					"async",
+					"await",
+					"react",
+					"component",
+					"state",
+					"props",
+					"render",
+					"event",
+					"handler",
+					"callback",
+					"closure",
+					"scope",
+					"context",
+					"prototype",
+					"inheritance",
+					"module",
+				],
+				hard: [
+					"asynchronous",
+					"polymorphism",
+					"encapsulation",
+					"abstraction",
+					"instantiation",
+					"concatenation",
+					"serialization",
+					"deserialization",
+					"authentication",
+					"authorization",
+					"optimization",
+					"refactoring",
+					"debugging",
+					"deployment",
+					"configuration",
+					"implementation",
+					"documentation",
+					"specification",
+					"architecture",
+					"infrastructure",
+					"middleware",
+				],
+				expert: [
+					"deoxyribonucleic",
+					"pneumonoultramicroscopicsilicovolcanoconiosiss",
+					"antidisestablishmentarianism",
+					"supercalifragilisticexpialidocious",
+					"pseudopseudohypoparathyroidism",
+					"floccinaucinihilipilification",
+					"hippopotomonstrosesquippedaliophobia",
+					"spectrophotofluorometrically",
+					"tetraiodophenolphthalein",
+					"thyroparathyroidectomized",
+					"radioimmunoelectrophoresis",
+					"psychoneuroendocrinological",
+				],
+			};
+
+			// update the dead line area when browser is resized
+			document.getElementById("dead-line").style.top = `${bottomLimit}px`;
+			window.addEventListener("resize", () => {
+				setTimeout(() => {
+					bottomLimit = gameArea.offsetHeight - inputArea.offsetHeight;
+					wordStartingPosition = gameArea.offsetHeight - SPAWN_POSITION;
+					document.getElementById("dead-line").style.top = `${bottomLimit}px`;
+				}, 1000);
+			});
+
+			//check browser tab is active or not
+			document.addEventListener("visibilitychange", function () {
+				browserIsActive = document.visibilityState === "visible";
+			});
+
+			// Get current word list based on difficulty
+			function getCurrentWords() {
+				return wordLists[selectedDifficulty] || wordLists.normal;
+			}
+
+			// Enhanced Utility Functions
+
+			// Toast notification system
+			function showToast(message, type = "info", duration = 3000) {
+				const toastContainer = document.getElementById("toast-container");
+				const toast = document.createElement("div");
+				toast.className = `toast ${type}`;
+
+				const icon =
+					type === "success"
+						? "fa-check-circle"
+						: type === "error"
+						? "fa-exclamation-circle"
+						: type === "info"
+						? "fa-info-circle"
+						: "fa-bell";
+
+				toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="fas ${icon}"></i>
+                    <span>${type.charAt(0).toUpperCase() + type.slice(1)}</span>
+                </div>
+                <div class="toast-body">${message}</div>
+            `;
+
+				toastContainer.appendChild(toast);
+
+				// Trigger animation
+				setTimeout(() => toast.classList.add("show"), 100);
+
+				// Auto remove
+				setTimeout(() => {
+					toast.classList.remove("show");
+					setTimeout(() => toast.remove(), 400);
+				}, duration);
+			}
+
+			// Calculate WPM (Words Per Minute)
+			function calculateWPM() {
+				if (wordsOnScreenDuration === 0) return 0;
+				const timeInMinutes = wordsOnScreenDuration / 1000 / 60;
+				return Math.round(wordsTyped / timeInMinutes || 0);
+			}
+
+			// Calculate accuracy percentage
+			function calculateAccuracy() {
+				if (totalKeystrokes === 0) return 100;
+				// Ensure accuracy never goes above 100%
+				return Math.min(
+					100,
+					Math.round((correctKeystrokes / totalKeystrokes) * 100)
+				);
+			}
+
+			// Update performance metrics
+			function updatePerformanceMetrics() {
+				wpm = calculateWPM();
+				accuracy = calculateAccuracy();
+
+				// Update UI
+				document.getElementById("wpm").textContent = wpm;
+				document.getElementById("accuracy").textContent = accuracy + "%";
+				document.getElementById("streak").textContent = currentStreak;
+
+				// Update progress bars
+				const wpmProgress = Math.min((wpm / 100) * 100, 100); // Max 100 WPM for full bar
+				const streakProgress = Math.min((currentStreak / 25) * 100, 100); // Max 25 streak for full bar
+
+				document.getElementById("wpm-progress").style.width = wpmProgress + "%";
+				document.getElementById("accuracy-progress").style.width =
+					accuracy + "%";
+				document.getElementById("streak-progress").style.width =
+					streakProgress + "%";
+			}
+
+			// Select difficulty
+			function selectDifficulty(difficulty) {
+				selectedDifficulty = difficulty;
+				document.querySelectorAll(".difficulty-option").forEach((option) => {
+					option.classList.remove("selected");
+					if (option.dataset.difficulty === difficulty) {
+						option.classList.add("selected");
+					}
+				});
+
+				// Apply difficulty settings
+				const settings = difficultySettings[difficulty];
+				fallSpeed = settings.fallSpeed;
+
+				showToast(
+					`Difficulty set to ${
+						difficulty.charAt(0).toUpperCase() + difficulty.slice(1)
+					}`,
+					"info",
+					2000
+				);
+			}
+
+			// Audio functionality removed for cleaner experience
+
+			// Sound toggle removed
+
+			// Toggle theme
+
+			// Loading screen
+			function showLoadingScreen() {
+				const loadingScreen = document.getElementById("loading-screen");
+				const loadingBar = document.querySelector(".loading-bar");
+
+				loadingBar.style.width = "0%";
+				loadingScreen.style.display = "flex";
+
+				let progress = 0;
+				const interval = setInterval(() => {
+					progress += Math.random() * 10;
+					if (progress >= 100) {
+						progress = 100;
+						clearInterval(interval);
+						setTimeout(() => {
+							loadingScreen.classList.add("loaded");
+							setTimeout(() => {
+								loadingScreen.style.display = "none";
+							}, 500);
+						}, 300);
+					}
+					loadingBar.style.width = progress + "%";
+				}, 100);
+			}
+
+			// Create confetti
+			function createConfetti() {
+				if (confettiActive) return;
+				confettiActive = true;
+
+				const container = document.getElementById("confetti-container");
+				container.innerHTML = "";
+
+				const colors = [
+					"#f94144",
+					"#f3722c",
+					"#f8961e",
+					"#f9c74f",
+					"#90be6d",
+					"#43aa8b",
+					"#577590",
+					"#277da1",
+				];
+
+				for (let i = 0; i < 150; i++) {
+					const confetti = document.createElement("div");
+					confetti.className = "confetti";
+					confetti.style.backgroundColor =
+						colors[Math.floor(Math.random() * colors.length)];
+					confetti.style.left = Math.random() * 100 + "vw";
+					confetti.style.animationDelay = Math.random() * 3 + "s";
+					confetti.style.animationDuration = Math.random() * 3 + 2 + "s";
+
+					container.appendChild(confetti);
+				}
+
+				// Audio removed
+
+				setTimeout(() => {
+					container.innerHTML = "";
+					confettiActive = false;
+				}, 6000);
+			}
+
+			// Check achievements
+			function checkAchievements() {
+				let newAchievements = [];
+
+				if (wordsTyped >= 50 && !achievements.wordmaster) {
+					achievements.wordmaster = true;
+					newAchievements.push("Word Master");
+				}
+
+				if (wordsTyped >= 100 && !achievements.speedster) {
+					achievements.speedster = true;
+					newAchievements.push("Speed Demon");
+				}
+
+				if (combo >= 10 && !achievements.combo10) {
+					achievements.combo10 = true;
+					newAchievements.push("Combo King");
+				}
+
+				if (
+					selectedTime > 0 &&
+					lives === MAX_HEART &&
+					!achievements.perfectGame
+				) {
+					achievements.perfectGame = true;
+					newAchievements.push("Perfect Game");
+				}
+
+				// Achievement notifications removed
+			}
+
+			function createParticles() {
+				const particlesContainer = document.getElementById("particles");
+				for (let i = 0; i < 50; i++) {
+					const particle = document.createElement("div");
+					particle.className = "particle";
+					particle.style.left = Math.random() * 100 + "%";
+					particle.style.animationDelay = Math.random() * 20 + "s";
+					particle.style.animationDuration = 15 + Math.random() * 10 + "s";
+					particlesContainer.appendChild(particle);
+				}
+			}
+
+			// Select timer
+			function selectTimer(time) {
+				selectedTime = time;
+				document.querySelectorAll(".timer-option").forEach((option) => {
+					option.classList.remove("selected");
+					if (parseInt(option.dataset.time) === time) {
+						option.classList.add("selected");
+					}
+				});
+			}
+
+			// Enhanced start game function
+			function startGame() {
+				document.getElementById("start-screen").style.display = "none";
+				gameActive = true;
+				gameStartTime = Date.now();
+
+				resetValues();
+
+				// Apply difficulty settings
+				const settings = difficultySettings[selectedDifficulty];
+				fallSpeed = settings.fallSpeed;
+
+				// Setup timer
+				if (selectedTime > 0) {
+					timeRemaining = selectedTime;
+					document.getElementById("timer-display").style.display = "block";
+					updateTimerDisplay();
+					startTimer();
+				}
+
+				// Audio removed
+				showToast(
+					`Game started on ${selectedDifficulty} difficulty!`,
+					"success",
+					2000
+				);
+				spawnWord();
+				gameLoop();
+				document.getElementById("word-input").focus();
+			}
+
+			// Start timer countdown
+			function startTimer() {
+				timerInterval = setInterval(() => {
+					timeRemaining--;
+					updateTimerDisplay();
+
+					if (timeRemaining <= 10 && timeRemaining > 0) {
+						document.getElementById("timer-display").classList.add("warning");
+					}
+
+					if (timeRemaining <= 0) {
+						clearInterval(timerInterval);
+						endGame(true);
+					}
+				}, 1000);
+			}
+
+			function updateTimerDisplay() {
+				const minutes = Math.floor(timeRemaining / 60);
+				const seconds = timeRemaining % 60;
+				document.getElementById(
+					"timer-display"
+				).textContent = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+			}
+
+			function resetValues() {
+				score = 0;
+				wordsTyped = 0;
+				combo = 0;
+				maxCombo = 0;
+				lives = MAX_HEART;
+				fallSpeed = 1;
+				timeRemaining = 0;
+
+				// Add these lines to reset accuracy values
+				totalKeystrokes = 0;
+				correctKeystrokes = 0;
+				accuracy = 100;
+
+				wmpStartTime = 0;
+				wordsOnScreenDuration = 0;
+				isTypingTimerActive = false;
+				lastPauseTime = 0;
+
+				document.getElementById("timer-display").style.display = "none";
+				document.getElementById("timer-display").classList.remove("warning");
+				if (timerInterval) {
+					clearInterval(timerInterval);
+					timerInterval = null;
+				}
+				updateUI();
+				updateLives();
+				clearWords();
+				updatePerformanceMetrics(); // Update metrics display after reset
+			}
+			function clearWords() {
+				const words = document.querySelectorAll(".falling-word");
+				words.forEach((word) => word.remove());
+			}
+
+			function updateUI() {
+				document.getElementById("score").textContent = score;
+				document.getElementById("words-typed").textContent = wordsTyped;
+				document.getElementById("combo").textContent = combo;
+			}
+
+			function updateLives() {
+				const hearts = document.querySelectorAll(".heart");
+				hearts.forEach((heart, index) => {
+					if (index >= lives) {
+						heart.classList.add("lost");
+					} else {
+						heart.classList.remove("lost");
+					}
+				});
+			}
+
+			function spawnWord() {
+				if (!gameActive) return;
+				console.log("difficulty", fallSpeed);
+				const word = document.createElement("div");
+				word.className = "falling-word";
+
+				//element to trigger new spawn after reach certain point
+				const existingTrigger = document.getElementById("spawn-trigger");
+				if (existingTrigger) {
+					existingTrigger.remove();
+				}
+				const currentWords = getCurrentWords();
+				const selectedWord =
+					currentWords[Math.floor(Math.random() * currentWords.length)];
+
+				const offsetWordWidth = selectedWord.length * 11 + 42; // estimation: each letter ~12px width
+				const maxLeft = gameArea.offsetWidth - offsetWordWidth;
+				const randomDistanceMultiplier = Math.random();
+				const alignFromRight = randomDistanceMultiplier > 0.5;
+				if (alignFromRight) {
+					// Align from right edge
+					word.style.right =
+						Math.max(10, (1 - randomDistanceMultiplier) * maxLeft) + "px";
+					word.style.left = "auto";
+				} else {
+					// Align from left edge
+					word.style.left =
+						Math.max(10, randomDistanceMultiplier * maxLeft) + "px";
+					word.style.right = "auto";
+				}
+
+				word.textContent = selectedWord;
+
+				word.style.bottom = `${wordStartingPosition}px`;
+				word.dataset.y = wordStartingPosition;
+
+				spawnTriggerLine = wordStartingPosition;
+
+				gameArea.appendChild(word);
+			}
+
+			function increaseDifficulty() {
+				fallSpeed += 0.1;
+			}
+
+			function checkSpawnTrigger() {
+				spawnTriggerLine -= slowMotionActive ? fallSpeed * 0.3 : fallSpeed;
+				// spawn new word after react 100px below the the wordStartingPosition
+				if (spawnTriggerLine < wordStartingPosition - SPAWN_TRIGGER_DISTANCE) {
+					spawnWord();
+				}
+			}
+
+			function gameLoop() {
+				if (!gameActive) return;
+
+				const words = document.querySelectorAll(".falling-word");
+
+				checkSpawnTrigger();
+
+				words.forEach((word) => {
+					let y = parseFloat(word.dataset.y);
+					y -= slowMotionActive ? fallSpeed * 0.3 : fallSpeed;
+					word.dataset.y = y;
+					word.style.bottom = y + "px";
+
+					//spawn new word if last word reached below the spawn line
+
+					if (y < inputArea.offsetHeight + 100) {
+						word.classList.add("danger");
+					}
+
+					if (y < inputArea.offsetHeight) {
+						word.remove();
+						if (shieldActive) {
+							shieldActive = false;
+							document
+								.getElementById("shield-indicator")
+								.classList.remove("active");
+							showToast("Shield blocked the hit!", "success", 2000);
+						} else {
+							lives--;
+							currentStreak = 0;
+						}
+
+						combo = 0;
+						updateLives();
+						updateUI();
+						updatePerformanceMetrics();
+
+						if (lives <= 0) {
+							endGame();
+						}
+					}
+				});
+
+				// Check if word is exist on the screen for typing timer activity
+
+				const wordsOnScreen = document.querySelectorAll(".falling-word").length;
+				if (wordsOnScreen > 0 && !isTypingTimerActive) {
+					isTypingTimerActive = true;
+					lastPauseTime = Date.now();
+				} else if (wordsOnScreen === 0 && isTypingTimerActive) {
+					isTypingTimerActive = false;
+					if (lastPauseTime > 0) {
+						wordsOnScreenDuration += Date.now() - lastPauseTime;
+					}
+				}
+
+				gameLoopId = requestAnimationFrame(gameLoop);
+			}
+
+			document
+				.getElementById("word-input")
+				.addEventListener("input", function (e) {
+					const input = e.target.value.trim().toUpperCase();
+
+					// Don't increment totalKeystrokes on every input event
+					// We'll only count actual words and power-ups
+
+					if (input === "SLOW") {
+						activateSlowMotion();
+						e.target.value = "";
+						totalKeystrokes += 4; // Count total keystrokes
+						correctKeystrokes += 4; // Count correct keystrokes
+						updatePerformanceMetrics();
+						return;
+					}
+
+					if (input === "CLEAR") {
+						activateClearAll();
+						e.target.value = "";
+						totalKeystrokes += 5;
+						correctKeystrokes += 5;
+						updatePerformanceMetrics();
+						return;
+					}
+
+					if (input === "BOOST") {
+						activateSpeedBoost();
+						e.target.value = "";
+						totalKeystrokes += 5;
+						correctKeystrokes += 5;
+						updatePerformanceMetrics();
+						return;
+					}
+
+					if (input === "SHIELD") {
+						activateShield();
+						e.target.value = "";
+						totalKeystrokes += 6;
+						correctKeystrokes += 6;
+						updatePerformanceMetrics();
+						return;
+					}
+
+					const words = document.querySelectorAll(".falling-word");
+					words.forEach((word) => {
+						if (word.textContent.toUpperCase() === input) {
+							// When word matches, count both total and correct keystrokes
+							totalKeystrokes += word.textContent.length;
+							correctKeystrokes += word.textContent.length;
+							currentStreak++;
+							if (currentStreak > maxStreak) maxStreak = currentStreak;
+
+							const baseScore = 10 + combo * 2;
+							const difficultyMultiplier =
+								difficultySettings[selectedDifficulty].scoreMultiplier;
+							const speedBoostMultiplier = speedBoostActive ? 2 : 1;
+
+							score += Math.round(
+								baseScore * difficultyMultiplier * speedBoostMultiplier
+							);
+							wordsTyped++;
+							combo++;
+							if (combo > maxCombo) maxCombo = combo;
+
+							word.style.transform = "scale(1.5)";
+							word.style.opacity = "0";
+							setTimeout(() => word.remove(), 300);
+
+							checkAchievements();
+
+							updateUI();
+							updatePerformanceMetrics();
+							e.target.value = "";
+
+							if (wordsTyped > 0 && wordsTyped % 15 === 0) {
+								increaseDifficulty();
+							}
+						} else if (
+							input.length > 0 &&
+							word.textContent.toUpperCase().startsWith(input)
+						) {
+							// For partial matches, count input as valid keystrokes
+							// This allows for counting keystrokes as you type
+							// This section is optional - remove if you only want to count completed words
+						} else if (input.length === word.textContent.length) {
+							// Count incorrect complete words
+							totalKeystrokes += input.length;
+							updatePerformanceMetrics();
+						}
+					});
+				});
+			function activateSlowMotion() {
+				if (slowMotionActive) return;
+
+				slowMotionActive = true;
+				document.getElementById("slow-indicator").classList.add("active");
+
+				if (slowMotionTimer) clearTimeout(slowMotionTimer);
+				slowMotionTimer = setTimeout(() => {
+					slowMotionActive = false;
+					document.getElementById("slow-indicator").classList.remove("active");
+				}, 5000);
+			}
+
+			function activateClearAll() {
+				const words = document.querySelectorAll(".falling-word");
+				let cleared = 0;
+
+				words.forEach((word, index) => {
+					setTimeout(() => {
+						word.style.transform = "scale(2) rotate(360deg)";
+						word.style.opacity = "0";
+						setTimeout(() => word.remove(), 300);
+					}, index * 50);
+					cleared++;
+				});
+
+				score += cleared * 5;
+				updateUI();
+				showToast(`Cleared ${cleared} words!`, "success", 2000);
+
+				document.getElementById("clear-indicator").classList.add("active");
+				setTimeout(() => {
+					document.getElementById("clear-indicator").classList.remove("active");
+				}, 1000);
+			}
+
+			function activateSpeedBoost() {
+				if (speedBoostActive) return;
+
+				speedBoostActive = true;
+				showToast("Double points for 10 seconds!", "info", 2000);
+
+				document.getElementById("boost-indicator").classList.add("active");
+
+				if (speedBoostTimer) clearTimeout(speedBoostTimer);
+				speedBoostTimer = setTimeout(() => {
+					speedBoostActive = false;
+					document.getElementById("boost-indicator").classList.remove("active");
+					showToast("Speed boost ended", "info", 1500);
+				}, 10000);
+			}
+
+			function activateShield() {
+				if (shieldActive) return;
+
+				shieldActive = true;
+				showToast(
+					"Shield activated! Next miss will be blocked.",
+					"success",
+					3000
+				);
+
+				document.getElementById("shield-indicator").classList.add("active");
+			}
+
+			function endGame(timerEnded = false) {
+				gameActive = false;
+				if (timerInterval) clearInterval(timerInterval);
+				cancelAnimationFrame(gameLoopId);
+
+				const gameOverTitle = document.querySelector(".game-over-content h2");
+				if (timerEnded) {
+					gameOverTitle.textContent = "Time's Up!";
+
+					if (lives === MAX_HEART && selectedTime > 0) {
+						achievements.perfectGame = true;
+						setTimeout(() => {
+							createConfetti();
+						}, 500);
+					}
+				} else {
+					gameOverTitle.textContent = "Game Over!";
+				}
+
+				if (score > 500) {
+					setTimeout(() => {
+						createConfetti();
+					}, 1000);
+				}
+
+				document.getElementById("final-score").textContent = score;
+				document.getElementById("final-words").textContent = wordsTyped;
+				document.getElementById("final-combo").textContent = maxCombo;
+
+				const gameModeDisplay = document.getElementById("game-mode-display");
+				if (selectedTime === 0) {
+					gameModeDisplay.textContent = "Mode: Unlimited";
+				} else if (selectedTime === 30) {
+					gameModeDisplay.textContent = "Mode: 30 Second Challenge";
+				} else if (selectedTime === 60) {
+					gameModeDisplay.textContent = "Mode: 1 Minute Challenge";
+				} else if (selectedTime === 120) {
+					gameModeDisplay.textContent = "Mode: 2 Minute Challenge";
+				}
+
+				saveStats();
+				document.getElementById("game-over").style.display = "flex";
+			}
+
+			function resetGame(openStartScreen) {
+				document.getElementById("game-over").style.display = "none";
+
+				gameStartTime = 0;
+				totalKeystrokes = 0;
+				correctKeystrokes = 0;
+				currentStreak = 0;
+				wpm = 0;
+				accuracy = 100;
+
+				speedBoostActive = false;
+				shieldActive = false;
+				if (speedBoostTimer) clearTimeout(speedBoostTimer);
+
+				document.getElementById("slow-indicator").classList.remove("active");
+				document.getElementById("clear-indicator").classList.remove("active");
+				document.getElementById("boost-indicator").classList.remove("active");
+				document.getElementById("shield-indicator").classList.remove("active");
+
+				saveStats();
+				if (openStartScreen) {
+					document.getElementById("start-screen").style.display = "flex";
+				} else {
+					startGame();
+				}
+			}
+
+			function setupMobileOptimizations() {
+				const wordInput = document.getElementById("word-input");
+				if (wordInput) {
+					wordInput.addEventListener("touchstart", function () {
+						if (window.innerWidth <= 768) {
+							document
+								.querySelector("meta[name=viewport]")
+								.setAttribute(
+									"content",
+									"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+								);
+						}
+					});
+				}
+
+				// Prevent pull-to-refresh on mobile
+				document.body.addEventListener(
+					"touchstart",
+					function (e) {
+						if (e.touches.length === 1 && e.touches[0].clientY <= 50) {
+							e.preventDefault();
+						}
+					},
+					{ passive: false }
+				);
+
+				document.body.addEventListener(
+					"touchmove",
+					function (e) {
+						if (e.touches.length === 1) {
+							e.preventDefault();
+						}
+					},
+					{ passive: false }
+				);
+
+				document.addEventListener("touchstart", function () {}, {
+					passive: true,
+				});
+
+				window.addEventListener("orientationchange", function () {
+					setTimeout(function () {
+						window.scrollTo(0, 0);
+
+						if (gameActive) {
+							const gameArea = document.getElementById("game-area");
+							if (gameArea) {
+								gameArea.style.display = "none";
+								gameArea.offsetHeight;
+								gameArea.style.display = "";
+							}
+						}
+					}, 100);
+				});
+
+				if (wordInput) {
+					wordInput.addEventListener("focus", function () {
+						if (window.innerWidth <= 768) {
+							setTimeout(function () {
+								window.scrollTo(0, 0);
+							}, 300);
+						}
+					});
+
+					if ("ontouchstart" in window) {
+						wordInput.setAttribute("autocomplete", "off");
+						wordInput.setAttribute("autocorrect", "off");
+						wordInput.setAttribute("autocapitalize", "off");
+						wordInput.setAttribute("spellcheck", "false");
+					}
+				}
+			}
+
+			createParticles();
+			showLoadingScreen();
+			setupMobileOptimizations();
+
+			document.addEventListener("DOMContentLoaded", function () {
+				const glassElements = document.querySelectorAll(
+					".game-area, .score-panel, .power-up-indicator, .timer-display"
+				);
+				glassElements.forEach((el) => el.classList.add("bg-glass"));
+
+				const titleElements = document.querySelectorAll(
+					".game-over h2, .start-content h1"
+				);
+				titleElements.forEach((el) => el.classList.add("text-gradient"));
+
+				const hoverElements = document.querySelectorAll(
+					".power-up-indicator, .score-item, .timer-option"
+				);
+				hoverElements.forEach((el) =>
+					el.classList.add("hover-scale", "hover-glow")
+				);
+			});
+
+			document
+				.getElementById("game-area")
+				.addEventListener("click", function () {
+					if (gameActive) {
+						document.getElementById("word-input").focus();
+					}
+				});
+
+			function saveStats() {
+				const currentHighScore = parseInt(
+					localStorage.getItem("highScore") || 0
+				);
+				const currentBestStreak = parseInt(
+					localStorage.getItem("bestStreak") || 0
+				);
+				const currentBestWPM = parseInt(localStorage.getItem("bestWPM") || 0);
+				const currentTotalWords = parseInt(
+					localStorage.getItem("totalWords") || 0
+				);
+
+				if (score > currentHighScore) {
+					localStorage.setItem("highScore", score);
+					showToast("New High Score!", "success", 3000);
+				}
+
+				if (maxStreak > currentBestStreak) {
+					localStorage.setItem("bestStreak", maxStreak);
+					showToast("New Best Streak!", "success", 3000);
+				}
+
+				if (wpm > currentBestWPM) {
+					localStorage.setItem("bestWPM", wpm);
+					showToast("New Best WPM!", "success", 3000);
+				}
+
+				localStorage.setItem("totalWords", currentTotalWords + wordsTyped);
+			}
+
+			document.addEventListener("keydown", function (e) {
+				if (
+					e.key === "Enter" &&
+					document.getElementById("start-screen").style.display !== "none"
+				) {
+					startGame();
+				}
+				if (e.key === "Escape" && gameActive) {
+					endGame();
+				}
+			});
+
+			document
+				.getElementById("word-input")
+				.addEventListener("keydown", function (e) {
+					if (e.key === "Enter") {
+						e.preventDefault();
+					}
+				});
+		</script>
+	</body>
+</html>
