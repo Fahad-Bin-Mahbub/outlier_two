@@ -1,0 +1,3544 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Smart Home Health Dashboard</title>
+		<!-- Modern UI Libraries -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+		<style>
+			:root {
+				--primary-color: #1a1a2e;
+				--primary-light: #16213e;
+				--primary-dark: #0f172a;
+
+				--secondary-color: #4361ee;
+				--secondary-light: #4895ef;
+				--secondary-dark: #3a0ca3;
+
+				--accent-color: #4cc9f0;
+				--accent-secondary: #48bfe3;
+
+				--background-color: #f8f9fd;
+				--card-background: #ffffff;
+				--card-background-alt: #f1f5f9;
+				--sidebar-background: #ffffff;
+
+				--text-color: #0f172a;
+				--text-secondary: #334155;
+				--text-light: #4b5563;
+				--text-muted: #6b7280;
+
+				--success-color: #10b981;
+				--success-light: #ecfdf5;
+				--warning-color: #f59e0b;
+				--warning-light: #fffbeb;
+				--danger-color: #ef4444;
+				--danger-light: #fee2e2;
+				--info-color: #3b82f6;
+				--info-light: #eff6ff;
+
+				--border-color: #e2e8f0;
+				--border-radius-sm: 8px;
+				--border-radius-md: 12px;
+				--border-radius-lg: 16px;
+				--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+				--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+				--shadow-focus: 0 0 0 3px rgba(59, 130, 246, 0.5);
+
+				--transition-fast: all 0.15s ease;
+				--transition-normal: all 0.25s ease;
+				--transition-slow: all 0.4s ease;
+
+				--space-xs: 4px;
+				--space-sm: 8px;
+				--space-md: 16px;
+				--space-lg: 24px;
+				--space-xl: 32px;
+				--space-xxl: 48px;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+					Roboto, Oxygen, Ubuntu, sans-serif;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			html {
+				font-size: 16px;
+			}
+
+			body {
+				background-color: var(--background-color);
+				color: var(--text-color);
+				line-height: 1.6;
+				overflow-x: hidden;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-weight: 600;
+				line-height: 1.3;
+				color: var(--text-color);
+				margin-bottom: var(--space-sm);
+			}
+
+			h1 {
+				font-size: 1.75rem;
+				font-weight: 700;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+				font-weight: 600;
+			}
+
+			h3 {
+				font-size: 1.125rem;
+			}
+
+			p {
+				margin-bottom: var(--space-md);
+				color: var(--text-secondary);
+			}
+
+			a {
+				color: var(--secondary-color);
+				text-decoration: none;
+				transition: var(--transition-fast);
+			}
+
+			a:hover {
+				color: var(--secondary-dark);
+				text-decoration: underline;
+			}
+
+			button,
+			.btn {
+				cursor: pointer;
+				border: none;
+				border-radius: var(--border-radius-md);
+				padding: 0.625rem 1.25rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				transition: var(--transition-fast);
+				box-shadow: var(--shadow-sm);
+				background-color: var(--secondary-color);
+				color: white;
+				gap: var(--space-sm);
+			}
+
+			button:hover,
+			.btn:hover {
+				background-color: var(--secondary-dark);
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-md);
+			}
+
+			button:focus,
+			.btn:focus {
+				outline: none;
+				box-shadow: var(--shadow-focus);
+			}
+
+			button:active,
+			.btn:active {
+				transform: translateY(1px);
+			}
+
+			button.btn-secondary,
+			.btn.btn-secondary {
+				background-color: white;
+				color: var(--text-secondary);
+				border: 1px solid var(--border-color);
+			}
+
+			button.btn-secondary:hover,
+			.btn.btn-secondary:hover {
+				background-color: var(--card-background-alt);
+				color: var(--text-color);
+			}
+
+			button.btn-accent,
+			.btn.btn-accent {
+				background-color: var(--accent-color);
+			}
+
+			button.btn-accent:hover,
+			.btn.btn-accent:hover {
+				background-color: var(--accent-secondary);
+			}
+
+			input,
+			select,
+			textarea {
+				width: 100%;
+				padding: 0.625rem 0.875rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--border-radius-md);
+				background-color: white;
+				color: var(--text-color);
+				font-size: 0.875rem;
+				transition: var(--transition-fast);
+			}
+
+			input:focus,
+			select:focus,
+			textarea:focus {
+				border-color: var(--secondary-color);
+				outline: none;
+				box-shadow: var(--shadow-focus);
+			}
+
+			label {
+				display: block;
+				margin-bottom: var(--space-xs);
+				font-size: 0.875rem;
+				font-weight: 500;
+				color: var(--text-secondary);
+			}
+
+			.dashboard-container {
+				display: grid;
+				grid-template-areas:
+					"header header"
+					"refresh refresh"
+					"main sidebar"
+					"footer footer";
+				grid-template-columns: 1fr 340px;
+				grid-template-rows: auto auto 1fr auto;
+				min-height: 100vh;
+				max-width: 1600px;
+				margin: 0 auto;
+				gap: var(--space-xl);
+				padding: var(--space-xl);
+				position: relative;
+				background-color: var(--background-color);
+			}
+
+			.glass-panel {
+				background: rgba(255, 255, 255, 0.85);
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.18);
+				box-shadow: var(--shadow-md);
+			}
+
+			.card {
+				background-color: var(--card-background);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-md);
+				padding: var(--space-lg);
+				transition: var(--transition-normal);
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: var(--space-md);
+			}
+
+			.card-title {
+				font-size: 1.125rem;
+				font-weight: 600;
+				color: var(--text-color);
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+			}
+
+			.card-title i {
+				color: var(--secondary-color);
+				font-size: 1rem;
+			}
+
+			.card-body {
+				flex: 1;
+			}
+
+			.card-footer {
+				margin-top: var(--space-md);
+				padding-top: var(--space-md);
+				border-top: 1px solid var(--border-color);
+			}
+
+			.dashboard-header {
+				grid-area: header;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0;
+				background: linear-gradient(
+					120deg,
+					var(--primary-dark) 0%,
+					var(--primary-color) 50%,
+					var(--primary-light) 100%
+				);
+				color: white;
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-lg);
+				position: relative;
+				overflow: hidden;
+				height: 72px;
+			}
+
+			.dashboard-header::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+				opacity: 0.5;
+			}
+
+			.header-left {
+				display: flex;
+				align-items: center;
+				height: 100%;
+				position: relative;
+				z-index: 1;
+				flex: 1;
+			}
+
+			.logo-container {
+				display: flex;
+				align-items: center;
+				padding: 0 var(--space-xl);
+				height: 100%;
+			}
+
+			.logo-icon {
+				width: 40px;
+				height: 40px;
+				background: white;
+				border-radius: var(--border-radius-md);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: var(--space-md);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				position: relative;
+				overflow: hidden;
+			}
+
+			.logo-icon::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					135deg,
+					rgba(76, 201, 240, 0.1),
+					rgba(67, 97, 238, 0.1)
+				);
+				z-index: 0;
+			}
+
+			.logo-icon i {
+				font-size: 1.25rem;
+				color: var(--primary-dark);
+				position: relative;
+				z-index: 1;
+			}
+
+			.logo-text {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.logo-container h1 {
+				font-size: 1.375rem;
+				font-weight: 700;
+				margin-bottom: 0;
+				letter-spacing: -0.5px;
+				color: white;
+			}
+
+			.logo-highlight {
+				color: #4cc9f0;
+				font-weight: 800;
+				position: relative;
+			}
+
+			.logo-highlight::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 4px;
+				background-color: #4cc9f0;
+				border-radius: 2px;
+				opacity: 0.6;
+			}
+
+			.tagline {
+				font-size: 0.75rem;
+				color: rgba(255, 255, 255, 1);
+				font-weight: 400;
+				letter-spacing: 0.2px;
+			}
+
+			.header-controls {
+				display: flex;
+				align-items: center;
+				gap: var(--space-lg);
+				position: relative;
+				z-index: 1;
+				padding-right: var(--space-xl);
+				height: 100%;
+			}
+
+			.date-time {
+				font-size: 0.875rem;
+				font-weight: 500;
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+				color: rgba(255, 255, 255, 1);
+				padding: 0 var(--space-md);
+				height: 100%;
+				margin-right: var(--space-md);
+			}
+
+			.date-time i {
+				opacity: 0.7;
+				font-size: 0.875rem;
+				color: var(--accent-color);
+			}
+
+			.user-controls {
+				display: flex;
+				align-items: center;
+				gap: var(--space-md);
+				height: 100%;
+			}
+
+			.notification-bell {
+				position: relative;
+				cursor: pointer;
+				width: 38px;
+				height: 38px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--border-radius-md);
+				background-color: rgba(255, 255, 255, 0.08);
+				transition: var(--transition-fast);
+				border: 1px solid rgba(255, 255, 255, 0.05);
+			}
+
+			.notification-bell:hover {
+				background-color: rgba(255, 255, 255, 0.12);
+				transform: translateY(-1px);
+			}
+
+			.bell-icon {
+				font-size: 0.875rem;
+				color: white;
+			}
+
+			.notification-count {
+				position: absolute;
+				top: -5px;
+				right: -5px;
+				background-color: var(--danger-color);
+				color: white;
+				border-radius: 50%;
+				width: 18px;
+				height: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 0.6875rem;
+				font-weight: 600;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+				border: 2px solid var(--primary-dark);
+			}
+
+			.user-profile {
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+				cursor: pointer;
+				padding: 0 var(--space-sm);
+				height: 100%;
+				transition: var(--transition-fast);
+				padding-left: var(--space-md);
+			}
+
+			.user-profile:hover {
+				background-color: rgba(255, 255, 255, 0.05);
+			}
+
+			.user-avatar {
+				width: 38px;
+				height: 38px;
+				border-radius: var(--border-radius-md);
+				background: linear-gradient(
+					135deg,
+					var(--accent-color),
+					var(--secondary-color)
+				);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: 600;
+				color: white;
+				font-size: 0.875rem;
+				box-shadow: 0 2px 8px rgba(76, 201, 240, 0.3);
+			}
+
+			.user-info {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.user-name {
+				font-size: 0.875rem;
+				font-weight: 600;
+				color: white;
+			}
+
+			.user-role {
+				font-size: 0.75rem;
+				color: rgba(255, 255, 255, 0.85);
+			}
+
+			.dashboard-content {
+				grid-area: main;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-xl);
+				height: fit-content;
+			}
+
+			.metrics-container {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-lg);
+			}
+
+			.section-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.section-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+				color: var(--text-color);
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+			}
+
+			.section-title i {
+				color: var(--secondary-color);
+				font-size: 1.125rem;
+			}
+
+			.section-actions {
+				display: flex;
+				gap: var(--space-sm);
+			}
+
+			.metrics-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: var(--space-lg);
+			}
+
+			.metric-card {
+				position: relative;
+				border-radius: var(--border-radius-lg);
+				background-color: var(--card-background);
+				box-shadow: var(--shadow-md);
+				transition: var(--transition-normal);
+				overflow: hidden;
+			}
+
+			.metric-card:hover {
+				transform: translateY(-4px);
+				box-shadow: var(--shadow-lg);
+			}
+
+			.metric-card-header {
+				padding: var(--space-md) var(--space-lg);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.metric-title-group {
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+			}
+
+			.metric-icon {
+				width: 36px;
+				height: 36px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--border-radius-md);
+				font-size: 1.25rem;
+				background-color: var(--secondary-light);
+				color: white;
+			}
+
+			.metric-title {
+				font-size: 0.9375rem;
+				font-weight: 600;
+				color: var(--text-secondary);
+			}
+
+			.metric-trend {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+				font-size: 0.8125rem;
+				font-weight: 500;
+				padding: 4px 8px;
+				border-radius: var(--border-radius-sm);
+			}
+
+			.metric-trend.up {
+				color: var(--success-color);
+				background-color: var(--success-light);
+			}
+
+			.metric-trend.down {
+				color: var(--danger-color);
+				background-color: var(--danger-light);
+			}
+
+			.metric-card-body {
+				padding: var(--space-lg);
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-md);
+			}
+
+			.metric-value-container {
+				display: flex;
+				align-items: baseline;
+				gap: var(--space-xs);
+			}
+
+			.metric-value {
+				font-size: 2.5rem;
+				font-weight: 700;
+				color: var(--text-color);
+				line-height: 1;
+				transition: color 0.3s ease;
+			}
+
+			@keyframes subtle-update {
+				0% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.7;
+				}
+				100% {
+					opacity: 1;
+				}
+			}
+
+			.metric-value.updating {
+				animation: subtle-update 0.5s ease;
+			}
+
+			.metric-unit {
+				font-size: 1rem;
+				color: var(--text-light);
+				font-weight: 500;
+			}
+
+			.metric-gauge-container {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-xs);
+			}
+
+			.metric-gauge-labels {
+				display: flex;
+				justify-content: space-between;
+				font-size: 0.75rem;
+				color: var(--text-light);
+			}
+
+			.metric-gauge {
+				height: 8px;
+				background-color: var(--card-background-alt);
+				border-radius: 4px;
+				overflow: hidden;
+			}
+
+			.gauge-fill {
+				height: 100%;
+				width: 0%;
+				border-radius: 4px;
+				transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1),
+					background-color 1s ease;
+			}
+
+			.metric-status {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--space-xs);
+				font-weight: 600;
+				font-size: 0.8125rem;
+				padding: 6px 12px;
+				border-radius: var(--border-radius-md);
+				transition: var(--transition-normal);
+				align-self: flex-start;
+			}
+
+			.metric-status i {
+				font-size: 0.875rem;
+			}
+
+			.history-container {
+				background-color: var(--card-background);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-md);
+				overflow: hidden;
+			}
+
+			.history-header {
+				padding: var(--space-lg);
+				border-bottom: 1px solid var(--border-color);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.time-selector {
+				display: flex;
+				gap: var(--space-xs);
+				background-color: var(--card-background-alt);
+				padding: 4px;
+				border-radius: var(--border-radius-md);
+			}
+
+			.time-btn {
+				background-color: transparent;
+				color: var(--text-secondary);
+				font-size: 0.8125rem;
+				font-weight: 500;
+				padding: 6px 12px;
+				box-shadow: none;
+			}
+
+			.time-btn:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+				transform: none;
+				box-shadow: none;
+			}
+
+			.time-btn.active {
+				background-color: white;
+				color: var(--secondary-color);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.chart-actions {
+				display: flex;
+				gap: var(--space-sm);
+			}
+
+			.chart-action-btn {
+				width: 32px;
+				height: 32px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--border-radius-md);
+				background-color: var(--card-background-alt);
+				color: var(--text-secondary);
+				cursor: pointer;
+				transition: var(--transition-fast);
+			}
+
+			.chart-action-btn:hover {
+				background-color: var(--border-color);
+				color: var(--text-color);
+			}
+
+			.chart-container {
+				height: 360px;
+				position: relative;
+				padding: var(--space-lg);
+			}
+
+			.chart-legend {
+				display: flex;
+				justify-content: center;
+				gap: var(--space-md);
+				padding: var(--space-md) 0;
+				border-top: 1px solid var(--border-color);
+			}
+
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: var(--space-xs);
+				font-size: 0.8125rem;
+				color: var(--text-secondary);
+			}
+
+			.legend-color {
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+			}
+
+			.dashboard-sidebar {
+				grid-area: sidebar;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-xl);
+			}
+
+			.sidebar-panel {
+				background-color: var(--card-background);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-md);
+				overflow: hidden;
+				transition: box-shadow 0.3s ease, transform 0.3s ease;
+			}
+
+			.highlight-panel {
+				box-shadow: 0 0 0 3px var(--secondary-color), var(--shadow-lg);
+				transform: translateY(-3px);
+				animation: pulse-highlight 1.5s ease;
+			}
+
+			@keyframes pulse-highlight {
+				0% {
+					box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.7), var(--shadow-md);
+				}
+				70% {
+					box-shadow: 0 0 0 10px rgba(67, 97, 238, 0), var(--shadow-lg);
+				}
+				100% {
+					box-shadow: 0 0 0 0 rgba(67, 97, 238, 0), var(--shadow-md);
+				}
+			}
+
+			.panel-header {
+				padding: var(--space-md) var(--space-lg);
+				border-bottom: 1px solid var(--border-color);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.panel-title {
+				font-size: 1rem;
+				font-weight: 600;
+				color: var(--text-color);
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+			}
+
+			.panel-title i {
+				color: var(--secondary-color);
+				font-size: 1rem;
+			}
+
+			.panel-actions {
+				display: flex;
+				gap: var(--space-xs);
+			}
+
+			.panel-action-btn {
+				width: 28px;
+				height: 28px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--border-radius-md);
+				background-color: var(--card-background-alt);
+				color: var(--text-secondary);
+				cursor: pointer;
+				transition: var(--transition-fast);
+				font-size: 0.75rem;
+			}
+
+			.panel-action-btn:hover {
+				background-color: var(--border-color);
+				color: var(--text-color);
+			}
+
+			.panel-body {
+				padding: var(--space-lg);
+			}
+
+			.notification-list {
+				max-height: 360px;
+				overflow-y: auto;
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-sm);
+			}
+
+			.notification-list::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.notification-list::-webkit-scrollbar-track {
+				background: var(--card-background-alt);
+				border-radius: 10px;
+			}
+
+			.notification-list::-webkit-scrollbar-thumb {
+				background: var(--border-color);
+				border-radius: 10px;
+			}
+
+			.notification-list::-webkit-scrollbar-thumb:hover {
+				background: var(--text-muted);
+			}
+
+			.notification-item {
+				padding: var(--space-md);
+				border-radius: var(--border-radius-md);
+				background-color: var(--card-background-alt);
+				position: relative;
+				transition: var(--transition-fast);
+				border-left: 4px solid;
+			}
+
+			.notification-item:hover {
+				transform: translateX(4px);
+			}
+
+			.notification-item.warning {
+				border-left-color: var(--warning-color);
+				background-color: var(--warning-light);
+			}
+
+			.notification-item.danger {
+				border-left-color: var(--danger-color);
+				background-color: var(--danger-light);
+			}
+
+			.notification-item.success {
+				border-left-color: var(--success-color);
+				background-color: var(--success-light);
+			}
+
+			.notification-content {
+				font-size: 0.875rem;
+				color: var(--text-secondary);
+				line-height: 1.5;
+			}
+
+			.notification-time {
+				font-size: 0.75rem;
+				color: var(--text-muted);
+				margin-top: var(--space-xs);
+				display: block;
+			}
+
+			.notification-actions {
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--space-xs);
+				margin-top: var(--space-sm);
+			}
+
+			.notification-btn {
+				font-size: 0.75rem;
+				padding: 4px 8px;
+				background: transparent;
+				color: var(--text-secondary);
+				box-shadow: none;
+			}
+
+			.notification-btn:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+				box-shadow: none;
+			}
+
+			.empty-notification {
+				color: var(--text-muted);
+				text-align: center;
+				padding: var(--space-xl) var(--space-lg);
+				font-size: 0.875rem;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--space-md);
+			}
+
+			.empty-notification i {
+				font-size: 2rem;
+				color: var(--border-color);
+				opacity: 0.7;
+			}
+
+			.settings-form {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-lg);
+			}
+
+			.settings-section {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-md);
+			}
+
+			.settings-section-title {
+				font-size: 0.875rem;
+				font-weight: 600;
+				color: var(--text-secondary);
+				display: flex;
+				align-items: center;
+				gap: var(--space-xs);
+			}
+
+			.setting-group {
+				display: flex;
+				flex-direction: column;
+				gap: var(--space-xs);
+				position: relative;
+			}
+
+			.setting-group label {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			.setting-value {
+				font-size: 0.75rem;
+				color: var(--text-muted);
+				font-weight: normal;
+			}
+
+			.range-slider {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 100%;
+				height: 6px;
+				border-radius: 3px;
+				background: var(--card-background-alt);
+				outline: none;
+				margin: var(--space-xs) 0;
+			}
+
+			.range-slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: var(--secondary-color);
+				cursor: pointer;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				transition: var(--transition-fast);
+			}
+
+			.range-slider::-webkit-slider-thumb:hover {
+				transform: scale(1.1);
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+			}
+
+			.range-values {
+				display: flex;
+				justify-content: space-between;
+				font-size: 0.75rem;
+				color: var(--text-muted);
+				margin-top: 4px;
+			}
+
+			.save-settings-btn {
+				margin-top: var(--space-md);
+				background-color: var(--accent-color);
+				align-self: flex-end;
+			}
+
+			.save-settings-btn:hover {
+				background-color: var(--accent-secondary);
+			}
+
+			.refresh-control-bar {
+				grid-area: refresh;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: var(--space-md) var(--space-xl);
+				background-color: var(--card-background);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-md);
+				border-top: 3px solid var(--secondary-color);
+			}
+
+			.refresh-status {
+				display: flex;
+				align-items: center;
+				gap: var(--space-xl);
+			}
+
+			.last-updated {
+				color: var(--text-secondary);
+				font-size: 0.8125rem;
+				display: flex;
+				align-items: center;
+				gap: var(--space-xs);
+			}
+
+			.last-updated i {
+				color: var(--secondary-color);
+				font-size: 0.875rem;
+				opacity: 0.8;
+			}
+
+			.system-status {
+				display: flex;
+				align-items: center;
+				gap: var(--space-xs);
+				font-size: 0.8125rem;
+				color: var(--success-color);
+				font-weight: 500;
+			}
+
+			.status-indicator {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background-color: var(--success-color);
+				position: relative;
+			}
+
+			.status-indicator::after {
+				content: "";
+				position: absolute;
+				top: -2px;
+				left: -2px;
+				right: -2px;
+				bottom: -2px;
+				border-radius: 50%;
+				background-color: var(--success-color);
+				opacity: 0.4;
+				animation: pulse-status 2s ease-in-out infinite;
+			}
+
+			@keyframes pulse-status {
+				0% {
+					transform: scale(1);
+					opacity: 0.4;
+				}
+				50% {
+					transform: scale(1.5);
+					opacity: 0.2;
+				}
+				100% {
+					transform: scale(1);
+					opacity: 0.4;
+				}
+			}
+
+			.refresh-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-md);
+			}
+
+			.refresh-now-btn {
+				display: flex;
+				align-items: center;
+				gap: var(--space-xs);
+				font-size: 0.8125rem;
+				padding: 8px 16px;
+				height: 36px;
+				background-color: var(--primary-dark);
+				color: white;
+				border-radius: var(--border-radius-md);
+				box-shadow: var(--shadow-sm);
+				transition: var(--transition-fast);
+				font-weight: 500;
+			}
+
+			.refresh-now-btn:hover {
+				background-color: var(--primary-color);
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-md);
+			}
+
+			.refresh-now-btn:active {
+				transform: translateY(1px);
+			}
+
+			.auto-refresh {
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+				font-size: 0.8125rem;
+				color: var(--text-secondary);
+			}
+
+			.toggle-switch {
+				position: relative;
+				display: inline-block;
+				width: 36px;
+				height: 20px;
+			}
+
+			.toggle-switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.toggle-slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: var(--card-background-alt);
+				transition: var(--transition-fast);
+				border-radius: 20px;
+			}
+
+			.toggle-slider:before {
+				position: absolute;
+				content: "";
+				height: 16px;
+				width: 16px;
+				left: 2px;
+				bottom: 2px;
+				background-color: white;
+				transition: var(--transition-fast);
+				border-radius: 50%;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+			}
+
+			input:checked + .toggle-slider {
+				background-color: var(--primary-dark);
+			}
+
+			input:focus + .toggle-slider {
+				box-shadow: var(--shadow-focus);
+			}
+
+			input:checked + .toggle-slider:before {
+				transform: translateX(16px);
+			}
+
+			.dashboard-footer {
+				grid-area: footer;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: var(--space-lg) var(--space-xl);
+				background-color: var(--primary-dark);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-md);
+				color: white;
+			}
+
+			.footer-left,
+			.footer-right {
+				display: flex;
+				align-items: center;
+			}
+
+			.footer-left {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+				gap: var(--space-md);
+			}
+
+			.footer-right {
+				text-align: right;
+			}
+
+			.footer-brand {
+				display: flex;
+				align-items: center;
+				gap: var(--space-sm);
+			}
+
+			.footer-logo {
+				width: 32px;
+				height: 32px;
+				border-radius: var(--border-radius-sm);
+				background-color: rgba(255, 255, 255, 0.1);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--accent-color);
+				font-size: 1rem;
+			}
+
+			.footer-company {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.company-name {
+				font-size: 0.9375rem;
+				font-weight: 600;
+				color: white;
+			}
+
+			.company-tagline {
+				font-size: 0.75rem;
+				color: rgba(255, 255, 255, 0.85);
+			}
+
+			.footer-links {
+				display: flex;
+				align-items: center;
+				gap: var(--space-md);
+				font-size: 0.75rem;
+			}
+
+			.footer-link {
+				color: rgba(255, 255, 255, 0.9);
+				text-decoration: none;
+				transition: var(--transition-fast);
+			}
+
+			.footer-link:hover {
+				color: var(--accent-color);
+				text-decoration: none;
+			}
+
+			.footer-divider {
+				width: 4px;
+				height: 4px;
+				border-radius: 50%;
+				background-color: rgba(255, 255, 255, 0.3);
+			}
+
+			.footer-center {
+				padding: 0 var(--space-xl);
+			}
+
+			.quick-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--space-md);
+			}
+
+			.quick-action-btn {
+				display: flex;
+				align-items: center;
+				gap: var(--space-xs);
+				background: rgba(255, 255, 255, 0.08);
+				color: rgba(255, 255, 255, 0.9);
+				font-size: 0.8125rem;
+				padding: 8px 12px;
+				border-radius: var(--border-radius-md);
+				transition: var(--transition-fast);
+				box-shadow: none;
+				border: 1px solid rgba(255, 255, 255, 0.05);
+			}
+
+			.quick-action-btn:hover {
+				background-color: rgba(255, 255, 255, 0.12);
+				color: white;
+				transform: translateY(-1px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			.quick-action-btn i {
+				font-size: 0.875rem;
+				color: var(--accent-color);
+			}
+
+			.footer-right {
+				display: flex;
+				flex-direction: column;
+				align-items: flex-end;
+				gap: var(--space-xs);
+			}
+
+			.footer-version {
+				font-size: 0.75rem;
+				color: rgba(255, 255, 255, 0.75);
+			}
+
+			.footer-copyright {
+				font-size: 0.75rem;
+				color: rgba(255, 255, 255, 0.7);
+			}
+
+			@media (max-width: 1400px) {
+				.dashboard-container {
+					padding: var(--space-lg);
+					gap: var(--space-lg);
+				}
+
+				.search-input-wrapper {
+					width: 180px;
+				}
+			}
+
+			@media (max-width: 1200px) {
+			}
+
+			@media (max-width: 992px) {
+				.dashboard-container {
+					grid-template-areas:
+						"header header"
+						"refresh refresh"
+						"main main"
+						"sidebar sidebar"
+						"footer footer";
+					grid-template-columns: 1fr;
+					padding: var(--space-md);
+					gap: var(--space-md);
+				}
+
+				.dashboard-header {
+					height: auto;
+					padding: var(--space-md) 0;
+					flex-direction: column;
+				}
+
+				.header-left,
+				.header-controls {
+					width: 100%;
+					height: auto;
+					padding: var(--space-sm) var(--space-md);
+				}
+
+				.logo-container {
+					border-right: none;
+					border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+					padding-bottom: var(--space-sm);
+					width: 100%;
+					justify-content: center;
+				}
+
+				.header-controls {
+					margin-top: var(--space-md);
+					justify-content: space-between;
+					border-top: 1px solid rgba(255, 255, 255, 0.1);
+					padding-top: var(--space-md);
+				}
+
+				.date-time {
+					border: none;
+				}
+
+				.dashboard-sidebar {
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+					gap: var(--space-md);
+				}
+
+				.refresh-control-bar {
+					flex-direction: column;
+					gap: var(--space-md);
+					align-items: flex-start;
+				}
+
+				.refresh-status,
+				.refresh-actions {
+					width: 100%;
+				}
+
+				.refresh-status {
+					justify-content: space-between;
+				}
+
+				.dashboard-footer {
+					padding: var(--space-md);
+					flex-direction: column;
+					gap: var(--space-lg);
+					align-items: flex-start;
+				}
+
+				.footer-left,
+				.footer-right {
+					width: 100%;
+				}
+
+				.footer-right {
+					align-items: flex-start;
+					margin-top: var(--space-md);
+				}
+			}
+
+			@media (max-width: 768px) {
+				.dashboard-sidebar {
+					display: flex;
+					flex-direction: column;
+				}
+
+				.metrics-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.user-info {
+					display: none;
+				}
+
+				.history-header {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: var(--space-sm);
+				}
+
+				.time-selector {
+					width: 100%;
+					justify-content: space-between;
+				}
+
+				.refresh-actions {
+					flex-direction: column;
+					gap: var(--space-sm);
+					width: 100%;
+				}
+
+				.refresh-now-btn {
+					width: 100%;
+				}
+
+				.auto-refresh {
+					width: 100%;
+					justify-content: space-between;
+				}
+			}
+
+			@media (max-width: 576px) {
+				.dashboard-container {
+					padding: var(--space-sm);
+					gap: var(--space-sm);
+				}
+
+				.chart-container {
+					height: 240px;
+					padding: var(--space-sm);
+				}
+
+				.refresh-status {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: var(--space-sm);
+				}
+
+				.footer-links {
+					flex-wrap: wrap;
+					gap: var(--space-xs) var(--space-md);
+				}
+
+				.footer-brand {
+					width: 100%;
+					justify-content: center;
+					margin-bottom: var(--space-md);
+				}
+
+				.footer-links {
+					width: 100%;
+					justify-content: center;
+				}
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			@keyframes fade-in {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes slide-in-right {
+				from {
+					opacity: 0;
+					transform: translateX(20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes slide-in-left {
+				from {
+					opacity: 0;
+					transform: translateX(-20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes scale-in {
+				from {
+					opacity: 0;
+					transform: scale(0.9);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1);
+				}
+			}
+
+			.metric-value.updating {
+				animation: pulse 1s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.metric-card {
+				animation: fade-in 0.5s ease-out both;
+			}
+
+			.metric-card:nth-child(1) {
+				animation-delay: 0.1s;
+			}
+
+			.metric-card:nth-child(2) {
+				animation-delay: 0.2s;
+			}
+
+			.metric-card:nth-child(3) {
+				animation-delay: 0.3s;
+			}
+
+			.notification-item {
+				animation: slide-in-right 0.3s ease-out both;
+			}
+
+			.chart-container {
+				animation: scale-in 0.5s ease-out both;
+				animation-delay: 0.4s;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="dashboard-container">
+			<!-- Header Section - Enterprise Navigation 2025 -->
+			<header class="dashboard-header">
+				<div class="header-left">
+					<div class="logo-container">
+						<div class="logo-icon">
+							<i class="fas fa-microchip"></i>
+						</div>
+						<div class="logo-text">
+							<h1>Enviro<span class="logo-highlight">Sense</span></h1>
+							<span class="tagline">Smart Environment Monitoring</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="header-controls">
+					<div class="date-time" id="current-datetime">
+						<i class="far fa-clock"></i>
+						<span>Loading...</span>
+					</div>
+
+					<div class="user-controls">
+						<div class="notification-bell">
+							<i class="fas fa-bell bell-icon"></i>
+							<span class="notification-count" id="notification-count">0</span>
+						</div>
+
+						<div class="user-profile">
+							<div class="user-avatar">AP</div>
+							<div class="user-info">
+								<span class="user-name">Ashish Pathak</span>
+								<span class="user-role">Administrator</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<!-- Main Dashboard Content -->
+			<main class="dashboard-content">
+				<!-- Real-time Metrics Section -->
+				<section class="metrics-container">
+					<div class="section-header">
+						<h2 class="section-title">
+							<i class="fas fa-chart-line"></i> Real-time Metrics
+						</h2>
+						<div class="section-actions">
+							<button class="btn btn-secondary" id="export-metrics">
+								<i class="fas fa-download"></i> Export
+							</button>
+						</div>
+					</div>
+
+					<div class="metrics-grid">
+						<!-- Temperature Card -->
+						<div class="metric-card" id="temperature-card">
+							<div class="metric-card-header">
+								<div class="metric-title-group">
+									<div class="metric-icon">
+										<i class="fas fa-temperature-high"></i>
+									</div>
+									<div class="metric-title">Temperature</div>
+								</div>
+								<div class="metric-trend up">
+									<i class="fas fa-arrow-up"></i> 2.4%
+								</div>
+							</div>
+
+							<div class="metric-card-body">
+								<div class="metric-value-container">
+									<div class="metric-value" id="temperature-value">--</div>
+									<div class="metric-unit">°C</div>
+								</div>
+
+								<div class="metric-gauge-container">
+									<div class="metric-gauge-labels">
+										<span>0°C</span>
+										<span>40°C</span>
+									</div>
+									<div class="metric-gauge">
+										<div class="gauge-fill" id="temperature-gauge"></div>
+									</div>
+								</div>
+
+								<div class="metric-status" id="temperature-status">
+									<i class="fas fa-check-circle"></i> Normal
+								</div>
+							</div>
+						</div>
+
+						<!-- Humidity Card -->
+						<div class="metric-card" id="humidity-card">
+							<div class="metric-card-header">
+								<div class="metric-title-group">
+									<div class="metric-icon">
+										<i class="fas fa-tint"></i>
+									</div>
+									<div class="metric-title">Humidity</div>
+								</div>
+								<div class="metric-trend down">
+									<i class="fas fa-arrow-down"></i> 1.2%
+								</div>
+							</div>
+
+							<div class="metric-card-body">
+								<div class="metric-value-container">
+									<div class="metric-value" id="humidity-value">--</div>
+									<div class="metric-unit">%</div>
+								</div>
+
+								<div class="metric-gauge-container">
+									<div class="metric-gauge-labels">
+										<span>0%</span>
+										<span>100%</span>
+									</div>
+									<div class="metric-gauge">
+										<div class="gauge-fill" id="humidity-gauge"></div>
+									</div>
+								</div>
+
+								<div class="metric-status" id="humidity-status">
+									<i class="fas fa-check-circle"></i> Normal
+								</div>
+							</div>
+						</div>
+
+						<!-- Air Quality Card -->
+						<div class="metric-card" id="air-quality-card">
+							<div class="metric-card-header">
+								<div class="metric-title-group">
+									<div class="metric-icon">
+										<i class="fas fa-wind"></i>
+									</div>
+									<div class="metric-title">Air Quality</div>
+								</div>
+								<div class="metric-trend up">
+									<i class="fas fa-arrow-up"></i> 5.7%
+								</div>
+							</div>
+
+							<div class="metric-card-body">
+								<div class="metric-value-container">
+									<div class="metric-value" id="air-quality-value">--</div>
+									<div class="metric-unit">AQI</div>
+								</div>
+
+								<div class="metric-gauge-container">
+									<div class="metric-gauge-labels">
+										<span>0</span>
+										<span>300</span>
+									</div>
+									<div class="metric-gauge">
+										<div class="gauge-fill" id="air-quality-gauge"></div>
+									</div>
+								</div>
+
+								<div class="metric-status" id="air-quality-status">
+									<i class="fas fa-check-circle"></i> Good
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Historical Data Section -->
+				<section class="history-container">
+					<div class="history-header">
+						<h2 class="section-title">
+							<i class="fas fa-history"></i> Historical Trends
+						</h2>
+
+						<div class="time-selector">
+							<button class="time-btn active" data-time="day">24 Hours</button>
+							<button class="time-btn" data-time="week">Week</button>
+							<button class="time-btn" data-time="month">Month</button>
+						</div>
+
+						<div class="chart-actions">
+							<div class="chart-action-btn" title="Download CSV">
+								<i class="fas fa-file-csv"></i>
+							</div>
+							<div class="chart-action-btn" title="Download Image">
+								<i class="fas fa-image"></i>
+							</div>
+							<div class="chart-action-btn" title="Fullscreen">
+								<i class="fas fa-expand"></i>
+							</div>
+						</div>
+					</div>
+
+					<div class="chart-container">
+						<canvas id="history-chart"></canvas>
+					</div>
+
+					<div class="chart-legend">
+						<div class="legend-item">
+							<div class="legend-color" style="background-color: #e74c3c"></div>
+							<span>Temperature</span>
+						</div>
+						<div class="legend-item">
+							<div class="legend-color" style="background-color: #3498db"></div>
+							<span>Humidity</span>
+						</div>
+						<div class="legend-item">
+							<div class="legend-color" style="background-color: #2ecc71"></div>
+							<span>Air Quality</span>
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<!-- Sidebar for Notifications and Settings -->
+			<aside class="dashboard-sidebar">
+				<!-- Notifications Panel -->
+				<section class="sidebar-panel notifications-panel">
+					<div class="panel-header">
+						<h3 class="panel-title">
+							<i class="fas fa-bell"></i> Notifications
+						</h3>
+						<div class="panel-actions">
+							<div class="panel-action-btn" title="Mark all as read">
+								<i class="fas fa-check-double"></i>
+							</div>
+							<div class="panel-action-btn" title="Settings">
+								<i class="fas fa-cog"></i>
+							</div>
+						</div>
+					</div>
+
+					<div class="panel-body">
+						<div class="notification-list" id="notification-list">
+							<div class="empty-notification">
+								<i class="far fa-bell-slash"></i>
+								<span>No new notifications</span>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Settings Panel -->
+				<section class="sidebar-panel settings-panel">
+					<div class="panel-header">
+						<h3 class="panel-title">
+							<i class="fas fa-sliders-h"></i> Alert Thresholds
+						</h3>
+						<div class="panel-actions">
+							<div class="panel-action-btn" title="Reset to defaults">
+								<i class="fas fa-undo"></i>
+							</div>
+						</div>
+					</div>
+
+					<div class="panel-body">
+						<div class="settings-form">
+							<div class="settings-section">
+								<h4 class="settings-section-title">
+									<i class="fas fa-temperature-high"></i> Temperature
+								</h4>
+
+								<div class="setting-group">
+									<label for="temp-min"
+										>Minimum Threshold
+										<span class="setting-value" id="temp-min-value"
+											>18°C</span
+										></label
+									>
+									<input
+										type="range"
+										class="range-slider"
+										id="temp-min"
+										value="18"
+										min="0"
+										max="30"
+										step="1"
+									/>
+									<div class="range-values">
+										<span>0°C</span>
+										<span>30°C</span>
+									</div>
+								</div>
+
+								<div class="setting-group">
+									<label for="temp-max"
+										>Maximum Threshold
+										<span class="setting-value" id="temp-max-value"
+											>25°C</span
+										></label
+									>
+									<input
+										type="range"
+										class="range-slider"
+										id="temp-max"
+										value="25"
+										min="10"
+										max="40"
+										step="1"
+									/>
+									<div class="range-values">
+										<span>10°C</span>
+										<span>40°C</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="settings-section">
+								<h4 class="settings-section-title">
+									<i class="fas fa-tint"></i> Humidity
+								</h4>
+
+								<div class="setting-group">
+									<label for="humidity-min"
+										>Minimum Threshold
+										<span class="setting-value" id="humidity-min-value"
+											>30%</span
+										></label
+									>
+									<input
+										type="range"
+										class="range-slider"
+										id="humidity-min"
+										value="30"
+										min="0"
+										max="100"
+										step="5"
+									/>
+									<div class="range-values">
+										<span>0%</span>
+										<span>100%</span>
+									</div>
+								</div>
+
+								<div class="setting-group">
+									<label for="humidity-max"
+										>Maximum Threshold
+										<span class="setting-value" id="humidity-max-value"
+											>60%</span
+										></label
+									>
+									<input
+										type="range"
+										class="range-slider"
+										id="humidity-max"
+										value="60"
+										min="0"
+										max="100"
+										step="5"
+									/>
+									<div class="range-values">
+										<span>0%</span>
+										<span>100%</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="settings-section">
+								<h4 class="settings-section-title">
+									<i class="fas fa-wind"></i> Air Quality
+								</h4>
+
+								<div class="setting-group">
+									<label for="aqi-max"
+										>Maximum Threshold
+										<span class="setting-value" id="aqi-max-value"
+											>50 AQI</span
+										></label
+									>
+									<input
+										type="range"
+										class="range-slider"
+										id="aqi-max"
+										value="50"
+										min="0"
+										max="500"
+										step="10"
+									/>
+									<div class="range-values">
+										<span>0</span>
+										<span>500</span>
+									</div>
+								</div>
+							</div>
+
+							<button class="btn save-settings-btn" id="save-settings">
+								<i class="fas fa-save"></i> Save Changes
+							</button>
+						</div>
+					</div>
+				</section>
+			</aside>
+
+			<!-- Refresh Control Bar -->
+			<div class="refresh-control-bar">
+				<div class="refresh-status">
+					<div class="last-updated">
+						<i class="far fa-clock"></i>
+						Last updated: <span id="last-updated-time">Never</span>
+					</div>
+
+					<div class="system-status">
+						<div class="status-indicator"></div>
+						System operational
+					</div>
+				</div>
+
+				<div class="refresh-actions">
+					<button class="btn refresh-now-btn" id="refresh-now-btn">
+						<i class="fas fa-sync-alt"></i> Refresh Now
+					</button>
+
+					<div class="auto-refresh">
+						<label class="toggle-switch">
+							<input type="checkbox" id="auto-refresh" checked />
+							<span class="toggle-slider"></span>
+						</label>
+						Auto-refresh (5 min)
+					</div>
+				</div>
+			</div>
+
+			<!-- Footer - Enterprise Status Bar 2025 -->
+			<footer class="dashboard-footer">
+				<div class="footer-left">
+					<div class="footer-brand">
+						<div class="footer-logo">
+							<i class="fas fa-microchip"></i>
+						</div>
+						<div class="footer-company">
+							<span class="company-name">EnviroSense</span>
+							<span class="company-tagline"
+								>Intelligent Environment Monitoring</span
+							>
+						</div>
+					</div>
+
+					<div class="footer-links">
+						<a href="#" class="footer-link">Privacy Policy</a>
+						<span class="footer-divider"></span>
+						<a href="#" class="footer-link">Terms of Service</a>
+						<span class="footer-divider"></span>
+						<a href="#" class="footer-link">Help Center</a>
+					</div>
+				</div>
+
+				<div class="footer-right">
+					<div class="footer-version">
+						<span>EnviroSense v2.5.3</span>
+					</div>
+
+					<div class="footer-copyright">
+						<span
+							>&copy; 2025 EnviroSense Technologies. All rights reserved.</span
+						>
+					</div>
+				</div>
+			</footer>
+		</div>
+
+		<!-- We'll add JavaScript here -->
+		<script>
+			let currentData = {
+				temperature: null,
+				humidity: null,
+				airQuality: null,
+			};
+
+			let historicalData = {
+				day: generateHistoricalData(24),
+				week: generateHistoricalData(7 * 24, 3),
+				month: generateHistoricalData(30 * 24, 12),
+			};
+
+			let settings = {
+				temperature: { min: 18, max: 25 },
+				humidity: { min: 30, max: 60 },
+				airQuality: { max: 50 },
+			};
+
+			let notifications = [];
+			let chart = null;
+			let autoRefreshInterval = null;
+			let currentTimeFrame = "day";
+
+			const temperatureValue = document.getElementById("temperature-value");
+			const humidityValue = document.getElementById("humidity-value");
+			const airQualityValue = document.getElementById("air-quality-value");
+
+			const temperatureGauge = document.getElementById("temperature-gauge");
+			const humidityGauge = document.getElementById("humidity-gauge");
+			const airQualityGauge = document.getElementById("air-quality-gauge");
+
+			const temperatureStatus = document.getElementById("temperature-status");
+			const humidityStatus = document.getElementById("humidity-status");
+			const airQualityStatus = document.getElementById("air-quality-status");
+
+			const currentDatetime = document.getElementById("current-datetime");
+			const lastUpdatedTime = document.getElementById("last-updated-time");
+			const notificationCount = document.getElementById("notification-count");
+			const notificationList = document.getElementById("notification-list");
+
+			const refreshNowBtn = document.getElementById("refresh-now-btn");
+			const autoRefreshCheckbox = document.getElementById("auto-refresh");
+			const saveSettingsBtn = document.getElementById("save-settings");
+
+			const timeButtons = document.querySelectorAll(".time-btn");
+
+			document.addEventListener("DOMContentLoaded", () => {
+				loadSettings();
+
+				setupEventListeners();
+
+				initializeChart();
+
+				updateDateTime();
+				setInterval(updateDateTime, 1000);
+
+				setupRangeSliders();
+
+				fetchData();
+
+				startAutoRefresh();
+
+				setupExportButton();
+			});
+
+			function setupEventListeners() {
+				refreshNowBtn.addEventListener("click", fetchData);
+
+				autoRefreshCheckbox.addEventListener("change", () => {
+					if (autoRefreshCheckbox.checked) {
+						startAutoRefresh();
+					} else {
+						stopAutoRefresh();
+					}
+				});
+
+				saveSettingsBtn.addEventListener("click", saveSettings);
+
+				timeButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						timeButtons.forEach((btn) => btn.classList.remove("active"));
+						button.classList.add("active");
+						currentTimeFrame = button.dataset.time;
+						updateChart();
+					});
+				});
+
+				document
+					.querySelector(".notification-bell")
+					.addEventListener("click", () => {
+						const sidebar = document.querySelector(".dashboard-sidebar");
+						const notificationsPanel = document.querySelector(
+							".notifications-panel"
+						);
+
+						if (window.innerWidth <= 900) {
+							sidebar.style.display =
+								sidebar.style.display === "none" ? "flex" : "none";
+						} else {
+							notificationsPanel.scrollIntoView({ behavior: "smooth" });
+
+							notificationsPanel.classList.add("highlight-panel");
+							setTimeout(() => {
+								notificationsPanel.classList.remove("highlight-panel");
+							}, 1500);
+
+							addNotification("info", "Viewing notifications panel");
+						}
+					});
+
+				document
+					.querySelector('.panel-action-btn[title="Mark all as read"]')
+					.addEventListener("click", () => {
+						notifications = [];
+
+						notificationCount.textContent = "0";
+
+						updateNotificationList();
+
+						addNotification("success", "All notifications cleared");
+					});
+
+				const searchInput = document.querySelector(".search-input");
+				if (searchInput) {
+					searchInput.addEventListener("keypress", (e) => {
+						if (e.key === "Enter") {
+							const searchTerm = searchInput.value.trim();
+							if (searchTerm) {
+								addNotification(
+									"info",
+									`Search initiated for: "${searchTerm}"`
+								);
+								searchInput.value = "";
+							}
+						}
+					});
+				}
+
+				const userProfile = document.querySelector(".user-profile");
+				if (userProfile) {
+					userProfile.addEventListener("click", () => {
+						const existingMenu = document.querySelector(".user-dropdown-menu");
+
+						if (existingMenu) {
+							document.body.removeChild(existingMenu);
+							return;
+						}
+
+						const dropdownMenu = document.createElement("div");
+						dropdownMenu.className = "user-dropdown-menu";
+
+						const rect = userProfile.getBoundingClientRect();
+						dropdownMenu.style.top = `${rect.bottom + 10}px`;
+						dropdownMenu.style.right = `${window.innerWidth - rect.right}px`;
+
+						dropdownMenu.innerHTML = `
+                        <div class="dropdown-item"><i class="fas fa-user"></i> My Profile</div>
+                        <div class="dropdown-item"><i class="fas fa-cog"></i> Account Settings</div>
+                        <div class="dropdown-item"><i class="fas fa-bell"></i> Notification Preferences</div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item"><i class="fas fa-question-circle"></i> Help & Support</div>
+                        <div class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Sign Out</div>
+                    `;
+
+						document.body.appendChild(dropdownMenu);
+
+						dropdownMenu.querySelectorAll(".dropdown-item").forEach((item) => {
+							item.addEventListener("click", () => {
+								const action = item.textContent.trim();
+								addNotification("info", `${action} selected`);
+								document.body.removeChild(dropdownMenu);
+							});
+						});
+
+						document.addEventListener("click", function closeDropdown(e) {
+							if (
+								!dropdownMenu.contains(e.target) &&
+								!userProfile.contains(e.target)
+							) {
+								if (document.body.contains(dropdownMenu)) {
+									document.body.removeChild(dropdownMenu);
+								}
+								document.removeEventListener("click", closeDropdown);
+							}
+						});
+
+						const style = document.createElement("style");
+						style.textContent = `
+                        .user-dropdown-menu {
+                            position: fixed;
+                            background: white;
+                            border-radius: var(--border-radius-md);
+                            box-shadow: var(--shadow-lg);
+                            width: 220px;
+                            z-index: 1000;
+                            animation: dropdown-in 0.2s ease-out;
+                        }
+
+                        @keyframes dropdown-in {
+                            from { opacity: 0; transform: translateY(-10px); }
+                            to { opacity: 1; transform: translateY(0); }
+                        }
+
+                        .dropdown-item {
+                            padding: 12px 16px;
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            cursor: pointer;
+                            transition: background-color 0.2s ease;
+                            color: var(--text-secondary);
+                        }
+
+                        .dropdown-item:hover {
+                            background-color: var(--card-background-alt);
+                            color: var(--text-color);
+                        }
+
+                        .dropdown-item i {
+                            color: var(--secondary-color);
+                            width: 16px;
+                            text-align: center;
+                        }
+
+                        .dropdown-divider {
+                            height: 1px;
+                            background-color: var(--border-color);
+                            margin: 4px 0;
+                        }
+                    `;
+
+						document.head.appendChild(style);
+
+						const observer = new MutationObserver((mutations) => {
+							mutations.forEach((mutation) => {
+								mutation.removedNodes.forEach((node) => {
+									if (node === dropdownMenu) {
+										document.head.removeChild(style);
+										observer.disconnect();
+									}
+								});
+							});
+						});
+
+						observer.observe(document.body, { childList: true });
+					});
+				}
+
+				const headerBtn = document.querySelector(".header-btn");
+				if (headerBtn) {
+					headerBtn.addEventListener("click", () => {
+						addNotification(
+							"info",
+							"Create new dashboard option would open here"
+						);
+					});
+				}
+
+				document.querySelectorAll(".footer-link").forEach((link) => {
+					link.addEventListener("click", (e) => {
+						e.preventDefault();
+						const linkText = link.textContent.trim();
+
+						if (linkText === "Privacy Policy") {
+							showInfoModal(
+								"Privacy Policy",
+								`
+                            <h4>Privacy Policy</h4>
+                            <p>Last updated: April 2025</p>
+                            <p>EnviroSense is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our Smart Environment Monitoring system.</p>
+                            <h5>Information We Collect</h5>
+                            <p>We collect environmental data including temperature, humidity, and air quality measurements from your connected devices. We also collect usage data to improve our services.</p>
+                            <h5>How We Use Your Information</h5>
+                            <p>We use the collected data to provide and improve our services, analyze usage patterns, and send you alerts based on your configured thresholds.</p>
+                            <h5>Data Security</h5>
+                            <p>We implement industry-standard security measures to protect your data from unauthorized access or disclosure.</p>
+                        `
+							);
+						} else if (linkText === "Terms of Service") {
+							showInfoModal(
+								"Terms of Service",
+								`
+                            <h4>Terms of Service</h4>
+                            <p>Last updated: April 2025</p>
+                            <p>By using the EnviroSense Smart Environment Monitoring system, you agree to these Terms of Service.</p>
+                            <h5>Service Description</h5>
+                            <p>EnviroSense provides real-time monitoring of environmental conditions in your home or office, with alerts and historical data analysis.</p>
+                            <h5>User Responsibilities</h5>
+                            <p>You are responsible for maintaining the security of your account, configuring appropriate alert thresholds, and ensuring your devices are properly connected and maintained.</p>
+                            <h5>Limitations of Liability</h5>
+                            <p>EnviroSense is not liable for any damages resulting from your use of our service or any failure of the monitoring system to detect or alert you to environmental conditions.</p>
+                        `
+							);
+						} else if (linkText === "Help Center") {
+							showInfoModal(
+								"Help Center",
+								`
+                            <h4>Help Center</h4>
+                            <p>Welcome to the EnviroSense Help Center. Here are some common topics:</p>
+                            <h5>Getting Started</h5>
+                            <ul>
+                                <li>Setting up your first sensor</li>
+                                <li>Configuring alert thresholds</li>
+                                <li>Understanding the dashboard</li>
+                            </ul>
+                            <h5>Troubleshooting</h5>
+                            <ul>
+                                <li>Sensor connectivity issues</li>
+                                <li>Data accuracy concerns</li>
+                                <li>Alert notification problems</li>
+                            </ul>
+                            <h5>Contact Support</h5>
+                            <p>For additional help, contact our support team at <a href="mailto:support@envirosense.example.com">support@envirosense.example.com</a> or call 1-800-ENV-SENSE.</p>
+                        `
+							);
+						}
+
+						addNotification("info", `Opened ${linkText}`);
+					});
+				});
+
+				function showInfoModal(title, content) {
+					const overlay = document.createElement("div");
+					overlay.className = "modal-overlay";
+
+					const modal = document.createElement("div");
+					modal.className = "modal-content info-modal";
+					modal.innerHTML = `
+                    <div class="modal-header">
+                        <h3>${title}</h3>
+                        <button class="modal-close"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        ${content}
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn modal-ok">OK</button>
+                    </div>
+                `;
+
+					document.body.appendChild(overlay);
+					document.body.appendChild(modal);
+
+					const closeBtn = modal.querySelector(".modal-close");
+					const okBtn = modal.querySelector(".modal-ok");
+
+					closeBtn.addEventListener("click", closeModal);
+					okBtn.addEventListener("click", closeModal);
+					overlay.addEventListener("click", closeModal);
+
+					const style = document.createElement("style");
+					style.textContent = `
+                    .info-modal {
+                        max-width: 600px;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                    }
+
+                    .info-modal .modal-body {
+                        line-height: 1.6;
+                    }
+
+                    .info-modal h4 {
+                        margin-top: 0;
+                        color: var(--text-color);
+                        font-size: 1.2rem;
+                    }
+
+                    .info-modal h5 {
+                        margin: 16px 0 8px;
+                        color: var(--text-color);
+                        font-size: 1rem;
+                    }
+
+                    .info-modal p {
+                        margin: 0 0 12px;
+                        color: var(--text-secondary);
+                    }
+
+                    .info-modal ul {
+                        margin: 8px 0;
+                        padding-left: 24px;
+                    }
+
+                    .info-modal li {
+                        margin-bottom: 6px;
+                        color: var(--text-secondary);
+                    }
+
+                    .info-modal a {
+                        color: var(--secondary-color);
+                        text-decoration: none;
+                    }
+
+                    .info-modal a:hover {
+                        text-decoration: underline;
+                    }
+
+                    .modal-ok {
+                        min-width: 100px;
+                    }
+                `;
+
+					document.head.appendChild(style);
+
+					function closeModal() {
+						document.body.removeChild(overlay);
+						document.body.removeChild(modal);
+						document.head.removeChild(style);
+					}
+				}
+			}
+
+			function showShareDialog() {
+				const overlay = document.createElement("div");
+				overlay.className = "modal-overlay";
+
+				const modal = document.createElement("div");
+				modal.className = "modal-content";
+				modal.innerHTML = `
+                <div class="modal-header">
+                    <h3>Share Dashboard</h3>
+                    <button class="modal-close"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="share-options">
+                        <div class="share-option">
+                            <i class="fas fa-envelope"></i>
+                            <span>Email</span>
+                        </div>
+                        <div class="share-option">
+                            <i class="fab fa-slack"></i>
+                            <span>Slack</span>
+                        </div>
+                        <div class="share-option">
+                            <i class="fab fa-microsoft"></i>
+                            <span>Teams</span>
+                        </div>
+                        <div class="share-option">
+                            <i class="fas fa-link"></i>
+                            <span>Copy Link</span>
+                        </div>
+                    </div>
+                    <div class="share-link-container">
+                        <input type="text" class="share-link" value="https://smarthome.example.com/dashboard/share/a1b2c3d4" readonly>
+                        <button class="copy-link-btn">Copy</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary modal-cancel">Cancel</button>
+                    <button class="btn modal-share">Share</button>
+                </div>
+            `;
+
+				document.body.appendChild(overlay);
+				document.body.appendChild(modal);
+
+				const closeBtn = modal.querySelector(".modal-close");
+				const cancelBtn = modal.querySelector(".modal-cancel");
+				const shareBtn = modal.querySelector(".modal-share");
+				const copyBtn = modal.querySelector(".copy-link-btn");
+				const shareOptions = modal.querySelectorAll(".share-option");
+
+				closeBtn.addEventListener("click", closeModal);
+				cancelBtn.addEventListener("click", closeModal);
+				overlay.addEventListener("click", closeModal);
+
+				shareBtn.addEventListener("click", () => {
+					addNotification("success", "Dashboard shared successfully");
+					closeModal();
+				});
+
+				copyBtn.addEventListener("click", () => {
+					const linkInput = modal.querySelector(".share-link");
+					linkInput.select();
+					document.execCommand("copy");
+					copyBtn.textContent = "Copied!";
+					setTimeout(() => {
+						copyBtn.textContent = "Copy";
+					}, 2000);
+				});
+
+				shareOptions.forEach((option) => {
+					option.addEventListener("click", () => {
+						shareOptions.forEach((opt) => opt.classList.remove("selected"));
+						option.classList.add("selected");
+						const method = option.querySelector("span").textContent;
+						addNotification("info", `Share via ${method} selected`);
+					});
+				});
+
+				const style = document.createElement("style");
+				style.textContent = `
+                .modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    z-index: 1000;
+                }
+
+                .modal-content {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background-color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                    width: 500px;
+                    max-width: 90%;
+                    z-index: 1001;
+                    animation: modal-in 0.3s ease-out;
+                }
+
+                @keyframes modal-in {
+                    from { opacity: 0; transform: translate(-50%, -60%); }
+                    to { opacity: 1; transform: translate(-50%, -50%); }
+                }
+
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 16px 20px;
+                    border-bottom: 1px solid #e0e0e0;
+                }
+
+                .modal-header h3 {
+                    margin: 0;
+                    font-size: 18px;
+                }
+
+                .modal-close {
+                    background: none;
+                    border: none;
+                    font-size: 16px;
+                    cursor: pointer;
+                    color: #666;
+                }
+
+                .modal-body {
+                    padding: 20px;
+                }
+
+                .share-options {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 20px;
+                }
+
+                .share-option {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                .share-option:hover {
+                    background-color: #f0f4f9;
+                }
+
+                .share-option.selected {
+                    background-color: #e6f6ff;
+                    color: #00b8d9;
+                }
+
+                .share-option i {
+                    font-size: 24px;
+                }
+
+                .share-link-container {
+                    display: flex;
+                    margin-top: 16px;
+                }
+
+                .share-link {
+                    flex: 1;
+                    padding: 8px 12px;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 4px 0 0 4px;
+                    font-size: 14px;
+                }
+
+                .copy-link-btn {
+                    padding: 8px 12px;
+                    background-color: #f0f4f9;
+                    border: 1px solid #e0e0e0;
+                    border-left: none;
+                    border-radius: 0 4px 4px 0;
+                    cursor: pointer;
+                }
+
+                .modal-footer {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                    padding: 16px 20px;
+                    border-top: 1px solid #e0e0e0;
+                }
+            `;
+
+				document.head.appendChild(style);
+
+				function closeModal() {
+					document.body.removeChild(overlay);
+					document.body.removeChild(modal);
+					document.head.removeChild(style);
+				}
+			}
+
+			function fetchData() {
+				const newData = {
+					temperature: simulateSensorReading(15, 30, 1),
+					humidity: simulateSensorReading(20, 80, 0),
+					airQuality: simulateSensorReading(0, 150, 0),
+				};
+
+				currentData = newData;
+
+				updateUI(newData);
+
+				addToHistoricalData(newData);
+
+				checkAlerts(newData);
+
+				lastUpdatedTime.textContent = new Date().toLocaleTimeString();
+
+				updateChart();
+			}
+
+			function updateUI(data) {
+				updateMetric(
+					temperatureValue,
+					temperatureGauge,
+					temperatureStatus,
+					data.temperature,
+					settings.temperature.min,
+					settings.temperature.max,
+					0,
+					40
+				);
+
+				updateMetric(
+					humidityValue,
+					humidityGauge,
+					humidityStatus,
+					data.humidity,
+					settings.humidity.min,
+					settings.humidity.max,
+					0,
+					100
+				);
+
+				updateMetric(
+					airQualityValue,
+					airQualityGauge,
+					airQualityStatus,
+					data.airQuality,
+					0,
+					settings.airQuality.max,
+					0,
+					300,
+					true
+				);
+			}
+
+			function updateMetric(
+				valueElement,
+				gaugeElement,
+				statusElement,
+				value,
+				min,
+				max,
+				gaugeMin,
+				gaugeMax,
+				isInverted = false
+			) {
+				const oldValue = parseFloat(valueElement.textContent) || 0;
+
+				if (Math.abs(oldValue - value) > 0.5) {
+					valueElement.classList.add("updating");
+					setTimeout(() => valueElement.classList.remove("updating"), 500);
+				}
+
+				valueElement.textContent = value.toFixed(1);
+
+				const percentage = ((value - gaugeMin) / (gaugeMax - gaugeMin)) * 100;
+				gaugeElement.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+
+				let status, color, icon;
+
+				if (!isInverted) {
+					if (value < min) {
+						status = "Low";
+						color = "var(--warning-color)";
+						icon = "fa-exclamation-circle";
+					} else if (value > max) {
+						status = "High";
+						color = "var(--danger-color)";
+						icon = "fa-exclamation-triangle";
+					} else {
+						status = "Normal";
+						color = "var(--success-color)";
+						icon = "fa-check-circle";
+					}
+				} else {
+					if (value <= max / 2) {
+						status = "Good";
+						color = "var(--success-color)";
+						icon = "fa-check-circle";
+					} else if (value <= max) {
+						status = "Moderate";
+						color = "var(--warning-color)";
+						icon = "fa-exclamation-circle";
+					} else {
+						status = "Poor";
+						color = "var(--danger-color)";
+						icon = "fa-exclamation-triangle";
+					}
+				}
+
+				const currentStatus = statusElement.textContent
+					.trim()
+					.split(" ")
+					.slice(1)
+					.join(" ");
+				if (currentStatus !== status) {
+					statusElement.innerHTML = `<i class="fas ${icon}"></i> ${status}`;
+					statusElement.style.backgroundColor = color + "20";
+					statusElement.style.color = color;
+					gaugeElement.style.backgroundColor = color;
+				}
+
+				if (oldValue !== value) {
+					const metricCard = valueElement.closest(".metric-card");
+					const trendElement = metricCard.querySelector(".metric-trend");
+
+					const trend = value > oldValue;
+					const percentChange =
+						(Math.abs(oldValue - value) / Math.max(0.1, Math.abs(oldValue))) *
+						100;
+
+					const displayPercent = Math.min(
+						5,
+						Math.max(0.1, percentChange)
+					).toFixed(1);
+
+					if (trend) {
+						trendElement.classList.remove("down");
+						trendElement.classList.add("up");
+						trendElement.innerHTML = `<i class="fas fa-arrow-up"></i> ${displayPercent}%`;
+					} else {
+						trendElement.classList.remove("up");
+						trendElement.classList.add("down");
+						trendElement.innerHTML = `<i class="fas fa-arrow-down"></i> ${displayPercent}%`;
+					}
+				}
+			}
+
+			function checkAlerts(data) {
+				const alerts = [];
+
+				if (data.temperature < settings.temperature.min) {
+					alerts.push({
+						type: "warning",
+						message: `Temperature is low: ${data.temperature.toFixed(
+							1
+						)}°C (below ${settings.temperature.min}°C)`,
+					});
+				} else if (data.temperature > settings.temperature.max) {
+					alerts.push({
+						type: "danger",
+						message: `Temperature is high: ${data.temperature.toFixed(
+							1
+						)}°C (above ${settings.temperature.max}°C)`,
+					});
+				}
+
+				if (data.humidity < settings.humidity.min) {
+					alerts.push({
+						type: "warning",
+						message: `Humidity is low: ${data.humidity.toFixed(1)}% (below ${
+							settings.humidity.min
+						}%)`,
+					});
+				} else if (data.humidity > settings.humidity.max) {
+					alerts.push({
+						type: "danger",
+						message: `Humidity is high: ${data.humidity.toFixed(1)}% (above ${
+							settings.humidity.max
+						}%)`,
+					});
+				}
+
+				if (data.airQuality > settings.airQuality.max) {
+					alerts.push({
+						type: "danger",
+						message: `Air quality is poor: ${data.airQuality.toFixed(
+							1
+						)} AQI (above ${settings.airQuality.max} AQI)`,
+					});
+				}
+
+				if (alerts.length > 0) {
+					alerts.forEach((alert) => {
+						addNotification(alert.type, alert.message);
+					});
+				}
+			}
+
+			function addNotification(type, message) {
+				const notification = {
+					id: Date.now(),
+					type,
+					message,
+					timestamp: new Date(),
+				};
+
+				notifications.unshift(notification);
+
+				if (notifications.length > 50) {
+					notifications.pop();
+				}
+
+				notificationCount.textContent = notifications.length;
+
+				updateNotificationList();
+			}
+
+			function updateNotificationList() {
+				if (notifications.length === 0) {
+					notificationList.innerHTML = `
+                    <div class="empty-notification">
+                        <i class="far fa-bell-slash"></i>
+                        <span>No new notifications</span>
+                    </div>
+                `;
+					return;
+				}
+
+				notificationList.innerHTML = "";
+
+				notifications.forEach((notification) => {
+					const notificationItem = document.createElement("div");
+					notificationItem.className = `notification-item ${notification.type}`;
+
+					let icon = "fa-info-circle";
+					if (notification.type === "warning") {
+						icon = "fa-exclamation-circle";
+					} else if (notification.type === "danger") {
+						icon = "fa-exclamation-triangle";
+					} else if (notification.type === "success") {
+						icon = "fa-check-circle";
+					}
+
+					notificationItem.innerHTML = `
+                    <div class="notification-content">
+                        <i class="fas ${icon}"></i> ${notification.message}
+                        <span class="notification-time">${formatTimestamp(
+													notification.timestamp
+												)}</span>
+                    </div>
+                    <div class="notification-actions">
+                        <button class="notification-btn dismiss-btn">Dismiss</button>
+                    </div>
+                `;
+
+					notificationList.appendChild(notificationItem);
+
+					const dismissBtn = notificationItem.querySelector(".dismiss-btn");
+					dismissBtn.addEventListener("click", () => {
+						const index = notifications.findIndex(
+							(n) => n.id === notification.id
+						);
+						if (index !== -1) {
+							notifications.splice(index, 1);
+
+							notificationCount.textContent = notifications.length;
+
+							updateNotificationList();
+						}
+					});
+				});
+			}
+
+			function initializeChart() {
+				const ctx = document.getElementById("history-chart").getContext("2d");
+
+				chart = new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: [],
+						datasets: [
+							{
+								label: "Temperature (°C)",
+								data: [],
+								borderColor: "#e74c3c",
+								backgroundColor: "rgba(231, 76, 60, 0.1)",
+								tension: 0.4,
+								fill: true,
+							},
+							{
+								label: "Humidity (%)",
+								data: [],
+								borderColor: "#3498db",
+								backgroundColor: "rgba(52, 152, 219, 0.1)",
+								tension: 0.4,
+								fill: true,
+							},
+							{
+								label: "Air Quality (AQI)",
+								data: [],
+								borderColor: "#2ecc71",
+								backgroundColor: "rgba(46, 204, 113, 0.1)",
+								tension: 0.4,
+								fill: true,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						interaction: {
+							mode: "index",
+							intersect: false,
+						},
+						animation: {
+							duration: 1000,
+							easing: "easeOutQuad",
+						},
+						transitions: {
+							active: {
+								animation: {
+									duration: 400,
+								},
+							},
+						},
+						plugins: {
+							legend: {
+								position: "top",
+								labels: {
+									usePointStyle: true,
+									boxWidth: 6,
+								},
+							},
+							tooltip: {
+								backgroundColor: "rgba(0, 0, 0, 0.7)",
+								animation: {
+									duration: 150,
+								},
+							},
+						},
+						scales: {
+							x: {
+								grid: {
+									display: false,
+								},
+								ticks: {
+									maxRotation: 0,
+								},
+							},
+							y: {
+								beginAtZero: true,
+								grid: {
+									color: "rgba(0, 0, 0, 0.05)",
+								},
+							},
+						},
+					},
+				});
+
+				updateChart();
+			}
+
+			function updateChart() {
+				if (!chart) return;
+
+				const data = historicalData[currentTimeFrame];
+
+				chart.data.labels = data.map((entry) =>
+					formatChartTimestamp(entry.timestamp, currentTimeFrame)
+				);
+				chart.data.datasets[0].data = data.map((entry) => entry.temperature);
+				chart.data.datasets[1].data = data.map((entry) => entry.humidity);
+				chart.data.datasets[2].data = data.map((entry) => entry.airQuality);
+
+				chart.update({
+					duration: 800,
+					easing: "easeOutQuad",
+				});
+			}
+
+			function addToHistoricalData(data) {
+				const timestamp = new Date();
+				const entry = {
+					timestamp,
+					temperature: data.temperature,
+					humidity: data.humidity,
+					airQuality: data.airQuality,
+				};
+
+				historicalData.day.push(entry);
+				if (historicalData.day.length > 24) {
+					historicalData.day.shift();
+				}
+
+				if (timestamp.getHours() % 3 === 0 && timestamp.getMinutes() < 5) {
+					historicalData.week.push(entry);
+					if (historicalData.week.length > 56) {
+						historicalData.week.shift();
+					}
+				}
+
+				if (
+					(timestamp.getHours() === 0 || timestamp.getHours() === 12) &&
+					timestamp.getMinutes() < 5
+				) {
+					historicalData.month.push(entry);
+					if (historicalData.month.length > 60) {
+						historicalData.month.shift();
+					}
+				}
+			}
+
+			function generateHistoricalData(hours, interval = 1) {
+				const data = [];
+				const now = new Date();
+
+				let baseTemp = 22 + (Math.random() * 2 - 1);
+				let baseHumidity = 50 + (Math.random() * 10 - 5);
+				let baseAirQuality = 35 + (Math.random() * 10 - 5);
+
+				for (let i = hours - 1; i >= 0; i -= interval) {
+					const timestamp = new Date(now.getTime() - i * 60 * 60 * 1000);
+
+					const hour = timestamp.getHours();
+
+					let hourlyTempVariation = 0;
+					if (hour >= 6 && hour <= 18) {
+						hourlyTempVariation = 3 * Math.sin(((hour - 6) / 12) * Math.PI);
+					} else {
+						hourlyTempVariation = -1;
+					}
+
+					let hourlyHumidityVariation = 0;
+					if (hour >= 0 && hour <= 8) {
+						hourlyHumidityVariation = 10;
+					} else if (hour >= 12 && hour <= 16) {
+						hourlyHumidityVariation = -10;
+					}
+
+					let hourlyAirQualityVariation = 0;
+					if ((hour >= 7 && hour <= 9) || (hour >= 16 && hour <= 19)) {
+						hourlyAirQualityVariation = 20;
+					} else if (hour >= 1 && hour <= 5) {
+						hourlyAirQualityVariation = -15;
+					}
+
+					const tempRandom = Math.random() * 0.6 - 0.3;
+					const humidityRandom = Math.random() * 3 - 1.5;
+					const airQualityRandom = Math.random() * 5 - 2.5;
+
+					const temperature = Math.min(
+						30,
+						Math.max(15, baseTemp + hourlyTempVariation + tempRandom)
+					);
+					const humidity = Math.min(
+						80,
+						Math.max(
+							20,
+							baseHumidity + hourlyHumidityVariation + humidityRandom
+						)
+					);
+					const airQuality = Math.min(
+						150,
+						Math.max(
+							0,
+							baseAirQuality + hourlyAirQualityVariation + airQualityRandom
+						)
+					);
+
+					data.push({
+						timestamp,
+						temperature: Number(temperature.toFixed(1)),
+						humidity: Number(humidity.toFixed(1)),
+						airQuality: Math.round(airQuality),
+					});
+
+					baseTemp += Math.random() * 0.2 - 0.1;
+					baseHumidity += Math.random() * 0.4 - 0.2;
+					baseAirQuality += Math.random() * 0.6 - 0.3;
+				}
+
+				return data;
+			}
+
+			function simulateSensorReading(min, max, decimals = 0) {
+				if (currentData.temperature !== null) {
+					let currentValue;
+					let maxChange;
+
+					if (min === 15 && max === 30) {
+						currentValue = currentData.temperature;
+						maxChange = 0.5;
+					} else if (min === 20 && max === 80) {
+						currentValue = currentData.humidity;
+						maxChange = 3;
+					} else {
+						currentValue = currentData.airQuality;
+						maxChange = 5;
+					}
+
+					const change = (Math.random() * 2 - 1) * maxChange;
+					let newValue = currentValue + change;
+
+					newValue = Math.max(min, Math.min(max, newValue));
+
+					return Number(newValue.toFixed(decimals));
+				} else {
+					const value = Math.random() * (max - min) + min;
+					return Number(value.toFixed(decimals));
+				}
+			}
+
+			function updateDateTime() {
+				const now = new Date();
+				const dateTimeSpan = currentDatetime.querySelector("span");
+				dateTimeSpan.textContent = now.toLocaleString(undefined, {
+					weekday: "short",
+					year: "numeric",
+					month: "short",
+					day: "numeric",
+					hour: "2-digit",
+					minute: "2-digit",
+					second: "2-digit",
+				});
+			}
+
+			function formatTimestamp(timestamp) {
+				const now = new Date();
+				const diff = now - timestamp;
+
+				if (diff < 60000) {
+					return "Just now";
+				}
+
+				if (diff < 3600000) {
+					const minutes = Math.floor(diff / 60000);
+					return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+				}
+
+				if (diff < 86400000) {
+					const hours = Math.floor(diff / 3600000);
+					return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+				}
+
+				return timestamp.toLocaleDateString();
+			}
+
+			function formatChartTimestamp(timestamp, timeFrame) {
+				if (timeFrame === "day") {
+					return timestamp.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+					});
+				} else if (timeFrame === "week") {
+					return `${timestamp.toLocaleDateString([], {
+						weekday: "short",
+					})} ${timestamp.toLocaleTimeString([], { hour: "2-digit" })}`;
+				} else {
+					return timestamp.toLocaleDateString([], {
+						month: "short",
+						day: "numeric",
+					});
+				}
+			}
+
+			function startAutoRefresh() {
+				if (autoRefreshInterval) {
+					clearInterval(autoRefreshInterval);
+				}
+
+				autoRefreshInterval = setInterval(fetchData, 5 * 60 * 1000);
+			}
+
+			function stopAutoRefresh() {
+				if (autoRefreshInterval) {
+					clearInterval(autoRefreshInterval);
+					autoRefreshInterval = null;
+				}
+			}
+
+			function saveSettings() {
+				settings.temperature.min = parseFloat(
+					document.getElementById("temp-min").value
+				);
+				settings.temperature.max = parseFloat(
+					document.getElementById("temp-max").value
+				);
+				settings.humidity.min = parseFloat(
+					document.getElementById("humidity-min").value
+				);
+				settings.humidity.max = parseFloat(
+					document.getElementById("humidity-max").value
+				);
+				settings.airQuality.max = parseFloat(
+					document.getElementById("aqi-max").value
+				);
+
+				localStorage.setItem(
+					"smartHomeDashboardSettings",
+					JSON.stringify(settings)
+				);
+
+				updateUI(currentData);
+
+				const saveBtn = document.getElementById("save-settings");
+				saveBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+				saveBtn.style.backgroundColor = "var(--success-color)";
+
+				setTimeout(() => {
+					saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+					saveBtn.style.backgroundColor = "";
+				}, 2000);
+
+				addNotification("success", "Alert thresholds updated successfully");
+			}
+
+			function setupRangeSliders() {
+				const tempMinSlider = document.getElementById("temp-min");
+				const tempMinValue = document.getElementById("temp-min-value");
+				tempMinSlider.addEventListener("input", () => {
+					tempMinValue.textContent = `${tempMinSlider.value}°C`;
+				});
+
+				const tempMaxSlider = document.getElementById("temp-max");
+				const tempMaxValue = document.getElementById("temp-max-value");
+				tempMaxSlider.addEventListener("input", () => {
+					tempMaxValue.textContent = `${tempMaxSlider.value}°C`;
+				});
+
+				const humidityMinSlider = document.getElementById("humidity-min");
+				const humidityMinValue = document.getElementById("humidity-min-value");
+				humidityMinSlider.addEventListener("input", () => {
+					humidityMinValue.textContent = `${humidityMinSlider.value}%`;
+				});
+
+				const humidityMaxSlider = document.getElementById("humidity-max");
+				const humidityMaxValue = document.getElementById("humidity-max-value");
+				humidityMaxSlider.addEventListener("input", () => {
+					humidityMaxValue.textContent = `${humidityMaxSlider.value}%`;
+				});
+
+				const aqiMaxSlider = document.getElementById("aqi-max");
+				const aqiMaxValue = document.getElementById("aqi-max-value");
+				aqiMaxSlider.addEventListener("input", () => {
+					aqiMaxValue.textContent = `${aqiMaxSlider.value} AQI`;
+				});
+			}
+
+			function setupExportButton() {
+				const exportBtn = document.getElementById("export-metrics");
+				exportBtn.addEventListener("click", () => {
+					const csvContent =
+						"data:text/csv;charset=utf-8," +
+						"Metric,Value,Unit,Status\n" +
+						`Temperature,${currentData.temperature},°C,${
+							document.getElementById("temperature-status").textContent
+						}\n` +
+						`Humidity,${currentData.humidity},%,${
+							document.getElementById("humidity-status").textContent
+						}\n` +
+						`Air Quality,${currentData.airQuality},AQI,${
+							document.getElementById("air-quality-status").textContent
+						}`;
+
+					const encodedUri = encodeURI(csvContent);
+					const link = document.createElement("a");
+					link.setAttribute("href", encodedUri);
+					link.setAttribute(
+						"download",
+						`smart-home-metrics-${new Date().toISOString().split("T")[0]}.csv`
+					);
+					document.body.appendChild(link);
+
+					link.click();
+					document.body.removeChild(link);
+
+					addNotification("success", "Metrics exported successfully");
+				});
+
+				document.querySelectorAll(".chart-action-btn").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						if (this.title === "Download CSV") {
+							downloadChartData();
+						} else if (this.title === "Download Image") {
+							downloadChartImage();
+						} else if (this.title === "Fullscreen") {
+							toggleChartFullscreen();
+						}
+					});
+				});
+			}
+
+			function downloadChartData() {
+				const data = historicalData[currentTimeFrame];
+				let csvContent =
+					"data:text/csv;charset=utf-8,Timestamp,Temperature,Humidity,Air Quality\n";
+
+				data.forEach((entry) => {
+					csvContent += `${entry.timestamp.toISOString()},${
+						entry.temperature
+					},${entry.humidity},${entry.airQuality}\n`;
+				});
+
+				const encodedUri = encodeURI(csvContent);
+				const link = document.createElement("a");
+				link.setAttribute("href", encodedUri);
+				link.setAttribute(
+					"download",
+					`smart-home-historical-data-${currentTimeFrame}-${
+						new Date().toISOString().split("T")[0]
+					}.csv`
+				);
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+
+				addNotification("success", "Historical data exported successfully");
+			}
+
+			function downloadChartImage() {
+				const canvas = document.getElementById("history-chart");
+				const image = canvas.toDataURL("image/png");
+				const link = document.createElement("a");
+				link.setAttribute("href", image);
+				link.setAttribute(
+					"download",
+					`smart-home-chart-${currentTimeFrame}-${
+						new Date().toISOString().split("T")[0]
+					}.png`
+				);
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+
+				addNotification("success", "Chart image saved successfully");
+			}
+
+			function toggleChartFullscreen() {
+				const chartContainer = document.querySelector(".history-container");
+
+				if (!document.fullscreenElement) {
+					if (chartContainer.requestFullscreen) {
+						chartContainer.requestFullscreen();
+					} else if (chartContainer.webkitRequestFullscreen) {
+						chartContainer.webkitRequestFullscreen();
+					} else if (chartContainer.msRequestFullscreen) {
+						chartContainer.msRequestFullscreen();
+					}
+				} else {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					} else if (document.webkitExitFullscreen) {
+						document.webkitExitFullscreen();
+					} else if (document.msExitFullscreen) {
+						document.msExitFullscreen();
+					}
+				}
+			}
+
+			function loadSettings() {
+				const savedSettings = localStorage.getItem(
+					"smartHomeDashboardSettings"
+				);
+
+				if (savedSettings) {
+					settings = JSON.parse(savedSettings);
+
+					document.getElementById("temp-min").value = settings.temperature.min;
+					document.getElementById("temp-max").value = settings.temperature.max;
+					document.getElementById("humidity-min").value = settings.humidity.min;
+					document.getElementById("humidity-max").value = settings.humidity.max;
+					document.getElementById("aqi-max").value = settings.airQuality.max;
+
+					document.getElementById(
+						"temp-min-value"
+					).textContent = `${settings.temperature.min}°C`;
+					document.getElementById(
+						"temp-max-value"
+					).textContent = `${settings.temperature.max}°C`;
+					document.getElementById(
+						"humidity-min-value"
+					).textContent = `${settings.humidity.min}%`;
+					document.getElementById(
+						"humidity-max-value"
+					).textContent = `${settings.humidity.max}%`;
+					document.getElementById(
+						"aqi-max-value"
+					).textContent = `${settings.airQuality.max} AQI`;
+				}
+			}
+		</script>
+	</body>
+</html>
