@@ -1,0 +1,2365 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>NetSense - Network Monitoring Suite</title>
+
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: "#e0e5ec",
+							"primary-light": "#ffffff",
+							"primary-dark": "#c2c9d6",
+							accent: "#4299e1",
+							"accent-dark": "#4299e1",
+							danger: "#e53e3e",
+							success: "#38a169",
+							warning: "#ed8936",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			body {
+				background-color: #e0e5ec;
+				transition: all 0.3s ease;
+				overflow-x: hidden;
+			}
+
+			.neumorph {
+				border-radius: 16px;
+				background: #e0e5ec;
+				box-shadow: 6px 6px 12px #c2c9d6, -6px -6px 12px #ffffff;
+				transition: all 0.3s ease;
+			}
+
+			.neumorph-inset {
+				border-radius: 16px;
+				background: #e0e5ec;
+				box-shadow: inset 6px 6px 12px #c2c9d6, inset -6px -6px 12px #ffffff;
+				transition: all 0.3s ease;
+			}
+
+			.neumorph-circle {
+				border-radius: 50%;
+				background: #e0e5ec;
+				box-shadow: 6px 6px 12px #c2c9d6, -6px -6px 12px #ffffff;
+				transition: all 0.3s ease;
+			}
+
+			.neumorph-circle:active {
+				box-shadow: inset 6px 6px 12px #c2c9d6, inset -6px -6px 12px #ffffff;
+			}
+
+			.neumorph:hover,
+			.neumorph-circle:hover {
+				transform: translateY(-2px);
+				box-shadow: 8px 8px 16px #c2c9d6, -8px -8px 16px #ffffff;
+			}
+
+			.neumorph-btn {
+				border-radius: 8px;
+				background: #e0e5ec;
+				box-shadow: 4px 4px 8px #c2c9d6, -4px -4px 8px #ffffff;
+				transition: all 0.3s ease;
+			}
+
+			.neumorph-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: 6px 6px 10px #c2c9d6, -6px -6px 10px #ffffff;
+			}
+
+			.neumorph-btn:active {
+				box-shadow: inset 4px 4px 8px #c2c9d6, inset -4px -4px 8px #ffffff;
+				transform: translateY(0);
+			}
+
+			.neumorph-tab {
+				border-radius: 8px 8px 0 0;
+				background: #e0e5ec;
+				box-shadow: 4px 4px 8px #c2c9d6, -4px -4px 8px #ffffff;
+				transition: all 0.3s ease;
+			}
+
+			.active-tab {
+				box-shadow: inset 4px 4px 8px #c2c9d6, inset -4px -4px 8px #ffffff;
+				background: #e8ecf3;
+			}
+
+			.notification {
+				animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
+			}
+
+			@keyframes slideIn {
+				from {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeOut {
+				from {
+					opacity: 1;
+				}
+				to {
+					opacity: 0;
+				}
+			}
+
+			.connection-toast {
+				transform: translateY(-100%);
+				transition: transform 0.5s ease;
+			}
+
+			.connection-toast.show {
+				transform: translateY(0);
+			}
+
+			.notification-container {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: 1000;
+				max-width: calc(100% - 40px);
+			}
+
+			.mobile-menu {
+				display: none;
+			}
+
+			.mobile-menu.open {
+				display: block;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			.pulse {
+				animation: pulse 2s infinite;
+			}
+
+			.page {
+				display: none;
+			}
+
+			.page.active {
+				display: block;
+			}
+
+			.slide-in {
+				animation: slideInFromRight 0.3s forwards;
+			}
+
+			@keyframes slideInFromRight {
+				from {
+					transform: translateX(30px);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			.signal-bar {
+				height: 8px;
+				border-radius: 4px;
+				margin: 0 1px;
+				background-color: #cbd5e0;
+				transition: background-color 0.3s ease;
+			}
+
+			.signal-bar.active {
+				background-color: #4299e1;
+			}
+
+			.theme-switch {
+				position: relative;
+				width: 60px;
+				height: 30px;
+			}
+
+			.theme-switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: #c2c9d6;
+				transition: 0.4s;
+				border-radius: 34px;
+			}
+
+			.slider:before {
+				position: absolute;
+				content: "";
+				height: 22px;
+				width: 22px;
+				left: 4px;
+				bottom: 4px;
+				background-color: white;
+				transition: 0.4s;
+				border-radius: 50%;
+			}
+
+			input:checked + .slider {
+				background-color: #4299e1;
+			}
+
+			input:checked + .slider:before {
+				transform: translateX(30px);
+			}
+
+			body.dark-theme {
+				background-color: #1a202c;
+				color: #e2e8f0;
+			}
+
+			body.dark-theme .neumorph {
+				background: #2d3748;
+				box-shadow: 6px 6px 12px #1a1f2c, -6px -6px 12px #3a4860;
+			}
+
+			body.dark-theme .neumorph-inset {
+				background: #2d3748;
+				box-shadow: inset 6px 6px 12px #1a1f2c, inset -6px -6px 12px #3a4860;
+			}
+
+			body.dark-theme .neumorph-circle {
+				background: #2d3748;
+				box-shadow: 6px 6px 12px #1a1f2c, -6px -6px 12px #3a4860;
+			}
+
+			body.dark-theme .neumorph-circle:active {
+				box-shadow: inset 6px 6px 12px #1a1f2c, inset -6px -6px 12px #3a4860;
+			}
+
+			body.dark-theme .neumorph:hover,
+			body.dark-theme .neumorph-circle:hover {
+				box-shadow: 8px 8px 16px #1a1f2c, -8px -8px 16px #3a4860;
+			}
+
+			body.dark-theme .neumorph-btn {
+				background: #2d3748;
+				box-shadow: 4px 4px 8px #1a1f2c, -4px -4px 8px #3a4860;
+			}
+
+			body.dark-theme .neumorph-btn:hover {
+				box-shadow: 6px 6px 10px #1a1f2c, -6px -6px 10px #3a4860;
+			}
+
+			body.dark-theme .neumorph-btn:active {
+				box-shadow: inset 4px 4px 8px #1a1f2c, inset -4px -4px 8px #3a4860;
+			}
+
+			body.dark-theme .neumorph-tab {
+				background: #2d3748;
+				box-shadow: 4px 4px 8px #1a1f2c, -4px -4px 8px #3a4860;
+			}
+
+			body.dark-theme .active-tab {
+				box-shadow: inset 4px 4px 8px #1a1f2c, inset -4px -4px 8px #3a4860;
+				background: #2a3141;
+			}
+
+			body.dark-theme .text-gray-700 {
+				color: #e2e8f0;
+			}
+
+			body.dark-theme .text-gray-600 {
+				color: #cbd5e0;
+			}
+
+			body.dark-theme .signal-bar {
+				background-color: #4a5568;
+			}
+
+			.loader {
+				border: 4px solid rgba(0, 0, 0, 0.1);
+				border-radius: 50%;
+				border-top: 4px solid #4299e1;
+				width: 30px;
+				height: 30px;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.custom-icon {
+				position: relative;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 24px;
+				height: 24px;
+			}
+
+			.icon-share {
+				position: relative;
+				width: 12px;
+				height: 12px;
+				border: 2px solid currentColor;
+				border-radius: 50%;
+			}
+
+			.icon-share:before {
+				content: "";
+				position: absolute;
+				top: 9px;
+				left: 5px;
+				width: 10px;
+				height: 2px;
+				background-color: currentColor;
+				transform: rotate(45deg);
+			}
+
+			.icon-share:after {
+				content: "";
+				position: absolute;
+				top: 9px;
+				left: -3px;
+				width: 10px;
+				height: 2px;
+				background-color: currentColor;
+				transform: rotate(-45deg);
+			}
+
+			.icon-message {
+				position: relative;
+				width: 16px;
+				height: 12px;
+				border: 2px solid currentColor;
+				border-radius: 3px;
+			}
+
+			.icon-message:after {
+				content: "";
+				position: absolute;
+				bottom: -5px;
+				left: 2px;
+				width: 6px;
+				height: 6px;
+				background-color: currentColor;
+				clip-path: polygon(0 0, 100% 0, 50% 100%);
+			}
+
+			.icon-globe {
+				position: relative;
+				width: 16px;
+				height: 16px;
+				border: 2px solid currentColor;
+				border-radius: 50%;
+			}
+
+			.icon-globe:before {
+				content: "";
+				position: absolute;
+				top: 2px;
+				left: 5px;
+				width: 2px;
+				height: 8px;
+				background-color: currentColor;
+				border-radius: 1px;
+			}
+
+			.icon-globe:after {
+				content: "";
+				position: absolute;
+				top: 5px;
+				left: 2px;
+				width: 8px;
+				height: 2px;
+				background-color: currentColor;
+				border-radius: 1px;
+			}
+
+			.tooltip {
+				position: relative;
+				display: inline-block;
+			}
+
+			.tooltip .tooltip-text {
+				visibility: hidden;
+				width: 120px;
+				background-color: rgba(0, 0, 0, 0.8);
+				color: #fff;
+				text-align: center;
+				border-radius: 6px;
+				padding: 5px;
+				position: absolute;
+				z-index: 1;
+				bottom: 125%;
+				left: 50%;
+				margin-left: -60px;
+				opacity: 0;
+				transition: opacity 0.3s;
+			}
+
+			.tooltip:hover .tooltip-text {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			.widget-appear {
+				animation: widgetAppear 0.5s forwards;
+			}
+
+			@keyframes widgetAppear {
+				from {
+					transform: scale(0.8);
+					opacity: 0;
+				}
+				to {
+					transform: scale(1);
+					opacity: 1;
+				}
+			}
+
+			.switch {
+				position: relative;
+				display: inline-block;
+				width: 44px;
+				height: 22px;
+			}
+
+			.switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.switch-slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: #c2c9d6;
+				transition: 0.4s;
+				border-radius: 22px;
+			}
+
+			.switch-slider:before {
+				position: absolute;
+				content: "";
+				height: 16px;
+				width: 16px;
+				left: 3px;
+				bottom: 3px;
+				background-color: white;
+				transition: 0.4s;
+				border-radius: 50%;
+			}
+
+			input:checked + .switch-slider {
+				background-color: #4299e1;
+			}
+
+			input:checked + .switch-slider:before {
+				transform: translateX(22px);
+			}
+		</style>
+	</head>
+	<body class="min-h-screen flex flex-col">
+		<div
+			id="connectionToast"
+			class="connection-toast fixed top-0 left-0 w-full bg-danger text-white py-3 px-4 z-50 flex items-center justify-center text-center shadow-lg"
+		>
+			<svg
+				class="w-5 h-5 mr-2"
+				fill="none"
+				stroke="currentColor"
+				viewBox="0 0 24 24"
+				xmlns="http://www.w3.org/2000/svg"
+			>
+				<path
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="2"
+					d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+				></path>
+			</svg>
+			<span>Connection lost. Please check your network.</span>
+		</div>
+
+		<div
+			id="settingsPanel"
+			class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden"
+		>
+			<div class="neumorph p-6 max-w-md w-full mx-4">
+				<div class="flex justify-between items-center mb-6">
+					<h3 class="text-xl font-bold text-gray-700">Settings</h3>
+					<button
+						id="closeSettings"
+						class="neumorph-circle h-8 w-8 flex items-center justify-center"
+					>
+						<svg
+							class="w-5 h-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							></path>
+						</svg>
+					</button>
+				</div>
+
+				<div class="neumorph-inset p-4 mb-4">
+					<div class="flex justify-between items-center mb-4">
+						<span class="text-gray-700">Dark Mode</span>
+						<label class="switch">
+							<input type="checkbox" id="themeToggle" />
+							<span class="switch-slider"></span>
+						</label>
+					</div>
+
+					<div class="flex justify-between items-center mb-4">
+						<span class="text-gray-700">Notifications</span>
+						<label class="switch">
+							<input type="checkbox" id="notificationsToggle" checked />
+							<span class="switch-slider"></span>
+						</label>
+					</div>
+
+					<div class="flex justify-between items-center mb-4">
+						<span class="text-gray-700">Auto-Refresh</span>
+						<label class="switch">
+							<input type="checkbox" id="autoRefreshToggle" checked />
+							<span class="switch-slider"></span>
+						</label>
+					</div>
+
+					<div class="mb-4">
+						<label class="block text-gray-700 mb-2">Refresh Interval</label>
+						<div class="neumorph-inset p-2">
+							<input
+								type="range"
+								id="refreshInterval"
+								min="5"
+								max="60"
+								value="10"
+								class="w-full cursor-pointer"
+							/>
+							<div class="flex justify-between text-sm text-gray-600 mt-1">
+								<span>5s</span>
+								<span id="intervalValue">10s</span>
+								<span>60s</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<button
+					id="saveSettings"
+					class="neumorph-btn w-full py-2 text-accent font-bold"
+				>
+					Save Settings
+				</button>
+			</div>
+		</div>
+
+		<header class="neumorph p-4 m-4 mb-2">
+			<div
+				class="container mx-auto flex flex-col sm:flex-row items-center justify-between"
+			>
+				<div
+					class="flex items-center mb-4 sm:mb-0 justify-between w-full sm:w-auto"
+				>
+					<div class="flex items-center">
+						<div
+							class="neumorph-circle h-10 w-10 flex items-center justify-center mr-3"
+						>
+							<svg
+								class="w-6 h-6 text-accent"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+								></path>
+							</svg>
+						</div>
+						<h1 class="text-xl font-bold text-gray-700">NetSense</h1>
+					</div>
+
+					<button
+						id="menuToggle"
+						class="neumorph-circle h-10 w-10 flex items-center justify-center sm:hidden"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 6h16M4 12h16m-7 6h7"
+							></path>
+						</svg>
+					</button>
+				</div>
+
+				<nav class="hidden sm:block">
+					<ul class="flex space-x-4">
+						<li>
+							<a
+								href="#"
+								class="nav-link neumorph-btn px-4 py-2 text-gray-700 inline-block hover:shadow-neumorph-accent"
+								data-page="home"
+								>Dashboard</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="nav-link neumorph-btn px-4 py-2 text-gray-700 inline-block hover:shadow-neumorph-accent"
+								data-page="features"
+								>Features</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="nav-link neumorph-btn px-4 py-2 text-gray-700 inline-block hover:shadow-neumorph-accent"
+								data-page="about"
+								>About</a
+							>
+						</li>
+						<li>
+							<button
+								id="settingsBtn"
+								class="neumorph-btn px-4 py-2 text-gray-700 inline-block hover:shadow-neumorph-accent"
+							>
+								<svg
+									class="w-5 h-5 inline-block"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+									></path>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+									></path>
+								</svg>
+							</button>
+						</li>
+					</ul>
+				</nav>
+
+				<nav id="mobileMenu" class="mobile-menu w-full">
+					<ul class="flex flex-col space-y-2">
+						<li>
+							<a
+								href="#"
+								class="nav-link neumorph-btn px-4 py-2 text-gray-700 block text-center hover:shadow-neumorph-accent"
+								data-page="home"
+								>Dashboard</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="nav-link neumorph-btn px-4 py-2 text-gray-700 block text-center hover:shadow-neumorph-accent"
+								data-page="features"
+								>Features</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="nav-link neumorph-btn px-4 py-2 text-gray-700 block text-center hover:shadow-neumorph-accent"
+								data-page="about"
+								>About</a
+							>
+						</li>
+						<li>
+							<button
+								id="mobileSettingsBtn"
+								class="neumorph-btn px-4 py-2 text-gray-700 block text-center w-full hover:shadow-neumorph-accent"
+							>
+								Settings
+							</button>
+						</li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+
+		<main class="flex-grow container mx-auto p-4">
+			<section id="homePage" class="page active slide-in">
+				<div class="neumorph p-6 mb-6">
+					<div class="flex justify-between items-center mb-4">
+						<h2 class="text-2xl font-bold text-gray-700">Network Dashboard</h2>
+					</div>
+
+					<p class="text-gray-600 mb-6">
+						Track your device's connection status in real-time with our advanced
+						monitoring system.
+					</p>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<div class="neumorph p-5 widget-appear" style="animation-delay: 0s">
+							<h3 class="text-lg font-bold text-gray-700 mb-3">
+								Connection Status
+							</h3>
+							<div class="neumorph-inset p-5 flex items-center">
+								<div
+									id="statusIndicator"
+									class="h-5 w-5 rounded-full bg-green-500 mr-3"
+								></div>
+								<span id="connectionStatus" class="text-gray-700 text-lg"
+									>Connected</span
+								>
+							</div>
+							<div class="mt-4 text-center">
+								<span class="text-sm text-gray-600"
+									>Last checked: <span id="lastChecked">Just now</span></span
+								>
+							</div>
+						</div>
+
+						<div
+							class="neumorph p-5 widget-appear"
+							style="animation-delay: 0.1s"
+						>
+							<h3 class="text-lg font-bold text-gray-700 mb-3">
+								Network Strength
+							</h3>
+							<div class="neumorph-inset p-5">
+								<div class="flex flex-col items-center">
+									<div class="flex items-center mb-2">
+										<svg
+											class="w-5 h-5 text-accent mr-2"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+											></path>
+										</svg>
+										<span
+											id="wifiStrengthText"
+											class="text-gray-700 font-semibold"
+											>Excellent</span
+										>
+									</div>
+
+									<div class="w-full flex items-center justify-between mt-2">
+										<span class="text-xs text-gray-600">Low</span>
+										<div class="flex flex-grow mx-2" id="signalStrengthBars">
+											<div class="signal-bar flex-1 active"></div>
+											<div class="signal-bar flex-1 active"></div>
+											<div class="signal-bar flex-1 active"></div>
+											<div class="signal-bar flex-1 active"></div>
+										</div>
+										<span class="text-xs text-gray-600">High</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="neumorph p-5 widget-appear"
+							style="animation-delay: 0.2s"
+						>
+							<h3 class="text-lg font-bold text-gray-700 mb-3">Power Status</h3>
+							<div class="flex flex-col items-center justify-center">
+								<div
+									class="relative w-full h-12 mb-3 neumorph-inset rounded-lg p-2"
+								>
+									<div
+										class="absolute left-1 top-1 bottom-1 neumorph rounded-md"
+										id="batteryLevel"
+										style="width: 70%"
+									></div>
+									<div
+										class="absolute right-[-5px] top-3 bottom-3 w-3 neumorph rounded-r-md"
+									></div>
+								</div>
+								<div class="text-center">
+									<div class="text-xl font-bold mb-1" id="batteryPercentage">
+										70%
+									</div>
+									<div class="text-sm text-gray-600">
+										<span id="chargingStatus">Not charging</span> •
+										<span id="batterySaver">Saver: Off</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+						<div
+							class="neumorph p-4 widget-appear"
+							style="animation-delay: 0.3s"
+						>
+							<h3 class="text-lg font-bold text-gray-700 mb-3">
+								Connection Analytics
+							</h3>
+							<div class="neumorph-inset p-3">
+								<!-- Using flex instead of grid for better small screen support -->
+								<div class="flex flex-wrap -mx-2">
+									<!-- Uptime -->
+									<div class="w-full sm:w-1/2 p-2">
+										<div
+											class="neumorph p-2 rounded-lg flex items-center justify-between"
+										>
+											<div>
+												<div class="text-xs text-gray-600 mb-1">Uptime</div>
+												<div class="text-xl font-bold text-success" id="uptime">
+													99.8%
+												</div>
+											</div>
+											<svg
+												class="w-5 h-5 text-success ml-2"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M5 13l4 4L19 7"
+												></path>
+											</svg>
+										</div>
+									</div>
+
+									<!-- Response Time -->
+									<div class="w-full sm:w-1/2 p-2">
+										<div
+											class="neumorph p-2 rounded-lg flex items-center justify-between"
+										>
+											<div>
+												<div class="text-xs text-gray-600 mb-1">Response</div>
+												<div
+													class="text-xl font-bold text-accent"
+													id="responseTime"
+												>
+													28ms
+												</div>
+											</div>
+											<svg
+												class="w-5 h-5 text-accent ml-2"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+												></path>
+											</svg>
+										</div>
+									</div>
+
+									<!-- Disconnects -->
+									<div class="w-full sm:w-1/2 p-2">
+										<div
+											class="neumorph p-2 rounded-lg flex items-center justify-between"
+										>
+											<div>
+												<div class="text-xs text-gray-600 mb-1">
+													Disconnects
+												</div>
+												<div
+													class="text-xl font-bold text-warning"
+													id="disconnects"
+												>
+													2
+												</div>
+											</div>
+											<svg
+												class="w-5 h-5 text-warning ml-2"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+												></path>
+											</svg>
+										</div>
+									</div>
+
+									<!-- Data Usage -->
+									<div class="w-full sm:w-1/2 p-2">
+										<div
+											class="neumorph p-2 rounded-lg flex items-center justify-between"
+										>
+											<div>
+												<div class="text-xs text-gray-600 mb-1">Data Usage</div>
+												<div
+													class="text-xl font-bold text-accent"
+													id="dataUsage"
+												>
+													1.2GB
+												</div>
+											</div>
+											<svg
+												class="w-5 h-5 text-accent ml-2"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+												xmlns="http://www.w3.org/2000/svg"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+												></path>
+											</svg>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="neumorph p-5 widget-appear"
+							style="animation-delay: 0.4s"
+						>
+							<h3 class="text-lg font-bold text-gray-700 mb-3">
+								Network Troubleshooter
+							</h3>
+							<div class="neumorph-inset p-4">
+								<p class="text-gray-600 mb-3">
+									Experiencing connection issues? Try these steps:
+								</p>
+								<ol class="text-gray-700 pl-5 list-decimal">
+									<li class="mb-2">Check your Wi-Fi or Ethernet connection</li>
+									<li class="mb-2">Restart your router and modem</li>
+									<li class="mb-2">Try connecting to a different network</li>
+									<li class="mb-2">Check for system updates</li>
+								</ol>
+								<button
+									id="runDiagnostics"
+									class="neumorph-btn w-full py-2 mt-4 text-accent"
+								>
+									Run Diagnostics
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="featuresPage" class="page slide-in">
+				<div class="neumorph p-6 mb-6">
+					<h2 class="text-2xl font-bold text-gray-700 mb-4">Key Features</h2>
+					<p class="text-gray-600 mb-6">
+						Discover the powerful capabilities of NetSense that help you
+						maintain optimal network connectivity.
+					</p>
+
+					<div
+						class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
+					>
+						<div
+							class="neumorph p-5 hover:transform hover:scale-105 transition-transform"
+						>
+							<div
+								class="neumorph-circle h-14 w-14 flex items-center justify-center mx-auto mb-4"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-gray-700 text-center mb-2">
+								Real-Time Alerts
+							</h3>
+							<p class="text-gray-600 text-center">
+								Get notified immediately when your connection status changes,
+								with visual and optional sound alerts.
+							</p>
+						</div>
+
+						<div
+							class="neumorph p-5 hover:transform hover:scale-105 transition-transform"
+						>
+							<div
+								class="neumorph-circle h-14 w-14 flex items-center justify-center mx-auto mb-4"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-gray-700 text-center mb-2">
+								Network Analytics
+							</h3>
+							<p class="text-gray-600 text-center">
+								Track your connection quality with detailed performance metrics
+								and status monitoring.
+							</p>
+						</div>
+
+						<div
+							class="neumorph p-5 hover:transform hover:scale-105 transition-transform"
+						>
+							<div
+								class="neumorph-circle h-14 w-14 flex items-center justify-center mx-auto mb-4"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-gray-700 text-center mb-2">
+								Uptime Monitoring
+							</h3>
+							<p class="text-gray-600 text-center">
+								Keep track of your network reliability with detailed uptime
+								statistics and disconnection logs.
+							</p>
+						</div>
+
+						<div
+							class="neumorph p-5 hover:transform hover:scale-105 transition-transform"
+						>
+							<div
+								class="neumorph-circle h-14 w-14 flex items-center justify-center mx-auto mb-4"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-gray-700 text-center mb-2">
+								Device Monitoring
+							</h3>
+							<p class="text-gray-600 text-center">
+								View comprehensive information about your device's network and
+								power status in one place.
+							</p>
+						</div>
+
+						<div
+							class="neumorph p-5 hover:transform hover:scale-105 transition-transform"
+						>
+							<div
+								class="neumorph-circle h-14 w-14 flex items-center justify-center mx-auto mb-4"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-gray-700 text-center mb-2">
+								API Integration
+							</h3>
+							<p class="text-gray-600 text-center">
+								Connect NetSense with your other applications and services using
+								our robust API system.
+							</p>
+						</div>
+
+						<div
+							class="neumorph p-5 hover:transform hover:scale-105 transition-transform"
+						>
+							<div
+								class="neumorph-circle h-14 w-14 flex items-center justify-center mx-auto mb-4"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-bold text-gray-700 text-center mb-2">
+								Speed Testing
+							</h3>
+							<p class="text-gray-600 text-center">
+								Measure your connection speed with our built-in testing tool
+								that provides accurate download and upload metrics.
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="neumorph p-6">
+					<h2 class="text-2xl font-bold text-gray-700 mb-4">Speed Test</h2>
+					<p class="text-gray-600 mb-6">
+						Test your current connection speed to ensure optimal performance.
+					</p>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+						<div class="neumorph-inset p-5">
+							<div class="text-center">
+								<h3 class="text-lg font-bold text-gray-700 mb-3">Download</h3>
+								<div
+									class="text-3xl font-bold text-gray-700 mb-1"
+									id="downloadSpeed"
+								>
+									0 Mbps
+								</div>
+								<div class="text-sm text-gray-600">Speed</div>
+							</div>
+						</div>
+
+						<div class="neumorph-inset p-5">
+							<div class="text-center">
+								<h3 class="text-lg font-bold text-gray-700 mb-3">Upload</h3>
+								<div
+									class="text-3xl font-bold text-gray-700 mb-1"
+									id="uploadSpeed"
+								>
+									0 Mbps
+								</div>
+								<div class="text-sm text-gray-600">Speed</div>
+							</div>
+						</div>
+
+						<div class="neumorph-inset p-5">
+							<div class="text-center">
+								<h3 class="text-lg font-bold text-gray-700 mb-3">Ping</h3>
+								<div
+									class="text-3xl font-bold text-gray-700 mb-1"
+									id="pingTime"
+								>
+									0 ms
+								</div>
+								<div class="text-sm text-gray-600">Latency</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-6 text-center">
+						<button
+							id="runSpeedTest"
+							class="neumorph-btn px-6 py-3 text-accent font-bold"
+						>
+							Start Speed Test
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<section id="aboutPage" class="page slide-in">
+				<div class="neumorph p-6 mb-6">
+					<h2 class="text-2xl font-bold text-gray-700 mb-4">About NetSense</h2>
+					<div class="neumorph-inset p-5 mb-6">
+						<p class="text-gray-600 mb-4">
+							NetSense is a powerful network monitoring tool designed to provide
+							real-time insights into your connection status and performance
+							metrics. Our platform helps you stay informed about your network
+							health and quickly identify and resolve connectivity issues.
+						</p>
+						<p class="text-gray-600">
+							Founded in 2023, NetSense has quickly become the trusted solution
+							for individuals and businesses who need reliable network
+							monitoring. Our team of networking experts and developers work
+							tirelessly to create innovative features that make network
+							management simple and effective.
+						</p>
+					</div>
+
+					<h3 class="text-xl font-bold text-gray-700 mb-4">Our Mission</h3>
+					<div class="neumorph-inset p-5 mb-6">
+						<p class="text-gray-600">
+							We believe that everyone should have access to tools that help
+							them understand and optimize their network connections. Our
+							mission is to demystify network technology and empower users with
+							clear, actionable information about their connectivity.
+						</p>
+					</div>
+
+					<h3 class="text-xl font-bold text-gray-700 mb-4">The Team</h3>
+					<div
+						class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"
+					>
+						<div class="neumorph p-5 text-center">
+							<div
+								class="neumorph-circle h-24 w-24 mx-auto mb-4 flex items-center justify-center"
+							>
+								<svg
+									class="w-12 h-12 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									></path>
+								</svg>
+							</div>
+							<h4 class="text-lg font-bold text-gray-700">Alex Chen</h4>
+							<p class="text-gray-600">Founder & CEO</p>
+						</div>
+
+						<div class="neumorph p-5 text-center">
+							<div
+								class="neumorph-circle h-24 w-24 mx-auto mb-4 flex items-center justify-center"
+							>
+								<svg
+									class="w-12 h-12 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									></path>
+								</svg>
+							</div>
+							<h4 class="text-lg font-bold text-gray-700">Sarah Johnson</h4>
+							<p class="text-gray-600">CTO</p>
+						</div>
+
+						<div class="neumorph p-5 text-center">
+							<div
+								class="neumorph-circle h-24 w-24 mx-auto mb-4 flex items-center justify-center"
+							>
+								<svg
+									class="w-12 h-12 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									></path>
+								</svg>
+							</div>
+							<h4 class="text-lg font-bold text-gray-700">Michael Torres</h4>
+							<p class="text-gray-600">Lead Developer</p>
+						</div>
+
+						<div class="neumorph p-5 text-center">
+							<div
+								class="neumorph-circle h-24 w-24 mx-auto mb-4 flex items-center justify-center"
+							>
+								<svg
+									class="w-12 h-12 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+									></path>
+								</svg>
+							</div>
+							<h4 class="text-lg font-bold text-gray-700">Priya Patel</h4>
+							<p class="text-gray-600">UX Designer</p>
+						</div>
+					</div>
+
+					<h3 class="text-xl font-bold text-gray-700 mb-4">Contact Us</h3>
+					<div class="neumorph-inset p-5">
+						<form id="contactForm" class="space-y-4">
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div>
+									<label class="block text-gray-700 mb-2" for="name"
+										>Name</label
+									>
+									<input
+										type="text"
+										id="name"
+										class="w-full neumorph-inset p-3 text-gray-700 focus:outline-none"
+									/>
+								</div>
+								<div>
+									<label class="block text-gray-700 mb-2" for="email"
+										>Email</label
+									>
+									<input
+										type="email"
+										id="email"
+										class="w-full neumorph-inset p-3 text-gray-700 focus:outline-none"
+									/>
+								</div>
+							</div>
+							<div>
+								<label class="block text-gray-700 mb-2" for="subject"
+									>Subject</label
+								>
+								<input
+									type="text"
+									id="subject"
+									class="w-full neumorph-inset p-3 text-gray-700 focus:outline-none"
+								/>
+							</div>
+							<div>
+								<label class="block text-gray-700 mb-2" for="message"
+									>Message</label
+								>
+								<textarea
+									id="message"
+									rows="4"
+									class="w-full neumorph-inset p-3 text-gray-700 focus:outline-none"
+								></textarea>
+							</div>
+							<button
+								type="submit"
+								class="neumorph-btn w-full py-3 text-accent font-bold"
+							>
+								Send Message
+							</button>
+						</form>
+					</div>
+				</div>
+
+				<div class="neumorph p-6">
+					<h2 class="text-2xl font-bold text-gray-700 mb-4">
+						Frequently Asked Questions
+					</h2>
+					<div class="space-y-4">
+						<div class="neumorph p-4">
+							<button
+								class="faq-toggle w-full flex justify-between items-center text-left"
+							>
+								<span class="text-lg font-bold text-gray-700"
+									>What is NetSense?</span
+								>
+								<svg
+									class="w-5 h-5 transform transition-transform duration-200"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									></path>
+								</svg>
+							</button>
+							<div class="faq-content hidden mt-3 text-gray-600">
+								NetSense is a comprehensive network monitoring tool that
+								provides real-time information about your connection status,
+								signal strength, and performance metrics. It helps you stay
+								informed about your network health and quickly identify
+								connectivity issues.
+							</div>
+						</div>
+
+						<div class="neumorph p-4">
+							<button
+								class="faq-toggle w-full flex justify-between items-center text-left"
+							>
+								<span class="text-lg font-bold text-gray-700"
+									>How does NetSense detect connection issues?</span
+								>
+								<svg
+									class="w-5 h-5 transform transition-transform duration-200"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									></path>
+								</svg>
+							</button>
+							<div class="faq-content hidden mt-3 text-gray-600">
+								NetSense uses a combination of browser APIs and network pings to
+								continuously monitor your connection status. When a disruption
+								is detected, the system immediately alerts you and logs the
+								event for future analysis.
+							</div>
+						</div>
+
+						<div class="neumorph p-4">
+							<button
+								class="faq-toggle w-full flex justify-between items-center text-left"
+							>
+								<span class="text-lg font-bold text-gray-700"
+									>Is NetSense available on mobile devices?</span
+								>
+								<svg
+									class="w-5 h-5 transform transition-transform duration-200"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									></path>
+								</svg>
+							</button>
+							<div class="faq-content hidden mt-3 text-gray-600">
+								Yes, NetSense is fully responsive and works on all modern mobile
+								devices. We also offer native applications for iOS and Android
+								that provide enhanced functionality and background monitoring.
+							</div>
+						</div>
+
+						<div class="neumorph p-4">
+							<button
+								class="faq-toggle w-full flex justify-between items-center text-left"
+							>
+								<span class="text-lg font-bold text-gray-700"
+									>Can NetSense help improve my network performance?</span
+								>
+								<svg
+									class="w-5 h-5 transform transition-transform duration-200"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M19 9l-7 7-7-7"
+									></path>
+								</svg>
+							</button>
+							<div class="faq-content hidden mt-3 text-gray-600">
+								While NetSense primarily focuses on monitoring and diagnostics,
+								our analytics can help you identify patterns and issues that may
+								be affecting your performance. Our tools include optimization
+								recommendations based on your specific usage patterns.
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="neumorph p-5 m-4 mt-2">
+			<div class="container mx-auto">
+				<div class="flex flex-col md:flex-row justify-between items-center">
+					<div class="mb-4 md:mb-0">
+						<div class="flex items-center justify-center md:justify-start">
+							<div
+								class="neumorph-circle h-10 w-10 flex items-center justify-center mr-3"
+							>
+								<svg
+									class="w-6 h-6 text-accent"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"
+									></path>
+								</svg>
+							</div>
+							<span class="text-xl font-bold text-gray-700">NetSense</span>
+						</div>
+						<p class="text-gray-600 text-center md:text-left mt-2">
+							Network Monitoring Made Simple
+						</p>
+					</div>
+
+					<div class="flex flex-col items-center md:items-end">
+						<div class="flex space-x-4 mb-3">
+							<a
+								href="#"
+								class="neumorph-circle h-10 w-10 flex items-center justify-center"
+							>
+								<span class="custom-icon icon-share text-accent"></span>
+							</a>
+							<a
+								href="#"
+								class="neumorph-circle h-10 w-10 flex items-center justify-center"
+							>
+								<span class="custom-icon icon-message text-accent"></span>
+							</a>
+							<a
+								href="#"
+								class="neumorph-circle h-10 w-10 flex items-center justify-center"
+							>
+								<span class="custom-icon icon-globe text-accent"></span>
+							</a>
+						</div>
+						<p class="text-gray-600 text-sm">
+							Terms of Service | Privacy Policy
+						</p>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<div class="fixed bottom-6 right-6 z-10">
+			<button
+				id="notificationBtn"
+				class="neumorph-circle h-16 w-16 flex items-center justify-center pulse"
+			>
+				<svg
+					class="w-6 h-6"
+					fill="none"
+					stroke="currentColor"
+					viewBox="0 0 24 24"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+					></path>
+				</svg>
+			</button>
+		</div>
+
+		<div id="notificationContainer" class="notification-container"></div>
+
+		<div
+			id="diagnosticsModal"
+			class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden"
+		>
+			<div
+				class="neumorph p-4 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto"
+			>
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-xl font-bold text-gray-700">Network Diagnostics</h3>
+					<button
+						id="closeDiagnostics"
+						class="neumorph-circle h-8 w-8 flex items-center justify-center"
+					>
+						<svg
+							class="w-5 h-5"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							></path>
+						</svg>
+					</button>
+				</div>
+
+				<!-- Loading state -->
+				<div id="diagnosticsContent" class="neumorph-inset p-4 mb-4">
+					<div class="text-center py-8">
+						<div class="loader mx-auto mb-4"></div>
+						<p class="text-gray-700">Running diagnostics, please wait...</p>
+					</div>
+				</div>
+
+				<!-- Results state -->
+				<div id="diagnosticsResults" class="hidden mb-4">
+					<div class="neumorph-inset p-3">
+						<div class="flex flex-wrap -mx-2" id="diagnosticsResultsList">
+							<!-- Diagnostic results will be added here dynamically -->
+						</div>
+					</div>
+
+					<button
+						id="diagnosticsDone"
+						class="neumorph-btn w-full py-2 text-accent font-bold mt-4"
+					>
+						Done
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const connectionToast = document.getElementById("connectionToast");
+			const statusIndicator = document.getElementById("statusIndicator");
+			const connectionStatus = document.getElementById("connectionStatus");
+			const wifiStrengthEl = document.getElementById("wifiStrengthText");
+			const signalStrengthBars = document.getElementById("signalStrengthBars");
+			const batterySaverEl = document.getElementById("batterySaver");
+			const batteryLevelEl = document.getElementById("batteryLevel");
+			const batteryPercentageEl = document.getElementById("batteryPercentage");
+			const chargingStatusEl = document.getElementById("chargingStatus");
+			const notificationBtn = document.getElementById("notificationBtn");
+			const notificationContainer = document.getElementById(
+				"notificationContainer"
+			);
+			const menuToggle = document.getElementById("menuToggle");
+			const mobileMenu = document.getElementById("mobileMenu");
+			const lastCheckedEl = document.getElementById("lastChecked");
+			const settingsBtn = document.getElementById("settingsBtn");
+			const mobileSettingsBtn = document.getElementById("mobileSettingsBtn");
+			const settingsPanel = document.getElementById("settingsPanel");
+			const closeSettings = document.getElementById("closeSettings");
+			const saveSettings = document.getElementById("saveSettings");
+			const themeToggle = document.getElementById("themeToggle");
+			const notificationsToggle = document.getElementById(
+				"notificationsToggle"
+			);
+			let manualBatterySaver = false;
+			const autoRefreshToggle = document.getElementById("autoRefreshToggle");
+			const refreshInterval = document.getElementById("refreshInterval");
+			const intervalValue = document.getElementById("intervalValue");
+			const navLinks = document.querySelectorAll(".nav-link");
+			const pages = document.querySelectorAll(".page");
+			const runDiagnostics = document.getElementById("runDiagnostics");
+			const diagnosticsModal = document.getElementById("diagnosticsModal");
+			const closeDiagnostics = document.getElementById("closeDiagnostics");
+			const diagnosticsContent = document.getElementById("diagnosticsContent");
+			const diagnosticsResults = document.getElementById("diagnosticsResults");
+			const diagnosticsResultsList = document.getElementById(
+				"diagnosticsResultsList"
+			);
+			const diagnosticsDone = document.getElementById("diagnosticsDone");
+
+			const runSpeedTest = document.getElementById("runSpeedTest");
+			const downloadSpeedEl = document.getElementById("downloadSpeed");
+			const uploadSpeedEl = document.getElementById("uploadSpeed");
+			const pingTimeEl = document.getElementById("pingTime");
+			const faqToggles = document.querySelectorAll(".faq-toggle");
+			const contactForm = document.getElementById("contactForm");
+			const uptimeEl = document.getElementById("uptime");
+			const responseTimeEl = document.getElementById("responseTime");
+			const disconnectsEl = document.getElementById("disconnects");
+			const dataUsageEl = document.getElementById("dataUsage");
+
+			let notificationsEnabled = true;
+			let autoRefreshEnabled = true;
+			let refreshIntervalSeconds = 10;
+			let refreshIntervalId = null;
+			let currentPage = "home";
+			let currentTheme = "light";
+			let batteryLevel = 70;
+			let isCharging = false;
+			let isBatterySaving = false;
+			let wifiStrengths = ["Poor", "Fair", "Good", "Excellent"];
+			let currentWifiIndex = 3;
+			let disconnectCount = 0;
+			let uptimePercentage = 99.8;
+			let averageResponseTime = 28;
+			let dataUsage = 1.2;
+
+			menuToggle.addEventListener("click", () => {
+				mobileMenu.classList.toggle("open");
+			});
+
+			navLinks.forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					const targetPage = link.getAttribute("data-page");
+
+					pages.forEach((page) => page.classList.remove("active"));
+
+					document.getElementById(`${targetPage}Page`).classList.add("active");
+					document
+						.getElementById(`${targetPage}Page`)
+						.classList.add("slide-in");
+
+					navLinks.forEach((navLink) => {
+						navLink.classList.remove("active-link");
+					});
+					link.classList.add("active-link");
+
+					mobileMenu.classList.remove("open");
+
+					currentPage = targetPage;
+				});
+			});
+
+			function updateConnectionStatus() {
+				if (navigator.onLine) {
+					connectionToast.classList.remove("show");
+					statusIndicator.classList.remove("bg-red-500");
+					statusIndicator.classList.add("bg-green-500");
+					connectionStatus.textContent = "Connected";
+				} else {
+					connectionToast.classList.add("show");
+					statusIndicator.classList.remove("bg-green-500");
+					statusIndicator.classList.add("bg-red-500");
+					connectionStatus.textContent = "Disconnected";
+					disconnectCount++;
+					disconnectsEl.textContent = disconnectCount;
+
+					uptimePercentage = Math.max(99.0, 100 - disconnectCount * 0.1);
+					uptimeEl.textContent = uptimePercentage.toFixed(1) + "%";
+
+					if (notificationsEnabled) {
+						showNotification(
+							"disconnect-icon",
+							"Connection Lost",
+							"Your network connection has been interrupted."
+						);
+					}
+				}
+
+				const now = new Date();
+				lastCheckedEl.textContent = formatTimeAgo(now);
+			}
+
+			function formatTimeAgo(date) {
+				const seconds = Math.floor((new Date() - date) / 1000);
+
+				if (seconds < 5) {
+					return "Just now";
+				} else if (seconds < 60) {
+					return `${seconds} seconds ago`;
+				} else if (seconds < 3600) {
+					const minutes = Math.floor(seconds / 60);
+					return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
+				} else {
+					const hours = Math.floor(seconds / 3600);
+					return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+				}
+			}
+
+			updateConnectionStatus();
+
+			window.addEventListener("online", () => {
+				updateConnectionStatus();
+
+				if (notificationsEnabled) {
+					showNotification(
+						"connect-icon",
+						"Connection Restored",
+						"Your network connection has been restored."
+					);
+				}
+			});
+
+			window.addEventListener("offline", updateConnectionStatus);
+
+			function updateWifiStrength() {
+				if (Math.random() < 0.2) {
+					currentWifiIndex = Math.max(
+						0,
+						Math.min(3, currentWifiIndex + Math.floor(Math.random() * 3) - 1)
+					);
+				}
+
+				const strength = wifiStrengths[currentWifiIndex];
+				wifiStrengthEl.textContent = strength;
+
+				const bars = signalStrengthBars.querySelectorAll(".signal-bar");
+				for (let i = 0; i < bars.length; i++) {
+					if (i <= currentWifiIndex) {
+						bars[i].classList.add("active");
+					} else {
+						bars[i].classList.remove("active");
+					}
+				}
+
+				const wifiIcon = document.querySelector(".wifi-icon");
+				if (currentWifiIndex <= 1) {
+					if (wifiIcon) wifiIcon.style.color = "#e53e3e";
+				} else if (currentWifiIndex === 2) {
+					if (wifiIcon) wifiIcon.style.color = "#4299e1";
+				} else {
+					if (wifiIcon) wifiIcon.style.color = "#38a169";
+				}
+			}
+
+			function updateBatteryStatus() {
+				// Simulate battery level changes
+				if (Math.random() < 0.2) {
+					if (isCharging) {
+						batteryLevel = Math.min(
+							100,
+							batteryLevel + Math.floor(Math.random() * 3)
+						);
+					} else {
+						batteryLevel = Math.max(
+							5,
+							batteryLevel - Math.floor(Math.random() * 2)
+						);
+					}
+				}
+
+				// Randomly toggle charging state with small probability
+				if (Math.random() < 0.05) {
+					isCharging = !isCharging;
+				}
+
+				// Only set battery saver mode automatically if not manually controlled
+				if (!manualBatterySaver) {
+					isBatterySaving = batteryLevel < 20 && !isCharging;
+				}
+
+				// Update UI
+				batteryLevelEl.style.width = `${batteryLevel}%`;
+				batteryPercentageEl.textContent = `${batteryLevel}%`;
+				chargingStatusEl.textContent = isCharging ? "Charging" : "Not charging";
+				batterySaverEl.textContent = `Saver: ${isBatterySaving ? "On" : "Off"}`;
+
+				// Set battery color based on level
+				if (batteryLevel < 20) {
+					batteryLevelEl.style.backgroundColor = "#e53e3e"; // Red
+				} else if (batteryLevel < 50) {
+					batteryLevelEl.style.backgroundColor = "#ed8936"; // Orange
+				} else {
+					batteryLevelEl.style.backgroundColor = "#38a169"; // Green
+				}
+
+				// Show notification about battery saver mode if just activated automatically
+				if (
+					isBatterySaving &&
+					!manualBatterySaver &&
+					notificationsEnabled &&
+					Math.random() < 0.2
+				) {
+					showNotification(
+						"battery-icon",
+						"Battery Saver Mode",
+						"Your device is in battery saver mode to conserve power."
+					);
+				}
+			}
+
+			function showNotification(iconType, title, message) {
+				const notification = document.createElement("div");
+				notification.className =
+					"neumorph notification p-4 mb-4 flex items-start max-w-xs w-full";
+
+				let iconHtml = "";
+				if (iconType === "wifi-icon") {
+					iconHtml = `
+          <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>
+          </svg>
+        `;
+				} else if (iconType === "battery-icon") {
+					iconHtml = `
+          <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 6h2a2 2 0 012 2v8a2 2 0 01-2 2h-2M9 6H7a2 2 0 00-2 2v8a2 2 0 002 2h2m3-10v10"></path>
+          </svg>
+        `;
+				} else if (iconType === "disconnect-icon") {
+					iconHtml = `
+          <svg class="w-5 h-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
+          </svg>
+        `;
+				} else if (iconType === "connect-icon") {
+					iconHtml = `
+          <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        `;
+				} else {
+					iconHtml = `
+          <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        `;
+				}
+
+				notification.innerHTML = `
+        <div class="neumorph-circle h-12 w-12 flex-shrink-0 flex items-center justify-center mr-3">
+          ${iconHtml}
+        </div>
+        <div>
+          <h4 class="font-bold text-gray-700 text-lg">${title}</h4>
+          <p class="text-gray-600">${message}</p>
+        </div>
+      `;
+
+				notificationContainer.appendChild(notification);
+
+				setTimeout(() => {
+					notification.remove();
+				}, 5000);
+			}
+
+			notificationBtn.addEventListener("click", () => {
+				notificationBtn.classList.remove("pulse");
+
+				showNotification(
+					"wifi-icon",
+					"Wi-Fi Status",
+					`Signal strength: ${wifiStrengthEl.textContent}`
+				);
+
+				setTimeout(() => {
+					showNotification(
+						"battery-icon",
+						"Battery Status",
+						`Level: ${batteryLevel}% • ${
+							isBatterySaving ? "Saver: On" : "Saver: Off"
+						}`
+					);
+				}, 300);
+			});
+
+			function updateData() {
+				updateWifiStrength();
+				updateBatteryStatus();
+				updateLastChecked();
+
+				if (Math.random() < 0.3) {
+					averageResponseTime = Math.floor(20 + Math.random() * 15);
+					responseTimeEl.textContent = `${averageResponseTime}ms`;
+				}
+
+				if (Math.random() < 0.2) {
+					dataUsage = Math.round((dataUsage + Math.random() * 0.1) * 10) / 10;
+					dataUsageEl.textContent = `${dataUsage.toFixed(1)}GB`;
+				}
+			}
+
+			function updateLastChecked() {
+				lastCheckedEl.textContent = "Just now";
+			}
+
+			settingsBtn.addEventListener("click", () => {
+				settingsPanel.classList.remove("hidden");
+			});
+
+			mobileSettingsBtn.addEventListener("click", () => {
+				settingsPanel.classList.remove("hidden");
+				mobileMenu.classList.remove("open");
+			});
+
+			closeSettings.addEventListener("click", () => {
+				settingsPanel.classList.add("hidden");
+			});
+
+			themeToggle.addEventListener("change", () => {
+				document.body.classList.toggle("dark-theme");
+				currentTheme = document.body.classList.contains("dark-theme")
+					? "dark"
+					: "light";
+			});
+
+			notificationsToggle.addEventListener("change", () => {
+				notificationsEnabled = notificationsToggle.checked;
+			});
+
+			autoRefreshToggle.addEventListener("change", () => {
+				autoRefreshEnabled = autoRefreshToggle.checked;
+
+				if (autoRefreshEnabled) {
+					startAutoRefresh();
+				} else {
+					stopAutoRefresh();
+				}
+			});
+
+			refreshInterval.addEventListener("input", () => {
+				refreshIntervalSeconds = parseInt(refreshInterval.value);
+				intervalValue.textContent = `${refreshIntervalSeconds}s`;
+
+				if (autoRefreshEnabled) {
+					stopAutoRefresh();
+					startAutoRefresh();
+				}
+			});
+
+			saveSettings.addEventListener("click", () => {
+				settingsPanel.classList.add("hidden");
+				showNotification(
+					"info-icon",
+					"Settings Saved",
+					"Your preferences have been updated successfully."
+				);
+			});
+
+			function startAutoRefresh() {
+				if (refreshIntervalId) {
+					clearInterval(refreshIntervalId);
+				}
+
+				refreshIntervalId = setInterval(
+					updateData,
+					refreshIntervalSeconds * 1000
+				);
+			}
+
+			function stopAutoRefresh() {
+				if (refreshIntervalId) {
+					clearInterval(refreshIntervalId);
+					refreshIntervalId = null;
+				}
+			}
+
+			runDiagnostics.addEventListener("click", () => {
+				diagnosticsModal.classList.remove("hidden");
+				diagnosticsContent.classList.remove("hidden");
+				diagnosticsResults.classList.add("hidden");
+
+				setTimeout(() => {
+					diagnosticsContent.classList.add("hidden");
+					diagnosticsResults.classList.remove("hidden");
+
+					// Clear previous results
+					diagnosticsResultsList.innerHTML = "";
+
+					const diagnosticItems = [
+						{
+							name: "Internet Connection",
+							status: navigator.onLine ? "pass" : "fail",
+							message: navigator.onLine ? "Connected" : "Disconnected",
+							icon: navigator.onLine
+								? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>`
+								: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>`,
+						},
+						{
+							name: "Wi-Fi Signal Strength",
+							status: currentWifiIndex > 1 ? "pass" : "warning",
+							message: wifiStrengths[currentWifiIndex],
+							icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01m-7.08-7.071c3.904-3.905 10.236-3.905 14.141 0M1.394 9.393c5.857-5.857 15.355-5.857 21.213 0"></path>`,
+						},
+						{
+							name: "DNS Resolution",
+							status: "pass",
+							message: "Working properly",
+							icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>`,
+						},
+						{
+							name: "Latency Check",
+							status: averageResponseTime < 50 ? "pass" : "warning",
+							message: `${averageResponseTime}ms`,
+							icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>`,
+						},
+						{
+							name: "Bandwidth Test",
+							status: "pass",
+							message: "Download: 24.5 Mbps, Upload: 18.2 Mbps",
+							icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>`,
+						},
+					];
+
+					diagnosticItems.forEach((item) => {
+						// Determine color based on status
+						let statusColor = "";
+						if (item.status === "pass") {
+							statusColor = "text-success";
+						} else if (item.status === "warning") {
+							statusColor = "text-warning";
+						} else {
+							statusColor = "text-danger";
+						}
+
+						// Create diagnostic item card
+						const diagnosticCard = document.createElement("div");
+						diagnosticCard.className = "w-full sm:w-1/2 p-2";
+
+						diagnosticCard.innerHTML = `
+        <div class="neumorph p-2 rounded-lg flex items-center justify-between">
+          <div>
+            <div class="text-xs text-gray-600 mb-1">${item.name}</div>
+            <div class="text-md font-bold ${statusColor}">${item.message}</div>
+          </div>
+          <svg class="w-5 h-5 ${statusColor} ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            ${item.icon}
+          </svg>
+        </div>
+      `;
+
+						diagnosticsResultsList.appendChild(diagnosticCard);
+					});
+				}, 2000);
+			});
+			closeDiagnostics.addEventListener("click", () => {
+				diagnosticsModal.classList.add("hidden");
+			});
+
+			diagnosticsDone.addEventListener("click", () => {
+				diagnosticsModal.classList.add("hidden");
+			});
+
+			runSpeedTest.addEventListener("click", function () {
+				this.disabled = true;
+				this.textContent = "Running Test...";
+
+				downloadSpeedEl.textContent = "0 Mbps";
+				uploadSpeedEl.textContent = "0 Mbps";
+				pingTimeEl.textContent = "0 ms";
+
+				let progress = 0;
+				const downloadInterval = setInterval(() => {
+					progress += 10;
+					const randomSpeed = Math.floor(Math.random() * 50) + 30;
+					downloadSpeedEl.textContent = `${randomSpeed} Mbps`;
+
+					if (progress >= 100) {
+						clearInterval(downloadInterval);
+						progress = 0;
+
+						const ping = Math.floor(Math.random() * 30) + 15;
+						pingTimeEl.textContent = `${ping} ms`;
+
+						const uploadInterval = setInterval(() => {
+							progress += 10;
+							const randomUploadSpeed = Math.floor(Math.random() * 30) + 15;
+							uploadSpeedEl.textContent = `${randomUploadSpeed} Mbps`;
+
+							if (progress >= 100) {
+								clearInterval(uploadInterval);
+
+								runSpeedTest.disabled = false;
+								runSpeedTest.textContent = "Start Speed Test";
+
+								showNotification(
+									"info-icon",
+									"Speed Test Complete",
+									"Your network performance test has finished."
+								);
+							}
+						}, 200);
+					}
+				}, 200);
+			});
+
+			faqToggles.forEach((toggle) => {
+				toggle.addEventListener("click", () => {
+					const content = toggle.nextElementSibling;
+					const icon = toggle.querySelector("svg");
+
+					content.classList.toggle("hidden");
+					icon.classList.toggle("rotate-180");
+				});
+			});
+
+			contactForm.addEventListener("submit", (e) => {
+				e.preventDefault();
+
+				const formElements = contactForm.elements;
+				let isValid = true;
+
+				for (let i = 0; i < formElements.length; i++) {
+					const element = formElements[i];
+					if (element.type !== "submit" && !element.value.trim()) {
+						isValid = false;
+						element.classList.add("border", "border-red-500");
+					} else {
+						element.classList.remove("border", "border-red-500");
+					}
+				}
+
+				if (isValid) {
+					contactForm.reset();
+
+					showNotification(
+						"info-icon",
+						"Message Sent",
+						"Thank you for reaching out. We'll respond shortly!"
+					);
+				} else {
+					showNotification(
+						"info-icon",
+						"Form Error",
+						"Please fill in all required fields."
+					);
+				}
+			});
+
+			updateData();
+
+			if (autoRefreshEnabled) {
+				startAutoRefresh();
+			}
+
+			document.addEventListener("DOMContentLoaded", () => {
+				setTimeout(() => {
+					const offlineEvent = new Event("offline");
+					window.dispatchEvent(offlineEvent);
+
+					setTimeout(() => {
+						const onlineEvent = new Event("online");
+						window.dispatchEvent(onlineEvent);
+					}, 5000);
+				}, 3000);
+			});
+
+			function checkAndUpdatePowerMode() {
+				if (!manualBatterySaver) {
+					if (batteryLevel < 20 && !isCharging) {
+						if (Math.random() < 0.7) {
+							isBatterySaving = true;
+							batterySaverEl.textContent = "Saver: On";
+
+							if (notificationsEnabled && Math.random() < 0.3) {
+								showNotification(
+									"battery-icon",
+									"Low Power Mode",
+									"Your device appears to be in low power mode. Some features may be limited."
+								);
+							}
+						}
+					}
+				}
+			}
+			setInterval(checkAndUpdatePowerMode, 5000);
+
+			const batterySaverToggle = document.createElement("button");
+			batterySaverToggle.className =
+				"fixed top-20 right-6 neumorph-circle h-10 w-10 flex items-center justify-center z-10";
+			batterySaverToggle.innerHTML = `
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      </svg>
+    `;
+			document.body.appendChild(batterySaverToggle);
+
+			batterySaverToggle.addEventListener("click", () => {
+				isBatterySaving = !isBatterySaving;
+				manualBatterySaver = true;
+				batterySaverEl.textContent = `Saver: ${isBatterySaving ? "On" : "Off"}`;
+
+				showNotification(
+					"battery-icon",
+					`Low Power Mode ${isBatterySaving ? "Enabled" : "Disabled"}`,
+					`You've manually ${
+						isBatterySaving ? "enabled" : "disabled"
+					} low power mode simulation.`
+				);
+			});
+		</script>
+	</body>
+</html>
