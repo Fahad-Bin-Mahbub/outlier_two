@@ -1,0 +1,3350 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Global Population Growth Visualization</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				background-color: #f8f9ff;
+				color: #2d3748;
+				font-family: "Poppins", sans-serif;
+				line-height: 1.6;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-family: "Montserrat", sans-serif;
+				font-weight: 600;
+				color: #222;
+			}
+
+			:root {
+				--primary: #6366f1;
+				--primary-dark: #4f46e5;
+				--primary-light: #a5b4fc;
+				--secondary: #10b981;
+				--secondary-dark: #059669;
+				--secondary-light: #6ee7b7;
+				--accent: #f97316;
+				--accent-dark: #ea580c;
+				--accent-light: #fdba74;
+				--background: #f8f9ff;
+				--surface: #ffffff;
+				--surface-alt: #f1f5f9;
+				--text-primary: #2d3748;
+				--text-secondary: #64748b;
+				--text-light: #94a3b8;
+				--border: #e2e8f0;
+				--shadow: rgba(148, 163, 184, 0.2);
+
+				--chart-color-1: #6366f1;
+				--chart-color-2: #10b981;
+				--chart-color-3: #f97316;
+				--chart-color-4: #ec4899;
+				--chart-color-5: #8b5cf6;
+				--chart-color-6: #14b8a6;
+
+				--map-gradient-1: #cdfcf6;
+				--map-gradient-2: #7de7eb;
+				--map-gradient-3: #45b8e0;
+				--map-gradient-4: #3178c6;
+				--map-gradient-5: #274494;
+			}
+
+			.container {
+				width: 100%;
+				max-width: 1280px;
+				margin: 0 auto;
+				padding: 0 20px;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			header {
+				background-color: var(--surface);
+				color: var(--text-primary);
+				padding: 1rem 0;
+				box-shadow: 0 2px 10px var(--shadow);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+
+			.navbar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--primary);
+			}
+			.chart-container {
+				background-color: rgba(255, 255, 255, 0.8);
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 2px 10px var(--shadow);
+				margin-bottom: 2rem;
+			}
+			.logo i {
+				margin-right: 10px;
+				font-size: 1.8rem;
+				background: linear-gradient(45deg, var(--primary), var(--accent));
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.nav-menu {
+				display: flex;
+				list-style: none;
+			}
+
+			.nav-menu li {
+				margin-left: 1.5rem;
+			}
+
+			.nav-menu a {
+				color: var(--text-primary);
+				text-decoration: none;
+				font-weight: 500;
+				transition: all 0.3s;
+				padding: 0.5rem 0;
+				position: relative;
+			}
+
+			.nav-menu a:hover {
+				color: var(--primary);
+			}
+
+			.nav-menu a.active {
+				color: var(--primary);
+			}
+
+			.nav-menu a.active::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background-color: var(--primary);
+				border-radius: 2px;
+			}
+
+			.profile-container {
+				position: relative;
+			}
+
+			.profile-icon {
+				font-size: 1.5rem;
+				cursor: pointer;
+				transition: transform 0.3s;
+			}
+
+			.profile-icon:hover {
+				transform: scale(1.05);
+			}
+
+			.avatar {
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				border: 2px solid var(--primary-light);
+				object-fit: cover;
+			}
+
+			.profile-dropdown {
+				position: absolute;
+				top: 120%;
+				right: 0;
+				background-color: var(--surface);
+				border-radius: 8px;
+				box-shadow: 0 4px 20px var(--shadow);
+				width: 250px;
+				opacity: 0;
+				visibility: hidden;
+				transform: translateY(10px);
+				transition: all 0.3s;
+				z-index: 100;
+			}
+
+			.profile-container:hover .profile-dropdown {
+				opacity: 1;
+				visibility: visible;
+				transform: translateY(0);
+			}
+
+			.profile-header {
+				padding: 1rem;
+				display: flex;
+				align-items: center;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.dropdown-avatar {
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				object-fit: cover;
+				margin-right: 1rem;
+			}
+
+			.profile-info h3 {
+				font-size: 1rem;
+				margin-bottom: 0.25rem;
+			}
+
+			.profile-info p {
+				font-size: 0.8rem;
+				color: var(--text-secondary);
+			}
+
+			.profile-menu {
+				list-style: none;
+				padding: 0.5rem 0;
+			}
+
+			.profile-menu li {
+				padding: 0;
+			}
+
+			.profile-menu a {
+				display: flex;
+				align-items: center;
+				padding: 0.75rem 1rem;
+				color: var(--text-primary);
+				text-decoration: none;
+				transition: background-color 0.3s;
+			}
+
+			.profile-menu a:hover {
+				background-color: var(--surface-alt);
+			}
+
+			.profile-menu i {
+				width: 20px;
+				margin-right: 10px;
+				color: var(--text-secondary);
+			}
+
+			.profile-menu .divider {
+				height: 1px;
+				background-color: var(--border);
+				margin: 0.5rem 0;
+			}
+
+			.profile-menu .logout {
+				color: #ef4444;
+			}
+
+			.profile-menu .logout i {
+				color: #ef4444;
+			}
+
+			main {
+				padding: 2rem 0;
+			}
+
+			.page {
+				display: none;
+				animation: fadeIn 0.5s ease-out;
+			}
+
+			.page.active {
+				display: block;
+			}
+
+			.dashboard {
+				background-color: var(--surface);
+				border-radius: 12px;
+				box-shadow: 0 4px 20px var(--shadow);
+				padding: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.dashboard-header {
+				margin-bottom: 2rem;
+			}
+
+			.dashboard-title {
+				font-size: 2rem;
+				color: var(--text-primary);
+				margin-bottom: 0.5rem;
+				background: linear-gradient(45deg, var(--primary), var(--accent));
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+				display: inline-block;
+			}
+
+			.dashboard-subtitle {
+				color: var(--text-secondary);
+				font-size: 1.1rem;
+			}
+
+			.controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1.5rem;
+				margin-bottom: 2rem;
+			}
+
+			.control-group {
+				flex: 1;
+				min-width: 200px;
+			}
+
+			.control-label {
+				display: block;
+				margin-bottom: 0.5rem;
+				font-weight: 500;
+				color: var(--text-primary);
+			}
+
+			.custom-select {
+				position: relative;
+			}
+
+			.custom-select select {
+				appearance: none;
+				-webkit-appearance: none;
+				-moz-appearance: none;
+				width: 100%;
+				padding: 0.75rem 1rem;
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				background-color: var(--surface);
+				color: var(--text-primary);
+				font-family: "Poppins", sans-serif;
+				font-size: 1rem;
+				cursor: pointer;
+				transition: border-color 0.3s, box-shadow 0.3s;
+			}
+
+			.custom-select select:focus {
+				outline: none;
+				border-color: var(--primary);
+				box-shadow: 0 0 0 3px var(--primary-light);
+			}
+
+			.select-arrow {
+				position: absolute;
+				top: 50%;
+				right: 1rem;
+				transform: translateY(-50%);
+				color: var(--text-secondary);
+				pointer-events: none;
+			}
+
+			.map-container {
+				position: relative;
+				height: 500px;
+				margin-bottom: 2rem;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				overflow: hidden;
+				box-shadow: 0 4px 10px var(--shadow);
+			}
+			.animating {
+				animation: subtle-pulse 0.5s ease-out;
+			}
+
+			@keyframes subtle-pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.02);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+			.world-map {
+				width: 100%;
+				height: 100%;
+				background-color: #f1faff;
+			}
+
+			.continent {
+				stroke: white;
+				stroke-width: 1px;
+				transition: all 0.3s;
+				fill: var(--map-gradient-3);
+			}
+
+			.continent:hover {
+				stroke-width: 2px;
+				cursor: pointer;
+				filter: brightness(1.1);
+				transform: scale(1.01);
+			}
+
+			.continent-label {
+				font-size: 12px;
+				font-weight: 600;
+				fill: var(--text-primary);
+				pointer-events: none;
+				text-anchor: middle;
+			}
+
+			.legend {
+				display: flex;
+				align-items: center;
+				margin-bottom: 1.5rem;
+				background-color: var(--surface-alt);
+				padding: 1rem;
+				border-radius: 8px;
+			}
+
+			.legend-title {
+				font-weight: 600;
+				margin-right: 1.5rem;
+				color: var(--text-primary);
+			}
+
+			.legend-gradient {
+				display: flex;
+				align-items: center;
+				flex: 1;
+			}
+
+			.legend-item {
+				font-size: 0.8rem;
+				color: var(--text-secondary);
+			}
+
+			.legend-gradient-bar {
+				flex: 1;
+				height: 10px;
+				margin: 0 10px;
+				border-radius: 5px;
+				background: linear-gradient(
+					to right,
+					var(--map-gradient-1),
+					var(--map-gradient-2),
+					var(--map-gradient-3),
+					var(--map-gradient-4),
+					var(--map-gradient-5)
+				);
+			}
+
+			.tooltip {
+				position: absolute;
+				background-color: var(--surface);
+				color: var(--text-primary);
+				padding: 10px 15px;
+				border-radius: 8px;
+				font-size: 0.9rem;
+				box-shadow: 0 4px 15px var(--shadow);
+				pointer-events: none;
+				display: none;
+				z-index: 10;
+				border: 1px solid var(--border);
+				transition: opacity 0.3s;
+			}
+
+			.timeline-container {
+				margin-bottom: 2.5rem;
+			}
+
+			.modern-slider-container {
+				position: relative;
+				padding: 2rem 1rem 1rem;
+			}
+
+			.year-display {
+				font-size: 2.5rem;
+				font-weight: 700;
+				text-align: center;
+				margin-bottom: 1.5rem;
+				color: var(--primary);
+				transition: all 0.3s;
+			}
+
+			.modern-slider {
+				position: relative;
+				padding: 1rem 0;
+			}
+
+			.slider-track {
+				position: absolute;
+				height: 6px;
+				width: 100%;
+				background-color: var(--border);
+				border-radius: 3px;
+				top: 50%;
+				transform: translateY(-50%);
+			}
+
+			.slider-fill {
+				position: absolute;
+				height: 6px;
+				background: linear-gradient(
+					to right,
+					var(--primary-light),
+					var(--primary)
+				);
+				border-radius: 3px;
+				top: 50%;
+				transform: translateY(-50%);
+				transition: width 0.3s;
+			}
+
+			input[type="range"].timeline-slider {
+				-webkit-appearance: none;
+				width: 100%;
+				height: 6px;
+				background: transparent;
+				position: relative;
+				z-index: 2;
+			}
+
+			input[type="range"].timeline-slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background: var(--primary);
+				cursor: pointer;
+				box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
+				transition: all 0.3s;
+			}
+
+			input[type="range"].timeline-slider::-webkit-slider-thumb:hover {
+				transform: scale(1.2);
+				box-shadow: 0 2px 12px rgba(99, 102, 241, 0.7);
+			}
+
+			input[type="range"].timeline-slider::-moz-range-thumb {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background: var(--primary);
+				cursor: pointer;
+				box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
+				transition: all 0.3s;
+				border: none;
+			}
+
+			input[type="range"].timeline-slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background: var(--primary);
+				cursor: pointer;
+				box-shadow: 0 2px 8px rgba(99, 102, 241, 0.5);
+				transition: transform 0.15s ease-out;
+			}
+
+			input[type="range"].timeline-slider::-webkit-slider-thumb:hover {
+				transform: scale(1.1);
+				box-shadow: 0 2px 10px rgba(99, 102, 241, 0.6);
+			}
+
+			.timeline-labels {
+				display: flex;
+				justify-content: space-between;
+				margin-top: 0.75rem;
+				color: var(--text-secondary);
+				font-size: 0.85rem;
+			}
+
+			.metrics {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 1.5rem;
+				margin-bottom: 2.5rem;
+			}
+
+			.metric-card {
+				background-color: var(--surface-alt);
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 2px 10px var(--shadow);
+				display: flex;
+				align-items: center;
+				transition: all 0.3s;
+			}
+
+			.metric-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 10px 20px var(--shadow);
+			}
+
+			.metric-icon {
+				width: 50px;
+				height: 50px;
+				border-radius: 12px;
+				background: linear-gradient(
+					45deg,
+					var(--primary),
+					var(--primary-light)
+				);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 1rem;
+				color: white;
+				font-size: 1.5rem;
+			}
+
+			.metric-content {
+				flex: 1;
+			}
+
+			.metric-title {
+				font-size: 0.9rem;
+				color: var(--text-secondary);
+				margin-bottom: 0.5rem;
+			}
+
+			.metric-value {
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--text-primary);
+			}
+			.chart-container::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f1f5f9' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='1'/%3E%3Ccircle cx='13' cy='13' r='1'/%3E%3C/g%3E%3C/svg%3E");
+				opacity: 0.5;
+				border-radius: 12px;
+				pointer-events: none;
+			}
+
+			.chart-container {
+				background: linear-gradient(
+					to bottom right,
+					rgba(255, 255, 255, 0.95),
+					rgba(248, 249, 255, 0.95)
+				);
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 4px 15px rgba(148, 163, 184, 0.2);
+				margin-bottom: 2rem;
+				border: 1px solid rgba(226, 232, 240, 0.8);
+			}
+
+			.chart-title {
+				font-size: 1.2rem;
+				margin-bottom: 1.5rem;
+				color: var(--text-primary);
+			}
+
+			.population-chart {
+				height: 300px;
+				width: 100%;
+			}
+
+			.btn {
+				padding: 0.75rem 1.5rem;
+				border: none;
+				border-radius: 8px;
+				cursor: pointer;
+				font-weight: 600;
+				font-family: "Poppins", sans-serif;
+				font-size: 1rem;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.3s;
+			}
+
+			.btn i {
+				margin-right: 8px;
+			}
+
+			.btn-primary {
+				background-color: var(--primary);
+				color: white;
+				box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+			}
+
+			.btn-primary:hover {
+				background-color: var(--primary-dark);
+				transform: translateY(-2px);
+				box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+			}
+
+			.btn-secondary {
+				background-color: var(--secondary);
+				color: white;
+				box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+			}
+
+			.btn-secondary:hover {
+				background-color: var(--secondary-dark);
+				transform: translateY(-2px);
+				box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+			}
+
+			.trends-container {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 2rem;
+			}
+
+			.trend-chart-container {
+				background-color: var(--surface);
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 2px 10px var(--shadow);
+				margin-bottom: 2rem;
+			}
+			.population-chart,
+			.trend-chart,
+			.comparison-chart {
+				background-color: rgba(255, 255, 255, 0.7);
+				border-radius: 8px;
+				padding: 10px;
+			}
+			.trend-chart-container h3 {
+				font-size: 1.1rem;
+				margin-bottom: 1.5rem;
+				color: var(--text-primary);
+			}
+			.chart-title,
+			.trend-chart-container h3,
+			.comparison-chart-container h4 {
+				text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+			}
+
+			.trend-chart {
+				height: 300px;
+				width: 100%;
+			}
+
+			.trend-metrics {
+				grid-column: 1 / -1;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 1.5rem;
+			}
+
+			.trend-metric-card {
+				background-color: var(--surface-alt);
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 2px 10px var(--shadow);
+				display: flex;
+				align-items: center;
+				transition: all 0.3s;
+			}
+
+			.trend-metric-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 10px 20px var(--shadow);
+			}
+
+			.trend-metric-icon {
+				width: 40px;
+				height: 40px;
+				border-radius: 10px;
+				background: linear-gradient(
+					45deg,
+					var(--secondary),
+					var(--secondary-light)
+				);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 1rem;
+				color: white;
+				font-size: 1.2rem;
+			}
+
+			.trend-metric-content h4 {
+				font-size: 1rem;
+				color: var(--text-primary);
+				margin-bottom: 0.25rem;
+			}
+
+			.trend-metric-content p {
+				font-size: 1.1rem;
+				font-weight: 600;
+				color: var(--primary);
+			}
+
+			.continent-label {
+				font-size: 13px;
+				font-weight: 700;
+				fill: white;
+				stroke: rgba(0, 0, 0, 0.7);
+				stroke-width: 1px;
+				paint-order: stroke;
+				filter: drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.8));
+				pointer-events: none;
+				text-anchor: middle;
+			}
+
+			.compare-controls {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1.5rem;
+				margin-bottom: 2rem;
+				background-color: var(--surface-alt);
+				padding: 1.5rem;
+				border-radius: 12px;
+			}
+
+			.country-select-container {
+				display: flex;
+				flex: 1;
+				gap: 1.5rem;
+				min-width: 300px;
+			}
+
+			.country-select {
+				flex: 1;
+			}
+
+			.country-select label {
+				display: block;
+				margin-bottom: 0.5rem;
+				font-weight: 500;
+			}
+
+			.compare-btn-container {
+				display: flex;
+				align-items: flex-end;
+				margin-left: auto;
+			}
+
+			.comparison-container {
+				background-color: var(--surface);
+				border-radius: 12px;
+				padding: 2rem;
+				box-shadow: 0 2px 10px var(--shadow);
+			}
+
+			.comparison-header {
+				margin-bottom: 2rem;
+				text-align: center;
+			}
+
+			.comparison-header h3 {
+				font-size: 1.5rem;
+				color: var(--text-primary);
+				display: inline-block;
+				position: relative;
+			}
+
+			.comparison-header h3::after {
+				content: "";
+				position: absolute;
+				bottom: -10px;
+				left: 0;
+				width: 100%;
+				height: 3px;
+				background: linear-gradient(to right, var(--primary), var(--accent));
+				border-radius: 3px;
+			}
+
+			.comparison-metrics {
+				margin-bottom: 2rem;
+			}
+
+			.comparison-metric {
+				margin-bottom: 1.5rem;
+			}
+
+			.comparison-label {
+				font-weight: 500;
+				margin-bottom: 0.75rem;
+				color: var(--text-primary);
+			}
+
+			.comparison-bars {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.comparison-country {
+				display: flex;
+				align-items: center;
+			}
+
+			.country-name {
+				width: 60px;
+				font-weight: 600;
+				color: var(--text-primary);
+			}
+
+			.country-bar-container {
+				flex: 1;
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.country-bar {
+				height: 20px;
+				background: linear-gradient(
+					to right,
+					var(--primary-light),
+					var(--primary)
+				);
+				border-radius: 10px;
+				transition: width 1s ease-out;
+			}
+
+			.country-two .country-bar {
+				background: linear-gradient(
+					to right,
+					var(--secondary-light),
+					var(--secondary)
+				);
+			}
+
+			.country-value {
+				font-weight: 500;
+				color: var(--text-secondary);
+				width: 120px;
+			}
+
+			.comparison-charts {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 2rem;
+			}
+
+			.comparison-chart-container {
+				background-color: var(--surface-alt);
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 2px 10px var(--shadow);
+			}
+
+			.comparison-chart-container h4 {
+				font-size: 1.1rem;
+				margin-bottom: 1.5rem;
+				color: var(--text-primary);
+				text-align: center;
+			}
+
+			.comparison-chart {
+				height: 250px;
+				width: 100%;
+			}
+
+			.about-content {
+				display: flex;
+				flex-direction: column;
+				gap: 2rem;
+			}
+
+			.about-section {
+				background-color: var(--surface-alt);
+				border-radius: 12px;
+				padding: 2rem;
+				box-shadow: 0 2px 10px var(--shadow);
+			}
+
+			.about-section h3 {
+				font-size: 1.3rem;
+				margin-bottom: 1rem;
+				color: var(--primary);
+			}
+
+			.about-section p {
+				color: var(--text-primary);
+				line-height: 1.7;
+			}
+
+			.team-members {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2rem;
+				margin-top: 1.5rem;
+			}
+
+			.team-member {
+				flex: 1;
+				min-width: 200px;
+				text-align: center;
+			}
+
+			.team-member img {
+				width: 120px;
+				height: 120px;
+				border-radius: 50%;
+				object-fit: cover;
+				margin-bottom: 1rem;
+				border: 3px solid var(--primary-light);
+			}
+
+			.team-member h4 {
+				font-size: 1.1rem;
+				margin-bottom: 0.25rem;
+				color: var(--text-primary);
+			}
+
+			.team-member p {
+				color: var(--text-secondary);
+			}
+
+			.contact-info {
+				margin-top: 1.5rem;
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+
+			.contact-item {
+				display: flex;
+				align-items: center;
+			}
+
+			.contact-item i {
+				width: 30px;
+				color: var(--primary);
+			}
+
+			footer {
+				background-color: #2c3e50;
+				color: white;
+				padding: 3rem 0 1.5rem;
+				margin-top: 3rem;
+			}
+
+			.footer-container {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.footer-column h3 {
+				font-size: 1.2rem;
+				color: white;
+				margin-bottom: 1.5rem;
+				position: relative;
+				display: inline-block;
+			}
+
+			.footer-column h3::after {
+				content: "";
+				position: absolute;
+				bottom: -8px;
+				left: 0;
+				width: 40px;
+				height: 2px;
+				background-color: var(--primary);
+			}
+
+			.footer-column p {
+				color: #bdc3c7;
+				line-height: 1.7;
+				margin-bottom: 1.5rem;
+			}
+
+			.footer-links {
+				list-style: none;
+			}
+
+			.footer-links li {
+				margin-bottom: 0.75rem;
+			}
+
+			.footer-links a {
+				color: #bdc3c7;
+				text-decoration: none;
+				transition: color 0.3s;
+				display: inline-flex;
+				align-items: center;
+			}
+
+			.footer-links a:hover {
+				color: white;
+			}
+
+			.social-icons {
+				display: flex;
+				gap: 1rem;
+			}
+
+			.social-icon {
+				color: white;
+				font-size: 1.2rem;
+				transition: transform 0.3s;
+			}
+
+			.social-icon:hover {
+				transform: translateY(-3px);
+			}
+
+			.copyright {
+				text-align: center;
+				padding-top: 1.5rem;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				color: #bdc3c7;
+				font-size: 0.9rem;
+			}
+			.toast-container {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				z-index: 9999;
+				max-width: 320px;
+			}
+
+			.toast {
+				background-color: var(--surface);
+				color: var(--text-primary);
+				border-left: 4px solid var(--primary);
+				padding: 12px 16px;
+				margin-bottom: 10px;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				display: flex;
+				align-items: center;
+				animation: slide-in 0.3s ease-out forwards;
+				opacity: 0;
+				transform: translateX(50px);
+			}
+
+			.toast-success {
+				border-left-color: var(--secondary);
+			}
+
+			.toast-error {
+				border-left-color: #ef4444;
+			}
+
+			.toast-icon {
+				margin-right: 12px;
+				font-size: 18px;
+			}
+
+			.toast-message {
+				flex: 1;
+			}
+
+			.toast-close {
+				background: none;
+				border: none;
+				color: var(--text-secondary);
+				cursor: pointer;
+				font-size: 16px;
+				padding: 0;
+				margin-left: 8px;
+			}
+
+			@keyframes slide-in {
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes fade-out {
+				to {
+					opacity: 0;
+					transform: translateY(-20px);
+				}
+			}
+
+			@media (max-width: 992px) {
+				.trends-container,
+				.comparison-charts {
+					grid-template-columns: 1fr;
+				}
+
+				.map-container {
+					height: 400px;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.navbar {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+
+				.nav-menu {
+					margin-top: 1rem;
+					width: 100%;
+					justify-content: space-between;
+				}
+
+				.nav-menu li {
+					margin: 0;
+				}
+
+				.profile-container {
+					position: absolute;
+					top: 1rem;
+					right: 1rem;
+				}
+
+				.metrics,
+				.trend-metrics {
+					grid-template-columns: 1fr;
+				}
+
+				.country-select-container {
+					flex-direction: column;
+				}
+
+				.compare-btn-container {
+					margin-left: 0;
+					width: 100%;
+				}
+
+				.comparison-country {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+
+				.country-name {
+					width: 100%;
+					margin-bottom: 0.5rem;
+				}
+
+				.country-bar-container {
+					width: 100%;
+				}
+
+				.map-container {
+					height: 300px;
+				}
+			}
+
+			@media (max-width: 576px) {
+				.dashboard {
+					padding: 1.5rem;
+				}
+
+				.dashboard-title {
+					font-size: 1.5rem;
+				}
+
+				.metric-card,
+				.trend-metric-card {
+					padding: 1rem;
+				}
+
+				.metric-icon,
+				.trend-metric-icon {
+					display: none;
+				}
+
+				.year-display {
+					font-size: 2rem;
+				}
+
+				.map-container {
+					height: 250px;
+				}
+			}
+		</style>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+		/>
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<!-- Header with Navigation -->
+		<div id="toast-container" class="toast-container"></div>
+		<header>
+			<div class="container">
+				<nav class="navbar">
+					<div class="logo">
+						<i class="fas fa-globe-americas"></i>
+						PopViz
+					</div>
+					<ul class="nav-menu">
+						<li><a href="#home" class="active">Home</a></li>
+						<li><a href="#trends">Trends</a></li>
+						<li><a href="#compare">Compare</a></li>
+						<li><a href="#about">About</a></li>
+					</ul>
+					<div class="profile-container">
+						<div class="profile-icon" id="profile-trigger">
+							<img
+								src="https://randomuser.me/api/portraits/men/32.jpg"
+								alt="Profile"
+								class="avatar"
+							/>
+						</div>
+						<div class="profile-dropdown">
+							<div class="profile-header">
+								<img
+									src="https://randomuser.me/api/portraits/men/32.jpg"
+									alt="Profile"
+									class="dropdown-avatar"
+								/>
+								<div class="profile-info">
+									<h3>John Doe</h3>
+									<p>john.doe@example.com</p>
+								</div>
+							</div>
+							<ul class="profile-menu">
+								<li>
+									<a href="#profile"><i class="fas fa-user"></i> Profile</a>
+								</li>
+								<li>
+									<a href="#saved"><i class="fas fa-bookmark"></i> Saved</a>
+								</li>
+								<li>
+									<a href="#settings"><i class="fas fa-cog"></i> Settings</a>
+								</li>
+								<li class="divider"></li>
+								<li>
+									<a href="#logout" class="logout"
+										><i class="fas fa-sign-out-alt"></i> Logout</a
+									>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</nav>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="container">
+			<!-- Home Section -->
+			<section id="home" class="page active">
+				<div class="dashboard">
+					<div class="dashboard-header">
+						<h1 class="dashboard-title">Global Population Growth</h1>
+						<p class="dashboard-subtitle">
+							Explore historical population trends across continents (1950-2020)
+						</p>
+					</div>
+
+					<!-- Controls -->
+					<div class="controls">
+						<div class="control-group">
+							<label class="control-label" for="metric-select">Metric</label>
+							<div class="custom-select">
+								<select id="metric-select">
+									<option value="population">Total Population</option>
+									<option value="growth">Growth Rate</option>
+									<option value="density">Population Density</option>
+								</select>
+								<div class="select-arrow">
+									<i class="fas fa-chevron-down"></i>
+								</div>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="view-select">View Mode</label>
+							<div class="custom-select">
+								<select id="view-select">
+									<option value="continents">Continents</option>
+									<option value="regions">Regions</option>
+									<option value="countries">Countries</option>
+								</select>
+								<div class="select-arrow">
+									<i class="fas fa-chevron-down"></i>
+								</div>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label">&nbsp;</label>
+							<button id="play-btn" class="btn btn-primary">
+								<i class="fas fa-play"></i> Play Timeline
+							</button>
+						</div>
+					</div>
+
+					<!-- Legend -->
+					<div class="legend">
+						<div class="legend-title">Population Density</div>
+						<div class="legend-gradient">
+							<div class="legend-item">
+								<span>Low</span>
+							</div>
+							<div class="legend-gradient-bar"></div>
+							<div class="legend-item">
+								<span>High</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Map Visualization -->
+					<div class="map-container">
+						<svg class="world-map" id="world-map" viewBox="0 0 1000 500">
+							<!-- Map will be drawn here using JavaScript -->
+							<g id="map-content">
+								<path
+									id="north-america"
+									class="continent"
+									d="M 150,120 L 220,90 L 280,110 L 310,180 L 250,240 L 170,210 Z"
+								></path>
+								<path
+									id="south-america"
+									class="continent"
+									d="M 250,240 L 270,310 L 240,370 L 200,350 L 190,280 Z"
+								></path>
+								<path
+									id="europe"
+									class="continent"
+									d="M 490,100 L 530,90 L 560,120 L 550,170 L 510,180 L 480,150 Z"
+								></path>
+								<path
+									id="africa"
+									class="continent"
+									d="M 490,180 L 550,170 L 580,250 L 550,320 L 480,310 L 460,240 Z"
+								></path>
+								<path
+									id="asia"
+									class="continent"
+									d="M 560,120 L 700,90 L 760,140 L 750,210 L 660,250 L 580,240 L 550,170 Z"
+								></path>
+								<path
+									id="oceania"
+									class="continent"
+									d="M 750,270 L 800,260 L 830,290 L 820,330 L 770,340 L 740,310 Z"
+								></path>
+
+								<text x="220" y="160" class="continent-label">
+									North America
+								</text>
+								<text x="230" y="320" class="continent-label">
+									South America
+								</text>
+								<text x="510" y="135" class="continent-label">Europe</text>
+								<text x="520" y="240" class="continent-label">Africa</text>
+								<text x="650" y="170" class="continent-label">Asia</text>
+								<text x="780" y="300" class="continent-label">Oceania</text>
+							</g>
+						</svg>
+						<div id="tooltip" class="tooltip"></div>
+					</div>
+
+					<!-- Timeline Slider -->
+					<div class="timeline-container">
+						<div class="modern-slider-container">
+							<div class="year-display" id="current-year">2000</div>
+							<div class="modern-slider">
+								<input
+									type="range"
+									id="year-slider"
+									class="timeline-slider"
+									min="1950"
+									max="2020"
+									step="5"
+									value="2000"
+								/>
+								<div class="slider-track"></div>
+								<div class="slider-fill"></div>
+							</div>
+							<div class="timeline-labels">
+								<span>1950</span>
+								<span>1970</span>
+								<span>1990</span>
+								<span>2010</span>
+								<span>2020</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Metrics Cards -->
+					<div class="metrics">
+						<div class="metric-card">
+							<div class="metric-icon">
+								<i class="fas fa-users"></i>
+							</div>
+							<div class="metric-content">
+								<div class="metric-title">Total World Population</div>
+								<div class="metric-value" id="total-population">
+									6.1 Billion
+								</div>
+							</div>
+						</div>
+						<div class="metric-card">
+							<div class="metric-icon">
+								<i class="fas fa-chart-line"></i>
+							</div>
+							<div class="metric-content">
+								<div class="metric-title">Highest Population</div>
+								<div class="metric-value" id="highest-population">
+									Asia: 3.7 Billion
+								</div>
+							</div>
+						</div>
+						<div class="metric-card">
+							<div class="metric-icon">
+								<i class="fas fa-percentage"></i>
+							</div>
+							<div class="metric-content">
+								<div class="metric-title">Average Growth Rate</div>
+								<div class="metric-value" id="avg-growth">1.3%</div>
+							</div>
+						</div>
+						<div class="metric-card">
+							<div class="metric-icon">
+								<i class="fas fa-chart-bar"></i>
+							</div>
+							<div class="metric-content">
+								<div class="metric-title">Selected Metric</div>
+								<div class="metric-value" id="selected-metric">
+									Total Population
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Population Chart -->
+					<div class="chart-container">
+						<h2 class="chart-title">Population Growth Trends</h2>
+						<canvas class="population-chart" id="population-chart"></canvas>
+					</div>
+				</div>
+			</section>
+
+			<!-- Trends Section -->
+			<section id="trends" class="page">
+				<div class="dashboard">
+					<div class="dashboard-header">
+						<h1 class="dashboard-title">Population Trends Analysis</h1>
+						<p class="dashboard-subtitle">
+							Explore regional and global population trends over time
+						</p>
+					</div>
+
+					<div class="trends-container">
+						<div class="trend-chart-container">
+							<h3>Growth Rate by Region (1950-2020)</h3>
+							<canvas id="growth-rate-chart" class="trend-chart"></canvas>
+						</div>
+
+						<div class="trend-chart-container">
+							<h3>Population Distribution by Continent (2020)</h3>
+							<canvas id="distribution-chart" class="trend-chart"></canvas>
+						</div>
+
+						<div class="trend-metrics">
+							<div class="trend-metric-card">
+								<div class="trend-metric-icon">
+									<i class="fas fa-sort-amount-up"></i>
+								</div>
+								<div class="trend-metric-content">
+									<h4>Fastest Growing</h4>
+									<p>Africa (2.2%)</p>
+								</div>
+							</div>
+
+							<div class="trend-metric-card">
+								<div class="trend-metric-icon">
+									<i class="fas fa-sort-amount-down"></i>
+								</div>
+								<div class="trend-metric-content">
+									<h4>Slowest Growing</h4>
+									<p>Europe (0.1%)</p>
+								</div>
+							</div>
+
+							<div class="trend-metric-card">
+								<div class="trend-metric-icon">
+									<i class="fas fa-balance-scale"></i>
+								</div>
+								<div class="trend-metric-content">
+									<h4>Most Stable</h4>
+									<p>North America</p>
+								</div>
+							</div>
+
+							<div class="trend-metric-card">
+								<div class="trend-metric-icon">
+									<i class="fas fa-users"></i>
+								</div>
+								<div class="trend-metric-content">
+									<h4>Population Share</h4>
+									<p>Asia (59.5%)</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Compare Section -->
+			<section id="compare" class="page">
+				<div class="dashboard">
+					<div class="dashboard-header">
+						<h1 class="dashboard-title">Compare Countries</h1>
+						<p class="dashboard-subtitle">
+							Analyze population data between different countries
+						</p>
+					</div>
+
+					<div class="compare-controls">
+						<div class="country-select-container">
+							<div class="country-select">
+								<label for="country-one">First Country</label>
+								<div class="custom-select">
+									<select id="country-one">
+										<option value="usa">United States</option>
+										<option value="china">China</option>
+										<option value="india">India</option>
+										<option value="russia">Russia</option>
+										<option value="japan">Japan</option>
+										<option value="germany">Germany</option>
+										<option value="brazil">Brazil</option>
+										<option value="nigeria">Nigeria</option>
+									</select>
+									<div class="select-arrow">
+										<i class="fas fa-chevron-down"></i>
+									</div>
+								</div>
+							</div>
+							<div class="country-select">
+								<label for="country-two">Second Country</label>
+								<div class="custom-select">
+									<select id="country-two">
+										<option value="china">China</option>
+										<option value="usa">United States</option>
+										<option value="india">India</option>
+										<option value="russia">Russia</option>
+										<option value="japan">Japan</option>
+										<option value="germany">Germany</option>
+										<option value="brazil">Brazil</option>
+										<option value="nigeria">Nigeria</option>
+									</select>
+									<div class="select-arrow">
+										<i class="fas fa-chevron-down"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="compare-btn-container">
+							<button id="compare-btn" class="btn btn-primary">
+								<i class="fas fa-chart-bar"></i> Compare
+							</button>
+						</div>
+					</div>
+
+					<div class="comparison-container">
+						<div class="comparison-header">
+							<h3>United States vs China</h3>
+						</div>
+
+						<div class="comparison-metrics">
+							<div class="comparison-metric">
+								<div class="comparison-label">Total Population (2020)</div>
+								<div class="comparison-bars">
+									<div class="comparison-country country-one">
+										<div class="country-name">USA</div>
+										<div class="country-bar-container">
+											<div class="country-bar" style="width: 25%"></div>
+											<div class="country-value">331 Million</div>
+										</div>
+									</div>
+									<div class="comparison-country country-two">
+										<div class="country-name">China</div>
+										<div class="country-bar-container">
+											<div class="country-bar" style="width: 100%"></div>
+											<div class="country-value">1.4 Billion</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="comparison-metric">
+								<div class="comparison-label">Population Density (2020)</div>
+								<div class="comparison-bars">
+									<div class="comparison-country country-one">
+										<div class="country-name">USA</div>
+										<div class="country-bar-container">
+											<div class="country-bar" style="width: 18%"></div>
+											<div class="country-value">36 people/km²</div>
+										</div>
+									</div>
+									<div class="comparison-country country-two">
+										<div class="country-name">China</div>
+										<div class="country-bar-container">
+											<div class="country-bar" style="width: 70%"></div>
+											<div class="country-value">153 people/km²</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="comparison-metric">
+								<div class="comparison-label">Growth Rate (2020)</div>
+								<div class="comparison-bars">
+									<div class="comparison-country country-one">
+										<div class="country-name">USA</div>
+										<div class="country-bar-container">
+											<div class="country-bar" style="width: 60%"></div>
+											<div class="country-value">0.6%</div>
+										</div>
+									</div>
+									<div class="comparison-country country-two">
+										<div class="country-name">China</div>
+										<div class="country-bar-container">
+											<div class="country-bar" style="width: 40%"></div>
+											<div class="country-value">0.4%</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="comparison-charts">
+							<div class="comparison-chart-container">
+								<h4>Population Growth (1950-2020)</h4>
+								<canvas
+									id="comparison-growth-chart"
+									class="comparison-chart"
+								></canvas>
+							</div>
+
+							<div class="comparison-chart-container">
+								<h4>Age Distribution (2020)</h4>
+								<canvas
+									id="comparison-age-chart"
+									class="comparison-chart"
+								></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- About Section -->
+			<section id="about" class="page">
+				<div class="dashboard">
+					<div class="dashboard-header">
+						<h1 class="dashboard-title">About PopViz</h1>
+						<p class="dashboard-subtitle">
+							Visualizing global population data with precision and clarity
+						</p>
+					</div>
+
+					<div class="about-content">
+						<div class="about-section">
+							<h3>Our Mission</h3>
+							<p>
+								PopViz aims to make global population data accessible,
+								intuitive, and actionable for researchers, policymakers,
+								educators, and curious minds worldwide. We believe that
+								understanding demographic trends is crucial for addressing
+								global challenges and planning for a sustainable future.
+							</p>
+						</div>
+
+						<div class="about-section">
+							<h3>Data Sources</h3>
+							<p>
+								Our visualizations are based on data from trusted international
+								organizations including the United Nations Population Division,
+								World Bank, and national census bureaus. All data is
+								meticulously validated and updated regularly to ensure accuracy.
+							</p>
+						</div>
+
+						<div class="about-section">
+							<h3>Research Team</h3>
+							<div class="team-members">
+								<div class="team-member">
+									<img
+										src="https://randomuser.me/api/portraits/women/44.jpg"
+										alt="Team Member"
+									/>
+									<h4>Dr. Sarah Johnson</h4>
+									<p>Lead Demographer</p>
+								</div>
+								<div class="team-member">
+									<img
+										src="https://randomuser.me/api/portraits/men/67.jpg"
+										alt="Team Member"
+									/>
+									<h4>Prof. Michael Chen</h4>
+									<p>Data Scientist</p>
+								</div>
+								<div class="team-member">
+									<img
+										src="https://randomuser.me/api/portraits/women/33.jpg"
+										alt="Team Member"
+									/>
+									<h4>Dr. Aisha Patel</h4>
+									<p>Visualization Expert</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="about-section">
+							<h3>Contact Us</h3>
+							<p>Have questions or suggestions? We'd love to hear from you!</p>
+							<div class="contact-info">
+								<div class="contact-item">
+									<i class="fas fa-envelope"></i>
+									<span>info@popviz.org</span>
+								</div>
+								<div class="contact-item">
+									<i class="fas fa-phone"></i>
+									<span>+1 (555) 123-4567</span>
+								</div>
+								<div class="contact-item">
+									<i class="fas fa-map-marker-alt"></i>
+									<span>123 Data Drive, Analytics City, AC 12345</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Footer -->
+		<footer>
+			<div class="container">
+				<div class="footer-container">
+					<div class="footer-column">
+						<h3>PopViz</h3>
+						<p>
+							Visualizing global population trends for research, education, and
+							policy planning.
+						</p>
+						<div class="social-icons">
+							<a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+							<a href="#" class="social-icon"
+								><i class="fab fa-facebook"></i
+							></a>
+							<a href="#" class="social-icon"
+								><i class="fab fa-linkedin"></i
+							></a>
+							<a href="#" class="social-icon"
+								><i class="fab fa-instagram"></i
+							></a>
+						</div>
+					</div>
+					<div class="footer-column">
+						<h3>Quick Links</h3>
+						<ul class="footer-links">
+							<li><a href="#home">Home</a></li>
+							<li><a href="#trends">Trends</a></li>
+							<li><a href="#compare">Compare</a></li>
+							<li><a href="#about">About</a></li>
+						</ul>
+					</div>
+					<div class="footer-column">
+						<h3>Resources</h3>
+						<ul class="footer-links">
+							<li><a href="#">Data Sources</a></li>
+							<li><a href="#">Methodology</a></li>
+							<li><a href="#">API Documentation</a></li>
+							<li><a href="#">Publications</a></li>
+						</ul>
+					</div>
+					<div class="footer-column">
+						<h3>Legal</h3>
+						<ul class="footer-links">
+							<li><a href="#">Privacy Policy</a></li>
+							<li><a href="#">Terms of Service</a></li>
+							<li><a href="#">Data Usage Policy</a></li>
+							<li><a href="#">Cookie Policy</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="copyright">&copy; 2025 PopViz. All rights reserved.</div>
+			</div>
+		</footer>
+
+		<!-- Scripts -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.4/d3.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0/dist/chartjs-plugin-annotation.min.js"></script>
+		<script>
+			const countryData = {
+				usa: {
+					name: "United States",
+					color: "#6366f1",
+					population: {
+						1950: 152,
+						1960: 181,
+						1970: 205,
+						1980: 227,
+						1990: 249,
+						2000: 282,
+						2010: 309,
+						2020: 331,
+					},
+					growth: {
+						1950: 1.8,
+						1960: 1.7,
+						1970: 1.2,
+						1980: 1.0,
+						1990: 0.9,
+						2000: 1.1,
+						2010: 0.8,
+						2020: 0.6,
+					},
+					density: {
+						1950: 16,
+						1960: 19,
+						1970: 22,
+						1980: 24,
+						1990: 27,
+						2000: 30,
+						2010: 33,
+						2020: 36,
+					},
+					ageDistribution: {
+						"0-14": 18.4,
+						"15-64": 65.0,
+						"65+": 16.6,
+					},
+				},
+				china: {
+					name: "China",
+					color: "#10b981",
+					population: {
+						1950: 552,
+						1960: 662,
+						1970: 827,
+						1980: 984,
+						1990: 1149,
+						2000: 1263,
+						2010: 1338,
+						2020: 1411,
+					},
+					growth: {
+						1950: 1.9,
+						1960: 2.0,
+						1970: 2.2,
+						1980: 1.5,
+						1990: 1.3,
+						2000: 0.8,
+						2010: 0.5,
+						2020: 0.4,
+					},
+					density: {
+						1950: 57,
+						1960: 69,
+						1970: 86,
+						1980: 102,
+						1990: 120,
+						2000: 132,
+						2010: 139,
+						2020: 153,
+					},
+					ageDistribution: {
+						"0-14": 17.8,
+						"15-64": 70.3,
+						"65+": 11.9,
+					},
+				},
+				india: {
+					name: "India",
+					color: "#f97316",
+					population: {
+						1950: 372,
+						1960: 450,
+						1970: 555,
+						1980: 697,
+						1990: 868,
+						2000: 1056,
+						2010: 1234,
+						2020: 1380,
+					},
+					growth: {
+						1950: 1.8,
+						1960: 2.1,
+						1970: 2.3,
+						1980: 2.2,
+						1990: 2.0,
+						2000: 1.8,
+						2010: 1.5,
+						2020: 1.0,
+					},
+					density: {
+						1950: 113,
+						1960: 137,
+						1970: 169,
+						1980: 212,
+						1990: 264,
+						2000: 321,
+						2010: 375,
+						2020: 419,
+					},
+					ageDistribution: {
+						"0-14": 26.2,
+						"15-64": 67.3,
+						"65+": 6.5,
+					},
+				},
+				russia: {
+					name: "Russia",
+					color: "#8b5cf6",
+					population: {
+						1950: 103,
+						1960: 120,
+						1970: 130,
+						1980: 139,
+						1990: 148,
+						2000: 146,
+						2010: 143,
+						2020: 146,
+					},
+					growth: {
+						1950: 1.5,
+						1960: 1.0,
+						1970: 0.6,
+						1980: 0.7,
+						1990: 0.3,
+						2000: -0.2,
+						2010: -0.1,
+						2020: 0.1,
+					},
+					density: {
+						1950: 6,
+						1960: 7,
+						1970: 8,
+						1980: 8,
+						1990: 9,
+						2000: 9,
+						2010: 8,
+						2020: 9,
+					},
+					ageDistribution: {
+						"0-14": 17.2,
+						"15-64": 67.8,
+						"65+": 15.0,
+					},
+				},
+				japan: {
+					name: "Japan",
+					color: "#ec4899",
+					population: {
+						1950: 84,
+						1960: 94,
+						1970: 104,
+						1980: 117,
+						1990: 123,
+						2000: 127,
+						2010: 128,
+						2020: 126,
+					},
+					growth: {
+						1950: 1.7,
+						1960: 1.0,
+						1970: 1.1,
+						1980: 0.8,
+						1990: 0.4,
+						2000: 0.2,
+						2010: 0.0,
+						2020: -0.3,
+					},
+					density: {
+						1950: 222,
+						1960: 249,
+						1970: 275,
+						1980: 309,
+						1990: 325,
+						2000: 336,
+						2010: 339,
+						2020: 333,
+					},
+					ageDistribution: {
+						"0-14": 12.4,
+						"15-64": 59.2,
+						"65+": 28.4,
+					},
+				},
+				germany: {
+					name: "Germany",
+					color: "#14b8a6",
+					population: {
+						1950: 70,
+						1960: 73,
+						1970: 78,
+						1980: 78,
+						1990: 80,
+						2000: 82,
+						2010: 82,
+						2020: 83,
+					},
+					growth: {
+						1950: 1.0,
+						1960: 0.5,
+						1970: 0.6,
+						1980: 0.0,
+						1990: 0.3,
+						2000: 0.2,
+						2010: 0.0,
+						2020: 0.1,
+					},
+					density: {
+						1950: 196,
+						1960: 204,
+						1970: 218,
+						1980: 218,
+						1990: 224,
+						2000: 230,
+						2010: 230,
+						2020: 232,
+					},
+					ageDistribution: {
+						"0-14": 13.8,
+						"15-64": 64.5,
+						"65+": 21.7,
+					},
+				},
+				brazil: {
+					name: "Brazil",
+					color: "#a3e635",
+					population: {
+						1950: 54,
+						1960: 72,
+						1970: 95,
+						1980: 121,
+						1990: 149,
+						2000: 174,
+						2010: 196,
+						2020: 212,
+					},
+					growth: {
+						1950: 2.8,
+						1960: 2.9,
+						1970: 2.5,
+						1980: 2.1,
+						1990: 1.8,
+						2000: 1.5,
+						2010: 1.2,
+						2020: 0.7,
+					},
+					density: {
+						1950: 6,
+						1960: 8,
+						1970: 11,
+						1980: 14,
+						1990: 18,
+						2000: 20,
+						2010: 23,
+						2020: 25,
+					},
+					ageDistribution: {
+						"0-14": 21.1,
+						"15-64": 69.7,
+						"65+": 9.2,
+					},
+				},
+				nigeria: {
+					name: "Nigeria",
+					color: "#fb7185",
+					population: {
+						1950: 38,
+						1960: 45,
+						1970: 56,
+						1980: 73,
+						1990: 95,
+						2000: 123,
+						2010: 159,
+						2020: 206,
+					},
+					growth: {
+						1950: 1.8,
+						1960: 1.9,
+						1970: 2.2,
+						1980: 2.7,
+						1990: 2.8,
+						2000: 2.6,
+						2010: 2.7,
+						2020: 2.6,
+					},
+					density: {
+						1950: 41,
+						1960: 49,
+						1970: 61,
+						1980: 79,
+						1990: 103,
+						2000: 133,
+						2010: 172,
+						2020: 223,
+					},
+					ageDistribution: {
+						"0-14": 43.7,
+						"15-64": 53.8,
+						"65+": 2.5,
+					},
+				},
+			};
+
+			const populationData = {
+				1950: {
+					"North America": { population: 220, growth: 1.7, density: 11.2 },
+					"South America": { population: 112, growth: 2.8, density: 6.3 },
+					Europe: { population: 549, growth: 1.0, density: 58.7 },
+					Africa: { population: 227, growth: 2.1, density: 7.5 },
+					Asia: { population: 1394, growth: 1.9, density: 31.6 },
+					Oceania: { population: 12.6, growth: 2.3, density: 1.4 },
+				},
+				1955: {
+					"North America": { population: 242, growth: 1.9, density: 12.3 },
+					"South America": { population: 129, growth: 2.9, density: 7.3 },
+					Europe: { population: 575, growth: 0.9, density: 61.5 },
+					Africa: { population: 253, growth: 2.2, density: 8.4 },
+					Asia: { population: 1534, growth: 1.9, density: 34.8 },
+					Oceania: { population: 14.2, growth: 2.4, density: 1.6 },
+				},
+				1960: {
+					"North America": { population: 265, growth: 1.8, density: 13.5 },
+					"South America": { population: 148, growth: 2.8, density: 8.3 },
+					Europe: { population: 601, growth: 0.9, density: 64.3 },
+					Africa: { population: 283, growth: 2.3, density: 9.4 },
+					Asia: { population: 1687, growth: 1.9, density: 38.3 },
+					Oceania: { population: 15.9, growth: 2.3, density: 1.8 },
+				},
+				1965: {
+					"North America": { population: 288, growth: 1.7, density: 14.7 },
+					"South America": { population: 169, growth: 2.7, density: 9.5 },
+					Europe: { population: 625, growth: 0.8, density: 66.9 },
+					Africa: { population: 319, growth: 2.4, density: 10.6 },
+					Asia: { population: 1854, growth: 1.9, density: 42.0 },
+					Oceania: { population: 17.7, growth: 2.2, density: 2.0 },
+				},
+				1970: {
+					"North America": { population: 312, growth: 1.6, density: 15.9 },
+					"South America": { population: 191, growth: 2.5, density: 10.8 },
+					Europe: { population: 644, growth: 0.6, density: 69.0 },
+					Africa: { population: 360, growth: 2.5, density: 12.0 },
+					Asia: { population: 2042, growth: 2.0, density: 46.3 },
+					Oceania: { population: 19.5, growth: 2.0, density: 2.2 },
+				},
+				1975: {
+					"North America": { population: 334, growth: 1.4, density: 17.0 },
+					"South America": { population: 214, growth: 2.3, density: 12.1 },
+					Europe: { population: 659, growth: 0.5, density: 70.6 },
+					Africa: { population: 408, growth: 2.6, density: 13.6 },
+					Asia: { population: 2251, growth: 2.0, density: 51.1 },
+					Oceania: { population: 21.3, growth: 1.8, density: 2.4 },
+				},
+				1980: {
+					"North America": { population: 353, growth: 1.1, density: 18.0 },
+					"South America": { population: 238, growth: 2.1, density: 13.4 },
+					Europe: { population: 670, growth: 0.3, density: 71.8 },
+					Africa: { population: 470, growth: 2.8, density: 15.6 },
+					Asia: { population: 2477, growth: 1.9, density: 56.2 },
+					Oceania: { population: 22.9, growth: 1.5, density: 2.5 },
+				},
+				1985: {
+					"North America": { population: 369, growth: 0.9, density: 18.8 },
+					"South America": { population: 262, growth: 1.9, density: 14.8 },
+					Europe: { population: 682, growth: 0.4, density: 73.1 },
+					Africa: { population: 541, growth: 2.9, density: 18.0 },
+					Asia: { population: 2711, growth: 1.8, density: 61.5 },
+					Oceania: { population: 24.5, growth: 1.4, density: 2.7 },
+				},
+				1990: {
+					"North America": { population: 383, growth: 0.8, density: 19.5 },
+					"South America": { population: 286, growth: 1.8, density: 16.2 },
+					Europe: { population: 693, growth: 0.2, density: 74.2 },
+					Africa: { population: 622, growth: 2.8, density: 20.7 },
+					Asia: { population: 2954, growth: 1.7, density: 67.0 },
+					Oceania: { population: 26.2, growth: 1.4, density: 2.9 },
+				},
+				1995: {
+					"North America": { population: 397, growth: 0.7, density: 20.2 },
+					"South America": { population: 309, growth: 1.6, density: 17.4 },
+					Europe: { population: 700, growth: 0.1, density: 75.0 },
+					Africa: { population: 711, growth: 2.7, density: 23.6 },
+					Asia: { population: 3195, growth: 1.6, density: 72.5 },
+					Oceania: { population: 28.0, growth: 1.3, density: 3.1 },
+				},
+				2000: {
+					"North America": { population: 414, growth: 0.9, density: 21.1 },
+					"South America": { population: 330, growth: 1.4, density: 18.6 },
+					Europe: { population: 702, growth: 0.0, density: 75.2 },
+					Africa: { population: 808, growth: 2.5, density: 26.9 },
+					Asia: { population: 3437, growth: 1.4, density: 78.0 },
+					Oceania: { population: 29.9, growth: 1.3, density: 3.3 },
+				},
+				2005: {
+					"North America": { population: 432, growth: 0.8, density: 22.0 },
+					"South America": { population: 349, growth: 1.2, density: 19.7 },
+					Europe: { population: 705, growth: 0.1, density: 75.5 },
+					Africa: { population: 911, growth: 2.4, density: 30.3 },
+					Asia: { population: 3679, growth: 1.3, density: 83.5 },
+					Oceania: { population: 32.0, growth: 1.4, density: 3.5 },
+				},
+				2010: {
+					"North America": { population: 447, growth: 0.7, density: 22.8 },
+					"South America": { population: 368, growth: 1.1, density: 20.8 },
+					Europe: { population: 710, growth: 0.2, density: 76.0 },
+					Africa: { population: 1022, growth: 2.3, density: 34.0 },
+					Asia: { population: 3918, growth: 1.1, density: 88.9 },
+					Oceania: { population: 34.2, growth: 1.5, density: 3.8 },
+				},
+				2015: {
+					"North America": { population: 462, growth: 0.7, density: 23.5 },
+					"South America": { population: 386, growth: 1.0, density: 21.8 },
+					Europe: { population: 715, growth: 0.1, density: 76.6 },
+					Africa: { population: 1146, growth: 2.3, density: 38.1 },
+					Asia: { population: 4152, growth: 1.0, density: 94.2 },
+					Oceania: { population: 36.6, growth: 1.5, density: 4.0 },
+				},
+				2020: {
+					"North America": { population: 477, growth: 0.6, density: 24.3 },
+					"South America": { population: 404, growth: 0.9, density: 22.8 },
+					Europe: { population: 719, growth: 0.1, density: 77.0 },
+					Africa: { population: 1279, growth: 2.2, density: 42.5 },
+					Asia: { population: 4384, growth: 0.9, density: 99.5 },
+					Oceania: { population: 39.2, growth: 1.4, density: 4.3 },
+				},
+			};
+
+			const colorScale = [
+				"#cdfcf6",
+				"#7de7eb",
+				"#45b8e0",
+				"#3178c6",
+				"#274494",
+			];
+
+			let yearSlider, currentYearDisplay, metricSelect, viewSelect, playButton;
+			let tooltip,
+				totalPopulationDisplay,
+				highestPopulationDisplay,
+				avgGrowthDisplay,
+				selectedMetricDisplay;
+			let populationChart, growthRateChart, distributionChart;
+			let countryOneSelect, countryTwoSelect, compareButton;
+			let comparisonGrowthChart, comparisonAgeChart;
+			let navLinks, pages;
+
+			let currentYear = 2000;
+			let currentMetric = "population";
+			let currentView = "continents";
+			let isPlaying = false;
+			let playInterval;
+			let selectedCountryOne = "usa";
+			let selectedCountryTwo = "china";
+
+			document.addEventListener("DOMContentLoaded", function () {
+				yearSlider = document.getElementById("year-slider");
+				currentYearDisplay = document.getElementById("current-year");
+				metricSelect = document.getElementById("metric-select");
+				viewSelect = document.getElementById("view-select");
+				playButton = document.getElementById("play-btn");
+				tooltip = document.getElementById("tooltip");
+				totalPopulationDisplay = document.getElementById("total-population");
+				highestPopulationDisplay =
+					document.getElementById("highest-population");
+				avgGrowthDisplay = document.getElementById("avg-growth");
+				selectedMetricDisplay = document.getElementById("selected-metric");
+
+				navLinks = document.querySelectorAll(".nav-menu a");
+				pages = document.querySelectorAll(".page");
+
+				countryOneSelect = document.getElementById("country-one");
+				countryTwoSelect = document.getElementById("country-two");
+				compareButton = document.getElementById("compare-btn");
+
+				yearSlider.value = currentYear;
+				metricSelect.value = currentMetric;
+				viewSelect.value = currentView;
+
+				function handleYearChange() {
+					currentYear = parseInt(yearSlider.value);
+					updateVisualization();
+				}
+
+				function handleMetricChange() {
+					currentMetric = metricSelect.value;
+					updateVisualization();
+				}
+
+				function togglePlayTimeline() {
+					isPlaying = !isPlaying;
+
+					if (isPlaying) {
+						playButton.innerHTML = '<i class="fas fa-pause"></i> Pause';
+						playTimeline();
+					} else {
+						playButton.innerHTML = '<i class="fas fa-play"></i> Play Timeline';
+						clearInterval(playInterval);
+					}
+				}
+
+				function playTimeline() {
+					playInterval = setInterval(() => {
+						if (currentYear >= 2020) {
+							currentYear = 1950;
+						} else {
+							currentYear += 5;
+						}
+
+						yearSlider.value = currentYear;
+						updateVisualization();
+
+						if (currentYear >= 2020) {
+							togglePlayTimeline();
+						}
+					}, 1000);
+				}
+
+				function showToast(message, type = "info", duration = 3000) {
+					const toastContainer = document.getElementById("toast-container");
+
+					const toast = document.createElement("div");
+					toast.className = `toast ${type ? "toast-" + type : ""}`;
+
+					let iconClass = "fas fa-info-circle";
+					if (type === "success") iconClass = "fas fa-check-circle";
+					if (type === "error") iconClass = "fas fa-exclamation-circle";
+
+					toast.innerHTML = `
+    <div class="toast-icon"><i class="${iconClass}"></i></div>
+    <div class="toast-message">${message}</div>
+    <button class="toast-close"><i class="fas fa-times"></i></button>
+  `;
+
+					toastContainer.appendChild(toast);
+
+					setTimeout(() => {
+						toast.style.opacity = "1";
+						toast.style.transform = "translateX(0)";
+					}, 10);
+
+					const removeToast = () => {
+						toast.style.animation = "fade-out 0.3s forwards";
+						setTimeout(() => {
+							toastContainer.removeChild(toast);
+						}, 300);
+					};
+
+					const timeoutId = setTimeout(removeToast, duration);
+
+					toast.querySelector(".toast-close").addEventListener("click", () => {
+						clearTimeout(timeoutId);
+						removeToast();
+					});
+
+					return toast;
+				}
+
+				function showTooltip(e) {
+					const continentId = e.target.id;
+					const continentName = continentId
+						.replace(/-/g, " ")
+						.split(" ")
+						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(" ");
+
+					const yearData = populationData[currentYear];
+					const continentData = yearData[continentName];
+
+					if (!continentData) return;
+
+					let metricValue;
+					let metricUnit;
+
+					if (currentMetric === "population") {
+						metricValue = formatPopulation(continentData.population);
+						metricUnit = "";
+					} else if (currentMetric === "growth") {
+						metricValue = continentData.growth.toFixed(1);
+						metricUnit = "%";
+					} else {
+						metricValue = continentData.density.toFixed(1);
+						metricUnit = " people/km²";
+					}
+
+					tooltip.innerHTML = `
+        <strong>${continentName}</strong><br>
+        ${metricValue}${metricUnit}
+    `;
+
+					tooltip.style.display = "block";
+					moveTooltip(e);
+				}
+
+				function moveTooltip(e) {
+					tooltip.style.left = `${e.pageX + 10}px`;
+					tooltip.style.top = `${e.pageY + 10}px`;
+				}
+
+				function hideTooltip() {
+					tooltip.style.display = "none";
+				}
+
+				function handleContinentClick(e) {
+					const continentId = e.target.id;
+					const continentName = continentId
+						.replace(/-/g, " ")
+						.split(" ")
+						.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+						.join(" ");
+
+					const yearData = populationData[currentYear];
+					const continentData = yearData[continentName];
+
+					if (!continentData) return;
+
+					const message = `
+    <strong>${continentName} (${currentYear})</strong><br>
+    Population: ${formatPopulation(continentData.population)}<br>
+    Growth Rate: ${continentData.growth.toFixed(1)}%<br>
+    Population Density: ${continentData.density.toFixed(1)} people/km²
+    `;
+
+					showToast(message, "success", 5000);
+				}
+
+				yearSlider.addEventListener("input", handleYearChange);
+				metricSelect.addEventListener("change", handleMetricChange);
+				viewSelect.addEventListener("change", handleViewChange);
+				playButton.addEventListener("click", togglePlayTimeline);
+
+				function showPage(pageId) {
+					pages.forEach((page) => {
+						page.classList.remove("active");
+					});
+
+					const selectedPage = document.getElementById(pageId);
+					if (selectedPage) {
+						selectedPage.classList.add("active");
+					}
+
+					navLinks.forEach((link) => {
+						link.classList.remove("active");
+						if (link.getAttribute("href") === `#${pageId}`) {
+							link.classList.add("active");
+						}
+					});
+				}
+
+				navLinks.forEach((link) => {
+					link.addEventListener("click", function (e) {
+						e.preventDefault();
+						const targetId = this.getAttribute("href").substring(1);
+						showPage(targetId);
+					});
+				});
+
+				if (countryOneSelect && countryTwoSelect && compareButton) {
+					countryOneSelect.addEventListener("change", function () {
+						selectedCountryOne = this.value;
+					});
+
+					countryTwoSelect.addEventListener("change", function () {
+						selectedCountryTwo = this.value;
+					});
+
+					compareButton.addEventListener("click", updateComparison);
+				}
+
+				const continents = document.querySelectorAll(".continent");
+				continents.forEach((continent) => {
+					let hoverTimer;
+
+					continent.addEventListener("mouseover", (e) => {
+						clearTimeout(hoverTimer);
+						showTooltip(e);
+					});
+
+					continent.addEventListener("mousemove", (e) => {
+						clearTimeout(hoverTimer);
+						hoverTimer = setTimeout(() => moveTooltip(e), 10);
+					});
+
+					continent.addEventListener("mouseout", hideTooltip);
+					continent.addEventListener("click", handleContinentClick);
+				});
+
+				initializeModernSlider();
+
+				updateVisualization();
+
+				createPopulationChart();
+
+				if (
+					document.getElementById("growth-rate-chart") &&
+					document.getElementById("distribution-chart")
+				) {
+					createTrendsCharts();
+				}
+
+				if (
+					document.getElementById("comparison-growth-chart") &&
+					document.getElementById("comparison-age-chart")
+				) {
+					createComparisonCharts();
+				}
+			});
+
+			function initializeModernSlider() {
+				const sliderFill = document.querySelector(".slider-fill");
+
+				updateSliderFill();
+
+				yearSlider.addEventListener("input", updateSliderFill);
+
+				function updateSliderFill() {
+					const min = parseInt(yearSlider.min);
+					const max = parseInt(yearSlider.max);
+					const val = parseInt(yearSlider.value);
+					const percentage = ((val - min) / (max - min)) * 100;
+
+					sliderFill.style.width = `${percentage}%`;
+				}
+			}
+
+			function updateVisualization() {
+				currentYearDisplay.textContent = currentYear;
+				animateElement(currentYearDisplay);
+
+				const yearData = populationData[currentYear];
+
+				updateMapColors(yearData);
+
+				updateMetricDisplays(yearData);
+
+				if (populationChart) {
+					updatePopulationChart();
+				}
+			}
+
+			function updateMapColors(yearData) {
+				let minValue = Infinity;
+				let maxValue = -Infinity;
+
+				Object.keys(yearData).forEach((continent) => {
+					const value = yearData[continent][currentMetric];
+					minValue = Math.min(minValue, value);
+					maxValue = Math.max(maxValue, value);
+				});
+
+				Object.keys(yearData).forEach((continent) => {
+					const value = yearData[continent][currentMetric];
+					const normalizedValue = (value - minValue) / (maxValue - minValue);
+					const colorIndex = Math.min(
+						Math.floor(normalizedValue * colorScale.length),
+						colorScale.length - 1
+					);
+
+					const continentElement = document.getElementById(
+						continent.toLowerCase().replace(/\s+/g, "-")
+					);
+					if (continentElement) {
+						continentElement.style.fill = colorScale[colorIndex];
+
+						continentElement.style.transition = "fill 0.5s ease-in-out";
+					}
+				});
+			}
+
+			function updateMetricDisplays(yearData) {
+				let totalPopulation = 0;
+				let highestPopulation = { continent: "", value: 0 };
+				let totalGrowth = 0;
+
+				Object.keys(yearData).forEach((continent) => {
+					const data = yearData[continent];
+					totalPopulation += data.population;
+					totalGrowth += data.growth;
+
+					if (data.population > highestPopulation.value) {
+						highestPopulation = { continent, value: data.population };
+					}
+				});
+
+				const avgGrowth = totalGrowth / Object.keys(yearData).length;
+
+				animateCounter(
+					totalPopulationDisplay,
+					formatPopulation(totalPopulation)
+				);
+				animateCounter(
+					highestPopulationDisplay,
+					`${highestPopulation.continent}: ${formatPopulation(
+						highestPopulation.value
+					)}`
+				);
+				animateCounter(avgGrowthDisplay, `${avgGrowth.toFixed(1)}%`);
+
+				let metricText = "Total Population";
+				if (currentMetric === "growth") {
+					metricText = "Growth Rate";
+				} else if (currentMetric === "density") {
+					metricText = "Population Density";
+				}
+				selectedMetricDisplay.textContent = metricText;
+			}
+
+			function formatPopulation(value) {
+				if (value >= 1000) {
+					return `${(value / 1000).toFixed(1)} Billion`;
+				} else {
+					return `${value.toFixed(1)} Million`;
+				}
+			}
+
+			function animateElement(element) {
+				if (!element.classList.contains("animating")) {
+					element.classList.add("animating");
+
+					setTimeout(() => {
+						element.classList.remove("animating");
+					}, 500);
+				}
+			}
+
+			function animateCounter(element, finalValue) {
+				const currentValue = element.textContent;
+				element.textContent = finalValue;
+				animateElement(element);
+			}
+
+			function createPopulationChart() {
+				const ctx = document.getElementById("population-chart");
+				if (!ctx) return;
+
+				const chartData = prepareChartData();
+
+				populationChart = new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: Object.keys(populationData).map((year) => year),
+						datasets: chartData,
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "top",
+							},
+							tooltip: {
+								mode: "index",
+								intersect: false,
+							},
+						},
+						scales: {
+							x: {
+								title: {
+									display: true,
+									text: "Year",
+								},
+							},
+							y: {
+								title: {
+									display: true,
+									text: "Population (Millions)",
+								},
+								beginAtZero: true,
+							},
+						},
+						animation: false,
+						responsiveAnimationDuration: 0,
+						elements: {
+							line: {
+								tension: 0.1,
+							},
+						},
+						hover: {
+							mode: "nearest",
+							intersect: true,
+							animationDuration: 0,
+						},
+						maintainAspectRatio: true,
+						onResize: null,
+					},
+				});
+			}
+
+			function prepareChartData() {
+				const continents = [
+					"Asia",
+					"Africa",
+					"Europe",
+					"North America",
+					"South America",
+					"Oceania",
+				];
+				const colors = [
+					"#274494",
+					"#f97316",
+					"#6366f1",
+					"#10b981",
+					"#ec4899",
+					"#8b5cf6",
+				];
+
+				return continents.map((continent, index) => {
+					const data = Object.keys(populationData).map((year) => {
+						return populationData[year][continent].population;
+					});
+
+					return {
+						label: continent,
+						data: data,
+						borderColor: colors[index],
+						backgroundColor: colors[index] + "33",
+						tension: 0.3,
+						borderWidth: 3,
+						pointRadius: 3,
+						pointHoverRadius: 6,
+					};
+				});
+			}
+
+			function updatePopulationChart() {
+				if (!populationChart) return;
+
+				const datasets = populationChart.data.datasets;
+				const yearIndex = Object.keys(populationData).indexOf(
+					currentYear.toString()
+				);
+
+				populationChart.options.plugins.annotation = {
+					annotations: {
+						line1: {
+							type: "line",
+							xMin: yearIndex,
+							xMax: yearIndex,
+							borderColor: "rgba(255, 99, 132, 0.8)",
+							borderWidth: 2,
+							label: {
+								enabled: true,
+								content: currentYear.toString(),
+								position: "top",
+							},
+						},
+					},
+				};
+
+				populationChart.update();
+			}
+
+			function createTrendsCharts() {
+				createGrowthRateChart();
+				createDistributionChart();
+			}
+
+			function createGrowthRateChart() {
+				const ctx = document.getElementById("growth-rate-chart");
+				if (!ctx || growthRateChart) return;
+
+				const continents = [
+					"Asia",
+					"Africa",
+					"Europe",
+					"North America",
+					"South America",
+					"Oceania",
+				];
+				const colors = [
+					"#274494",
+					"#f97316",
+					"#6366f1",
+					"#10b981",
+					"#ec4899",
+					"#8b5cf6",
+				];
+
+				const datasets = continents.map((continent, index) => {
+					const data = Object.keys(populationData).map((year) => {
+						return populationData[year][continent].growth;
+					});
+
+					return {
+						label: continent,
+						data: data,
+						borderColor: colors[index],
+						backgroundColor: "transparent",
+						tension: 0.3,
+						borderWidth: 3,
+					};
+				});
+
+				growthRateChart = new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: Object.keys(populationData).map((year) => year),
+						datasets: datasets,
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "top",
+							},
+							tooltip: {
+								mode: "index",
+								intersect: false,
+							},
+						},
+						scales: {
+							x: {
+								title: {
+									display: true,
+									text: "Year",
+								},
+							},
+							y: {
+								title: {
+									display: true,
+									text: "Annual Growth Rate (%)",
+								},
+								beginAtZero: true,
+							},
+						},
+						animation: false,
+						responsiveAnimationDuration: 0,
+						elements: {
+							line: {
+								tension: 0.1,
+							},
+						},
+						hover: {
+							mode: "nearest",
+							intersect: true,
+							animationDuration: 0,
+						},
+						maintainAspectRatio: true,
+						onResize: null,
+					},
+				});
+			}
+
+			function createDistributionChart() {
+				const ctx = document.getElementById("distribution-chart");
+				if (!ctx || distributionChart) return;
+
+				const year2020 = populationData[2020];
+				const continents = Object.keys(year2020);
+				const data = continents.map(
+					(continent) => year2020[continent].population
+				);
+
+				distributionChart = new Chart(ctx, {
+					type: "doughnut",
+					data: {
+						labels: continents,
+						datasets: [
+							{
+								data: data,
+								backgroundColor: [
+									"#274494",
+									"#f97316",
+									"#6366f1",
+									"#10b981",
+									"#ec4899",
+									"#8b5cf6",
+								],
+								borderWidth: 1,
+								borderColor: "#ffffff",
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "right",
+							},
+							tooltip: {
+								callbacks: {
+									label: function (context) {
+										const total = context.dataset.data.reduce(
+											(a, b) => a + b,
+											0
+										);
+										const value = context.raw;
+										const percentage = ((value / total) * 100).toFixed(1);
+										return `${context.label}: ${formatPopulation(
+											value
+										)} (${percentage}%)`;
+									},
+								},
+							},
+						},
+						animation: false,
+						responsiveAnimationDuration: 0,
+						elements: {
+							line: {
+								tension: 0.1,
+							},
+						},
+						hover: {
+							mode: "nearest",
+							intersect: true,
+							animationDuration: 0,
+						},
+						maintainAspectRatio: true,
+						onResize: null,
+					},
+				});
+			}
+
+			function createComparisonCharts() {
+				createComparisonGrowthChart();
+				createComparisonAgeChart();
+			}
+
+			function createComparisonGrowthChart() {
+				const ctx = document.getElementById("comparison-growth-chart");
+				if (!ctx) return;
+
+				if (comparisonGrowthChart) {
+					comparisonGrowthChart.destroy();
+				}
+
+				const years = [1950, 1960, 1970, 1980, 1990, 2000, 2010, 2020];
+
+				const country1 = countryData[selectedCountryOne];
+				const country2 = countryData[selectedCountryTwo];
+
+				const datasets = [
+					{
+						label: country1.name,
+						data: years.map((year) => country1.population[year]),
+						borderColor: country1.color,
+						backgroundColor: "transparent",
+						tension: 0.3,
+						borderWidth: 3,
+					},
+					{
+						label: country2.name,
+						data: years.map((year) => country2.population[year]),
+						borderColor: country2.color,
+						backgroundColor: "transparent",
+						tension: 0.3,
+						borderWidth: 3,
+					},
+				];
+
+				comparisonGrowthChart = new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: years,
+						datasets: datasets,
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "top",
+							},
+							tooltip: {
+								mode: "index",
+								intersect: false,
+							},
+						},
+						scales: {
+							x: {
+								title: {
+									display: true,
+									text: "Year",
+								},
+							},
+							y: {
+								title: {
+									display: true,
+									text: "Population (Millions)",
+								},
+								beginAtZero: true,
+							},
+						},
+						animation: false,
+						responsiveAnimationDuration: 0,
+						elements: {
+							line: {
+								tension: 0.1,
+							},
+						},
+						hover: {
+							mode: "nearest",
+							intersect: true,
+							animationDuration: 0,
+						},
+						maintainAspectRatio: true,
+						onResize: null,
+					},
+				});
+			}
+
+			function createComparisonAgeChart() {
+				const ctx = document.getElementById("comparison-age-chart");
+				if (!ctx) return;
+
+				if (comparisonAgeChart) {
+					comparisonAgeChart.destroy();
+				}
+
+				const country1 = countryData[selectedCountryOne];
+				const country2 = countryData[selectedCountryTwo];
+
+				const ageGroups = ["0-14", "15-64", "65+"];
+
+				comparisonAgeChart = new Chart(ctx, {
+					type: "bar",
+					data: {
+						labels: ageGroups,
+						datasets: [
+							{
+								label: country1.name,
+								data: ageGroups.map((group) => country1.ageDistribution[group]),
+								backgroundColor: country1.color,
+								borderWidth: 1,
+								borderColor: "#ffffff",
+							},
+							{
+								label: country2.name,
+								data: ageGroups.map((group) => country2.ageDistribution[group]),
+								backgroundColor: country2.color,
+								borderWidth: 1,
+								borderColor: "#ffffff",
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "top",
+							},
+							tooltip: {
+								callbacks: {
+									label: function (context) {
+										return `${context.dataset.label}: ${context.raw}%`;
+									},
+								},
+							},
+						},
+						scales: {
+							x: {
+								title: {
+									display: true,
+									text: "Age Group",
+								},
+							},
+							y: {
+								title: {
+									display: true,
+									text: "Percentage (%)",
+								},
+								beginAtZero: true,
+								max: 100,
+							},
+						},
+						animation: false,
+						responsiveAnimationDuration: 0,
+						elements: {
+							line: {
+								tension: 0.1,
+							},
+						},
+						hover: {
+							mode: "nearest",
+							intersect: true,
+							animationDuration: 0,
+						},
+						maintainAspectRatio: true,
+						onResize: null,
+					},
+				});
+			}
+
+			function updateComparison() {
+				const comparisonHeader = document.querySelector(
+					".comparison-header h3"
+				);
+				if (comparisonHeader) {
+					const country1 = countryData[selectedCountryOne];
+					const country2 = countryData[selectedCountryTwo];
+					comparisonHeader.textContent = `${country1.name} vs ${country2.name}`;
+				}
+
+				updateComparisonMetrics();
+
+				createComparisonGrowthChart();
+				createComparisonAgeChart();
+			}
+
+			function updateComparisonMetrics() {
+				const country1 = countryData[selectedCountryOne];
+				const country2 = countryData[selectedCountryTwo];
+
+				const countryOneElements = document.querySelectorAll(".country-one");
+				const countryTwoElements = document.querySelectorAll(".country-two");
+
+				countryOneElements.forEach((el) => {
+					const nameEl = el.querySelector(".country-name");
+					if (nameEl) nameEl.textContent = country1.name;
+				});
+
+				countryTwoElements.forEach((el) => {
+					const nameEl = el.querySelector(".country-name");
+					if (nameEl) nameEl.textContent = country2.name;
+				});
+
+				updateComparisonMetric(
+					"Population (2020)",
+					country1.population[2020],
+					country2.population[2020],
+					(value) => `${value} Million`
+				);
+
+				updateComparisonMetric(
+					"Population Density (2020)",
+					country1.density[2020],
+					country2.density[2020],
+					(value) => `${value} people/km²`
+				);
+
+				updateComparisonMetric(
+					"Growth Rate (2020)",
+					country1.growth[2020],
+					country2.growth[2020],
+					(value) => `${value}%`
+				);
+			}
+
+			function updateComparisonMetric(labelText, value1, value2, formatFunc) {
+				const metricContainers =
+					document.querySelectorAll(".comparison-metric");
+				let targetContainer;
+
+				for (const container of metricContainers) {
+					const label = container.querySelector(".comparison-label");
+					if (label && label.textContent.includes(labelText)) {
+						targetContainer = container;
+						break;
+					}
+				}
+
+				if (!targetContainer) return;
+
+				const country1Bar = targetContainer.querySelector(
+					".country-one .country-bar"
+				);
+				const country1Value = targetContainer.querySelector(
+					".country-one .country-value"
+				);
+				const country2Bar = targetContainer.querySelector(
+					".country-two .country-bar"
+				);
+				const country2Value = targetContainer.querySelector(
+					".country-two .country-value"
+				);
+
+				const maxValue = Math.max(value1, value2);
+
+				if (country1Bar && country1Value) {
+					country1Bar.style.width = `${(value1 / maxValue) * 100}%`;
+					country1Value.textContent = formatFunc(value1);
+				}
+
+				if (country2Bar && country2Value) {
+					country2Bar.style.width = `${(value2 / maxValue) * 100}%`;
+					country2Value.textContent = formatFunc(value2);
+				}
+			}
+
+			function handleViewChange() {
+				currentView = viewSelect.value;
+
+				const continents = document.querySelectorAll(".continent");
+				continents.forEach((continent) => {
+					continent.style.opacity = currentView === "continents" ? 1 : 0.3;
+				});
+
+				if (currentView === "regions" || currentView === "countries") {
+					const message = `${
+						currentView.charAt(0).toUpperCase() + currentView.slice(1)
+					} view is not implemented in this demo. Would show more detailed map.`;
+
+					showToast(message, "info", 3000);
+
+					viewSelect.value = "continents";
+					currentView = "continents";
+					continents.forEach((continent) => {
+						continent.style.opacity = 1;
+					});
+				}
+
+				updateVisualization();
+			}
+
+			const profileTrigger = document.getElementById("profile-trigger");
+			const profileDropdown = document.querySelector(".profile-dropdown");
+
+			if (profileTrigger && profileDropdown) {
+				profileTrigger.addEventListener("click", function () {
+					if (profileDropdown.style.opacity === "1") {
+						profileDropdown.style.opacity = "0";
+						profileDropdown.style.visibility = "hidden";
+						profileDropdown.style.transform = "translateY(10px)";
+					} else {
+						profileDropdown.style.opacity = "1";
+						profileDropdown.style.visibility = "visible";
+						profileDropdown.style.transform = "translateY(0)";
+					}
+				});
+
+				document.addEventListener("click", function (e) {
+					if (
+						!profileTrigger.contains(e.target) &&
+						!profileDropdown.contains(e.target)
+					) {
+						profileDropdown.style.opacity = "0";
+						profileDropdown.style.visibility = "hidden";
+						profileDropdown.style.transform = "translateY(10px)";
+					}
+				});
+			}
+		</script>
+	</body>
+</html>

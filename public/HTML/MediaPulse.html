@@ -1,0 +1,2744 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>MediaPulse | Premium Content Platform</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+
+		<link
+			rel="preload"
+			href="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+			as="video"
+			type="video/mp4"
+		/>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: "#FF6B6B",
+							secondary: "#4ECDC4",
+							accent: "#FFD166",
+							neutral: "#292F36",
+							light: "#F7F9FC",
+						},
+						fontFamily: {
+							sans: ["Inter", "sans-serif"],
+						},
+						animation: {
+							"fade-in": "fadeIn 0.5s ease-in-out",
+							"slide-up": "slideUp 0.5s ease-in-out",
+							"pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+							gradient: "gradient 15s ease infinite",
+							spin: "spin 1s linear infinite",
+							float: "float 6s ease-in-out infinite",
+							"float-delayed": "float 6s ease-in-out 2s infinite",
+						},
+						keyframes: {
+							fadeIn: {
+								"0%": { opacity: "0" },
+								"100%": { opacity: "1" },
+							},
+							slideUp: {
+								"0%": { transform: "translateY(20px)", opacity: "0" },
+								"100%": { transform: "translateY(0)", opacity: "1" },
+							},
+							gradient: {
+								"0%": { backgroundPosition: "0% 50%" },
+								"50%": { backgroundPosition: "100% 50%" },
+								"100%": { backgroundPosition: "0% 50%" },
+							},
+							spin: {
+								"0%": { transform: "rotate(0deg)" },
+								"100%": { transform: "rotate(360deg)" },
+							},
+							float: {
+								"0%": { transform: "translateY(0px)" },
+								"50%": { transform: "translateY(-15px)" },
+								"100%": { transform: "translateY(0px)" },
+							},
+						},
+						boxShadow: {
+							neo: "5px 5px 10px rgba(0, 0, 0, 0.1), -5px -5px 10px rgba(255, 255, 255, 0.5)",
+							"neo-inset":
+								"inset 5px 5px 10px rgba(0, 0, 0, 0.1), inset -5px -5px 10px rgba(255, 255, 255, 0.5)",
+							card: "0 10px 40px rgba(0, 0, 0, 0.15)",
+							"card-hover": "0 15px 45px rgba(0, 0, 0, 0.2)",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+			body {
+				font-family: "Inter", sans-serif;
+				scroll-behavior: smooth;
+			}
+
+			body.modal-open {
+				overflow: hidden;
+			}
+
+			.glass-card {
+				background: rgba(255, 255, 255, 0.8);
+				backdrop-filter: blur(15px);
+				border: 1px solid rgba(255, 255, 255, 0.3);
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+				transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+			}
+
+			.glass-card:hover {
+				transform: translateY(-8px);
+				box-shadow: 0 15px 45px rgba(0, 0, 0, 0.2);
+			}
+
+			.neo-button {
+				transition: all 0.3s ease;
+			}
+
+			.neo-button:active {
+				box-shadow: inset 3px 3px 7px rgba(0, 0, 0, 0.1),
+					inset -3px -3px 7px rgba(255, 255, 255, 0.7);
+			}
+
+			.carousel-item {
+				transition: transform 0.5s ease-in-out;
+			}
+
+			.notification-badge {
+				animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.7;
+				}
+			}
+
+			.video-controls {
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				z-index: 20;
+				bottom: 170px;
+			}
+
+			.video-container:hover .video-controls {
+				opacity: 1;
+			}
+
+			.scroll-animate {
+				opacity: 0;
+				transform: translateY(20px);
+				transition: opacity 0.5s ease, transform 0.5s ease;
+			}
+
+			.scroll-animate.active {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			.carousel-indicator {
+				transition: all 0.3s ease;
+			}
+
+			.carousel-indicator.active {
+				background-color: #ff6b6b;
+				width: 30px;
+			}
+
+			.content-card {
+				transition: all 0.3s ease;
+			}
+
+			.content-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+			}
+
+			.btn-hover {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.btn-hover:after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.2),
+					transparent
+				);
+				transition: 0.5s;
+			}
+
+			.btn-hover:hover:after {
+				left: 100%;
+			}
+
+			.btn-primary {
+				background: linear-gradient(135deg, #ff6b6b, #ff4757);
+				color: white;
+				border-radius: 8px;
+				padding: 12px 24px;
+				box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+				transition: all 0.3s ease;
+			}
+
+			.btn-primary:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 7px 20px rgba(255, 107, 107, 0.4);
+			}
+
+			.dropdown-content {
+				transform-origin: top right;
+				transform: scale(0.95);
+				opacity: 0;
+				visibility: hidden;
+				transition: transform 0.2s ease, opacity 0.2s ease, visibility 0.2s;
+				z-index: 30;
+			}
+
+			.dropdown-content.active {
+				transform: scale(1);
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.category-tab {
+				transition: all 0.3s ease;
+			}
+
+			.category-tab.active {
+				color: #ff6b6b;
+				border-color: #ff6b6b;
+			}
+
+			.animated-bg {
+				background: linear-gradient(-45deg, #ff6b6b, #4ecdc4, #ffd166, #ff6b6b);
+				background-size: 400% 400%;
+				animation: gradient 15s ease infinite;
+			}
+			.featured-content-section .relative.overflow-hidden {
+				width: 100%;
+				margin: 0 auto;
+			}
+
+			#carousel-container {
+				display: flex;
+				width: 100%;
+				padding: 0.5rem 0;
+			}
+
+			.carousel-item {
+				min-width: 0;
+			}
+
+			@keyframes gradient {
+				0% {
+					background-position: 0% 50%;
+				}
+				50% {
+					background-position: 100% 50%;
+				}
+				100% {
+					background-position: 0% 50%;
+				}
+			}
+
+			.loading-spinner {
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				border: 3px solid rgba(255, 255, 255, 0.3);
+				border-top-color: #ff6b6b;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.content-modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.75);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				opacity: 0;
+				visibility: hidden;
+				z-index: 100;
+				transition: all 0.3s ease;
+				backdrop-filter: blur(5px);
+			}
+
+			.content-modal.open {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-content {
+				background: white;
+				border-radius: 12px;
+				max-width: 90%;
+				width: 800px;
+				max-height: 90vh;
+				overflow-y: auto;
+				transform: translateY(20px);
+				transition: transform 0.3s ease;
+				box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+			}
+
+			.content-modal.open .modal-content {
+				transform: translateY(0);
+			}
+
+			.decor-circle {
+				border-radius: 50%;
+				position: absolute;
+				z-index: -1;
+			}
+
+			.decor-square {
+				position: absolute;
+				transform: rotate(45deg);
+				z-index: -1;
+			}
+
+			.hide-scrollbar {
+				-ms-overflow-style: none;
+				scrollbar-width: none;
+			}
+
+			.hide-scrollbar::-webkit-scrollbar {
+				display: none;
+			}
+
+			@media (max-width: 640px) {
+				.video-controls {
+					bottom: 70px !important;
+					padding: 0 8px !important;
+					width: 100% !important;
+				}
+
+				.video-controls .flex {
+					flex-direction: row !important;
+					gap: 8px;
+					width: 100%;
+				}
+
+				.progress-bar-container {
+					width: 100% !important;
+					margin-top: 8px;
+					height: 24px !important;
+				}
+
+				.progress-container {
+					height: 8px !important;
+				}
+
+				.dropdown-content {
+					position: fixed !important;
+					top: auto !important;
+					bottom: 0 !important;
+					left: 0 !important;
+					right: 0 !important;
+					width: 100% !important;
+					max-height: 80vh !important;
+					margin: 0 !important;
+					border-radius: 16px 16px 0 0 !important;
+				}
+
+				.mobile-dropdown-pos {
+					position: static !important;
+				}
+
+				.modal-content {
+					width: 95% !important;
+					max-height: 85vh !important;
+				}
+
+				.hero-title {
+					font-size: 1.2rem !important;
+				}
+
+				.mobile-px-2 {
+					padding-left: 0.5rem !important;
+					padding-right: 0.5rem !important;
+				}
+
+				.header-logo {
+					font-size: 1.2rem !important;
+				}
+
+				.carousel-item {
+					width: 100% !important;
+				}
+
+				:fullscreen .video-container {
+					height: 100vh !important;
+					width: 100vw !important;
+				}
+			}
+
+			@media (max-width: 375px) {
+				.xs-text-sm {
+					font-size: 0.875rem !important;
+				}
+
+				.xs-p-1 {
+					padding: 0.25rem !important;
+				}
+
+				.xs-hidden {
+					display: none !important;
+				}
+
+				.xs-w-full {
+					width: 100% !important;
+				}
+
+				.xs-text-xs {
+					font-size: 0.75rem !important;
+				}
+
+				.video-controls {
+					bottom: 70px !important;
+				}
+
+				.header-height-xs {
+					height: 3.5rem !important;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.hero-text h1 {
+					font-size: 1.5rem;
+				}
+
+				.video-container {
+					height: 250px !important;
+				}
+
+				.content-card {
+					margin-bottom: 1rem;
+				}
+
+				.footer-grid {
+					display: grid;
+					grid-template-columns: 1fr;
+					gap: 2rem;
+				}
+
+				.md-flex-col {
+					flex-direction: column !important;
+				}
+
+				.md-space-y-2 > * + * {
+					margin-top: 0.5rem !important;
+				}
+
+				#modal-media {
+					height: auto !important;
+					max-height: 40vh !important;
+				}
+
+				.modal-content {
+					overflow-y: auto !important;
+				}
+
+				:fullscreen .video-container {
+					height: 100vh !important;
+				}
+			}
+
+			@media (min-width: 769px) and (max-width: 1024px) {
+				.hero-text h1 {
+					font-size: 2rem;
+				}
+
+				.video-container {
+					height: 400px !important;
+				}
+
+				.footer-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+
+				:fullscreen .video-container {
+					height: 100vh !important;
+					width: 100vw !important;
+				}
+
+				:fullscreen ~ * {
+					display: none;
+				}
+			}
+
+			:fullscreen .video-container {
+				width: 100vw;
+				height: 100vh;
+				max-width: none;
+				max-height: none;
+			}
+
+			:fullscreen .video-controls {
+				bottom: 30px;
+				padding: 0 20px;
+			}
+
+			:fullscreen .video-content {
+				visibility: hidden;
+			}
+		</style>
+	</head>
+	<body class="bg-light">
+		<div
+			class="decor-circle bg-primary bg-opacity-10 w-64 h-64 -left-32 top-[40%] animate-float hidden sm:block"
+		></div>
+
+		<div
+			class="decor-square bg-accent bg-opacity-10 w-40 h-40 left-[10%] bottom-[20%] animate-float hidden sm:block"
+		></div>
+		<div
+			class="decor-square bg-primary bg-opacity-10 w-24 h-24 right-[15%] bottom-[40%] animate-float-delayed hidden sm:block"
+		></div>
+
+		<header class="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+			<div class="container mx-auto px-2 sm:px-6 lg:px-8">
+				<div
+					class="flex items-center justify-between h-14 sm:h-16 md:h-20 header-height-xs"
+				>
+					<div class="flex items-center">
+						<a
+							href="#"
+							class="text-xl sm:text-2xl font-bold text-primary flex items-center header-logo"
+						>
+							<i class="fas fa-play-circle mr-1 sm:mr-2"></i>
+							<span class="hidden sm:inline">MediaPulse</span>
+							<span class="sm:hidden">MP</span>
+						</a>
+					</div>
+
+					<nav class="hidden md:flex space-x-4 lg:space-x-8">
+						<a
+							href="#"
+							class="text-neutral hover:text-primary font-medium transition-colors duration-200"
+							>Home</a
+						>
+						<a
+							href="#"
+							class="text-neutral hover:text-primary font-medium transition-colors duration-200"
+							>Discover</a
+						>
+						<a
+							href="#"
+							class="text-neutral hover:text-primary font-medium transition-colors duration-200"
+							>Library</a
+						>
+						<a
+							href="#"
+							class="text-neutral hover:text-primary font-medium transition-colors duration-200"
+							>About</a
+						>
+					</nav>
+
+					<div class="flex items-center space-x-2 sm:space-x-4">
+						<button
+							id="search-toggle"
+							class="text-neutral hover:text-primary transition-colors duration-200 p-1"
+						>
+							<i class="fas fa-search text-lg"></i>
+						</button>
+
+						<div class="relative">
+							<div class="flex items-center space-x-2 sm:space-x-3">
+								<div class="relative mobile-dropdown-pos">
+									<button
+										id="notifications-toggle"
+										class="text-neutral hover:text-primary transition-colors duration-200 p-1"
+									>
+										<i class="fas fa-bell text-lg"></i>
+										<span
+											class="notification-badge absolute top-0 bg-primary text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center"
+											>3</span
+										>
+									</button>
+
+									<div
+										id="notifications-dropdown"
+										class="dropdown-content absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg overflow-hidden z-20"
+									>
+										<div class="p-4 border-b border-gray-100">
+											<h3 class="font-semibold text-neutral">Notifications</h3>
+										</div>
+										<div
+											class="max-h-96 overflow-y-auto"
+											id="notifications-container"
+										>
+											<!-- Notifications will be populated by JavaScript -->
+										</div>
+										<div class="p-3 text-center border-t border-gray-100">
+											<button
+												class="text-primary text-sm font-medium hover:underline"
+											>
+												Mark all as read
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<!-- User Avatar -->
+								<div class="relative mobile-dropdown-pos">
+									<button
+										id="profile-toggle"
+										class="relative overflow-hidden w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-primary hover:border-secondary transition-colors duration-200"
+									>
+										<img
+											id="user-avatar"
+											src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+											alt="User Avatar"
+											class="w-full h-full object-cover"
+											loading="lazy"
+										/>
+									</button>
+									<!-- Profile Dropdown -->
+									<div
+										id="profile-dropdown"
+										class="dropdown-content absolute right-0 mt-2 w-60 bg-white rounded-lg shadow-lg overflow-hidden z-20"
+									>
+										<div
+											class="p-4 border-b border-gray-100 flex items-center space-x-3"
+										>
+											<div class="w-12 h-12 rounded-full overflow-hidden">
+												<img
+													src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+													alt="User Profile"
+													class="w-full h-full object-cover"
+													loading="lazy"
+												/>
+											</div>
+											<div>
+												<h4 class="font-medium text-neutral">Alex Morgan</h4>
+												<p class="text-sm text-gray-500">Premium Member</p>
+											</div>
+										</div>
+										<div class="py-2">
+											<a
+												href="#"
+												class="block px-4 py-2 text-sm text-neutral hover:bg-gray-50 hover:text-primary transition-colors duration-200"
+											>
+												<i class="fas fa-user mr-2"></i> My Profile
+											</a>
+											<a
+												href="#"
+												class="block px-4 py-2 text-sm text-neutral hover:bg-gray-50 hover:text-primary transition-colors duration-200"
+											>
+												<i class="fas fa-cog mr-2"></i> Account Settings
+											</a>
+											<a
+												href="#"
+												class="block px-4 py-2 text-sm text-neutral hover:bg-gray-50 hover:text-primary transition-colors duration-200"
+											>
+												<i class="fas fa-bookmark mr-2"></i> Saved Content
+											</a>
+											<a
+												href="#"
+												class="block px-4 py-2 text-sm text-neutral hover:bg-gray-50 hover:text-primary transition-colors duration-200"
+											>
+												<i class="fas fa-history mr-2"></i> Watch History
+											</a>
+										</div>
+										<div class="py-2 border-t border-gray-100">
+											<a
+												href="#"
+												class="block px-4 py-2 text-sm text-neutral hover:bg-gray-50 hover:text-primary transition-colors duration-200"
+											>
+												<i class="fas fa-question-circle mr-2"></i> Help Center
+											</a>
+											<a
+												href="#"
+												class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-50 hover:text-red-700 transition-colors duration-200"
+											>
+												<i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Mobile Menu Button -->
+						<button
+							id="mobile-menu-toggle"
+							class="md:hidden text-neutral hover:text-primary transition-colors duration-200 p-1"
+						>
+							<i class="fas fa-bars text-lg sm:text-xl"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile Navigation Menu -->
+			<div
+				id="mobile-menu"
+				class="hidden md:hidden bg-white border-t border-gray-100"
+			>
+				<div class="px-2 pt-2 pb-3 space-y-1">
+					<a
+						href="#"
+						class="block px-3 py-2 rounded-md text-base font-medium text-neutral hover:text-primary hover:bg-gray-50 transition-colors duration-200"
+						>Home</a
+					>
+					<a
+						href="#"
+						class="block px-3 py-2 rounded-md text-base font-medium text-neutral hover:text-primary hover:bg-gray-50 transition-colors duration-200"
+						>Discover</a
+					>
+					<a
+						href="#"
+						class="block px-3 py-2 rounded-md text-base font-medium text-neutral hover:text-primary hover:bg-gray-50 transition-colors duration-200"
+						>Library</a
+					>
+					<a
+						href="#"
+						class="block px-3 py-2 rounded-md text-base font-medium text-neutral hover:text-primary hover:bg-gray-50 transition-colors duration-200"
+						>About</a
+					>
+				</div>
+			</div>
+		</header>
+
+		<!-- Search Overlay -->
+		<div
+			id="search-overlay"
+			class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex items-center justify-center backdrop-blur-sm"
+		>
+			<div class="w-full max-w-3xl mx-4">
+				<div class="bg-white rounded-lg shadow-lg p-4">
+					<div class="flex items-center border-b border-gray-200 pb-4">
+						<i class="fas fa-search text-gray-400 text-xl mr-3"></i>
+						<input
+							type="text"
+							id="search-input"
+							placeholder="Search for videos, articles, creators..."
+							class="w-full text-base sm:text-lg focus:outline-none"
+						/>
+						<button
+							id="search-close"
+							class="ml-2 text-gray-400 hover:text-neutral transition-colors duration-200"
+						>
+							<i class="fas fa-times text-xl"></i>
+						</button>
+					</div>
+					<div class="pt-4">
+						<h3 class="font-medium text-neutral mb-2">Popular Searches</h3>
+						<div class="flex flex-wrap gap-2">
+							<span
+								class="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-full text-xs sm:text-sm text-neutral hover:bg-primary hover:text-white transition-colors duration-200 cursor-pointer"
+								>Documentary</span
+							>
+							<span
+								class="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-full text-xs sm:text-sm text-neutral hover:bg-primary hover:text-white transition-colors duration-200 cursor-pointer"
+								>Tech Reviews</span
+							>
+							<span
+								class="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-full text-xs sm:text-sm text-neutral hover:bg-primary hover:text-white transition-colors duration-200 cursor-pointer"
+								>Travel Vlogs</span
+							>
+							<span
+								class="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-full text-xs sm:text-sm text-neutral hover:bg-primary hover:text-white transition-colors duration-200 cursor-pointer"
+								>Cooking Shows</span
+							>
+							<span
+								class="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-full text-xs sm:text-sm text-neutral hover:bg-primary hover:text-white transition-colors duration-200 cursor-pointer"
+								>Fitness</span
+							>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<main class="pt-14 sm:pt-16 md:pt-20">
+			<!-- Hero Video Player -->
+			<section
+				class="relative w-full h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden video-section"
+			>
+				<div class="video-container w-full h-full bg-neutral relative z-10">
+					<!-- Loading Spinner for Video -->
+					<div
+						id="video-loading"
+						class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10"
+					>
+						<div class="loading-spinner"></div>
+					</div>
+
+					<video
+						id="hero-video"
+						class="w-full h-full object-cover"
+						poster="https://peach.blender.org/wp-content/uploads/title_anouncement.jpg"
+						preload="metadata"
+						playsinline
+					>
+						<source
+							src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+							type="video/mp4"
+						/>
+						<source
+							src="https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.webm"
+							type="video/webm"
+						/>
+						Your browser does not support the video tag.
+					</video>
+
+					<!-- Video Title and Info Overlay -->
+					<div
+						class="video-content absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent px-3 py-4 sm:px-4 sm:py-6 text-white"
+					>
+						<h1
+							class="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 hero-title"
+						>
+							Exploration: Beyond Horizons
+						</h1>
+						<div
+							class="flex flex-wrap items-center text-xs sm:text-sm md:text-base mb-2 sm:mb-4 gap-y-1 sm:gap-y-2"
+						>
+							<span
+								class="bg-primary px-2 py-0.5 rounded-sm mr-2 sm:mr-3 text-xs sm:text-sm"
+								>FEATURED</span
+							>
+							<span class="mr-2 sm:mr-3 text-xs sm:text-sm"
+								><i class="fas fa-eye mr-1"></i> 1.2M views</span
+							>
+							<span class="text-xs sm:text-sm"
+								><i class="fas fa-calendar-alt mr-1"></i> May 12, 2025</span
+							>
+						</div>
+						<p
+							class="hidden sm:block text-xs sm:text-sm md:text-base opacity-90 max-w-3xl"
+						>
+							Join us on an epic journey through the most breathtaking
+							landscapes on Earth. This documentary explores the untouched
+							corners of our planet and the importance of conservation.
+						</p>
+					</div>
+
+					<!-- Video Controls - Improved for mobile -->
+					<div
+						class="video-controls absolute left-0 right-0 px-2 sm:px-4 md:px-6"
+					>
+						<div
+							class="flex flex-row sm:flex-row items-center justify-between flex-wrap gap-1 sm:gap-2"
+						>
+							<div
+								class="flex items-center justify-center sm:justify-start w-full sm:w-auto space-x-2 sm:space-x-3 order-2 sm:order-1"
+							>
+								<button
+									id="play-pause-btn"
+									class="bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1.5 sm:p-2 hover:bg-opacity-30 transition-all duration-200"
+								>
+									<i class="fas fa-play text-white text-sm sm:text-lg"></i>
+								</button>
+								<span id="current-time" class="text-white text-xs sm:text-sm"
+									>0:00</span
+								>
+							</div>
+
+							<div
+								class="w-full order-1 sm:order-2 progress-bar-container flex items-center"
+							>
+								<div
+									class="relative w-full h-1 sm:h-1.5 bg-white bg-opacity-30 rounded-full overflow-hidden cursor-pointer progress-container"
+									id="progress-container"
+								>
+									<div
+										id="progress-bar"
+										class="absolute top-0 left-0 h-full bg-primary rounded-full"
+										style="width: 0%"
+									></div>
+									<div
+										id="buffer-bar"
+										class="absolute top-0 left-0 h-full bg-white bg-opacity-50 rounded-full"
+										style="width: 0%"
+									></div>
+								</div>
+							</div>
+
+							<div
+								class="flex items-center justify-center sm:justify-end w-full sm:w-auto space-x-3 order-3"
+							>
+								<span id="total-time" class="text-white text-xs sm:text-sm"
+									>0:00</span
+								>
+								<button
+									id="volume-btn"
+									class="text-white hover:text-primary transition-colors duration-200"
+								>
+									<i class="fas fa-volume-up text-sm sm:text-base"></i>
+								</button>
+								<button
+									id="fullscreen-btn"
+									class="text-white hover:text-primary transition-colors duration-200"
+								>
+									<i class="fas fa-expand text-sm sm:text-base"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Featured Content Carousel with updated styling -->
+			<section
+				class="py-8 sm:py-10 bg-white relative overflow-hidden featured-content-section"
+			>
+				<!-- Decorative elements for the section -->
+				<div
+					class="absolute -right-16 top-20 w-32 h-32 bg-primary bg-opacity-5 rounded-full hidden sm:block"
+				></div>
+				<div
+					class="absolute -left-20 bottom-10 w-40 h-40 bg-secondary bg-opacity-5 rounded-full hidden sm:block"
+				></div>
+
+				<div class="container mx-auto px-3 sm:px-6 lg:px-8 mobile-px-2">
+					<div class="flex items-center justify-between mb-4 sm:mb-6">
+						<h2
+							class="text-xl sm:text-2xl md:text-3xl font-bold text-neutral relative"
+						>
+							Featured Content
+							<span
+								class="absolute -bottom-2 left-0 w-16 sm:w-20 h-1 bg-primary rounded-full"
+							></span>
+						</h2>
+						<div class="flex space-x-2">
+							<button
+								id="prev-slide"
+								class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-gray-100 text-neutral hover:bg-primary hover:text-white transition-colors duration-200"
+							>
+								<i class="fas fa-chevron-left text-xs sm:text-base"></i>
+							</button>
+							<button
+								id="next-slide"
+								class="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-gray-100 text-neutral hover:bg-primary hover:text-white transition-colors duration-200"
+							>
+								<i class="fas fa-chevron-right text-xs sm:text-base"></i>
+							</button>
+						</div>
+					</div>
+
+					<div class="relative overflow-hidden">
+						<div
+							id="carousel-container"
+							class="flex transition-transform duration-500 ease-in-out"
+						>
+							<!-- Carousel items will be populated by JavaScript -->
+						</div>
+					</div>
+
+					<!-- Carousel Indicators -->
+					<div
+						class="flex justify-center mt-4 sm:mt-6 space-x-2"
+						id="carousel-indicators"
+					>
+						<!-- Indicators will be populated by JavaScript -->
+					</div>
+				</div>
+			</section>
+
+			<!-- Content Categories with improved styling -->
+			<section class="py-8 sm:py-10 bg-gray-50 relative">
+				<!-- Decorative elements for the section -->
+				<div
+					class="absolute left-10 top-1/4 w-20 h-20 bg-accent bg-opacity-10 rounded-full animate-pulse-slow hidden sm:block"
+				></div>
+				<div
+					class="absolute right-[10%] bottom-1/4 w-16 h-16 bg-primary bg-opacity-10 rotate-45 hidden sm:block"
+				></div>
+
+				<div class="container mx-auto px-3 sm:px-6 lg:px-8 mobile-px-2">
+					<h2
+						class="text-xl sm:text-2xl md:text-3xl font-bold text-neutral mb-4 sm:mb-6 relative"
+					>
+						Browse Categories
+						<span
+							class="absolute -bottom-2 left-0 w-16 sm:w-20 h-1 bg-primary rounded-full"
+						></span>
+					</h2>
+
+					<div class="mb-4 sm:mb-6 border-b border-gray-200">
+						<div class="w-full overflow-x-auto hide-scrollbar">
+							<ul
+								class="flex space-x-4 sm:space-x-6 pb-2 min-w-max"
+								id="category-tabs"
+							>
+								<li
+									class="category-tab active whitespace-nowrap cursor-pointer px-1 py-2 border-b-2 border-primary text-primary font-medium text-sm sm:text-base"
+								>
+									All Content
+								</li>
+								<li
+									class="category-tab whitespace-nowrap cursor-pointer px-1 py-2 border-b-2 border-transparent text-neutral font-medium text-sm sm:text-base"
+								>
+									Documentaries
+								</li>
+								<li
+									class="category-tab whitespace-nowrap cursor-pointer px-1 py-2 border-b-2 border-transparent text-neutral font-medium text-sm sm:text-base"
+								>
+									Tutorials
+								</li>
+								<li
+									class="category-tab whitespace-nowrap cursor-pointer px-1 py-2 border-b-2 border-transparent text-neutral font-medium text-sm sm:text-base"
+								>
+									Entertainment
+								</li>
+								<li
+									class="category-tab whitespace-nowrap cursor-pointer px-1 py-2 border-b-2 border-transparent text-neutral font-medium text-sm sm:text-base"
+								>
+									News
+								</li>
+								<li
+									class="category-tab whitespace-nowrap cursor-pointer px-1 py-2 border-b-2 border-transparent text-neutral font-medium text-sm sm:text-base"
+								>
+									Podcasts
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div
+						class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+						id="content-grid"
+					>
+						<!-- Content cards will be populated by JavaScript -->
+					</div>
+
+					<div class="flex justify-center mt-6 sm:mt-8">
+						<button
+							class="btn-primary px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-all duration-200 btn-hover text-sm sm:text-base"
+						>
+							Load More
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<!-- Trending Now -->
+			<section class="py-8 sm:py-10 bg-white relative">
+				<!-- Decorative elements for the section -->
+				<div
+					class="absolute -left-10 top-1/3 w-24 h-24 bg-secondary bg-opacity-5 rounded-full hidden sm:block"
+				></div>
+				<div
+					class="absolute right-[5%] top-1/4 w-12 h-12 bg-accent bg-opacity-10 rounded-full animate-pulse-slow hidden sm:block"
+				></div>
+
+				<div class="container mx-auto px-3 sm:px-6 lg:px-8 mobile-px-2">
+					<h2
+						class="text-xl sm:text-2xl md:text-3xl font-bold text-neutral mb-4 sm:mb-6 relative"
+					>
+						Trending Now
+						<span
+							class="absolute -bottom-2 left-0 w-16 sm:w-20 h-1 bg-primary rounded-full"
+						></span>
+					</h2>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+						<div class="glass-card rounded-xl overflow-hidden">
+							<div class="aspect-video relative overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1605379399642-870262d3d051?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+									alt="Trending Content"
+									class="w-full h-full object-cover"
+									loading="lazy"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"
+								></div>
+								<div
+									class="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white"
+								>
+									<span
+										class="bg-primary px-2 py-0.5 rounded-sm text-xs sm:text-sm"
+										>TECH</span
+									>
+									<p class="mt-1 text-sm sm:text-lg font-semibold">
+										The Future of AI in Content Creation
+									</p>
+								</div>
+								<button
+									class="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1.5 sm:p-2 hover:bg-opacity-30 transition-all duration-200 play-trending modal-trigger"
+									data-video="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+									data-title="The Future of AI in Content Creation"
+									data-image="https://images.unsplash.com/photo-1605379399642-870262d3d051?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+								>
+									<i class="fas fa-play text-white text-xs sm:text-base"></i>
+								</button>
+							</div>
+							<div class="p-3 sm:p-4">
+								<div class="flex items-center justify-between flex-wrap gap-2">
+									<div class="flex items-center space-x-2">
+										<img
+											src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+											alt="Creator"
+											class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
+											loading="lazy"
+										/>
+										<span class="font-medium text-neutral text-sm sm:text-base"
+											>TechInsights</span
+										>
+									</div>
+									<div
+										class="flex items-center space-x-3 text-gray-500 text-xs sm:text-sm"
+									>
+										<span><i class="fas fa-eye mr-1"></i> 245K</span>
+										<span><i class="fas fa-thumbs-up mr-1"></i> 18K</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="glass-card rounded-xl overflow-hidden">
+							<div class="aspect-video relative overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1554941829-202a0b2403b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+									alt="Trending Content"
+									class="w-full h-full object-cover"
+									loading="lazy"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"
+								></div>
+								<div
+									class="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white"
+								>
+									<span
+										class="bg-secondary px-2 py-0.5 rounded-sm text-xs sm:text-sm"
+										>LIFESTYLE</span
+									>
+									<p class="mt-1 text-sm sm:text-lg font-semibold">
+										Mindfulness Techniques for Creators
+									</p>
+								</div>
+								<button
+									class="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1.5 sm:p-2 hover:bg-opacity-30 transition-all duration-200 play-trending modal-trigger"
+									data-video="https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+									data-title="Mindfulness Techniques for Creators"
+									data-image="https://images.unsplash.com/photo-1554941829-202a0b2403b8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80"
+								>
+									<i class="fas fa-play text-white text-xs sm:text-base"></i>
+								</button>
+							</div>
+							<div class="p-3 sm:p-4">
+								<div class="flex items-center justify-between flex-wrap gap-2">
+									<div class="flex items-center space-x-2">
+										<img
+											src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80"
+											alt="Creator"
+											class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover"
+											loading="lazy"
+										/>
+										<span class="font-medium text-neutral text-sm sm:text-base"
+											>MindfulCreator</span
+										>
+									</div>
+									<div
+										class="flex items-center space-x-3 text-gray-500 text-xs sm:text-sm"
+									>
+										<span><i class="fas fa-eye mr-1"></i> 132K</span>
+										<span><i class="fas fa-thumbs-up mr-1"></i> 12K</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Subscribe Section with Animated Background -->
+			<section class="py-10 sm:py-16 animated-bg relative">
+				<!-- Decorative elements for the section -->
+				<div
+					class="absolute w-20 sm:w-40 h-20 sm:h-40 left-[10%] top-[10%] bg-white bg-opacity-10 rounded-full hidden sm:block"
+				></div>
+				<div
+					class="absolute w-12 sm:w-24 h-12 sm:h-24 right-[15%] bottom-[20%] bg-white bg-opacity-10 rounded-full hidden sm:block"
+				></div>
+
+				<div class="container mx-auto px-3 sm:px-6 lg:px-8 mobile-px-2">
+					<div
+						class="max-w-3xl mx-auto text-center bg-white bg-opacity-90 backdrop-blur-sm p-4 sm:p-8 rounded-xl shadow-lg"
+					>
+						<h2
+							class="text-xl sm:text-2xl md:text-3xl font-bold text-neutral mb-2 sm:mb-4"
+						>
+							Stay Updated
+						</h2>
+						<p class="text-gray-600 mb-4 sm:mb-8 text-sm sm:text-base">
+							Subscribe to our newsletter to get the latest updates on new
+							content, features, and exclusive offers.
+						</p>
+
+						<div
+							class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3"
+						>
+							<input
+								type="email"
+								placeholder="Enter your email address"
+								class="flex-grow px-3 py-2 sm:px-4 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
+							/>
+							<button
+								class="btn-primary btn-hover px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
+							>
+								Subscribe
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="bg-neutral text-white">
+			<div class="container mx-auto px-3 sm:px-6 lg:px-8 py-8 sm:py-12">
+				<div
+					class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 footer-grid"
+				>
+					<div>
+						<a
+							href="#"
+							class="text-xl sm:text-2xl font-bold flex items-center mb-3 sm:mb-4"
+						>
+							<i class="fas fa-play-circle mr-2"></i>
+							<span>MediaPulse</span>
+						</a>
+						<p class="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">
+							Your premium destination for high-quality multimedia content
+							across various categories and interests.
+						</p>
+						<div class="flex space-x-4">
+							<a
+								href="#"
+								class="text-gray-300 hover:text-white transition-colors duration-200"
+							>
+								<i class="fab fa-facebook-f"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-300 hover:text-white transition-colors duration-200"
+							>
+								<i class="fab fa-twitter"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-300 hover:text-white transition-colors duration-200"
+							>
+								<i class="fab fa-instagram"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-300 hover:text-white transition-colors duration-200"
+							>
+								<i class="fab fa-youtube"></i>
+							</a>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-4">
+							Quick Links
+						</h3>
+						<ul class="space-y-1 sm:space-y-2">
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Home</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Discover</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Categories</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Featured</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Creators</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-4">
+							Support
+						</h3>
+						<ul class="space-y-1 sm:space-y-2">
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Help Center</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>FAQs</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Contact Us</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Terms of Service</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-gray-300 hover:text-white transition-colors duration-200 text-sm sm:text-base"
+									>Privacy Policy</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-base sm:text-lg font-semibold mb-2 sm:mb-4">
+							Download Our App
+						</h3>
+						<p class="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base">
+							Get our app for the best experience on mobile devices.
+						</p>
+						<div class="flex flex-col space-y-2">
+							<a
+								href="#"
+								class="flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors duration-200"
+							>
+								<i class="fab fa-apple text-xl sm:text-2xl mr-2 sm:mr-3"></i>
+								<div>
+									<p class="text-xs">Download on the</p>
+									<p class="text-xs sm:text-sm font-medium">App Store</p>
+								</div>
+							</a>
+							<a
+								href="#"
+								class="flex items-center px-3 py-2 sm:px-4 sm:py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors duration-200"
+							>
+								<i
+									class="fab fa-google-play text-xl sm:text-2xl mr-2 sm:mr-3"
+								></i>
+								<div>
+									<p class="text-xs">Get it on</p>
+									<p class="text-xs sm:text-sm font-medium">Google Play</p>
+								</div>
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<div
+					class="border-t border-gray-700 mt-6 sm:mt-10 pt-4 sm:pt-6 flex flex-col md:flex-row justify-between items-center"
+				>
+					<p class="text-gray-400 text-xs sm:text-sm mb-3 md:mb-0">
+						© 2025 MediaPulse. All rights reserved.
+					</p>
+					<div class="flex space-x-4 sm:space-x-6">
+						<a
+							href="#"
+							class="text-gray-400 hover:text-white text-xs sm:text-sm transition-colors duration-200"
+							>Terms</a
+						>
+						<a
+							href="#"
+							class="text-gray-400 hover:text-white text-xs sm:text-sm transition-colors duration-200"
+							>Privacy</a
+						>
+						<a
+							href="#"
+							class="text-gray-400 hover:text-white text-xs sm:text-sm transition-colors duration-200"
+							>Cookies</a
+						>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Content Preview Modal - Improved for mobile -->
+		<div id="content-modal" class="content-modal">
+			<div class="modal-content">
+				<div class="relative">
+					<button
+						id="modal-close"
+						class="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 bg-white rounded-full p-1.5 sm:p-2 shadow-md text-neutral hover:text-primary transition-colors duration-200"
+					>
+						<i class="fas fa-times text-sm sm:text-base"></i>
+					</button>
+					<div id="modal-media" class="aspect-video bg-black relative">
+						<!-- Media content will be loaded here (video or image) -->
+						<div
+							id="modal-loading"
+							class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10"
+						>
+							<div class="loading-spinner"></div>
+						</div>
+					</div>
+					<div class="p-3 sm:p-4 md:p-6">
+						<h3
+							id="modal-title"
+							class="text-lg sm:text-xl md:text-2xl font-bold text-neutral mb-1 sm:mb-2"
+						></h3>
+						<div
+							class="flex flex-wrap items-center space-x-2 mb-2 sm:mb-4 gap-y-1"
+						>
+							<span
+								id="modal-category"
+								class="bg-primary text-white px-2 py-0.5 text-xs rounded-sm"
+							></span>
+							<span
+								id="modal-views"
+								class="text-xs sm:text-sm text-gray-500"
+							></span>
+						</div>
+						<p
+							id="modal-description"
+							class="text-gray-600 mb-3 sm:mb-4 text-xs sm:text-sm md:text-base"
+						></p>
+						<div
+							class="flex items-center justify-between border-t border-gray-200 pt-2 sm:pt-4"
+						>
+							<div class="flex items-center space-x-2">
+								<img
+									id="modal-creator-image"
+									class="w-6 h-6 sm:w-8 sm:h-8 rounded-full"
+									src=""
+									alt="Creator"
+								/>
+								<span
+									id="modal-creator"
+									class="font-medium text-neutral text-xs sm:text-sm md:text-base"
+								></span>
+							</div>
+							<div class="flex space-x-2">
+								<button
+									class="text-gray-500 hover:text-primary transition-colors duration-200"
+								>
+									<i class="far fa-heart text-xs sm:text-sm"></i>
+								</button>
+								<button
+									class="text-gray-500 hover:text-primary transition-colors duration-200"
+								>
+									<i class="far fa-bookmark text-xs sm:text-sm"></i>
+								</button>
+								<button
+									class="text-gray-500 hover:text-primary transition-colors duration-200"
+								>
+									<i class="fas fa-share-alt text-xs sm:text-sm"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const featuredContent = [
+				{
+					id: 1,
+					title: "The Art of Visual Storytelling",
+					category: "EDUCATION",
+					creator: "FilmCraft Studios",
+					creatorImage:
+						"https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "125K",
+					likes: "10.5K",
+					description:
+						"Learn the fundamentals of visual storytelling from industry experts.",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+				},
+				{
+					id: 2,
+					title: "Exploring the Deep Ocean",
+					category: "DOCUMENTARY",
+					creator: "Ocean Explorers",
+					creatorImage:
+						"https://images.unsplash.com/photo-1607990281513-2c110a25bd8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1551244072-5d12893278ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "98K",
+					likes: "8.2K",
+					description:
+						"Dive into the mysterious depths of our oceans and discover unseen wonders.",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+				},
+				{
+					id: 3,
+					title: "Urban Architecture Series",
+					category: "DESIGN",
+					creator: "DesignCollective",
+					creatorImage:
+						"https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1487958449943-2429e8be8625?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "67K",
+					likes: "5.8K",
+					description:
+						"Exploring the most impressive urban architectural marvels around the world.",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+				},
+				{
+					id: 4,
+					title: "The Future of Renewable Energy",
+					category: "SCIENCE",
+					creator: "FutureScience",
+					creatorImage:
+						"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "112K",
+					likes: "9.1K",
+					description:
+						"How renewable energy is transforming our world and shaping our future.",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+				},
+				{
+					id: 5,
+					title: "Culinary Journey: Asian Street Food",
+					category: "FOOD",
+					creator: "GlobalFoodie",
+					creatorImage:
+						"https://images.unsplash.com/photo-1558898479-33c0057a5d12?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1555939594-58d7cb561ad1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "83K",
+					likes: "7.4K",
+					description:
+						"Explore the vibrant and diverse street food culture across Asia.",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+				},
+			];
+
+			const contentGrid = [
+				{
+					id: 1,
+					title: "Digital Art Masterclass",
+					category: "TUTORIALS",
+					creator: "ArtistUnleashed",
+					creatorImage:
+						"https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://plus.unsplash.com/premium_photo-1701127871438-af582cdd8c55?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+					views: "56K",
+					likes: "4.2K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+					description:
+						"Learn digital art techniques from scratch with this comprehensive masterclass for beginners and advanced artists.",
+				},
+				{
+					id: 2,
+					title: "Wildlife Encounters",
+					category: "DOCUMENTARIES",
+					creator: "NatureChannel",
+					creatorImage:
+						"https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "89K",
+					likes: "7.8K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
+					description:
+						"Up-close encounters with rare and endangered species in their natural habitats around the world.",
+				},
+				{
+					id: 3,
+					title: "Modern Web Development",
+					category: "TUTORIALS",
+					creator: "CodeMaster",
+					creatorImage:
+						"https://images.unsplash.com/photo-1564564321837-a57b7070ac4f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "124K",
+					likes: "10.3K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+					description:
+						"Master the latest web development frameworks and techniques with this comprehensive guide.",
+				},
+				{
+					id: 4,
+					title: "Space Exploration: Mars Mission",
+					category: "DOCUMENTARIES",
+					creator: "CosmicVoyager",
+					creatorImage:
+						"https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "156K",
+					likes: "12.7K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+					description:
+						"An inside look at the planning and execution of humanity's most ambitious mission to the red planet.",
+				},
+				{
+					id: 5,
+					title: "Comedy Hour with Jake Thompson",
+					category: "ENTERTAINMENT",
+					creator: "LaughFactory",
+					creatorImage:
+						"https://images.unsplash.com/photo-1522556189639-b150ed9c4330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1525770041010-2a1233dd8152?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "78K",
+					likes: "6.5K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/WhatCarCanYouGetForAGrand.mp4",
+					description:
+						"Hilarious stand-up comedy from Jake Thompson's latest tour that will have you rolling with laughter.",
+				},
+				{
+					id: 6,
+					title: "Global Economic Trends 2025",
+					category: "NEWS",
+					creator: "EconomicsToday",
+					creatorImage:
+						"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1444653614773-995cb1ef9efa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "104K",
+					likes: "8.9K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+					description:
+						"Expert analysis of emerging economic trends that will shape global markets in the coming years.",
+				},
+				{
+					id: 7,
+					title: "Morning Routine for Productivity",
+					category: "PODCASTS",
+					creator: "ProductiveLife",
+					creatorImage:
+						"https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1470219556762-1771e7f9427d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "92K",
+					likes: "8.1K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+					description:
+						"Transform your mornings and boost productivity with these simple but effective routines from top performers.",
+				},
+				{
+					id: 8,
+					title: "Fitness for Busy Professionals",
+					category: "TUTORIALS",
+					creator: "FitLife",
+					creatorImage:
+						"https://images.unsplash.com/photo-1548142813-c348350df52b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					image:
+						"https://images.unsplash.com/photo-1517836357463-d25dfeac3438?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80",
+					views: "67K",
+					likes: "5.4K",
+					videoSrc:
+						"https://storage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+					description:
+						"Efficient workout routines and nutrition tips for professionals with limited time but big fitness goals.",
+				},
+			];
+
+			const notifications = [
+				{
+					id: 1,
+					type: "new_content",
+					title: "New content from FilmCraft Studios",
+					message: "The Art of Visual Storytelling Part 2 is now available.",
+					time: "2 hours ago",
+					image:
+						"https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					read: false,
+				},
+				{
+					id: 2,
+					type: "like",
+					title: "Your comment received 25 likes",
+					message: "on 'Wildlife Encounters'",
+					time: "Yesterday",
+					image:
+						"https://images.unsplash.com/photo-1549366021-9f761d450615?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
+					read: false,
+				},
+				{
+					id: 3,
+					type: "system",
+					title: "Your subscription will renew soon",
+					message: "Your premium plan will automatically renew on May 20.",
+					time: "2 days ago",
+					image: null,
+					read: true,
+				},
+			];
+
+			const carouselContainer = document.getElementById("carousel-container");
+			const carouselIndicators = document.getElementById("carousel-indicators");
+			const prevSlideBtn = document.getElementById("prev-slide");
+			const nextSlideBtn = document.getElementById("next-slide");
+			const contentGridEl = document.getElementById("content-grid");
+			const categoryTabs = document
+				.getElementById("category-tabs")
+				.querySelectorAll(".category-tab");
+			const notificationsContainer = document.getElementById(
+				"notifications-container"
+			);
+			const profileToggle = document.getElementById("profile-toggle");
+			const profileDropdown = document.getElementById("profile-dropdown");
+			const notificationsToggle = document.getElementById(
+				"notifications-toggle"
+			);
+			const notificationsDropdown = document.getElementById(
+				"notifications-dropdown"
+			);
+			const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+			const mobileMenu = document.getElementById("mobile-menu");
+			const searchToggle = document.getElementById("search-toggle");
+			const searchOverlay = document.getElementById("search-overlay");
+			const searchClose = document.getElementById("search-close");
+			const searchInput = document.getElementById("search-input");
+			const videoLoading = document.getElementById("video-loading");
+
+			const contentModal = document.getElementById("content-modal");
+			const modalClose = document.getElementById("modal-close");
+			const modalMedia = document.getElementById("modal-media");
+			const modalTitle = document.getElementById("modal-title");
+			const modalCategory = document.getElementById("modal-category");
+			const modalViews = document.getElementById("modal-views");
+			const modalDescription = document.getElementById("modal-description");
+			const modalCreator = document.getElementById("modal-creator");
+			const modalCreatorImage = document.getElementById("modal-creator-image");
+			const modalLoading = document.getElementById("modal-loading");
+
+			const heroVideo = document.getElementById("hero-video");
+			const playPauseBtn = document.getElementById("play-pause-btn");
+			const progressBar = document.getElementById("progress-bar");
+			const bufferBar = document.getElementById("buffer-bar");
+			const progressContainer = document.getElementById("progress-container");
+			const currentTime = document.getElementById("current-time");
+			const totalTime = document.getElementById("total-time");
+			const volumeBtn = document.getElementById("volume-btn");
+			const fullscreenBtn = document.getElementById("fullscreen-btn");
+
+			let isPlaying = false;
+
+			function showVideoLoading() {
+				if (videoLoading) {
+					videoLoading.style.display = "flex";
+				}
+			}
+
+			function hideVideoLoading() {
+				if (videoLoading) {
+					videoLoading.style.display = "none";
+				}
+			}
+
+			function togglePlayPause() {
+				if (heroVideo.readyState === 0) {
+					showVideoLoading();
+					heroVideo.load();
+					return;
+				}
+
+				if (isPlaying) {
+					heroVideo.pause();
+					playPauseBtn.innerHTML =
+						'<i class="fas fa-play text-white text-sm sm:text-lg"></i>';
+				} else {
+					heroVideo
+						.play()
+						.then(() => {
+							playPauseBtn.innerHTML =
+								'<i class="fas fa-pause text-white text-sm sm:text-lg"></i>';
+						})
+						.catch((error) => {
+							console.error("Error playing video:", error);
+
+							alert("There was an error playing the video. Please try again.");
+						});
+				}
+				isPlaying = !isPlaying;
+			}
+
+			function updateProgress() {
+				if (heroVideo.duration) {
+					const percentage = (heroVideo.currentTime / heroVideo.duration) * 100;
+					progressBar.style.width = `${percentage}%`;
+
+					if (heroVideo.buffered.length > 0) {
+						const bufferedEnd = heroVideo.buffered.end(
+							heroVideo.buffered.length - 1
+						);
+						const bufferPercentage = (bufferedEnd / heroVideo.duration) * 100;
+						bufferBar.style.width = `${bufferPercentage}%`;
+					}
+
+					const mins = Math.floor(heroVideo.currentTime / 60);
+					const secs = Math.floor(heroVideo.currentTime % 60);
+					currentTime.textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+				}
+			}
+
+			function setProgress(e) {
+				const rect = progressContainer.getBoundingClientRect();
+				const pos = (e.clientX - rect.left) / rect.width;
+				heroVideo.currentTime = pos * heroVideo.duration;
+			}
+
+			function toggleMute() {
+				heroVideo.muted = !heroVideo.muted;
+				volumeBtn.innerHTML = heroVideo.muted
+					? '<i class="fas fa-volume-mute text-sm sm:text-base"></i>'
+					: '<i class="fas fa-volume-up text-sm sm:text-base"></i>';
+			}
+
+			function toggleFullscreen() {
+				const videoContainer = heroVideo.closest(".video-container");
+
+				if (!document.fullscreenElement) {
+					if (videoContainer.requestFullscreen) {
+						videoContainer.requestFullscreen();
+					} else if (videoContainer.webkitRequestFullscreen) {
+						videoContainer.webkitRequestFullscreen();
+					} else if (videoContainer.msRequestFullscreen) {
+						videoContainer.msRequestFullscreen();
+					}
+					fullscreenBtn.innerHTML =
+						'<i class="fas fa-compress text-sm sm:text-base"></i>';
+
+					document.body.classList.add("video-fullscreen");
+
+					const videoSection = document.querySelector(".video-section");
+					if (videoSection) {
+						const allSections = document.querySelectorAll(
+							"section:not(.video-section)"
+						);
+						allSections.forEach((section) => {
+							section.dataset.originalDisplay = section.style.display;
+							section.style.display = "none";
+						});
+					}
+				} else {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					} else if (document.webkitExitFullscreen) {
+						document.webkitExitFullscreen();
+					} else if (document.msExitFullscreen) {
+						document.msExitFullscreen();
+					}
+					fullscreenBtn.innerHTML =
+						'<i class="fas fa-expand text-sm sm:text-base"></i>';
+
+					document.body.classList.remove("video-fullscreen");
+
+					const allSections = document.querySelectorAll("section");
+					allSections.forEach((section) => {
+						if (section.dataset.originalDisplay) {
+							section.style.display = section.dataset.originalDisplay;
+							delete section.dataset.originalDisplay;
+						} else {
+							section.style.display = "";
+						}
+					});
+				}
+			}
+
+			document.addEventListener("fullscreenchange", handleFullscreenChange);
+			document.addEventListener(
+				"webkitfullscreenchange",
+				handleFullscreenChange
+			);
+			document.addEventListener("mozfullscreenchange", handleFullscreenChange);
+			document.addEventListener("MSFullscreenChange", handleFullscreenChange);
+
+			function handleFullscreenChange() {
+				if (
+					!document.fullscreenElement &&
+					!document.webkitFullscreenElement &&
+					!document.mozFullScreenElement &&
+					!document.msFullscreenElement
+				) {
+					fullscreenBtn.innerHTML =
+						'<i class="fas fa-expand text-sm sm:text-base"></i>';
+					document.body.classList.remove("video-fullscreen");
+
+					const allSections = document.querySelectorAll("section");
+					allSections.forEach((section) => {
+						if (section.dataset.originalDisplay) {
+							section.style.display = section.dataset.originalDisplay;
+							delete section.dataset.originalDisplay;
+						} else {
+							section.style.display = "";
+						}
+					});
+				}
+			}
+
+			function updateVideoInfo(title, description) {
+				const videoTitle = document.querySelector(".absolute.bottom-0 h1");
+				const videoDesc = document.querySelector(".absolute.bottom-0 p");
+
+				if (videoTitle) {
+					videoTitle.textContent = title || "Exploration: Beyond Horizons";
+				}
+
+				if (videoDesc) {
+					videoDesc.textContent =
+						description ||
+						"Join us on an epic journey through the most breathtaking landscapes on Earth.";
+				}
+			}
+
+			function loadVideo(src, title, description) {
+				showVideoLoading();
+
+				heroVideo.src = src;
+				heroVideo.load();
+
+				updateVideoInfo(title, description);
+
+				isPlaying = false;
+				playPauseBtn.innerHTML =
+					'<i class="fas fa-play text-white text-sm sm:text-lg"></i>';
+
+				window.scrollTo({
+					top: 0,
+					behavior: "smooth",
+				});
+			}
+
+			heroVideo.addEventListener("timeupdate", updateProgress);
+			heroVideo.addEventListener("progress", updateProgress);
+			progressContainer.addEventListener("click", setProgress);
+			playPauseBtn.addEventListener("click", togglePlayPause);
+			volumeBtn.addEventListener("click", toggleMute);
+			fullscreenBtn.addEventListener("click", toggleFullscreen);
+
+			heroVideo.addEventListener("loadedmetadata", () => {
+				const mins = Math.floor(heroVideo.duration / 60);
+				const secs = Math.floor(heroVideo.duration % 60);
+				totalTime.textContent = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+				hideVideoLoading();
+			});
+
+			heroVideo.addEventListener("waiting", showVideoLoading);
+			heroVideo.addEventListener("playing", hideVideoLoading);
+			heroVideo.addEventListener("canplay", hideVideoLoading);
+
+			heroVideo.addEventListener("error", () => {
+				console.error("Video loading error");
+				hideVideoLoading();
+
+				const errorOverlay = document.createElement("div");
+				errorOverlay.className =
+					"absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center text-white text-center z-30 p-4";
+				errorOverlay.innerHTML = `
+					<i class="fas fa-exclamation-triangle text-yellow-400 text-2xl sm:text-4xl mb-3 sm:mb-4"></i>
+					<p class="text-base sm:text-xl mb-2">Sorry, there was an error loading the video.</p>
+					<p class="text-xs sm:text-base">Please try again or select another video.</p>
+					<button class="mt-3 sm:mt-4 px-3 py-1.5 sm:px-4 sm:py-2 bg-primary rounded-lg hover:bg-opacity-80 text-sm sm:text-base">Try Again</button>
+				`;
+
+				errorOverlay.querySelector("button").addEventListener("click", () => {
+					errorOverlay.remove();
+					heroVideo.load();
+				});
+
+				heroVideo.parentElement.appendChild(errorOverlay);
+			});
+
+			let currentSlide = 0;
+			const slideWidth = 100;
+			let visibleSlides = 1;
+			let slidesToScroll = 1;
+			const totalSlides = featuredContent.length;
+
+			function updateCarouselLayout() {
+				if (window.innerWidth < 640) {
+					visibleSlides = 1;
+					slidesToScroll = 1;
+				} else if (window.innerWidth < 1024) {
+					visibleSlides = 2;
+					slidesToScroll = 1;
+				} else if (window.innerWidth < 1280) {
+					visibleSlides = 3;
+					slidesToScroll = 2;
+				} else {
+					visibleSlides = 4;
+					slidesToScroll = 2;
+				}
+
+				const carouselItems = document.querySelectorAll(".carousel-item");
+				carouselItems.forEach((item) => {
+					item.style.width = `${100 / visibleSlides}%`;
+				});
+
+				if (currentSlide > totalSlides - visibleSlides) {
+					currentSlide = totalSlides - visibleSlides;
+					if (currentSlide < 0) currentSlide = 0;
+				}
+
+				updateCarouselPosition();
+				renderCarouselIndicators();
+			}
+
+			function renderCarousel() {
+				carouselContainer.innerHTML = "";
+
+				featuredContent.forEach((item, index) => {
+					const slide = document.createElement("div");
+					slide.className = `carousel-item flex-shrink-0 px-2`;
+					slide.style.width = `${100 / visibleSlides}%`;
+
+					slide.innerHTML = `
+						<div class="content-card glass-card h-full rounded-xl overflow-hidden shadow-lg">
+							<div class="relative aspect-video overflow-hidden">
+								<img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover" loading="lazy">
+								<div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+								<div class="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
+									<span class="bg-primary px-2 py-0.5 rounded-sm text-xs sm:text-sm">${item.category}</span>
+								</div>
+								<button class="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1.5 sm:p-2 hover:bg-opacity-30 transition-all duration-200 modal-trigger"
+                                    data-video="${item.videoSrc}"
+                                    data-title="${item.title}"
+                                    data-image="${item.image}"
+                                    data-category="${item.category}"
+                                    data-description="${item.description}"
+                                    data-views="${item.views}"
+                                    data-creator="${item.creator}"
+                                    data-creator-image="${item.creatorImage}">
+									<i class="fas fa-play text-white text-xs sm:text-base"></i>
+								</button>
+							</div>
+							<div class="p-3 sm:p-4">
+								<h3 class="font-semibold text-neutral text-sm sm:text-lg mb-1 sm:mb-2 line-clamp-2">${item.title}</h3>
+								<p class="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-4 line-clamp-2">${item.description}</p>
+								<div class="flex items-center justify-between flex-wrap gap-1 sm:gap-2">
+									<div class="flex items-center space-x-1 sm:space-x-2">
+										<img src="${item.creatorImage}" alt="${item.creator}" class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover" loading="lazy">
+										<span class="text-xs sm:text-sm font-medium text-neutral truncate max-w-[80px] sm:max-w-[120px]">${item.creator}</span>
+									</div>
+									<div class="flex items-center space-x-2 text-xs text-gray-500">
+										<span><i class="fas fa-eye mr-1"></i> ${item.views}</span>
+										<span><i class="fas fa-thumbs-up mr-1"></i> ${item.likes}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					`;
+
+					carouselContainer.appendChild(slide);
+
+					setupModalTriggers(slide.querySelectorAll(".modal-trigger"));
+				});
+
+				updateCarouselPosition();
+				renderCarouselIndicators();
+			}
+
+			function renderCarouselIndicators() {
+				carouselIndicators.innerHTML = "";
+
+				const maxDots = Math.ceil(totalSlides / slidesToScroll);
+
+				for (let i = 0; i < maxDots; i++) {
+					const indicator = document.createElement("span");
+					indicator.className = `carousel-indicator h-1.5 sm:h-2 w-6 sm:w-8 bg-gray-300 rounded-full cursor-pointer transition-all duration-300 ${
+						i === Math.floor(currentSlide / slidesToScroll) ? "active" : ""
+					}`;
+
+					indicator.addEventListener("click", () => {
+						currentSlide = i * slidesToScroll;
+						if (currentSlide > totalSlides - visibleSlides) {
+							currentSlide = totalSlides - visibleSlides;
+						}
+						updateCarouselPosition();
+						renderCarouselIndicators();
+					});
+
+					carouselIndicators.appendChild(indicator);
+				}
+			}
+
+			function updateCarouselPosition() {
+				const translateValue = -currentSlide * (100 / visibleSlides);
+				carouselContainer.style.transform = `translateX(${translateValue}%)`;
+			}
+
+			function nextSlide() {
+				currentSlide += slidesToScroll;
+				if (currentSlide > totalSlides - visibleSlides) {
+					currentSlide = totalSlides - visibleSlides;
+
+					carouselContainer.classList.add("transition-all");
+					carouselContainer.style.transform = `translateX(${-(
+						currentSlide * (100 / visibleSlides) +
+						2
+					)}%)`;
+
+					setTimeout(() => {
+						carouselContainer.style.transform = `translateX(${-(
+							currentSlide *
+							(100 / visibleSlides)
+						)}%)`;
+					}, 200);
+				}
+				updateCarouselPosition();
+				renderCarouselIndicators();
+			}
+
+			function prevSlide() {
+				currentSlide -= slidesToScroll;
+				if (currentSlide < 0) {
+					currentSlide = 0;
+
+					carouselContainer.classList.add("transition-all");
+					carouselContainer.style.transform = `translateX(2%)`;
+
+					setTimeout(() => {
+						carouselContainer.style.transform = `translateX(0%)`;
+					}, 200);
+				}
+				updateCarouselPosition();
+				renderCarouselIndicators();
+			}
+
+			function renderContentGrid(category = "All Content") {
+				contentGridEl.innerHTML = "";
+
+				let filteredContent = contentGrid;
+				if (category !== "All Content") {
+					filteredContent = contentGrid.filter(
+						(item) => item.category === category.toUpperCase()
+					);
+				}
+
+				if (filteredContent.length === 0) {
+					const emptyMessage = document.createElement("div");
+					emptyMessage.className = "col-span-full text-center py-8 sm:py-10";
+					emptyMessage.innerHTML = `
+						<i class="fas fa-film text-gray-300 text-3xl sm:text-5xl mb-3 sm:mb-4"></i>
+						<p class="text-gray-500 text-base sm:text-lg">No content found in the "${category}" category.</p>
+						<button class="mt-3 sm:mt-4 px-3 py-1.5 sm:px-4 sm:py-2 bg-primary text-white rounded-lg text-sm sm:text-base show-all-btn">Show All Content</button>
+					`;
+
+					contentGridEl.appendChild(emptyMessage);
+
+					const showAllBtn = emptyMessage.querySelector(".show-all-btn");
+					if (showAllBtn) {
+						showAllBtn.addEventListener("click", () => {
+							categoryTabs.forEach((tab) => {
+								tab.addEventListener("click", () => {
+									categoryTabs.forEach((t) => {
+										t.classList.remove("active");
+									});
+
+									tab.classList.add("active");
+
+									const selectedCategory = tab.textContent.trim();
+									renderContentGrid(selectedCategory);
+								});
+							});
+
+							renderContentGrid();
+						});
+					}
+
+					return;
+				}
+
+				filteredContent.forEach((item, index) => {
+					const card = document.createElement("div");
+					card.className =
+						"content-card glass-card rounded-xl overflow-hidden shadow-lg opacity-0 transform translate-y-4 sm:translate-y-8";
+					card.style.transitionDelay = `${index * 50}ms`;
+
+					card.innerHTML = `
+						<div class="relative aspect-video overflow-hidden">
+							<img src="${item.image}" alt="${
+						item.title
+					}" class="w-full h-full object-cover" loading="lazy">
+							<div class="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+							<div class="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
+								<span class="bg-primary px-2 py-0.5 rounded-sm text-xs sm:text-sm">${
+									item.category
+								}</span>
+							</div>
+							<button class="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white bg-opacity-20 backdrop-blur-sm rounded-full p-1.5 sm:p-2 hover:bg-opacity-30 transition-all duration-200 modal-trigger"
+                                data-video="${item.videoSrc}"
+                                data-title="${item.title}"
+                                data-image="${item.image}"
+                                data-category="${item.category}"
+                                data-description="${item.description || ""}"
+                                data-views="${item.views}"
+                                data-creator="${item.creator}"
+                                data-creator-image="${item.creatorImage}">
+								<i class="fas fa-play text-white text-xs sm:text-base"></i>
+							</button>
+						</div>
+						<div class="p-3 sm:p-4">
+							<h3 class="font-semibold text-neutral text-sm sm:text-lg mb-1 sm:mb-2 line-clamp-2">${
+								item.title
+							}</h3>
+							<div class="flex items-center justify-between flex-wrap gap-1 sm:gap-2">
+								<div class="flex items-center space-x-1 sm:space-x-2">
+									<img src="${item.creatorImage}" alt="${
+						item.creator
+					}" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full object-cover" loading="lazy">
+									<span class="text-xs sm:text-sm font-medium text-neutral truncate max-w-[80px] sm:max-w-[120px]">${
+										item.creator
+									}</span>
+								</div>
+								<div class="flex items-center space-x-2 text-xs text-gray-500">
+									<span><i class="fas fa-eye mr-1"></i> ${item.views}</span>
+									<span><i class="fas fa-thumbs-up mr-1"></i> ${item.likes}</span>
+								</div>
+							</div>
+						</div>
+					`;
+
+					contentGridEl.appendChild(card);
+
+					setupModalTriggers(card.querySelectorAll(".modal-trigger"));
+
+					setTimeout(() => {
+						card.classList.add("opacity-100", "translate-y-0");
+						card.classList.remove("translate-y-4", "sm:translate-y-8");
+					}, 100);
+				});
+			}
+
+			function setupModalTriggers(triggers) {
+				triggers.forEach((trigger) => {
+					trigger.addEventListener("click", () => {
+						openContentModal({
+							title: trigger.dataset.title,
+							video: trigger.dataset.video,
+							image: trigger.dataset.image,
+							category: trigger.dataset.category,
+							description: trigger.dataset.description,
+							views: trigger.dataset.views,
+							creator: trigger.dataset.creator,
+							creatorImage: trigger.dataset.creatorImage,
+						});
+					});
+				});
+			}
+
+			function openContentModal(data) {
+				modalLoading.style.display = "flex";
+
+				modalTitle.textContent = data.title || "";
+				modalCategory.textContent = data.category || "";
+				modalViews.innerHTML = `<i class="fas fa-eye mr-1"></i> ${
+					data.views || "0"
+				} views`;
+				modalDescription.textContent = data.description || "";
+				modalCreator.textContent = data.creator || "";
+
+				if (data.creatorImage) {
+					modalCreatorImage.src = data.creatorImage;
+					modalCreatorImage.alt = data.creator;
+				} else {
+					modalCreatorImage.src = "";
+					modalCreatorImage.alt = "";
+				}
+
+				modalMedia.innerHTML = "";
+				modalMedia.appendChild(modalLoading);
+
+				if (data.video) {
+					const video = document.createElement("video");
+					video.className = "w-full h-full object-cover";
+					video.controls = true;
+					video.playsInline = true;
+
+					const source = document.createElement("source");
+					source.src = data.video;
+					source.type = "video/mp4";
+
+					video.appendChild(source);
+
+					video.addEventListener("loadeddata", () => {
+						modalLoading.style.display = "none";
+					});
+
+					video.addEventListener("error", () => {
+						modalLoading.style.display = "none";
+
+						const errorMsg = document.createElement("div");
+						errorMsg.className =
+							"absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-center p-4";
+						errorMsg.innerHTML = `
+							<div>
+								<i class="fas fa-exclamation-triangle text-yellow-400 text-2xl sm:text-3xl mb-2"></i>
+								<p class="text-sm sm:text-base">Error loading video. Please try again later.</p>
+							</div>
+						`;
+
+						modalMedia.appendChild(errorMsg);
+					});
+
+					modalMedia.appendChild(video);
+				} else if (data.image) {
+					const img = document.createElement("img");
+					img.className = "w-full h-full object-cover";
+					img.src = data.image;
+					img.alt = data.title;
+
+					img.addEventListener("load", () => {
+						modalLoading.style.display = "none";
+					});
+
+					img.addEventListener("error", () => {
+						modalLoading.style.display = "none";
+
+						const errorMsg = document.createElement("div");
+						errorMsg.className =
+							"absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-center p-4";
+						errorMsg.innerHTML = `
+							<div>
+								<i class="fas fa-exclamation-triangle text-yellow-400 text-2xl sm:text-3xl mb-2"></i>
+								<p class="text-sm sm:text-base">Error loading image. Please try again later.</p>
+							</div>
+						`;
+
+						modalMedia.appendChild(errorMsg);
+					});
+
+					modalMedia.appendChild(img);
+				}
+
+				document.body.classList.add("modal-open");
+				contentModal.classList.add("open");
+			}
+
+			function closeContentModal() {
+				contentModal.classList.remove("open");
+				document.body.classList.remove("modal-open");
+
+				setTimeout(() => {
+					modalMedia.innerHTML = "";
+					modalMedia.appendChild(modalLoading);
+				}, 300);
+			}
+
+			modalClose.addEventListener("click", closeContentModal);
+
+			contentModal.addEventListener("click", (e) => {
+				if (e.target === contentModal) {
+					closeContentModal();
+				}
+			});
+
+			renderContentGrid();
+
+			categoryTabs.forEach((tab) => {
+				tab.addEventListener("click", () => {
+					categoryTabs.forEach((t) => {
+						t.classList.remove("active");
+						t.style.color = "#292F36";
+						t.style.borderColor = "transparent";
+					});
+
+					tab.classList.add("active");
+					tab.style.color = "#FF6B6B";
+					tab.style.borderColor = "#FF6B6B";
+
+					const selectedCategory = tab.textContent.trim();
+
+					renderContentGrid(selectedCategory);
+				});
+			});
+
+			function renderNotifications() {
+				notificationsContainer.innerHTML = "";
+
+				if (notifications.length === 0) {
+					notificationsContainer.innerHTML = `
+						<div class="p-4 text-center text-gray-500">
+							<i class="fas fa-bell-slash text-xl sm:text-2xl mb-2"></i>
+							<p class="text-sm sm:text-base">No notifications yet</p>
+						</div>
+					`;
+					return;
+				}
+
+				notifications.forEach((notification) => {
+					const notifEl = document.createElement("div");
+					notifEl.className = `p-3 sm:p-4 border-b border-gray-100 ${
+						notification.read ? "bg-white" : "bg-blue-50"
+					} hover:bg-gray-50 transition-colors duration-200 cursor-pointer`;
+
+					let iconClass = "fas fa-bell";
+
+					if (notification.type === "new_content") iconClass = "fas fa-video";
+					if (notification.type === "like") iconClass = "fas fa-thumbs-up";
+					if (notification.type === "system") iconClass = "fas fa-info-circle";
+
+					notifEl.innerHTML = `
+						<div class="flex items-start">
+							${
+								notification.image
+									? `<img src="${notification.image}" alt="" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover mr-2 sm:mr-3" loading="lazy">`
+									: `<div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-2 sm:mr-3">
+										<i class="${iconClass} text-primary"></i>
+									</div>`
+							}
+							<div class="flex-1">
+								<h4 class="font-medium text-neutral text-xs sm:text-sm md:text-base">${
+									notification.title
+								}</h4>
+								<p class="text-xs sm:text-sm text-gray-600">${notification.message}</p>
+								<span class="text-xs text-gray-500 mt-1">${notification.time}</span>
+							</div>
+							${
+								!notification.read
+									? `<span class="h-2 w-2 rounded-full bg-primary"></span>`
+									: ""
+							}
+						</div>
+					`;
+
+					notifEl.addEventListener("click", () => {
+						notification.read = true;
+						notifEl.classList.remove("bg-blue-50");
+						notifEl.classList.add("bg-white");
+						const indicator = notifEl.querySelector(".bg-primary");
+						if (indicator) {
+							indicator.remove();
+						}
+
+						updateNotificationCount();
+					});
+
+					notificationsContainer.appendChild(notifEl);
+				});
+			}
+
+			function updateNotificationCount() {
+				const unreadCount = notifications.filter((n) => !n.read).length;
+				const badge = notificationsToggle.querySelector(".notification-badge");
+
+				if (badge) {
+					badge.textContent = unreadCount;
+
+					if (unreadCount === 0) {
+						badge.classList.add("hidden");
+					} else {
+						badge.classList.remove("hidden");
+					}
+				}
+			}
+
+			renderNotifications();
+
+			profileToggle.addEventListener("click", (e) => {
+				e.stopPropagation();
+				profileDropdown.classList.toggle("active");
+				notificationsDropdown.classList.remove("active");
+
+				if (window.innerWidth <= 640) {
+					document.body.classList.toggle("modal-open");
+				}
+			});
+
+			notificationsToggle.addEventListener("click", (e) => {
+				e.stopPropagation();
+				notificationsDropdown.classList.toggle("active");
+				profileDropdown.classList.remove("active");
+
+				if (window.innerWidth <= 640) {
+					document.body.classList.toggle("modal-open");
+				}
+			});
+
+			document.addEventListener("click", () => {
+				if (
+					profileDropdown.classList.contains("active") ||
+					notificationsDropdown.classList.contains("active")
+				) {
+					document.body.classList.remove("modal-open");
+				}
+
+				profileDropdown.classList.remove("active");
+				notificationsDropdown.classList.remove("active");
+			});
+
+			profileDropdown.addEventListener("click", (e) => {
+				e.stopPropagation();
+			});
+
+			notificationsDropdown.addEventListener("click", (e) => {
+				e.stopPropagation();
+			});
+
+			mobileMenuToggle.addEventListener("click", () => {
+				mobileMenu.classList.toggle("hidden");
+
+				if (!mobileMenu.classList.contains("hidden")) {
+					const menuItems = mobileMenu.querySelectorAll("a");
+					menuItems.forEach((item, index) => {
+						item.style.opacity = "0";
+						item.style.transform = "translateY(10px)";
+
+						setTimeout(() => {
+							item.style.transition = "all 0.3s ease";
+							item.style.opacity = "1";
+							item.style.transform = "translateY(0)";
+						}, 100 + index * 50);
+					});
+				}
+			});
+
+			searchToggle.addEventListener("click", () => {
+				searchOverlay.classList.remove("hidden");
+				searchOverlay.classList.add("flex");
+				searchInput.focus();
+
+				const searchBox = searchOverlay.querySelector(".bg-white");
+				searchBox.style.opacity = "0";
+				searchBox.style.transform = "translateY(-20px)";
+
+				setTimeout(() => {
+					searchBox.style.transition = "all 0.3s ease";
+					searchBox.style.opacity = "1";
+					searchBox.style.transform = "translateY(0)";
+				}, 100);
+
+				document.body.classList.add("modal-open");
+			});
+
+			searchClose.addEventListener("click", () => {
+				const searchBox = searchOverlay.querySelector(".bg-white");
+				searchBox.style.transition = "all 0.3s ease";
+				searchBox.style.opacity = "0";
+				searchBox.style.transform = "translateY(-20px)";
+
+				setTimeout(() => {
+					searchOverlay.classList.add("hidden");
+					searchOverlay.classList.remove("flex");
+
+					document.body.classList.remove("modal-open");
+				}, 300);
+			});
+
+			searchInput.addEventListener("keydown", (e) => {
+				if (e.key === "Enter") {
+					const searchTerm = searchInput.value.trim();
+
+					if (searchTerm) {
+						const searchResults = document.createElement("div");
+						searchResults.className =
+							"mt-4 animated-bg p-4 rounded-lg text-center";
+						searchResults.innerHTML = `
+							<div class="loading-spinner mx-auto mb-3"></div>
+							<p class="text-white text-sm sm:text-base">Searching for "${searchTerm}"...</p>
+						`;
+
+						searchOverlay.querySelector(".bg-white").appendChild(searchResults);
+
+						setTimeout(() => {
+							searchOverlay.classList.add("hidden");
+							searchOverlay.classList.remove("flex");
+
+							document.body.classList.remove("modal-open");
+
+							searchInput.value = "";
+
+							searchResults.remove();
+
+							renderContentGrid();
+
+							document.querySelector("#content-grid").scrollIntoView({
+								behavior: "smooth",
+							});
+						}, 1500);
+					}
+				}
+			});
+
+			function setupScrollAnimations() {
+				const scrollElements = document.querySelectorAll(".scroll-animate");
+
+				function checkElementsInView() {
+					scrollElements.forEach((element) => {
+						const elementTop = element.getBoundingClientRect().top;
+						const elementHeight = element.offsetHeight;
+						const windowHeight = window.innerHeight;
+
+						if (elementTop < windowHeight - elementHeight / 4) {
+							element.classList.add("active");
+						}
+					});
+				}
+
+				window.addEventListener("scroll", checkElementsInView);
+				checkElementsInView();
+			}
+
+			setupScrollAnimations();
+
+			function handleResize() {
+				updateCarouselLayout();
+
+				if (window.innerWidth <= 640) {
+					notificationsDropdown.style.maxHeight =
+						window.innerHeight * 0.8 + "px";
+					profileDropdown.style.maxHeight = window.innerHeight * 0.8 + "px";
+				} else {
+					notificationsDropdown.style.maxHeight = "";
+					profileDropdown.style.maxHeight = "";
+
+					if (!contentModal.classList.contains("open")) {
+						document.body.classList.remove("modal-open");
+					}
+				}
+
+				if (document.fullscreenElement) {
+					const videoContainer = document.querySelector(".video-container");
+					if (videoContainer && videoContainer === document.fullscreenElement) {
+						videoContainer.style.height = "100vh";
+						videoContainer.style.width = "100vw";
+					}
+				}
+			}
+
+			window.addEventListener("resize", handleResize);
+
+			const markAllReadBtn = document.querySelector(
+				"#notifications-dropdown .text-primary"
+			);
+			if (markAllReadBtn) {
+				markAllReadBtn.addEventListener("click", () => {
+					notifications.forEach((notification) => {
+						notification.read = true;
+					});
+					renderNotifications();
+					updateNotificationCount();
+				});
+			}
+
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape") {
+					if (contentModal.classList.contains("open")) {
+						closeContentModal();
+					}
+
+					if (
+						profileDropdown.classList.contains("active") ||
+						notificationsDropdown.classList.contains("active")
+					) {
+						profileDropdown.classList.remove("active");
+						notificationsDropdown.classList.remove("active");
+						document.body.classList.remove("modal-open");
+					}
+
+					if (!searchOverlay.classList.contains("hidden")) {
+						searchClose.click();
+					}
+				}
+			});
+
+			renderCarousel();
+			prevSlideBtn.addEventListener("click", prevSlide);
+			nextSlideBtn.addEventListener("click", nextSlide);
+
+			document.addEventListener("DOMContentLoaded", () => {
+				heroVideo.load();
+
+				handleResize();
+
+				const fadeElements = [
+					document.querySelector(".video-container"),
+					...document.querySelectorAll("section"),
+				];
+
+				fadeElements.forEach((el, index) => {
+					if (el) {
+						el.style.opacity = "0";
+						el.style.transform = "translateY(20px)";
+
+						setTimeout(() => {
+							el.style.transition = "all 0.5s ease";
+							el.style.opacity = "1";
+							el.style.transform = "translateY(0)";
+						}, 200 + index * 100);
+					}
+				});
+			});
+
+			document.addEventListener("touchstart", function () {}, {
+				passive: true,
+			});
+		</script>
+	</body>
+</html>
