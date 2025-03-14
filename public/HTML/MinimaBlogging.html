@@ -1,0 +1,3198 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Minima | Modern Blogging Platform</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: "#2563eb",
+							secondary: "#f97316",
+							neutral: {
+								50: "#f8fafc",
+								100: "#f1f5f9",
+								200: "#e2e8f0",
+								300: "#cbd5e1",
+								400: "#94a3b8",
+								500: "#64748b",
+								600: "#475569",
+								700: "#334155",
+								800: "#1e293b",
+								900: "#0f172a",
+							},
+						},
+						fontFamily: {
+							sans: ["Inter", "sans-serif"],
+							serif: ["Merriweather", "serif"],
+						},
+						animation: {
+							"fade-in": "fadeIn 0.3s ease-in-out",
+							"slide-up": "slideUp 0.3s ease-in-out",
+							"slide-in-right": "slideInRight 0.3s ease-in-out",
+							"slide-in-left": "slideInLeft 0.3s ease-in-out",
+							"pulse-slow": "pulse 3s ease-in-out infinite",
+							float: "float 6s ease-in-out infinite",
+							expand: "expand 0.2s ease-out",
+							"bounce-in": "bounceIn 0.5s ease-out",
+							wiggle: "wiggle 1s ease-in-out",
+						},
+						keyframes: {
+							fadeIn: {
+								"0%": { opacity: "0" },
+								"100%": { opacity: "1" },
+							},
+							slideUp: {
+								"0%": { transform: "translateY(20px)", opacity: "0" },
+								"100%": { transform: "translateY(0)", opacity: "1" },
+							},
+							slideInRight: {
+								"0%": { transform: "translateX(20px)", opacity: "0" },
+								"100%": { transform: "translateX(0)", opacity: "1" },
+							},
+							slideInLeft: {
+								"0%": { transform: "translateX(-20px)", opacity: "0" },
+								"100%": { transform: "translateX(0)", opacity: "1" },
+							},
+							pulse: {
+								"0%, 100%": { transform: "scale(1)" },
+								"50%": { transform: "scale(1.05)" },
+							},
+							float: {
+								"0%, 100%": { transform: "translateY(0)" },
+								"50%": { transform: "translateY(-10px)" },
+							},
+							expand: {
+								"0%": { transform: "scale(0.8)", opacity: "0" },
+								"100%": { transform: "scale(1)", opacity: "1" },
+							},
+							bounceIn: {
+								"0%": { transform: "scale(0.3)", opacity: "0" },
+								"50%": { transform: "scale(1.05)", opacity: "0.9" },
+								"70%": { transform: "scale(0.9)", opacity: "1" },
+								"100%": { transform: "scale(1)", opacity: "1" },
+							},
+							wiggle: {
+								"0%, 100%": { transform: "rotate(-3deg)" },
+								"50%": { transform: "rotate(3deg)" },
+							},
+						},
+					},
+				},
+			};
+		</script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			* {
+				scroll-behavior: smooth;
+				cursor: default;
+			}
+
+			:root {
+				--color-primary: #2563eb;
+				--color-secondary: #f97316;
+				--color-bg: #ffffff;
+				--color-bg-secondary: #f1f5f9;
+				--color-bg-tertiary: #f8fafc;
+				--color-text: #1e293b;
+				--color-text-secondary: #475569;
+				--color-text-tertiary: #64748b;
+				--color-border: #e2e8f0;
+				--color-card-bg: #ffffff;
+			}
+
+			body.dark-mode {
+				--color-primary: #3b82f6;
+				--color-secondary: #f97316;
+				--color-bg: #0f172a;
+				--color-bg-secondary: #1e293b;
+				--color-bg-tertiary: #334155;
+				--color-text: #f1f5f9;
+				--color-text-secondary: #cbd5e1;
+				--color-text-tertiary: #94a3b8;
+				--color-border: #334155;
+				--color-card-bg: #1e293b;
+			}
+
+			body {
+				background-color: var(--color-bg);
+				color: var(--color-text);
+			}
+
+			.bg-app {
+				background-color: var(--color-bg);
+			}
+
+			.bg-app-secondary {
+				background-color: var(--color-bg-secondary);
+			}
+
+			.bg-app-tertiary {
+				background-color: var(--color-bg-tertiary);
+			}
+
+			.border-app {
+				border-color: var(--color-border);
+			}
+
+			.text-app {
+				color: var(--color-text);
+			}
+
+			.text-app-secondary {
+				color: var(--color-text-secondary);
+			}
+
+			.text-app-tertiary {
+				color: var(--color-text-tertiary);
+			}
+
+			.card-bg {
+				background-color: var(--color-card-bg);
+			}
+
+			a,
+			button,
+			select,
+			input[type="checkbox"],
+			input[type="radio"],
+			.cursor-pointer {
+				cursor: pointer !important;
+			}
+
+			::-webkit-scrollbar {
+				width: 10px;
+			}
+
+			::-webkit-scrollbar-track {
+				background-color: var(--color-bg-secondary);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background-color: var(--color-primary);
+				border-radius: 5px;
+				transition: background-color 0.3s;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background-color: #1e40af;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+			}
+
+			.animate-pulse-slow {
+				animation: pulse 3s infinite;
+			}
+
+			.animate-float {
+				animation: float 6s ease-in-out infinite;
+			}
+
+			.line-clamp-3 {
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
+			.scrollbar-hide::-webkit-scrollbar {
+				display: none;
+			}
+
+			.scrollbar-hide {
+				-ms-overflow-style: none;
+				scrollbar-width: none;
+			}
+
+			.card-zoom {
+				cursor: pointer;
+				transition: transform 0.5s ease;
+			}
+
+			.card-zoom:hover {
+				transform: scale(1.05);
+			}
+
+			.excerpt-container {
+				height: 4.5rem;
+				overflow: hidden;
+			}
+
+			.nav-link {
+				position: relative;
+			}
+
+			.nav-link::after {
+				content: "";
+				position: absolute;
+				bottom: -2px;
+				left: 0;
+				width: 0;
+				height: 2px;
+				background-color: var(--color-primary);
+				transition: width 0.3s ease;
+			}
+
+			.nav-link:hover::after {
+				width: 100%;
+			}
+
+			.nav-link.active::after {
+				width: 100%;
+			}
+
+			.btn-primary {
+				position: relative;
+				overflow: hidden;
+				transition: all 0.3s ease;
+				z-index: 1;
+			}
+
+			.btn-primary::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.2);
+				transition: all 0.4s ease-out;
+				z-index: -1;
+			}
+
+			.btn-primary:hover::before {
+				left: 100%;
+			}
+
+			.focus-ring {
+				transition: box-shadow 0.2s ease;
+			}
+
+			.focus-ring:focus {
+				box-shadow: 0 0 0 2px var(--color-primary);
+			}
+
+			.text-gradient {
+				background-image: linear-gradient(
+					90deg,
+					var(--color-primary),
+					var(--color-secondary)
+				);
+				background-clip: text;
+				-webkit-background-clip: text;
+				color: transparent;
+				background-size: 200% 200%;
+				animation: gradient-shift 5s ease infinite;
+			}
+
+			@keyframes gradient-shift {
+				0% {
+					background-position: 0% 50%;
+				}
+				50% {
+					background-position: 100% 50%;
+				}
+				100% {
+					background-position: 0% 50%;
+				}
+			}
+
+			.progress-bar {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 0%;
+				height: 3px;
+				background: var(--color-primary);
+				z-index: 9999;
+				transition: width 0.2s ease;
+			}
+
+			.particle {
+				position: absolute;
+				border-radius: 50%;
+				background-color: var(--color-primary);
+				opacity: 0.3;
+				pointer-events: none;
+			}
+
+			body,
+			nav,
+			section,
+			footer,
+			.text-app,
+			.text-app-secondary,
+			.text-app-tertiary,
+			.bg-app,
+			.bg-app-secondary,
+			.bg-app-tertiary,
+			.border-app,
+			.card-bg {
+				transition: background-color 0.3s ease, color 0.3s ease,
+					border-color 0.3s ease;
+			}
+
+			.modal {
+				z-index: 50;
+			}
+
+			.modal-backdrop {
+				z-index: 40;
+			}
+
+			.post-animated {
+				opacity: 0;
+				transform: translateY(20px);
+				animation: fadeInUp 0.5s forwards;
+			}
+
+			@keyframes fadeInUp {
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.card-content {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.card-content .card-text {
+				flex-grow: 1;
+			}
+
+			@media (max-width: 640px) {
+				h1 {
+					font-size: 1.75rem !important;
+					line-height: 1.2 !important;
+				}
+
+				p {
+					font-size: 0.95rem !important;
+				}
+
+				.btn-primary,
+				button {
+					padding: 0.5rem 1rem !important;
+					font-size: 0.9rem !important;
+				}
+
+				.card-footer {
+					padding-top: 0.5rem !important;
+				}
+
+				.excerpt-container {
+					height: 3.6rem;
+				}
+			}
+		</style>
+	</head>
+	<body class="font-sans bg-app text-app overflow-x-hidden">
+		<!-- Progress Bar -->
+		<div class="progress-bar"></div>
+
+		<!-- Page Transition Overlay -->
+		<div
+			id="page-transition"
+			class="fixed inset-0 bg-primary z-[60] pointer-events-none hidden"
+		>
+			<div class="h-full w-full flex items-center justify-center">
+				<div class="text-white text-3xl font-bold">Minima</div>
+			</div>
+		</div>
+
+		<!-- Notification Banner -->
+		<div
+			id="notification"
+			class="bg-gradient-to-r from-secondary to-primary/80 text-white text-center py-2 text-sm sm:text-base relative overflow-hidden"
+		>
+			<div class="z-10 relative">
+				🎉 Join our community of writers! Get started today and receive premium
+				features free for 30 days.
+				<button
+					id="close-notification"
+					class="ml-2 font-bold hover:text-neutral-100 transition-colors duration-300 transform hover:scale-110"
+				>
+					×
+				</button>
+			</div>
+		</div>
+
+		<!-- Navigation -->
+		<nav
+			id="navbar"
+			class="border-b border-app bg-app transition-all duration-300 z-50 sticky top-0"
+		>
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex justify-between h-16">
+					<div class="flex items-center">
+						<div class="flex-shrink-0 flex items-center">
+							<a href="#" class="cursor-pointer">
+								<span class="font-serif text-2xl font-bold text-gradient"
+									>Minima</span
+								>
+							</a>
+						</div>
+						<div class="hidden md:ml-12 md:flex md:space-x-8">
+							<a
+								href="#hero-section"
+								class="nav-link text-app border-b-2 border-primary px-1 pt-1 font-medium active"
+								>Home</a
+							>
+							<a
+								href="#featured-section"
+								class="nav-link text-app-tertiary hover:text-app hover:border-neutral-300 border-b-2 border-transparent px-1 pt-1 font-medium transition-colors duration-300"
+								>Featured</a
+							>
+							<a
+								href="#latest-articles"
+								class="nav-link text-app-tertiary hover:text-app hover:border-neutral-300 border-b-2 border-transparent px-1 pt-1 font-medium transition-colors duration-300"
+								>Articles</a
+							>
+							<a
+								href="#newsletter-section"
+								class="nav-link text-app-tertiary hover:text-app hover:border-neutral-300 border-b-2 border-transparent px-1 pt-1 font-medium transition-colors duration-300"
+								>Newsletter</a
+							>
+						</div>
+					</div>
+					<div class="flex items-center space-x-4">
+						<div class="hidden md:flex">
+							<button
+								id="search-button"
+								class="p-2 rounded-full hover:bg-neutral-100 transition-all duration-300 transform hover:scale-110"
+								aria-label="Search"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-app-tertiary"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+									/>
+								</svg>
+							</button>
+						</div>
+						<button
+							id="signup-button"
+							class="btn-primary hidden md:block bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-md"
+						>
+							Sign Up
+						</button>
+						<button
+							id="login-button"
+							class="hidden md:block border border-primary text-primary hover:bg-primary/10 font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:translate-y-[-2px]"
+						>
+							Log In
+						</button>
+						<!-- Mobile menu button -->
+						<div class="flex md:hidden">
+							<button
+								id="mobile-menu-button"
+								type="button"
+								class="inline-flex items-center justify-center p-2 rounded-md text-app-tertiary hover:text-app hover:bg-neutral-100 transition-colors duration-300"
+								aria-controls="mobile-menu"
+								aria-expanded="false"
+							>
+								<svg
+									class="block h-6 w-6"
+									xmlns="http://www.w3.org/2000/svg"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile menu, show/hide based on menu state -->
+			<div id="mobile-menu" class="md:hidden hidden animate-fade-in">
+				<div class="px-2 pt-2 pb-3 space-y-1 border-t border-app">
+					<a
+						href="#hero-section"
+						class="text-primary block px-3 py-2 rounded-md text-base font-medium"
+						>Home</a
+					>
+					<a
+						href="#featured-section"
+						class="text-app-secondary hover:text-primary hover:bg-neutral-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300"
+						>Featured</a
+					>
+					<a
+						href="#latest-articles"
+						class="text-app-secondary hover:text-primary hover:bg-neutral-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300"
+						>Articles</a
+					>
+					<a
+						href="#newsletter-section"
+						class="text-app-secondary hover:text-primary hover:bg-neutral-100 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-300"
+						>Newsletter</a
+					>
+
+					<div class="flex space-x-2 mt-3 px-3">
+						<button
+							id="mobile-signup-button"
+							class="flex-1 bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:translate-y-[-2px]"
+						>
+							Sign Up
+						</button>
+						<button
+							id="mobile-login-button"
+							class="flex-1 border border-primary text-primary hover:bg-primary/10 font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:translate-y-[-2px]"
+						>
+							Log In
+						</button>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Search Modal -->
+		<div
+			id="search-modal"
+			class="fixed inset-0 bg-neutral-900/80 backdrop-blur-sm z-50 hidden"
+		>
+			<div
+				class="relative max-w-2xl mx-auto mt-20 card-bg rounded-lg shadow-xl animate-expand"
+			>
+				<div class="p-6">
+					<div class="flex items-center justify-between mb-4">
+						<h3 class="text-xl font-medium text-app">Search Articles</h3>
+						<button
+							id="close-search"
+							class="text-app-tertiary hover:text-app transition-colors duration-300"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</div>
+					<div class="relative">
+						<input
+							type="text"
+							id="search-input"
+							class="w-full border border-app bg-app text-app rounded-lg py-3 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+							placeholder="Search for articles, topics, or authors..."
+						/>
+						<div class="absolute inset-y-0 right-0 flex items-center pr-3">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+								/>
+							</svg>
+						</div>
+					</div>
+					<div class="mt-4">
+						<div
+							class="flex items-center space-x-2 mb-3 overflow-x-auto pb-2 scrollbar-hide"
+						>
+							<span class="text-sm font-medium text-app-secondary flex-shrink-0"
+								>Popular searches:</span
+							>
+							<button
+								class="text-xs bg-app-tertiary hover:bg-app-secondary text-app-secondary px-2 py-1 rounded-full transition-all duration-300 transform hover:scale-105 flex-shrink-0"
+							>
+								Minimalism
+							</button>
+							<button
+								class="text-xs bg-app-tertiary hover:bg-app-secondary text-app-secondary px-2 py-1 rounded-full transition-all duration-300 transform hover:scale-105 flex-shrink-0"
+							>
+								Typography
+							</button>
+							<button
+								class="text-xs bg-app-tertiary hover:bg-app-secondary text-app-secondary px-2 py-1 rounded-full transition-all duration-300 transform hover:scale-105 flex-shrink-0"
+							>
+								Design Trends
+							</button>
+							<button
+								class="text-xs bg-app-tertiary hover:bg-app-secondary text-app-secondary px-2 py-1 rounded-full transition-all duration-300 transform hover:scale-105 flex-shrink-0"
+							>
+								UX Research
+							</button>
+							<button
+								class="text-xs bg-app-tertiary hover:bg-app-secondary text-app-secondary px-2 py-1 rounded-full transition-all duration-300 transform hover:scale-105 flex-shrink-0"
+							>
+								JavaScript
+							</button>
+						</div>
+					</div>
+					<div
+						id="search-results"
+						class="mt-4 max-h-64 overflow-y-auto scrollbar-hide"
+					>
+						<!-- Search results will be populated here -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Signup Modal -->
+		<div
+			id="signup-modal"
+			class="fixed inset-0 bg-neutral-900/80 backdrop-blur-sm z-50 hidden"
+		>
+			<div
+				class="relative max-w-md mx-auto mt-20 card-bg rounded-lg shadow-xl animate-bounce-in"
+			>
+				<div class="p-6">
+					<div class="flex items-center justify-between mb-4">
+						<h3 class="text-xl font-medium text-app">Create an Account</h3>
+						<button
+							id="close-signup"
+							class="text-app-tertiary hover:text-app transition-colors duration-300"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</div>
+					<form id="signup-form" class="space-y-4">
+						<div>
+							<label
+								for="name"
+								class="block text-sm font-medium text-app-secondary mb-1"
+								>Full Name</label
+							>
+							<input
+								type="text"
+								id="name"
+								name="name"
+								class="w-full border border-app bg-app text-app rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+								placeholder="John Doe"
+								required
+							/>
+						</div>
+						<div>
+							<label
+								for="email"
+								class="block text-sm font-medium text-app-secondary mb-1"
+								>Email Address</label
+							>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								class="w-full border border-app bg-app text-app rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+								placeholder="you@example.com"
+								required
+							/>
+						</div>
+						<div>
+							<label
+								for="password"
+								class="block text-sm font-medium text-app-secondary mb-1"
+								>Password</label
+							>
+							<input
+								type="password"
+								id="password"
+								name="password"
+								class="w-full border border-app bg-app text-app rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+								placeholder="••••••••"
+								required
+								minlength="8"
+							/>
+						</div>
+						<div class="flex items-center">
+							<input
+								type="checkbox"
+								id="terms"
+								name="terms"
+								class="h-4 w-4 text-primary focus:ring-primary border-neutral-300 rounded"
+								required
+							/>
+							<label for="terms" class="ml-2 block text-sm text-app-secondary">
+								I agree to the
+								<a href="#" class="text-primary hover:text-primary/80"
+									>Terms of Service</a
+								>
+								and
+								<a href="#" class="text-primary hover:text-primary/80"
+									>Privacy Policy</a
+								>
+							</label>
+						</div>
+						<button
+							type="submit"
+							class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-md"
+						>
+							Create Account
+						</button>
+						<div class="text-center mt-4">
+							<span class="text-sm text-app-secondary"
+								>Already have an account?</span
+							>
+							<button
+								type="button"
+								id="switch-to-login"
+								class="ml-1 text-sm text-primary hover:text-primary/80"
+							>
+								Log In
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Login Modal -->
+		<div
+			id="login-modal"
+			class="fixed inset-0 bg-neutral-900/80 backdrop-blur-sm z-50 hidden"
+		>
+			<div
+				class="relative max-w-md mx-auto mt-20 card-bg rounded-lg shadow-xl animate-bounce-in"
+			>
+				<div class="p-6">
+					<div class="flex items-center justify-between mb-4">
+						<h3 class="text-xl font-medium text-app">Welcome Back</h3>
+						<button
+							id="close-login"
+							class="text-app-tertiary hover:text-app transition-colors duration-300"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</div>
+					<form id="login-form" class="space-y-4">
+						<div>
+							<label
+								for="login-email"
+								class="block text-sm font-medium text-app-secondary mb-1"
+								>Email Address</label
+							>
+							<input
+								type="email"
+								id="login-email"
+								name="email"
+								class="w-full border border-app bg-app text-app rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+								placeholder="you@example.com"
+								required
+							/>
+						</div>
+						<div>
+							<div class="flex items-center justify-between">
+								<label
+									for="login-password"
+									class="block text-sm font-medium text-app-secondary mb-1"
+									>Password</label
+								>
+								<a href="#" class="text-xs text-primary hover:text-primary/80"
+									>Forgot password?</a
+								>
+							</div>
+							<input
+								type="password"
+								id="login-password"
+								name="password"
+								class="w-full border border-app bg-app text-app rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+								placeholder="••••••••"
+								required
+							/>
+						</div>
+						<div class="flex items-center">
+							<input
+								type="checkbox"
+								id="remember"
+								name="remember"
+								class="h-4 w-4 text-primary focus:ring-primary border-neutral-300 rounded"
+							/>
+							<label
+								for="remember"
+								class="ml-2 block text-sm text-app-secondary"
+							>
+								Remember me
+							</label>
+						</div>
+						<button
+							type="submit"
+							class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-md"
+						>
+							Log In
+						</button>
+						<div class="text-center mt-4">
+							<span class="text-sm text-app-secondary"
+								>Don't have an account?</span
+							>
+							<button
+								type="button"
+								id="switch-to-signup"
+								class="ml-1 text-sm text-primary hover:text-primary/80"
+							>
+								Sign Up
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Post Detail Modal -->
+		<div
+			id="post-detail-modal"
+			class="fixed inset-0 bg-neutral-900/90 backdrop-blur-sm z-50 hidden overflow-y-auto"
+		>
+			<div
+				class="relative max-w-4xl mx-auto my-10 bg-app rounded-lg shadow-xl animate-bounce-in"
+			>
+				<div class="p-6">
+					<div class="flex items-center justify-between mb-4">
+						<div>
+							<span
+								id="post-category"
+								class="inline-block px-3 py-1 rounded-full text-xs font-medium bg-primary text-white mb-2"
+								>Category</span
+							>
+						</div>
+						<button
+							id="close-post-detail"
+							class="text-app-tertiary hover:text-app transition-colors duration-300"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</div>
+
+					<div>
+						<div class="mb-6">
+							<h2
+								id="post-title"
+								class="font-serif text-2xl md:text-3xl font-bold text-app mb-3"
+							>
+								Article Title
+							</h2>
+
+							<div class="flex items-center mb-5">
+								<div
+									class="w-10 h-10 rounded-full overflow-hidden mr-3 transform transition-transform duration-300 hover:scale-110"
+								>
+									<img
+										id="post-author-img"
+										src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5"
+										alt="Author"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<div>
+									<p
+										id="post-author"
+										class="text-sm font-medium text-app-secondary"
+									>
+										Author Name
+									</p>
+									<p id="post-date" class="text-sm text-app-tertiary">
+										Publication Date
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-8">
+							<img
+								id="post-image"
+								src="https://images.unsplash.com/photo-1499750310107-5fef28a66643"
+								alt="Article feature image"
+								class="w-full h-80 object-cover rounded-lg mb-6"
+							/>
+
+							<div
+								id="post-content"
+								class="prose max-w-none prose-lg text-app-secondary"
+							>
+								<p>
+									Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+									Vivamus luctus urna sed urna ultricies ac tempor dui sagittis.
+									In condimentum facilisis porta. Sed nec diam eu diam mattis
+									viverra. Nulla fringilla, orci ac euismod semper, magna diam
+									porttitor mauris, quis sollicitudin sapien justo in libero.
+									Vestibulum mollis mauris enim.
+								</p>
+								<p>
+									Morbi euismod magna ac lorem rutrum elementum. Donec viverra
+									auctor lobortis. Pellentesque eu est a nulla placerat
+									dignissim. Morbi a enim in magna semper bibendum. Etiam
+									scelerisque, nunc ac egestas consequat, odio nibh euismod
+									nulla, eget auctor orci nibh vel nisi.
+								</p>
+								<h3>Key Points</h3>
+								<ul>
+									<li>First important consideration about this topic</li>
+									<li>Second critical aspect to understand</li>
+									<li>Third element that makes this concept valuable</li>
+								</ul>
+								<p>
+									Nullam et orci eu lorem consequat tincidunt vivamus et
+									sagittis libero. Mauris aliquet magna magna sed nunc rhoncus
+									pharetra. Pellentesque condimentum sem. In efficitur ligula
+									tate urna. Maecenas laoreet massa vel lacinia pellentesque
+									lorem ipsum dolor.
+								</p>
+								<blockquote>
+									"Design is intelligence made visible." — Alina Wheeler
+								</blockquote>
+								<p>
+									Aliquam ut ex ut augue consectetur interdum. Donec hendrerit
+									imperdiet. Mauris eleifend fringilla nullam aenean mi ligula.
+									Pellentesque habitant morbi tristique senectus et netus et
+									malesuada fames ac turpis egestas. Quisque consectetur felis
+									eros, non gravida lectus finibus a.
+								</p>
+							</div>
+						</div>
+
+						<div class="border-t border-app pt-6">
+							<h4 class="text-lg font-semibold text-app mb-4">
+								Share this article
+							</h4>
+							<div class="flex space-x-4">
+								<button
+									class="p-2 rounded-full bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+										/>
+									</svg>
+								</button>
+								<button
+									class="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 transition-colors"
+								>
+									<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+										<path
+											d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+										/>
+									</svg>
+								</button>
+								<button
+									class="p-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors"
+								>
+									<svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+										<path
+											fill-rule="evenodd"
+											d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</button>
+								<button
+									class="p-2 rounded-full bg-neutral-200 text-neutral-700 hover:bg-neutral-300 transition-colors"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Hero Section -->
+		<section
+			id="hero-section"
+			class="bg-app py-12 sm:py-16 relative overflow-hidden"
+		>
+			<!-- Simplified Particles Background -->
+			<div id="particles-container" class="absolute inset-0 opacity-30"></div>
+
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+				<div class="text-center">
+					<h1
+						class="font-serif text-4xl md:text-5xl lg:text-6xl font-bold text-app leading-tight mb-4 hero-title"
+					>
+						Ideas that <span class="text-gradient">inspire</span>
+					</h1>
+					<p
+						class="text-app-secondary text-lg md:text-xl max-w-2xl mx-auto mb-8 hero-subtitle"
+					>
+						Discover thought-provoking articles on design, technology, and
+						creative inspiration from writers around the world.
+					</p>
+					<div
+						class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
+					>
+						<button
+							id="start-reading-btn"
+							class="btn-primary bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-md transition-all duration-300 shadow-sm"
+						>
+							Start Reading
+						</button>
+						<button
+							id="become-writer-btn"
+							class="border border-neutral-300 hover:border-neutral-400 text-app-secondary font-medium py-3 px-6 rounded-md transition-all duration-300 transform hover:translate-y-[-2px] hover:shadow-sm"
+						>
+							Become a Writer
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Decorative Elements (simplified) -->
+			<div
+				class="hidden lg:block absolute top-20 left-20 w-16 h-16 rounded-full bg-primary/10 animate-pulse-slow"
+			></div>
+			<div
+				class="hidden lg:block absolute bottom-20 right-20 w-24 h-24 rounded-full bg-secondary/10 animate-float"
+			></div>
+		</section>
+
+		<!-- Featured Posts -->
+		<section id="featured-section" class="py-12 bg-app-secondary relative">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex items-center justify-between mb-8">
+					<h2
+						class="font-serif text-2xl md:text-3xl font-bold text-app section-title"
+					>
+						Featured Stories
+					</h2>
+					<a
+						href="#latest-articles"
+						class="text-primary hover:text-primary/80 font-medium flex items-center transition-all duration-300 group"
+					>
+						View all
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 ml-1 transform group-hover:translate-x-1 transition-transform duration-300"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</a>
+				</div>
+
+				<div
+					class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 featured-posts"
+				>
+					<div
+						class="card-bg rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 card-zoom featured-post animate-slide-in-left cursor-pointer"
+						data-post-id="1"
+					>
+						<div class="relative overflow-hidden h-48">
+							<img
+								src="https://images.unsplash.com/photo-1499750310107-5fef28a66643"
+								alt="Workspace"
+								class="w-full h-full object-cover transition-all duration-700 hover:scale-105"
+							/>
+							<div class="absolute top-4 left-4">
+								<span
+									class="bg-secondary/90 text-white text-xs font-medium px-2 py-1 rounded-full transform transition-transform duration-300 hover:scale-110"
+									>Design</span
+								>
+							</div>
+						</div>
+						<div class="p-6 card-content">
+							<div class="flex items-center mb-3">
+								<div
+									class="w-8 h-8 rounded-full overflow-hidden mr-3 transform transition-transform duration-300 hover:scale-110"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5"
+										alt="Author"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<span class="text-sm text-app-tertiary"
+									>David Chen • May 8, 2025</span
+								>
+							</div>
+							<div class="card-text">
+								<h3
+									class="font-serif text-xl font-bold mb-2 text-app hover:text-primary transition-colors duration-300"
+								>
+									The Principles of Minimalist Design in Modern Web Development
+								</h3>
+								<div class="excerpt-container">
+									<p class="text-app-tertiary mb-4">
+										Explore how minimalist design principles can enhance user
+										experience and create more effective digital products
+										without sacrificing functionality.
+									</p>
+								</div>
+							</div>
+							<div class="card-footer pt-4">
+								<a
+									href="#"
+									class="read-more-btn text-primary hover:text-primary/80 font-medium flex items-center transition-all duration-300 group"
+								>
+									Read more
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 ml-1 transform group-hover:translate-x-1 transition-transform duration-300"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="card-bg rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 card-zoom featured-post animate-fade-in cursor-pointer"
+						data-post-id="2"
+					>
+						<div class="relative overflow-hidden h-48">
+							<img
+								src="https://images.unsplash.com/photo-1523437113738-bbd3cc89fb19"
+								alt="Typography"
+								class="w-full h-full object-cover transition-transform duration-700"
+							/>
+							<div class="absolute top-4 left-4">
+								<span
+									class="bg-primary/90 text-white text-xs font-medium px-2 py-1 rounded-full transform transition-transform duration-300 hover:scale-110"
+									>Typography</span
+								>
+							</div>
+						</div>
+						<div class="p-6 card-content">
+							<div class="flex items-center mb-3">
+								<div
+									class="w-8 h-8 rounded-full overflow-hidden mr-3 transform transition-transform duration-300 hover:scale-110"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1544005313-94ddf0286df2"
+										alt="Author"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<span class="text-sm text-app-tertiary"
+									>Emily Johnson • May 5, 2025</span
+								>
+							</div>
+							<div class="card-text">
+								<h3
+									class="font-serif text-xl font-bold mb-2 text-app hover:text-primary transition-colors duration-300"
+								>
+									Why Typography Matters: The Art of Readable Content
+								</h3>
+								<div class="excerpt-container">
+									<p class="text-app-tertiary mb-4">
+										Good typography isn't just about aesthetics—it's about
+										readability, hierarchy, and creating an intuitive reading
+										experience for your audience.
+									</p>
+								</div>
+							</div>
+							<div class="card-footer pt-4">
+								<a
+									href="#"
+									class="read-more-btn text-primary hover:text-primary/80 font-medium flex items-center transition-all duration-300 group"
+								>
+									Read more
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 ml-1 transform group-hover:translate-x-1 transition-transform duration-300"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="card-bg rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 card-zoom featured-post animate-slide-in-right cursor-pointer"
+						data-post-id="3"
+					>
+						<div class="relative overflow-hidden h-48">
+							<img
+								src="https://images.unsplash.com/photo-1551288049-bebda4e38f71"
+								alt="Code"
+								class="w-full h-full object-cover transition-transform duration-700"
+							/>
+							<div class="absolute top-4 left-4">
+								<span
+									class="bg-neutral-800/90 text-white text-xs font-medium px-2 py-1 rounded-full transform transition-transform duration-300 hover:scale-110"
+									>Development</span
+								>
+							</div>
+						</div>
+						<div class="p-6 card-content">
+							<div class="flex items-center mb-3">
+								<div
+									class="w-8 h-8 rounded-full overflow-hidden mr-3 transform transition-transform duration-300 hover:scale-110"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+										alt="Author"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<span class="text-sm text-app-tertiary"
+									>Michael Wu • May 3, 2025</span
+								>
+							</div>
+							<div class="card-text">
+								<h3
+									class="font-serif text-xl font-bold mb-2 text-app hover:text-primary transition-colors duration-300"
+								>
+									The Evolution of JavaScript Frameworks in 2025
+								</h3>
+								<div class="excerpt-container">
+									<p class="text-app-tertiary mb-4">
+										A comprehensive look at the current JavaScript ecosystem and
+										how modern frameworks are shaping the future of web
+										development.
+									</p>
+								</div>
+							</div>
+							<div class="card-footer pt-4">
+								<a
+									href="#"
+									class="read-more-btn text-primary hover:text-primary/80 font-medium flex items-center transition-all duration-300 group"
+								>
+									Read more
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 ml-1 transform group-hover:translate-x-1 transition-transform duration-300"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Main Content Section -->
+		<section id="latest-articles" class="py-12 bg-app">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<!-- Search and Filter -->
+				<div class="mb-8">
+					<div
+						class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0"
+					>
+						<h2
+							class="font-serif text-2xl md:text-3xl font-bold text-app section-title"
+						>
+							Latest Articles
+						</h2>
+						<div
+							class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full md:w-auto"
+						>
+							<div class="relative w-full sm:w-64">
+								<input
+									type="text"
+									id="filter-search"
+									class="w-full border border-app bg-app text-app rounded-lg py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+									placeholder="Search articles..."
+								/>
+								<div class="absolute inset-y-0 right-0 flex items-center pr-3">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-neutral-400"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+										/>
+									</svg>
+								</div>
+							</div>
+							<div class="relative w-full sm:w-44">
+								<select
+									id="category-select"
+									class="block w-full border border-app bg-app text-app rounded-lg py-2 px-4 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+								>
+									<option value="">All Categories</option>
+									<option value="design">Design</option>
+									<option value="typography">Typography</option>
+									<option value="development">Development</option>
+									<option value="productivity">Productivity</option>
+									<option value="creativity">Creativity</option>
+								</select>
+								<div
+									class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-neutral-400"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fill-rule="evenodd"
+											d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Blog Posts Grid -->
+				<div
+					id="posts-container"
+					class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+				>
+					<!-- Posts will be populated here via JavaScript -->
+				</div>
+
+				<!-- Loading Indicator -->
+				<div id="loading-indicator" class="hidden mt-12 flex justify-center">
+					<div class="relative">
+						<div
+							class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"
+						></div>
+						<div
+							class="absolute inset-0 flex items-center justify-center text-primary text-xs font-medium"
+						>
+							Loading
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Newsletter Section -->
+		<section
+			id="newsletter-section"
+			class="py-16 bg-gradient-to-r from-primary/5 to-secondary/5 relative overflow-hidden"
+		>
+			<!-- Decorative Shapes -->
+			<div
+				class="absolute top-0 left-0 w-64 h-64 bg-primary/10 rounded-full transform translate-x-[-50%] translate-y-[-50%]"
+			></div>
+			<div
+				class="absolute bottom-0 right-0 w-80 h-80 bg-secondary/10 rounded-full transform translate-x-[30%] translate-y-[30%]"
+			></div>
+
+			<div
+				class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10"
+			>
+				<h2
+					class="font-serif text-2xl md:text-3xl font-bold text-app mb-4 section-title"
+				>
+					Join Our Newsletter
+				</h2>
+				<p class="text-app-secondary mb-8 max-w-2xl mx-auto">
+					Stay updated with the latest articles, design tips, and exclusive
+					content delivered directly to your inbox.
+				</p>
+				<form
+					id="newsletter-form"
+					class="flex flex-col sm:flex-row max-w-lg mx-auto space-y-4 sm:space-y-0 sm:space-x-4"
+				>
+					<input
+						type="email"
+						placeholder="Your email address"
+						required
+						class="flex-1 border border-app bg-app text-app rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 focus-ring"
+					/>
+					<button
+						type="submit"
+						class="btn-primary bg-primary hover:bg-primary/90 text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 shadow-sm transform hover:translate-y-[-2px]"
+					>
+						Subscribe
+					</button>
+				</form>
+				<p
+					id="newsletter-success"
+					class="hidden mt-4 text-sm text-green-600 font-medium animate-pulse-slow"
+				>
+					Thanks for subscribing! Check your email for a confirmation.
+				</p>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="bg-app border-t border-app py-12">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+					<div>
+						<span class="font-serif text-2xl font-bold text-gradient"
+							>Minima</span
+						>
+						<p class="mt-4 text-app-tertiary">
+							A minimalist blogging platform for modern creators and readers who
+							appreciate thoughtful content.
+						</p>
+						<div class="mt-6 flex space-x-4">
+							<a
+								href="#"
+								class="text-app-tertiary hover:text-app transition-all duration-300 transform hover:scale-110"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="text-app-tertiary hover:text-app transition-all duration-300 transform hover:scale-110"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="text-app-tertiary hover:text-app transition-all duration-300 transform hover:scale-110"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</a>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-medium text-app mb-4">Quick Links</h3>
+						<ul class="space-y-2 footer-links">
+							<li>
+								<a
+									href="#hero-section"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Home</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#featured-section"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Featured</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#latest-articles"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Latest Articles</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#newsletter-section"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Newsletter</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Contact</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-medium text-app mb-4">Categories</h3>
+						<ul class="space-y-2 footer-links">
+							<li>
+								<a
+									href="#"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Design</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Typography</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Development</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Productivity</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-app-tertiary hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Creativity</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3
+							class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-4"
+						>
+							Legal
+						</h3>
+						<ul class="space-y-2 footer-links">
+							<li>
+								<a
+									href="#"
+									class="text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Privacy Policy</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Terms of Service</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>Cookie Policy</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-300 group flex items-center"
+								>
+									<span>GDPR Compliance</span>
+									<span
+										class="transform translate-x-0 group-hover:translate-x-1 transition-transform duration-300 opacity-0 group-hover:opacity-100"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 ml-1"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div
+					class="mt-12 border-t border-neutral-200 dark:border-dark-border pt-8 flex flex-col md:flex-row justify-between items-center"
+				>
+					<div class="flex items-center space-x-2">
+						<div
+							class="h-4 w-4 bg-primary rounded-full animate-pulse-slow"
+						></div>
+						<p class="text-neutral-500 dark:text-neutral-400 text-sm">
+							© 2025 Minima. All rights reserved.
+						</p>
+					</div>
+					<div class="mt-4 md:mt-0">
+						<select
+							id="language-select"
+							class="border border-neutral-300 dark:border-dark-border dark:bg-dark-bg dark:text-neutral-300 rounded-md py-1 px-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300 text-sm focus-ring cursor-pointer"
+						>
+							<option value="en">English</option>
+							<option value="es">Español</option>
+							<option value="fr">Français</option>
+							<option value="de">Deutsch</option>
+						</select>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Back to Top Button -->
+		<button
+			id="back-to-top"
+			class="fixed bottom-8 right-8 bg-primary text-white p-3 rounded-full shadow-md opacity-0 invisible transition-all duration-300 hover:bg-primary/90 transform hover:translate-y-[-5px] z-40"
+			aria-label="Back to top"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				class="h-5 w-5"
+				viewBox="0 0 20 20"
+				fill="currentColor"
+			>
+				<path
+					fill-rule="evenodd"
+					d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+					clip-rule="evenodd"
+				/>
+			</svg>
+		</button>
+
+		<!-- Notification Toast -->
+		<div
+			id="toast"
+			class="fixed top-4 right-4 bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-md shadow-md transition-all duration-300 transform translate-y-[-100px] opacity-0 z-50"
+		>
+			<div class="flex items-center">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-5 w-5 mr-2"
+					viewBox="0 0 20 20"
+					fill="currentColor"
+				>
+					<path
+						fill-rule="evenodd"
+						d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+						clip-rule="evenodd"
+					/>
+				</svg>
+				<span id="toast-text"></span>
+			</div>
+		</div>
+
+		<!-- Preloader -->
+		<div
+			id="preloader"
+			class="fixed inset-0 bg-white dark:bg-dark-bg flex items-center justify-center z-[100]"
+		>
+			<div class="text-center">
+				<div
+					class="text-primary font-serif text-4xl font-bold animate-pulse-slow mb-4"
+				>
+					Minima
+				</div>
+				<div
+					class="w-48 h-1 bg-neutral-200 dark:bg-dark-border rounded-full mx-auto overflow-hidden"
+				>
+					<div
+						id="preloader-progress"
+						class="h-full bg-primary rounded-full w-0 transition-all duration-300"
+					></div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const blogPosts = [
+				{
+					id: 1,
+					title: "Creating a Perfect Color Palette for Your Brand",
+					excerpt:
+						"Learn how to select the right colors that represent your brand's personality and resonate with your target audience.",
+					content: `
+						<p>The colors you choose for your brand are more than just a visual element—they're a powerful communication tool that can influence how people perceive your business.</p>
+						
+						<p>When crafting the perfect color palette, consider these essential factors:</p>
+						
+						<h3>Understanding Color Psychology</h3>
+						<p>Different colors evoke different emotions and associations. Blue conveys trust and reliability, making it popular for financial and tech brands. Red triggers excitement and urgency, perfect for sales and food industries. Yellow radiates optimism and clarity, while green suggests growth and sustainability.</p>
+						
+						<h3>Know Your Audience</h3>
+						<p>Research your target demographic's preferences and cultural considerations. Color perceptions vary across cultures, age groups, and genders. What works for a children's brand won't necessarily resonate with a luxury audience.</p>
+						
+						<h3>Analyze Your Competition</h3>
+						<p>Study the color schemes used by competitors in your industry. You'll want to differentiate yourself while still meeting audience expectations for your sector.</p>
+						
+						<blockquote>"Color is a power which directly influences the soul." — Wassily Kandinsky</blockquote>
+						
+						<h3>Creating Balance and Harmony</h3>
+						<p>A well-designed color palette typically includes:</p>
+						<ul>
+							<li>1-2 primary brand colors that dominate your visual identity</li>
+							<li>2-3 complementary secondary colors for variety and accent</li>
+							<li>Neutral tones to balance and provide breathing space</li>
+						</ul>
+						
+						<p>The 60-30-10 rule is a helpful starting point: use your dominant color for 60% of the design, secondary color for 30%, and accent color for 10%.</p>
+						
+						<p>Remember that consistency is key—once established, apply your color palette systematically across all touchpoints from your website to marketing materials and product packaging.</p>
+					`,
+					category: "design",
+					image: "https://images.unsplash.com/photo-1523821741446-edb2b68bb7a0",
+					author: {
+						name: "Alex Morgan",
+						avatar:
+							"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+					},
+					date: "May 9, 2025",
+				},
+				{
+					id: 2,
+					title: "The Psychology of Fonts: Choosing the Right Typography",
+					excerpt:
+						"Different fonts evoke different emotions. Discover how to choose typography that aligns with your brand message.",
+					content: `
+						<p>Typography is the art and technique of arranging type to make written language legible, readable, and appealing when displayed. The choice of typeface can dramatically affect how your message is received.</p>
+						
+						<h3>The Science Behind Font Psychology</h3>
+						<p>Research shows that typography influences how readers perceive information. A 2016 study found that fonts categorized as "formal" (like Times New Roman) were associated with professionalism and trustworthiness, while "casual" fonts (like Comic Sans) conveyed friendliness but less authority.</p>
+						
+						<h3>Categories of Typefaces and Their Impressions</h3>
+						<p>Serif fonts (like Times New Roman or Garamond) have small lines or strokes attached to the ends of letters. They convey tradition, reliability, and respectability—perfect for established institutions, academic publications, or luxury brands.</p>
+						
+						<p>Sans-serif fonts (like Helvetica or Arial) lack these decorative strokes, appearing cleaner and more modern. They suggest simplicity, objectivity, and innovation, making them ideal for tech companies and contemporary brands.</p>
+						
+						<p>Script fonts mimic handwriting and suggest elegance, creativity, and personalization. They work well for wedding invitations, luxury products, or brands wanting to convey authenticity.</p>
+						
+						<p>Display fonts are dramatic and distinctive, designed to capture attention rather than for extended reading. They're perfect for headlines, logos, or contexts where making a strong visual statement matters.</p>
+						
+						<blockquote>"Typography is what language looks like." — Ellen Lupton</blockquote>
+						
+						<h3>Practical Considerations for Selection</h3>
+						<ul>
+							<li>Readability should always be your priority—especially for body text</li>
+							<li>Consider how the font will appear across different mediums and sizes</li>
+							<li>Limit your selection to 2-3 complementary typefaces to maintain coherence</li>
+							<li>Ensure your chosen fonts support all necessary characters and weights</li>
+						</ul>
+						
+						<p>The best typography choices are those that quietly support your message without drawing attention to themselves. When they work well, readers absorb your content without even noticing the careful typographic decisions that made their experience seamless.</p>
+					`,
+					category: "typography",
+					image: "https://images.unsplash.com/photo-1467951591042-f388365db261",
+					author: {
+						name: "Sarah Johnson",
+						avatar:
+							"https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+					},
+					date: "May 7, 2025",
+				},
+				{
+					id: 3,
+					title: "Building Responsive Layouts with CSS Grid",
+					excerpt:
+						"A comprehensive guide to creating flexible and responsive web layouts using modern CSS Grid techniques.",
+					content: `
+						<p>CSS Grid Layout has revolutionized how we design web layouts, offering a two-dimensional system that handles both columns and rows. This powerful tool enables complex layouts that were previously difficult or impossible to achieve with earlier methods.</p>
+						
+						<h3>The Fundamentals of CSS Grid</h3>
+						<p>At its core, CSS Grid consists of two key components: the grid container and grid items. The container is the element that holds grid items and has the <code>display: grid</code> property. Grid items are the direct children of this container.</p>
+						
+						<p>Basic grid setup involves defining your columns and rows:</p>
+						
+						<pre><code>
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: auto;
+  gap: 20px;
+}
+						</code></pre>
+						
+						<p>The <code>fr</code> unit represents a fraction of available space, making fluid layouts straightforward. In this example, the middle column takes up twice as much space as the others.</p>
+						
+						<h3>Creating Responsive Layouts</h3>
+						<p>One of Grid's strengths is its ability to create truly responsive designs without media queries, using functions like <code>minmax()</code> and <code>repeat()</code>:</p>
+						
+						<pre><code>
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+						</code></pre>
+						
+						<p>This creates as many columns as will fit with a minimum width of 250px, automatically adjusting the number of columns as the viewport changes size.</p>
+						
+						<h3>Named Grid Areas for Complex Layouts</h3>
+						<p>For more complex layouts, named grid areas provide an intuitive way to visualize and structure your design:</p>
+						
+						<pre><code>
+.layout {
+  display: grid;
+  grid-template-areas: 
+    "header header header"
+    "sidebar content content"
+    "footer footer footer";
+  grid-template-columns: 1fr 3fr 1fr;
+}
+
+.header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.content { grid-area: content; }
+.footer { grid-area: footer; }
+						</code></pre>
+						
+						<p>This approach makes it incredibly simple to reorganize entire layouts for different screen sizes with just a few lines of CSS.</p>
+						
+						<blockquote>"CSS Grid is the most powerful layout system available in CSS. It's a 2-dimensional system, meaning it can handle both columns and rows." — Rachel Andrew</blockquote>
+						
+						<h3>Grid vs. Flexbox: Using the Right Tool</h3>
+						<p>While Grid excels at two-dimensional layouts (rows and columns simultaneously), Flexbox is optimized for one-dimensional layouts (either rows OR columns). The two technologies complement each other perfectly:</p>
+						
+						<ul>
+							<li>Use Grid for overall page layout</li>
+							<li>Use Flexbox for alignment within grid cells or for simpler linear arrangements</li>
+						</ul>
+						
+						<p>By mastering CSS Grid, you'll gain the ability to create sophisticated, responsive layouts with cleaner markup and more maintainable code than was possible with previous approaches.</p>
+					`,
+					category: "development",
+					image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+					author: {
+						name: "Mark Wilson",
+						avatar:
+							"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+					},
+					date: "May 5, 2025",
+				},
+				{
+					id: 4,
+					title: "Mastering Time Management for Creative Professionals",
+					excerpt:
+						"Practical strategies to improve productivity and create a balanced workflow in your creative career.",
+					content: `
+						<p>Creative professionals face unique challenges when it comes to productivity. The nature of creative work—which requires both focused execution and open-ended ideation—demands specialized approaches to time management.</p>
+						
+						<h3>Understanding Your Creative Rhythm</h3>
+						<p>The first step toward effective time management is recognizing your natural energy patterns. Most people experience predictable cycles of high and low energy throughout the day. Track your productivity and mood for a week to identify when you're naturally most focused, creative, and energetic.</p>
+						
+						<p>Schedule your most demanding creative tasks during your peak energy periods. For many, this is during the morning hours, but it varies significantly between individuals. Reserve administrative tasks, emails, and routine work for your lower-energy periods.</p>
+						
+						<h3>Time Blocking for Creative Work</h3>
+						<p>Time blocking involves dedicating specific chunks of time to particular types of work. For creative professionals, consider these distinct blocks:</p>
+						
+						<ul>
+							<li><strong>Deep creation blocks</strong> (90-120 minutes): For your most intensive creative work, free from all distractions</li>
+							<li><strong>Ideation/research blocks</strong> (60 minutes): For exploring new ideas, gathering inspiration, and research</li>
+							<li><strong>Feedback/revision blocks</strong> (60 minutes): Dedicated time for incorporating feedback and making revisions</li>
+							<li><strong>Administrative blocks</strong> (30-60 minutes): For emails, invoicing, and other business tasks</li>
+							<li><strong>Connection blocks</strong> (30 minutes): For client communication, networking, and social media</li>
+						</ul>
+						
+						<p>Between these focused blocks, schedule 15-30 minute breaks to recharge. Research shows that taking regular breaks actually improves creative thinking and prevents burnout.</p>
+						
+						<blockquote>"Creativity is the residue of time wasted." — Albert Einstein</blockquote>
+						
+						<h3>The Pomodoro Technique for Creative Flow</h3>
+						<p>The Pomodoro Technique—working in focused 25-minute intervals followed by 5-minute breaks—can be particularly effective for creative work when modified slightly. Consider extending the work period to 45-50 minutes to accommodate creative flow states, which can take 15-20 minutes to fully develop.</p>
+						
+						<h3>Preventing Burnout and Maintaining Creativity</h3>
+						<p>Creative burnout is a serious risk when managing creative work. Implement these protective practices:</p>
+						
+						<ul>
+							<li>Schedule regular "inspiration days" with no deliverables</li>
+							<li>Maintain firm boundaries between work and personal time</li>
+							<li>Plan projects with buffer time for the unexpected</li>
+							<li>Develop rituals that signal the transition into creative work</li>
+						</ul>
+						
+						<p>Remember that creative energy is a renewable but finite resource. The most sustainable approach to creative productivity isn't about maximizing every minute, but about creating the conditions where your best work can emerge consistently.</p>
+					`,
+					category: "productivity",
+					image: "https://images.unsplash.com/photo-1507238691740-187a5b1d37b8",
+					author: {
+						name: "Jennifer Lee",
+						avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+					},
+					date: "May 3, 2025",
+				},
+				{
+					id: 5,
+					title: "The Art of Visual Storytelling in Digital Media",
+					excerpt:
+						"How to use visual elements to create compelling narratives that engage your audience on a deeper level.",
+					content: `
+						<p>Visual storytelling—the art of communicating narratives through images, videos, graphics, and other visual media—has become essential in our digital landscape. When skillfully executed, visual stories can engage audiences emotionally and intellectually in ways that text alone cannot.</p>
+						
+						<h3>The Foundations of Visual Narrative</h3>
+						<p>All powerful visual storytelling rests on understanding fundamental visual principles:</p>
+						
+						<ul>
+							<li><strong>Composition</strong> guides the viewer's eye and establishes relationships between elements</li>
+							<li><strong>Color</strong> sets mood, creates emotional impact, and highlights key elements</li>
+							<li><strong>Contrast</strong> directs attention and creates visual hierarchy</li>
+							<li><strong>Movement</strong> (literal or implied) creates dynamic energy and leads the viewer through the narrative</li>
+							<li><strong>Space</strong> (negative and positive) provides context and breathing room for the story</li>
+						</ul>
+						
+						<p>These elements work together to convey meaning beyond what is explicitly shown—creating subtext and emotional resonance.</p>
+						
+						<h3>Crafting a Visual Narrative Arc</h3>
+						<p>Just as written stories have a beginning, middle, and end, visual stories require thoughtful structure. For digital media, consider these storytelling stages:</p>
+						
+						<p><strong>The Hook:</strong> An attention-grabbing visual that immediately engages viewers and establishes the story's tone. In social media, this might be the first frame of a video or the feature image of a post.</p>
+						
+						<p><strong>Context Building:</strong> Visual elements that establish the setting, characters or concepts, and the central tension or question of your narrative.</p>
+						
+						<p><strong>Development:</strong> A series of visuals that advance your narrative, building emotional investment and complexity.</p>
+						
+						<p><strong>Climax:</strong> The visual peak of your story—where the central tension reaches its highest point.</p>
+						
+						<p><strong>Resolution:</strong> Visuals that provide closure and reinforce your core message or call to action.</p>
+						
+						<blockquote>"If it can be written, or thought, it can be filmed." — Stanley Kubrick</blockquote>
+						
+						<h3>Platform-Specific Visual Storytelling</h3>
+						<p>Different digital platforms require tailored approaches:</p>
+						
+						<p><strong>Instagram:</strong> Emphasizes aesthetic cohesion. Stories work best with strong visual continuity, subtle transitions, and a consistent color palette across carousel posts.</p>
+						
+						<p><strong>TikTok/Short-form Video:</strong> Demands immediate engagement. Successful stories use pattern interruption, rapid pacing, and unexpected visual twists.</p>
+						
+						<p><strong>Websites/Long-form:</strong> Allows for more complex visual narratives. Parallax scrolling, thoughtful typographic hierarchy, and progressive disclosure of visual elements can create immersive storytelling experiences.</p>
+						
+						<h3>The Power of Visual Metaphor</h3>
+						<p>Perhaps the most sophisticated aspect of visual storytelling is the use of metaphor—communicating abstract ideas through concrete imagery. Visual metaphors create layers of meaning that engage viewers intellectually and emotionally, making your message more memorable and impactful.</p>
+						
+						<p>Remember that effective visual storytelling isn't about creating the most stunning individual images—it's about how these visuals work together to convey meaning and emotion that resonates with your audience.</p>
+					`,
+					category: "creativity",
+					image: "https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5",
+					author: {
+						name: "Daniel Brown",
+						avatar:
+							"https://images.unsplash.com/photo-1566492031773-4f4e44671857",
+					},
+					date: "May 1, 2025",
+				},
+				{
+					id: 6,
+					title: "Optimizing Website Performance for Better User Experience",
+					excerpt:
+						"Techniques to improve loading speed, responsiveness, and overall performance of your websites.",
+					content: `
+						<p>Website performance directly impacts user experience, conversion rates, and search engine rankings. Research shows that 53% of mobile site visitors will leave a page that takes longer than three seconds to load. Optimizing performance isn't just technical fine-tuning—it's a business imperative.</p>
+						
+						<h3>Understanding Core Web Vitals</h3>
+						<p>Google's Core Web Vitals provide a framework for measuring user experience, focusing on three key metrics:</p>
+						
+						<p><strong>Largest Contentful Paint (LCP)</strong> measures loading performance. For good user experience, LCP should occur within 2.5 seconds of when the page first starts loading.</p>
+						
+						<p><strong>First Input Delay (FID)</strong> measures interactivity. Pages should have a FID of less than 100 milliseconds.</p>
+						
+						<p><strong>Cumulative Layout Shift (CLS)</strong> measures visual stability. Pages should maintain a CLS of less than 0.1.</p>
+						
+						<h3>Image Optimization Techniques</h3>
+						<p>Images often account for the largest portion of a webpage's file size. Implement these optimization strategies:</p>
+						
+						<ul>
+							<li>Use modern image formats like WebP, which provides superior compression</li>
+							<li>Implement responsive images using srcset attributes to serve appropriate sizes</li>
+							<li>Lazy load images that appear below the fold</li>
+							<li>Compress images appropriately, balancing quality and file size</li>
+							<li>Consider using CSS for simple illustrations instead of image files</li>
+						</ul>
+						
+						<blockquote>"Performance is user experience." — Steve Souders</blockquote>
+						
+						<h3>JavaScript Performance Optimization</h3>
+						<p>JavaScript execution can significantly impact page responsiveness. Consider these best practices:</p>
+						
+						<ul>
+							<li>Defer non-critical JavaScript to prevent render-blocking</li>
+							<li>Split your JavaScript bundles using code-splitting techniques</li>
+							<li>Remove unused code with tree shaking</li>
+							<li>Minimize DOM manipulation and repaints</li>
+							<li>Use requestAnimationFrame for animations</li>
+							<li>Implement proper debouncing and throttling for event handlers</li>
+						</ul>
+						
+						<h3>Server Response Time and Delivery Optimization</h3>
+						<p>Beyond front-end optimizations, consider these infrastructure improvements:</p>
+						
+						<ul>
+							<li>Implement a Content Delivery Network (CDN) to reduce latency</li>
+							<li>Enable HTTP/2 or HTTP/3 for multiplexed connections</li>
+							<li>Configure proper browser caching with appropriate cache headers</li>
+							<li>Optimize your database queries and server-side code</li>
+							<li>Consider edge computing for dynamic content that needs to be personalized</li>
+						</ul>
+						
+						<h3>Measuring and Monitoring Performance</h3>
+						<p>Performance optimization is an ongoing process. Implement these measurement practices:</p>
+						
+						<ul>
+							<li>Use tools like Lighthouse, WebPageTest, and PageSpeed Insights for testing</li>
+							<li>Set up Real User Monitoring (RUM) to understand actual user experience</li>
+							<li>Establish performance budgets for new features and designs</li>
+							<li>Monitor performance metrics in your analytics dashboard</li>
+						</ul>
+						
+						<p>By prioritizing website performance, you're not just improving technical metrics—you're creating a better experience for your users, which translates to improved engagement, conversion, and satisfaction.</p>
+					`,
+					category: "development",
+					image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+					author: {
+						name: "Ryan Thompson",
+						avatar: "https://images.unsplash.com/photo-1552058544-f2b08422138a",
+					},
+					date: "April 29, 2025",
+				},
+			];
+
+			const moreBlogPosts = [
+				{
+					id: 7,
+					title: "Sustainable Design Practices for a Better Future",
+					excerpt:
+						"Exploring eco-friendly design approaches that minimize environmental impact without compromising aesthetics.",
+					content: `
+						<p>As awareness of environmental challenges grows, designers across disciplines are embracing sustainable practices that reduce ecological footprints while still creating beautiful, functional work. Sustainable design isn't just an ethical choice—it's increasingly becoming a business necessity as consumers and clients prioritize environmental responsibility.</p>
+						
+						<h3>The Core Principles of Sustainable Design</h3>
+						<p>True sustainable design is built on several foundational principles:</p>
+						
+						<p><strong>Material Efficiency</strong> - Using fewer materials overall and selecting those with minimal environmental impact. This includes renewable, recyclable, or upcycled materials with consideration for their entire lifecycle.</p>
+						
+						<p><strong>Energy Efficiency</strong> - Designing to minimize energy consumption during both production and use phases. For digital products, this means optimizing for lower processing power and battery usage.</p>
+						
+						<p><strong>Longevity and Adaptability</strong> - Creating designs that remain functional and aesthetically pleasing for extended periods, avoiding the rapid obsolescence that drives waste.</p>
+						
+						<p><strong>Circular Economy Approach</strong> - Designing with the entire lifecycle in mind, planning for eventual recycling, biodegradation, or repurposing from the start.</p>
+						
+						<h3>Sustainable Approaches in Different Design Fields</h3>
+						<p><strong>Graphic Design:</strong> Digital-first approaches that minimize printing; specifying recycled papers and vegetable-based inks when physical materials are necessary; designing print layouts to minimize paper waste; creating timeless visual identities that won't require frequent updating.</p>
+						
+						<p><strong>Web and UX Design:</strong> Creating energy-efficient websites and applications (sometimes called "digital sustainability"); minimizing unnecessary animations and autoplay videos; optimizing image sizes; using system fonts to reduce loading requirements; designing dark mode interfaces that use less power on OLED screens.</p>
+						
+						<p><strong>Product Design:</strong> Selecting non-toxic, renewable or recycled materials; designing for disassembly to facilitate repairs and eventual recycling; minimizing packaging; reducing manufacturing waste through precise design specifications.</p>
+						
+						<blockquote>"Good design is environmentally friendly. It conserves resources and minimizes physical and visual pollution throughout the lifecycle of the product." — Dieter Rams</blockquote>
+						
+						<h3>Measuring Sustainability Impact</h3>
+						<p>Sustainable design requires quantifiable metrics to avoid "greenwashing" (making misleading environmental claims). Consider these measurement approaches:</p>
+						
+						<ul>
+							<li>Carbon footprint calculations for the entire product lifecycle</li>
+							<li>Lifecycle assessment (LCA) to evaluate environmental impacts</li>
+							<li>For websites, tools like Website Carbon Calculator can estimate CO2 emissions</li>
+							<li>Certifications like Cradle to Cradle, FSC (for paper products), or Energy Star provide standardized sustainability metrics</li>
+						</ul>
+						
+						<h3>Making the Business Case for Sustainable Design</h3>
+						<p>Beyond environmental benefits, sustainable design offers compelling business advantages:</p>
+						
+						<ul>
+							<li>Cost savings through reduced material usage and energy efficiency</li>
+							<li>Strengthened brand reputation and consumer loyalty</li>
+							<li>Regulatory compliance and future-proofing as environmental regulations tighten</li>
+							<li>Access to the growing market of environmentally conscious consumers</li>
+							<li>Improved employee satisfaction and recruitment advantages</li>
+						</ul>
+						
+						<p>By integrating sustainability principles into your design process, you're not just creating better designs—you're contributing to essential solutions for our collective environmental challenges.</p>
+					`,
+					category: "design",
+					image: "https://images.unsplash.com/photo-1557804506-669a67965ba0",
+					author: {
+						name: "Olivia Green",
+						avatar:
+							"https://images.unsplash.com/photo-1534751516642-a1af1ef26a56",
+					},
+					date: "April 27, 2025",
+				},
+				{
+					id: 8,
+					title: "Typography Trends to Watch in 2025",
+					excerpt:
+						"From variable fonts to expressive serifs, these are the typography trends shaping design this year.",
+					content: `
+						<p>Typography continues to evolve as both a functional necessity and an art form in design. The typography landscape of 2025 reflects broader cultural shifts toward expressiveness, adaptability, and technological integration. Here are the key typographic trends defining this year's visual language.</p>
+						
+						<h3>Variable Fonts Go Mainstream</h3>
+						<p>Once considered an experimental technology, variable fonts have now become a standard tool in designers' arsenals. These versatile fonts allow for infinite variations in weight, width, slant, and other attributes within a single font file.</p>
+						
+						<p>The breakthrough has come from improved browser support and design tool integration, making variable fonts accessible to designers at all levels. Brands are embracing custom variable font systems that allow typography to respond dynamically to user preferences, screen sizes, and even environmental factors like ambient light.</p>
+						
+						<p>Leading the charge are new variable fonts with unprecedented axes of variation—not just traditional parameters like weight and width, but creative dimensions like texture, temperature, and mood.</p>
+						
+						<h3>The Return of Expressive Serifs</h3>
+						<p>After years of minimalist sans-serif dominance, expressive serif typefaces are experiencing a dramatic revival. This renaissance isn't about returning to classic serifs, but rather exploring new interpretations that combine traditional elegance with contemporary edge.</p>
+						
+						<p>These modern serifs feature exaggerated details, unexpected contrasts, and unique character constructions that make them suitable for both headlines and extended reading. Designers are particularly drawn to serifs that balance personality with readability, allowing brands to convey sophistication while maintaining approachable warmth.</p>
+						
+						<blockquote>"Type is a beautiful group of letters, not a group of beautiful letters." — Matthew Carter</blockquote>
+						
+						<h3>Kinetic Typography and Motion Integration</h3>
+						<p>Static typography is increasingly giving way to thoughtfully animated text. As motion design tools become more accessible and performance concerns decrease, brands are integrating subtle animations into their typography as standard practice.</p>
+						
+						<p>This isn't just decorative—kinetic typography enhances user experience by guiding attention, expressing brand personality, and improving information hierarchy. The most effective implementations use motion sparingly to emphasize meaning rather than distract from it.</p>
+						
+						<p>We're seeing the emergence of "smart" kinetic typography systems that respond to user interactions, scroll position, and data inputs, creating dynamic reading experiences that adapt to context.</p>
+						
+						<h3>Accessibility-Driven Innovation</h3>
+						<p>Perhaps the most important trend isn't aesthetic but functional: the prioritization of typographic accessibility. Designers are embracing inclusive typography that works for readers with dyslexia, low vision, and other reading challenges.</p>
+						
+						<p>This has spurred innovation in typeface design, with new fonts specifically engineered to increase legibility for diverse reading needs. Features like distinguished letter forms, consistent stroke weights, and clear counters are being incorporated without sacrificing style.</p>
+						
+						<p>Beyond font selection, designers are implementing typography systems with user-adjustable settings for font size, line height, letter spacing, and contrast—placing readability control in users' hands.</p>
+						
+						<h3>Humanist Touches in a Digital World</h3>
+						<p>As AI and automation become more prevalent in design, we're seeing a countertrend of typography with deliberate human imperfections. Fonts with subtle irregularities, hand-drawn elements, and organic textures are being embraced for their authenticity and emotional resonance.</p>
+						
+						<p>This doesn't mean a return to amateurish design—rather, it's about thoughtfully incorporating elements that feel crafted by human hands, even when executed with digital precision.</p>
+						
+						<p>The most forward-thinking designers are finding this balance by combining highly structured typographic systems with selective moments of expressive, human typographic touches.</p>
+					`,
+					category: "typography",
+					image: "https://images.unsplash.com/photo-1503694978374-8a2fa686963a",
+					author: {
+						name: "Nathan Parker",
+						avatar:
+							"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d",
+					},
+					date: "April 25, 2025",
+				},
+				{
+					id: 9,
+					title: "The Future of JavaScript: What's Coming in ES2025",
+					excerpt:
+						"A look at the upcoming features and improvements planned for the next JavaScript specification.",
+					content: `
+						<p>JavaScript continues its rapid evolution with the upcoming ECMAScript 2025 specification. Building on the language's increasing maturity, ES2025 introduces features focused on developer productivity, performance optimization, and enhanced expressiveness. Here's what you can expect in the next major JavaScript update.</p>
+						
+						<h3>Pattern Matching: Transforming Control Flow</h3>
+						<p>Perhaps the most anticipated addition to JavaScript is comprehensive pattern matching. Similar to features in languages like Rust and Scala, pattern matching in JavaScript will provide a powerful and expressive way to handle complex control flow and data extraction.</p>
+						
+						<pre><code>
+const response = await fetchData();
+const result = match (response) {
+  { status: 200, data: { users: [...var users] } } => users,
+  { status: 404 } => "Not found",
+  { status: var status } if status >= 500 => throw new ServerError(status),
+  _ => "Unknown response"
+};
+						</code></pre>
+						
+						<p>This declaration syntax allows for concise handling of complex nested data structures, significantly reducing boilerplate compared to nested conditional statements.</p>
+						
+						<h3>Pipe Operator: Functional Programming Made Clearer</h3>
+						<p>After years in the proposal stage, the pipe operator (<code>|></code>) is finally making its way into the language. This operator enables clean, readable function composition by passing the result of one expression as an input to another:</p>
+						
+						<pre><code>
+const processedData = data
+  |> filter(?, item => item.active)
+  |> map(?, transformItem)
+  |> groupBy(?, item => item.category);
+						</code></pre>
+						
+						<p>This approach eliminates deeply nested function calls and creates a natural left-to-right flow that matches how we read code. The <code>?</code> placeholder indicates where the piped value should be inserted in functions that aren't unary or don't have the parameter in the first position.</p>
+						
+						<h3>Records and Tuples: True Immutable Data Types</h3>
+						<p>JavaScript is gaining built-in immutable data structures with Records and Tuples. Records (immutable objects) and Tuples (immutable arrays) are defined using a hash prefix:</p>
+						
+						<pre><code>
+const user = #{
+  name: "Alex Chen",
+  preferences: #{ theme: "dark", notifications: #[email, push] }
+};
+						</code></pre>
+						
+						<p>These immutable structures enable structural equality comparisons (deep equality checking by default), reliable hashing for use as Map/Set keys, and improved optimization opportunities for JavaScript engines. They're particularly valuable for state management, reducing errors from unintended mutations.</p>
+						
+						<blockquote>"Good code is its own best documentation." — Steve McConnell</blockquote>
+						
+						<h3>Temporal API: Modern Date/Time Handling</h3>
+						<p>The much-maligned <code>Date</code> object is finally getting a proper replacement with the Temporal API. This comprehensive solution for date/time operations provides immutable date/time objects with clear, explicit methods for common operations:</p>
+						
+						<pre><code>
+const now = Temporal.Now.instant();
+const meeting = Temporal.ZonedDateTime.from({
+  timeZone: 'America/New_York',
+  year: 2025, month: 5, day: 12,
+  hour: 13, minute: 30
+});
+
+const duration = Temporal.Duration.from({ hours: 1, minutes: 30 });
+const meetingEnd = meeting.add(duration);
+						</code></pre>
+						
+						<p>Unlike the legacy Date API, Temporal provides proper timezone handling, duration calculations, and calendar system support, addressing long-standing pain points for JavaScript developers.</p>
+						
+						<h3>Type Annotations: Optional Static Typing</h3>
+						<p>In a significant shift, ECMAScript 2025 introduces optional, compile-time-only type annotations directly in JavaScript. These annotations build on TypeScript's syntax but are completely erased at runtime and have no impact on execution:</p>
+						
+						<pre><code>
+function calculateDiscount(price: number, percentage: number): number {
+  return price * (percentage / 100);
+}
+						</code></pre>
+						
+						<p>This feature aims to standardize typing across JavaScript tooling while maintaining the language's dynamic nature at runtime. TypeScript, Flow, and other type-checking tools will be able to leverage these standard annotations while ignoring their own syntax extensions.</p>
+						
+						<h3>Preparing for ES2025</h3>
+						<p>While the final specification is still being developed, you can start experimenting with many of these features through:</p>
+						
+						<ul>
+							<li>Babel plugins and experimental presets</li>
+							<li>TypeScript's support for upcoming features</li>
+							<li>Polyfills for APIs like Temporal</li>
+							<li>Staged implementation in browser engines</li>
+						</ul>
+						
+						<p>As JavaScript continues to evolve, these additions represent significant steps forward in the language's capabilities, addressing developer pain points while embracing modern programming patterns.</p>
+					`,
+					category: "development",
+					image: "https://images.unsplash.com/photo-1555099962-4199c345e5dd",
+					author: {
+						name: "Sophia Chen",
+						avatar:
+							"https://images.unsplash.com/photo-1521252659862-eec69941b071",
+					},
+					date: "April 23, 2025",
+				},
+			];
+
+			function createBlogPostCard(post, index) {
+				const categoryColor = getCategoryColor(post.category);
+
+				return `
+                <div class="bg-white dark:bg-dark-bg rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 card-zoom post-animated cursor-pointer" 
+                    style="animation-delay: ${index * 0.1}s" data-post-id="${
+					post.id
+				}">
+                    <div class="relative overflow-hidden h-48">
+                        <img src="${post.image}" alt="${
+					post.title
+				}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-${categoryColor}/90 text-white text-xs font-medium px-2 py-1 rounded-full transform transition-transform duration-300 hover:scale-110">${
+					post.category.charAt(0).toUpperCase() + post.category.slice(1)
+				}</span>
+                        </div>
+                    </div>
+                    <div class="p-6 card-content">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-3 transform transition-transform duration-300 hover:scale-110">
+                                <img src="${post.author.avatar}" alt="${
+					post.author.name
+				}" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-neutral-600 dark:text-neutral-400">${
+															post.author.name
+														} • ${post.date}</span>
+                        </div>
+                        <div class="card-text">
+                            <h3 class="font-serif text-xl font-bold mb-2 text-black hover:text-primary transition-colors duration-300">
+                                ${post.title}
+                            </h3>
+                            <div class="excerpt-container">
+                                <p class="text-neutral-600 dark:text-neutral-400 mb-4">${
+																	post.excerpt
+																}</p>
+                            </div>
+                        </div>
+                        <div class="card-footer pt-4">
+                            <a href="#" class="read-more-btn text-primary hover:text-primary/80 font-medium flex items-center transition-all duration-300 group">
+                                Read more
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 transform group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+			}
+
+			function getCategoryColor(category) {
+				const categoryColors = {
+					design: "secondary",
+					typography: "primary",
+					development: "neutral-800",
+					productivity: "green-600",
+					creativity: "purple-600",
+				};
+
+				return categoryColors[category] || "neutral-600";
+			}
+
+			function createSimplifiedParticles() {
+				const container = document.getElementById("particles-container");
+				const numParticles = 10;
+
+				for (let i = 0; i < numParticles; i++) {
+					const size = Math.random() * 5 + 3;
+					const particle = document.createElement("div");
+					particle.classList.add("particle");
+					particle.style.width = `${size}px`;
+					particle.style.height = `${size}px`;
+					particle.style.left = `${Math.random() * 100}%`;
+					particle.style.top = `${Math.random() * 100}%`;
+
+					particle.style.animation = `float ${
+						5 + Math.random() * 5
+					}s linear infinite`;
+					container.appendChild(particle);
+				}
+			}
+
+			function populateInitialPosts() {
+				const postsContainer = document.getElementById("posts-container");
+				postsContainer.innerHTML = "";
+
+				blogPosts.forEach((post, index) => {
+					postsContainer.innerHTML += createBlogPostCard(post, index);
+				});
+			}
+
+			function filterPosts() {
+				const category = document.getElementById("category-select").value;
+				const searchTerm = document
+					.getElementById("filter-search")
+					.value.toLowerCase();
+				const postsContainer = document.getElementById("posts-container");
+
+				postsContainer.innerHTML = "";
+
+				const filteredPosts = blogPosts.filter((post) => {
+					const matchesCategory = category === "" || post.category === category;
+					const matchesSearch =
+						post.title.toLowerCase().includes(searchTerm) ||
+						post.excerpt.toLowerCase().includes(searchTerm);
+
+					return matchesCategory && matchesSearch;
+				});
+
+				if (filteredPosts.length === 0) {
+					postsContainer.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 py-12 text-center">
+                        <p class="text-neutral-600 dark:text-neutral-400">No posts found matching your criteria.</p>
+                    </div>
+                `;
+				} else {
+					filteredPosts.forEach((post, index) => {
+						postsContainer.innerHTML += createBlogPostCard(post, index);
+					});
+				}
+			}
+
+			function showToast(message) {
+				const toast = document.getElementById("toast");
+				const toastText = document.getElementById("toast-text");
+
+				toastText.textContent = message;
+				toast.classList.remove("translate-y-[-100px]", "opacity-0");
+				toast.classList.add("translate-y-0", "opacity-100");
+
+				setTimeout(() => {
+					toast.classList.remove("translate-y-0", "opacity-100");
+					toast.classList.add("translate-y-[-100px]", "opacity-0");
+				}, 3000);
+			}
+
+			function openPostDetail(postId) {
+				const post = [...blogPosts, ...moreBlogPosts].find(
+					(p) => p.id === parseInt(postId)
+				);
+				if (!post) return;
+
+				document.getElementById("post-title").textContent = post.title;
+				document.getElementById("post-author").textContent = post.author.name;
+				document.getElementById("post-date").textContent = post.date;
+				document.getElementById("post-author-img").src = post.author.avatar;
+				document.getElementById("post-image").src = post.image;
+				document.getElementById("post-content").innerHTML = post.content;
+
+				const categoryColor = getCategoryColor(post.category);
+				const categorySpan = document.getElementById("post-category");
+				categorySpan.textContent =
+					post.category.charAt(0).toUpperCase() + post.category.slice(1);
+				categorySpan.className = `inline-block px-3 py-1 rounded-full text-xs font-medium bg-${categoryColor} text-white mb-2`;
+
+				document.getElementById("post-detail-modal").classList.remove("hidden");
+				document.body.classList.add("overflow-hidden");
+			}
+
+			function closePostDetail() {
+				document.getElementById("post-detail-modal").classList.add("hidden");
+				document.body.classList.remove("overflow-hidden");
+			}
+
+			function toggleDarkMode() {
+				document.body.classList.toggle("dark-mode");
+				const isDarkMode = document.body.classList.contains("dark-mode");
+				localStorage.setItem("dark-mode", isDarkMode);
+
+				showToast(isDarkMode ? "Dark mode enabled" : "Light mode enabled");
+			}
+
+			function animatePreloader() {
+				const preloader = document.getElementById("preloader");
+				const progress = document.getElementById("preloader-progress");
+				let width = 0;
+
+				const progressInterval = setInterval(() => {
+					if (width >= 100) {
+						clearInterval(progressInterval);
+						preloader.style.opacity = "0";
+
+						setTimeout(() => {
+							preloader.style.display = "none";
+						}, 300);
+					} else {
+						width += 10;
+						if (width > 100) width = 100;
+						progress.style.width = width + "%";
+					}
+				}, 100);
+			}
+
+			function loadMorePosts() {
+				if (isLoading) return;
+
+				const scrollPosition =
+					window.scrollY || document.documentElement.scrollTop;
+				const windowHeight = window.innerHeight;
+				const documentHeight = document.documentElement.scrollHeight;
+
+				if (scrollPosition + windowHeight >= documentHeight - 200) {
+					isLoading = true;
+
+					const loadingIndicator = document.getElementById("loading-indicator");
+					loadingIndicator.classList.remove("hidden");
+
+					setTimeout(() => {
+						if (page === 1) {
+							const postsContainer = document.getElementById("posts-container");
+
+							moreBlogPosts.forEach((post, index) => {
+								postsContainer.innerHTML += createBlogPostCard(
+									post,
+									index + blogPosts.length
+								);
+							});
+
+							page++;
+						} else {
+							const postsContainer = document.getElementById("posts-container");
+							const allPosts = [...blogPosts, ...moreBlogPosts];
+
+							for (let i = 0; i < 3; i++) {
+								const randomPost =
+									allPosts[Math.floor(Math.random() * allPosts.length)];
+								const modifiedPost = {
+									...randomPost,
+									id: randomPost.id + page * 10 + i,
+									title: randomPost.title + " - Part " + (page + 1),
+									date: "April " + (20 - page * 3 - i) + ", 2025",
+								};
+
+								postsContainer.innerHTML += createBlogPostCard(
+									modifiedPost,
+									blogPosts.length + moreBlogPosts.length + i
+								);
+							}
+
+							page++;
+						}
+
+						loadingIndicator.classList.add("hidden");
+						isLoading = false;
+
+						addPostEventListeners();
+					}, 500);
+				}
+			}
+
+			function smoothScrollToAnchor(e) {
+				e.preventDefault();
+				const targetId = this.getAttribute("href");
+				if (!targetId || targetId === "#") return;
+
+				const targetElement = document.querySelector(targetId);
+				if (!targetElement) return;
+
+				window.scrollTo({
+					top: targetElement.offsetTop - 70,
+					behavior: "smooth",
+				});
+
+				if (
+					!document.getElementById("mobile-menu").classList.contains("hidden")
+				) {
+					document.getElementById("mobile-menu").classList.add("hidden");
+				}
+			}
+
+			function initNavigation() {
+				document
+					.getElementById("mobile-menu-button")
+					.addEventListener("click", function () {
+						const mobileMenu = document.getElementById("mobile-menu");
+						if (mobileMenu.classList.contains("hidden")) {
+							mobileMenu.classList.remove("hidden");
+						} else {
+							mobileMenu.classList.add("hidden");
+						}
+					});
+
+				document.querySelectorAll('a[href^="#"]').forEach((link) => {
+					link.addEventListener("click", smoothScrollToAnchor);
+				});
+			}
+
+			function initModals() {
+				document
+					.getElementById("search-button")
+					.addEventListener("click", function () {
+						document.getElementById("search-modal").classList.remove("hidden");
+						document.getElementById("search-input").focus();
+					});
+
+				document
+					.getElementById("close-search")
+					.addEventListener("click", function () {
+						document.getElementById("search-modal").classList.add("hidden");
+					});
+
+				document
+					.getElementById("signup-button")
+					.addEventListener("click", function () {
+						document.getElementById("signup-modal").classList.remove("hidden");
+					});
+
+				document
+					.getElementById("mobile-signup-button")
+					.addEventListener("click", function () {
+						document.getElementById("signup-modal").classList.remove("hidden");
+						document.getElementById("mobile-menu").classList.add("hidden");
+					});
+
+				document
+					.getElementById("close-signup")
+					.addEventListener("click", function () {
+						document.getElementById("signup-modal").classList.add("hidden");
+					});
+
+				document
+					.getElementById("login-button")
+					.addEventListener("click", function () {
+						document.getElementById("login-modal").classList.remove("hidden");
+					});
+
+				document
+					.getElementById("mobile-login-button")
+					.addEventListener("click", function () {
+						document.getElementById("login-modal").classList.remove("hidden");
+						document.getElementById("mobile-menu").classList.add("hidden");
+					});
+
+				document
+					.getElementById("close-login")
+					.addEventListener("click", function () {
+						document.getElementById("login-modal").classList.add("hidden");
+					});
+
+				document
+					.getElementById("switch-to-login")
+					.addEventListener("click", function () {
+						document.getElementById("signup-modal").classList.add("hidden");
+						document.getElementById("login-modal").classList.remove("hidden");
+					});
+
+				document
+					.getElementById("switch-to-signup")
+					.addEventListener("click", function () {
+						document.getElementById("login-modal").classList.add("hidden");
+						document.getElementById("signup-modal").classList.remove("hidden");
+					});
+
+				document
+					.getElementById("close-post-detail")
+					.addEventListener("click", closePostDetail);
+
+				document.querySelectorAll(".fixed.inset-0").forEach((modal) => {
+					modal.addEventListener("click", function (e) {
+						if (e.target === this) {
+							this.classList.add("hidden");
+							document.body.classList.remove("overflow-hidden");
+						}
+					});
+				});
+			}
+
+			function initForms() {
+				document
+					.getElementById("login-form")
+					.addEventListener("submit", function (e) {
+						e.preventDefault();
+						document.getElementById("login-modal").classList.add("hidden");
+						showToast("Login successful! Welcome back.");
+					});
+
+				document
+					.getElementById("signup-form")
+					.addEventListener("submit", function (e) {
+						e.preventDefault();
+						document.getElementById("signup-modal").classList.add("hidden");
+						showToast("Account created successfully! Welcome to Minima.");
+					});
+
+				document
+					.getElementById("newsletter-form")
+					.addEventListener("submit", function (e) {
+						e.preventDefault();
+
+						this.style.opacity = "0.5";
+
+						setTimeout(() => {
+							this.style.opacity = "1";
+							this.reset();
+							document
+								.getElementById("newsletter-success")
+								.classList.remove("hidden");
+
+							setTimeout(() => {
+								document
+									.getElementById("newsletter-success")
+									.classList.add("hidden");
+							}, 5000);
+
+							showToast("Successfully subscribed to the newsletter!");
+						}, 500);
+					});
+			}
+
+			function initButtons() {
+				document
+					.getElementById("start-reading-btn")
+					.addEventListener("click", function () {
+						document
+							.getElementById("latest-articles")
+							.scrollIntoView({ behavior: "smooth" });
+					});
+
+				document
+					.getElementById("become-writer-btn")
+					.addEventListener("click", function () {
+						document.getElementById("signup-modal").classList.remove("hidden");
+						showToast("Sign up to become a writer on Minima!");
+					});
+
+				const backToTopButton = document.getElementById("back-to-top");
+
+				window.addEventListener("scroll", function () {
+					if (window.scrollY > 300) {
+						backToTopButton.classList.remove("opacity-0", "invisible");
+					} else {
+						backToTopButton.classList.add("opacity-0", "invisible");
+					}
+				});
+
+				backToTopButton.addEventListener("click", function () {
+					window.scrollTo({
+						top: 0,
+						behavior: "smooth",
+					});
+				});
+
+				document
+					.getElementById("close-notification")
+					.addEventListener("click", function () {
+						document.getElementById("notification").classList.add("hidden");
+					});
+			}
+
+			function addPostEventListeners() {
+				document.querySelectorAll(".read-more-btn").forEach((btn) => {
+					btn.addEventListener("click", function (e) {
+						e.preventDefault();
+						const postCard = this.closest("[data-post-id]");
+						const postId = postCard.getAttribute("data-post-id");
+						openPostDetail(postId);
+					});
+				});
+
+				document.querySelectorAll("[data-post-id]").forEach((card) => {
+					card.addEventListener("click", function (e) {
+						if (!e.target.closest("a") && !e.target.closest("button")) {
+							const postId = this.getAttribute("data-post-id");
+							openPostDetail(postId);
+						}
+					});
+				});
+			}
+
+			function initProgressBar() {
+				const progressBar = document.querySelector(".progress-bar");
+
+				window.addEventListener("scroll", () => {
+					const scrollTop = window.scrollY;
+					const docHeight = document.body.offsetHeight;
+					const winHeight = window.innerHeight;
+					const scrollPercent = scrollTop / (docHeight - winHeight);
+					const scrollPercentRounded = Math.round(scrollPercent * 100);
+
+					progressBar.style.width = scrollPercentRounded + "%";
+				});
+			}
+
+			document.addEventListener("DOMContentLoaded", function () {
+				if (localStorage.getItem("dark-mode") === "true") {
+					document.body.classList.add("dark-mode");
+				}
+
+				animatePreloader();
+
+				createSimplifiedParticles();
+
+				populateInitialPosts();
+
+				initProgressBar();
+
+				initNavigation();
+
+				initModals();
+
+				initForms();
+
+				initButtons();
+
+				addPostEventListeners();
+
+				document
+					.getElementById("category-select")
+					.addEventListener("change", filterPosts);
+				document
+					.getElementById("filter-search")
+					.addEventListener("input", function () {
+						clearTimeout(searchTimeout);
+						searchTimeout = setTimeout(filterPosts, 300);
+					});
+
+				window.addEventListener("scroll", loadMorePosts);
+
+				document
+					.getElementById("search-input")
+					.addEventListener("input", function () {
+						const query = this.value.toLowerCase();
+						const resultsContainer = document.getElementById("search-results");
+
+						if (query.length < 2) {
+							resultsContainer.innerHTML = "";
+							return;
+						}
+
+						const filteredPosts = [...blogPosts, ...moreBlogPosts]
+							.filter(
+								(post) =>
+									post.title.toLowerCase().includes(query) ||
+									post.excerpt.toLowerCase().includes(query) ||
+									post.category.toLowerCase().includes(query)
+							)
+							.slice(0, 5);
+
+						if (filteredPosts.length === 0) {
+							resultsContainer.innerHTML =
+								'<p class="text-center py-4 text-neutral-600 dark:text-neutral-400">No results found</p>';
+							return;
+						}
+
+						resultsContainer.innerHTML = filteredPosts
+							.map(
+								(post) => `
+						<div class="p-3 hover:bg-neutral-100 dark:hover:bg-dark-border rounded-md transition-colors duration-300 cursor-pointer search-result" data-post-id="${
+							post.id
+						}">
+							<h4 class="font-medium text-black dark:text-neutral-100">${post.title}</h4>
+							<p class="text-sm text-neutral-600 dark:text-neutral-400">${post.excerpt.substring(
+								0,
+								80
+							)}...</p>
+							<div class="mt-1 flex items-center">
+								<span class="text-xs bg-${getCategoryColor(
+									post.category
+								)}/90 text-white px-2 py-0.5 rounded-full">${
+									post.category
+								}</span>
+								<span class="text-xs text-neutral-500 dark:text-neutral-500 ml-2">${
+									post.date
+								}</span>
+							</div>
+						</div>
+					`
+							)
+							.join("");
+
+						document.querySelectorAll(".search-result").forEach((result) => {
+							result.addEventListener("click", function () {
+								const postId = this.getAttribute("data-post-id");
+								document.getElementById("search-modal").classList.add("hidden");
+								openPostDetail(postId);
+							});
+						});
+					});
+			});
+
+			let isLoading = false;
+			let page = 1;
+			let searchTimeout;
+		</script>
+	</body>
+</html>
