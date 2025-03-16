@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ZenFlow - Wellness Companion</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+		/>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							inter: ["Inter", "sans-serif"],
+							poppins: ["Poppins", "sans-serif"],
+						},
+						colors: {
+							sage: {
+								50: "#f6f7f6",
+								100: "#e8ece8",
+								200: "#d1d9d1",
+								300: "#b0beb0",
+								400: "#8a9e8a",
+								500: "#6b816b",
+								600: "#546854",
+								700: "#455545",
+								800: "#3a453a",
+								900: "#323a32",
+							},
+							warm: {
+								50: "#fefcfa",
+								100: "#fdf8f3",
+								200: "#faf0e4",
+								300: "#f6e4d1",
+								400: "#f0d3b6",
+								500: "#e8bf94",
+								600: "#dea673",
+								700: "#d08c52",
+								800: "#b8753d",
+								900: "#9e6234",
+							},
+						},
+						animation: {
+							"slide-up": "slideUp 0.3s ease-out",
+							"fade-in": "fadeIn 0.4s ease-out",
+							"scale-in": "scaleIn 0.2s ease-out",
+							"pulse-soft": "pulseSoft 2s infinite",
+							float: "float 3s ease-in-out infinite",
+							glow: "glow 2s ease-in-out infinite alternate",
+						},
+						backdropBlur: {
+							xs: "2px",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			* {
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+				-webkit-tap-highlight-color: transparent;
+			}
+
+			@keyframes slideUp {
+				from {
+					transform: translateY(100%);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes scaleIn {
+				from {
+					transform: scale(0.95);
+					opacity: 0;
+				}
+				to {
+					transform: scale(1);
+					opacity: 1;
+				}
+			}
+
+			@keyframes pulseSoft {
+				0%,
+				100% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0px);
+				}
+				50% {
+					transform: translateY(-10px);
+				}
+			}
+
+			@keyframes glow {
+				from {
+					box-shadow: 0 0 20px rgba(107, 129, 107, 0.3);
+				}
+				to {
+					box-shadow: 0 0 30px rgba(107, 129, 107, 0.6);
+				}
+			}
+
+			/* Glassmorphism */
+			.glass {
+				background: rgba(255, 255, 255, 0.25);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.18);
+			}
+
+			.glass-dark {
+				background: rgba(107, 129, 107, 0.1);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(107, 129, 107, 0.2);
+			}
+
+			/* Soft UI Elements */
+			.soft-shadow {
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08),
+					0 2px 8px rgba(0, 0, 0, 0.04);
+			}
+
+			.soft-shadow-lg {
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1),
+					0 8px 16px rgba(0, 0, 0, 0.06);
+			}
+
+			.soft-inset {
+				box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Button Styles */
+			.btn-primary {
+				background: linear-gradient(135deg, #6b816b, #8a9e8a);
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.btn-primary:hover {
+				background: linear-gradient(135deg, #546854, #6b816b);
+				transform: translateY(-2px);
+				box-shadow: 0 12px 24px rgba(107, 129, 107, 0.3);
+			}
+
+			.btn-primary:active {
+				transform: translateY(0);
+				box-shadow: 0 4px 12px rgba(107, 129, 107, 0.2);
+			}
+
+			/* Canvas Styles */
+			#drawingCanvas {
+				cursor: crosshair;
+				touch-action: none;
+				background: #ffffff;
+			}
+
+			/* Video Styles */
+			.video-overlay {
+				background: linear-gradient(
+					45deg,
+					rgba(107, 129, 107, 0.9),
+					rgba(138, 158, 138, 0.8)
+				);
+			}
+
+			/* Progress Ring */
+			.progress-ring {
+				transform: rotate(-90deg);
+			}
+
+			/* Swipe Indicator */
+			.swipe-indicator {
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(107, 129, 107, 0.3),
+					transparent
+				);
+			}
+
+			/* Responsive Adjustments */
+			@media (max-width: 480px) {
+				.mobile-text-xs {
+					font-size: 0.7rem;
+				}
+				.mobile-text-sm {
+					font-size: 0.8rem;
+				}
+				.mobile-p-2 {
+					padding: 0.5rem;
+				}
+				.mobile-p-3 {
+					padding: 0.75rem;
+				}
+				.mobile-gap-2 {
+					gap: 0.5rem;
+				}
+				.mobile-gap-3 {
+					gap: 0.75rem;
+				}
+			}
+
+			/* Scrollbar Styling */
+			.custom-scrollbar::-webkit-scrollbar {
+				width: 4px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-track {
+				background: rgba(107, 129, 107, 0.1);
+				border-radius: 2px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-thumb {
+				background: rgba(107, 129, 107, 0.3);
+				border-radius: 2px;
+			}
+
+			/* Haptic Feedback Effect */
+			.haptic-click {
+				animation: hapticPulse 0.15s ease-out;
+			}
+
+			@keyframes hapticPulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(0.98);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+		</style>
+	</head>
+	<body
+		class="bg-gradient-to-br from-sage-50 via-white to-warm-50 min-h-screen font-inter"
+	>
+		<!-- App Container -->
+		<div
+			class="max-w-md mx-auto min-h-screen bg-white/80 backdrop-blur-sm relative overflow-hidden"
+		>
+			<!-- Background Pattern -->
+			<div class="absolute inset-0 opacity-5">
+				<div
+					class="absolute top-10 left-10 w-32 h-32 bg-sage-300 rounded-full blur-3xl"
+				></div>
+				<div
+					class="absolute top-1/3 right-10 w-24 h-24 bg-warm-300 rounded-full blur-2xl"
+				></div>
+				<div
+					class="absolute bottom-1/3 left-5 w-40 h-40 bg-sage-200 rounded-full blur-3xl"
+				></div>
+			</div>
+
+			<!-- Header -->
+			<header class="relative z-10 glass rounded-b-3xl p-4 mb-6">
+				<div class="flex items-center justify-between">
+					<div class="flex items-center space-x-3">
+						<div
+							class="w-12 h-12 bg-gradient-to-br from-sage-400 to-sage-600 rounded-2xl flex items-center justify-center animate-glow"
+						>
+							<i class="fas fa-spa text-white text-lg"></i>
+						</div>
+						<div>
+							<h1 class="text-xl font-bold font-poppins text-gray-800">
+								ZenFlow
+							</h1>
+							<p class="text-xs text-gray-600">Find your inner peace</p>
+						</div>
+					</div>
+					<div class="flex items-center space-x-3">
+						<button id="streakBtn" class="relative">
+							<div
+								class="w-10 h-10 bg-gradient-to-r from-warm-400 to-warm-500 rounded-full flex items-center justify-center"
+							>
+								<i class="fas fa-fire text-white text-sm"></i>
+							</div>
+							<span
+								class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold"
+								>7</span
+							>
+						</button>
+						<div
+							class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-sage-200"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1494790108755-2616c0763c5c?w=40&h=40&fit=crop&crop=face"
+								alt="Profile"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+					</div>
+				</div>
+
+				<!-- Quick Stats -->
+				<div class="grid grid-cols-3 gap-4 mt-4">
+					<div class="text-center">
+						<div class="text-lg font-bold text-sage-700" id="todayMinutes">
+							15
+						</div>
+						<div class="text-xs text-gray-600">min today</div>
+					</div>
+					<div class="text-center">
+						<div class="text-lg font-bold text-sage-700" id="totalSessions">
+							42
+						</div>
+						<div class="text-xs text-gray-600">sessions</div>
+					</div>
+					<div class="text-center">
+						<div class="text-lg font-bold text-sage-700" id="streakDays">7</div>
+						<div class="text-xs text-gray-600">day streak</div>
+					</div>
+				</div>
+			</header>
+
+			<!-- Main Content -->
+			<main class="relative z-10 px-4 pb-24">
+				<!-- Meditation Section -->
+				<section id="meditation-section" class="mb-8">
+					<div class="flex items-center justify-between mb-4">
+						<h2 class="text-xl font-semibold text-gray-800">
+							Today's Practice
+						</h2>
+						<button id="viewAllBtn" class="text-sage-600 text-sm font-medium">
+							View All
+						</button>
+					</div>
+
+					<!-- Featured Session -->
+					<div
+						id="featuredSession"
+						class="soft-shadow-lg rounded-3xl overflow-hidden mb-6 bg-gradient-to-br from-sage-100 to-sage-50 cursor-pointer transform transition-all duration-300 hover:scale-105"
+					>
+						<div class="relative h-48">
+							<img
+								src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=300&fit=crop"
+								alt="Morning Meditation"
+								class="w-full h-full object-cover"
+							/>
+							<div
+								class="absolute inset-0 video-overlay flex items-center justify-center"
+							>
+								<button
+									id="playFeaturedBtn"
+									class="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center animate-pulse-soft"
+								>
+									<i class="fas fa-play text-sage-600 text-xl ml-1"></i>
+								</button>
+							</div>
+							<div
+								class="absolute top-4 left-4 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1"
+							>
+								<span class="text-white text-xs font-medium">Featured</span>
+							</div>
+							<div
+								class="absolute top-4 right-4 bg-black/20 backdrop-blur-sm rounded-full px-3 py-1"
+							>
+								<span class="text-white text-xs">15 min</span>
+							</div>
+						</div>
+						<div class="p-6">
+							<h3 class="text-lg font-semibold text-gray-800 mb-2">
+								Morning Clarity
+							</h3>
+							<p class="text-gray-600 text-sm mb-4">
+								Start your day with focused breathing and gentle awareness
+								practices
+							</p>
+							<div class="flex items-center justify-between">
+								<div class="flex items-center space-x-4">
+									<div class="flex items-center space-x-1">
+										<i class="fas fa-star text-warm-400 text-xs"></i>
+										<span class="text-xs text-gray-600">4.9</span>
+									</div>
+									<div class="flex items-center space-x-1">
+										<i class="fas fa-headphones text-sage-500 text-xs"></i>
+										<span class="text-xs text-gray-600">12.3k</span>
+									</div>
+								</div>
+								<div class="flex items-center space-x-2">
+									<span class="text-xs text-gray-500">Beginner</span>
+									<div class="w-2 h-2 bg-green-400 rounded-full"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Mode Selector -->
+					<div class="glass rounded-2xl p-4 mb-6">
+						<h3 class="font-medium text-gray-800 mb-3">
+							Choose Your Experience
+						</h3>
+						<div class="grid grid-cols-3 gap-3">
+							<button class="mode-btn active" data-mode="video">
+								<div
+									class="glass-dark rounded-xl p-4 text-center transition-all duration-300"
+								>
+									<i class="fas fa-video text-sage-600 mb-2 block"></i>
+									<span class="text-xs font-medium text-gray-700">Video</span>
+								</div>
+							</button>
+							<button class="mode-btn" data-mode="audio">
+								<div
+									class="rounded-xl p-4 text-center transition-all duration-300 bg-gray-50"
+								>
+									<i class="fas fa-headphones text-gray-500 mb-2 block"></i>
+									<span class="text-xs font-medium text-gray-500">Audio</span>
+								</div>
+							</button>
+							<button class="mode-btn" data-mode="guide">
+								<div
+									class="rounded-xl p-4 text-center transition-all duration-300 bg-gray-50"
+								>
+									<i class="fas fa-book-open text-gray-500 mb-2 block"></i>
+									<span class="text-xs font-medium text-gray-500">Guide</span>
+								</div>
+							</button>
+						</div>
+					</div>
+
+					<!-- Content Grid -->
+					<div id="content-grid">
+						<!-- Video Mode -->
+						<div id="video-content" class="mode-content">
+							<div class="grid grid-cols-2 gap-4">
+								<div
+									class="video-card soft-shadow rounded-2xl overflow-hidden bg-white cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-video="breathing"
+								>
+									<div class="relative h-24">
+										<img
+											src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=150&fit=crop"
+											alt="Breathing"
+											class="w-full h-full object-cover"
+										/>
+										<div
+											class="absolute inset-0 bg-black/20 flex items-center justify-center"
+										>
+											<i class="fas fa-play text-white text-sm"></i>
+										</div>
+									</div>
+									<div class="p-3">
+										<h4 class="font-medium text-gray-800 text-sm mb-1">
+											Deep Breathing
+										</h4>
+										<p class="text-xs text-gray-600 mb-2">Calm your mind</p>
+										<div class="flex justify-between items-center">
+											<span class="text-xs text-sage-600 font-medium"
+												>10 min</span
+											>
+											<div class="flex items-center space-x-1">
+												<i class="fas fa-heart text-red-400 text-xs"></i>
+												<span class="text-xs text-gray-500">234</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div
+									class="video-card soft-shadow rounded-2xl overflow-hidden bg-white cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-video="body-scan"
+								>
+									<div class="relative h-24">
+										<img
+											src="https://images.unsplash.com/photo-1588856088295-67f1fbb02bed?w=200&h=150&fit=crop"
+											alt="Body Scan"
+											class="w-full h-full object-cover"
+										/>
+										<div
+											class="absolute inset-0 bg-black/20 flex items-center justify-center"
+										>
+											<i class="fas fa-play text-white text-sm"></i>
+										</div>
+									</div>
+									<div class="p-3">
+										<h4 class="font-medium text-gray-800 text-sm mb-1">
+											Body Scan
+										</h4>
+										<p class="text-xs text-gray-600 mb-2">Release tension</p>
+										<div class="flex justify-between items-center">
+											<span class="text-xs text-sage-600 font-medium"
+												>20 min</span
+											>
+											<div class="flex items-center space-x-1">
+												<i class="fas fa-heart text-red-400 text-xs"></i>
+												<span class="text-xs text-gray-500">189</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div
+									class="video-card soft-shadow rounded-2xl overflow-hidden bg-white cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-video="mindfulness"
+								>
+									<div class="relative h-24">
+										<img
+											src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=200&h=150&fit=crop"
+											alt="Mindfulness"
+											class="w-full h-full object-cover"
+										/>
+										<div
+											class="absolute inset-0 bg-black/20 flex items-center justify-center"
+										>
+											<i class="fas fa-play text-white text-sm"></i>
+										</div>
+									</div>
+									<div class="p-3">
+										<h4 class="font-medium text-gray-800 text-sm mb-1">
+											Mindfulness
+										</h4>
+										<p class="text-xs text-gray-600 mb-2">Present moment</p>
+										<div class="flex justify-between items-center">
+											<span class="text-xs text-sage-600 font-medium"
+												>15 min</span
+											>
+											<div class="flex items-center space-x-1">
+												<i class="fas fa-heart text-red-400 text-xs"></i>
+												<span class="text-xs text-gray-500">312</span>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div
+									class="video-card soft-shadow rounded-2xl overflow-hidden bg-white cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-video="sleep"
+								>
+									<div class="relative h-24">
+										<img
+											src="https://images.unsplash.com/photo-1540206395-68808572332f?w=200&h=150&fit=crop"
+											alt="Sleep"
+											class="w-full h-full object-cover"
+										/>
+										<div
+											class="absolute inset-0 bg-black/20 flex items-center justify-center"
+										>
+											<i class="fas fa-play text-white text-sm"></i>
+										</div>
+									</div>
+									<div class="p-3">
+										<h4 class="font-medium text-gray-800 text-sm mb-1">
+											Sleep Stories
+										</h4>
+										<p class="text-xs text-gray-600 mb-2">Peaceful rest</p>
+										<div class="flex justify-between items-center">
+											<span class="text-xs text-sage-600 font-medium"
+												>30 min</span
+											>
+											<div class="flex items-center space-x-1">
+												<i class="fas fa-heart text-red-400 text-xs"></i>
+												<span class="text-xs text-gray-500">567</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Audio Mode -->
+						<div id="audio-content" class="mode-content hidden">
+							<div class="space-y-4">
+								<div
+									class="audio-card glass rounded-2xl p-4 flex items-center space-x-4 cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-audio="nature"
+								>
+									<div
+										class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center"
+									>
+										<i class="fas fa-leaf text-white"></i>
+									</div>
+									<div class="flex-1">
+										<h4 class="font-medium text-gray-800">Forest Sounds</h4>
+										<p class="text-sm text-gray-600">
+											Birds chirping, gentle breeze
+										</p>
+									</div>
+									<div class="text-right">
+										<div class="text-sm font-medium text-sage-600">45 min</div>
+										<div class="flex items-center space-x-1">
+											<i class="fas fa-star text-warm-400 text-xs"></i>
+											<span class="text-xs text-gray-500">4.8</span>
+										</div>
+									</div>
+								</div>
+
+								<div
+									class="audio-card glass rounded-2xl p-4 flex items-center space-x-4 cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-audio="rain"
+								>
+									<div
+										class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center"
+									>
+										<i class="fas fa-cloud-rain text-white"></i>
+									</div>
+									<div class="flex-1">
+										<h4 class="font-medium text-gray-800">Rain & Thunder</h4>
+										<p class="text-sm text-gray-600">Calming storm sounds</p>
+									</div>
+									<div class="text-right">
+										<div class="text-sm font-medium text-sage-600">60 min</div>
+										<div class="flex items-center space-x-1">
+											<i class="fas fa-star text-warm-400 text-xs"></i>
+											<span class="text-xs text-gray-500">4.9</span>
+										</div>
+									</div>
+								</div>
+
+								<div
+									class="audio-card glass rounded-2xl p-4 flex items-center space-x-4 cursor-pointer transform transition-all duration-300 hover:scale-105"
+									data-audio="ocean"
+								>
+									<div
+										class="w-12 h-12 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-xl flex items-center justify-center"
+									>
+										<i class="fas fa-water text-white"></i>
+									</div>
+									<div class="flex-1">
+										<h4 class="font-medium text-gray-800">Ocean Waves</h4>
+										<p class="text-sm text-gray-600">Gentle waves on shore</p>
+									</div>
+									<div class="text-right">
+										<div class="text-sm font-medium text-sage-600">120 min</div>
+										<div class="flex items-center space-x-1">
+											<i class="fas fa-star text-warm-400 text-xs"></i>
+											<span class="text-xs text-gray-500">4.7</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Guide Mode -->
+						<div id="guide-content" class="mode-content hidden">
+							<div class="soft-shadow rounded-2xl bg-white p-6">
+								<h3 class="text-lg font-semibold text-gray-800 mb-4">
+									Breathing Exercise Guide
+								</h3>
+								<div class="space-y-4 text-gray-700 leading-relaxed">
+									<div class="flex items-start space-x-3">
+										<div
+											class="w-6 h-6 bg-sage-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
+										>
+											<span class="text-sage-600 text-xs font-bold">1</span>
+										</div>
+										<p>
+											Find a comfortable seated position with your back straight
+											and shoulders relaxed.
+										</p>
+									</div>
+									<div class="flex items-start space-x-3">
+										<div
+											class="w-6 h-6 bg-sage-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
+										>
+											<span class="text-sage-600 text-xs font-bold">2</span>
+										</div>
+										<p>
+											Close your eyes gently and take a moment to settle into
+											your body.
+										</p>
+									</div>
+									<div class="flex items-start space-x-3">
+										<div
+											class="w-6 h-6 bg-sage-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
+										>
+											<span class="text-sage-600 text-xs font-bold">3</span>
+										</div>
+										<p>
+											Breathe in slowly through your nose for 4 counts, filling
+											your belly with air.
+										</p>
+									</div>
+									<div class="flex items-start space-x-3">
+										<div
+											class="w-6 h-6 bg-sage-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
+										>
+											<span class="text-sage-600 text-xs font-bold">4</span>
+										</div>
+										<p>Hold your breath gently for 2 counts.</p>
+									</div>
+									<div class="flex items-start space-x-3">
+										<div
+											class="w-6 h-6 bg-sage-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1"
+										>
+											<span class="text-sage-600 text-xs font-bold">5</span>
+										</div>
+										<p>
+											Exhale slowly through your mouth for 6 counts, completely
+											emptying your lungs.
+										</p>
+									</div>
+								</div>
+								<button
+									id="startGuideBtn"
+									class="btn-primary text-white font-medium py-3 px-8 rounded-2xl mt-6 w-full"
+								>
+									Start Guided Practice
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Journal Section -->
+				<section id="journal-section" class="mb-8">
+					<div class="flex items-center justify-between mb-4">
+						<h2 class="text-xl font-semibold text-gray-800">
+							Daily Reflection
+						</h2>
+						<button
+							id="journalHistoryBtn"
+							class="text-sage-600 text-sm font-medium"
+						>
+							History
+						</button>
+					</div>
+
+					<!-- Mood Tracker -->
+					<div class="soft-shadow rounded-2xl bg-white p-6 mb-6">
+						<h3 class="font-medium text-gray-800 mb-4">
+							How are you feeling today?
+						</h3>
+						<div class="grid grid-cols-5 gap-3 mb-4">
+							<button
+								class="mood-btn p-3 rounded-2xl text-center transition-all duration-300 hover:scale-110"
+								data-mood="amazing"
+							>
+								<div class="text-2xl mb-1">🤩</div>
+								<span class="text-xs text-gray-600">Amazing</span>
+							</button>
+							<button
+								class="mood-btn p-3 rounded-2xl text-center transition-all duration-300 hover:scale-110"
+								data-mood="good"
+							>
+								<div class="text-2xl mb-1">😊</div>
+								<span class="text-xs text-gray-600">Good</span>
+							</button>
+							<button
+								class="mood-btn p-3 rounded-2xl text-center transition-all duration-300 hover:scale-110"
+								data-mood="okay"
+							>
+								<div class="text-2xl mb-1">😐</div>
+								<span class="text-xs text-gray-600">Okay</span>
+							</button>
+							<button
+								class="mood-btn p-3 rounded-2xl text-center transition-all duration-300 hover:scale-110"
+								data-mood="down"
+							>
+								<div class="text-2xl mb-1">😔</div>
+								<span class="text-xs text-gray-600">Down</span>
+							</button>
+							<button
+								class="mood-btn p-3 rounded-2xl text-center transition-all duration-300 hover:scale-110"
+								data-mood="tough"
+							>
+								<div class="text-2xl mb-1">😢</div>
+								<span class="text-xs text-gray-600">Tough</span>
+							</button>
+						</div>
+						<div
+							id="mood-message"
+							class="text-sm text-gray-600 text-center opacity-0 transition-opacity duration-300"
+						></div>
+					</div>
+
+					<!-- Journal Entry -->
+					<div class="soft-shadow rounded-2xl bg-white p-6 mb-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="font-medium text-gray-800">Today's Entry</h3>
+							<div class="flex items-center space-x-2">
+								<button
+									id="drawingToggle"
+									class="p-2 rounded-lg bg-sage-50 text-sage-600"
+								>
+									<i class="fas fa-paint-brush text-sm"></i>
+								</button>
+								<button
+									id="saveJournalBtn"
+									class="p-2 rounded-lg bg-sage-50 text-sage-600"
+								>
+									<i class="fas fa-save text-sm"></i>
+								</button>
+							</div>
+						</div>
+
+						<!-- Text Input -->
+						<textarea
+							id="journalText"
+							placeholder="What's on your mind today? Take a moment to reflect on your thoughts, feelings, and experiences..."
+							class="w-full h-32 p-4 border-2 border-sage-100 rounded-2xl resize-none focus:outline-none focus:border-sage-300 transition-colors text-gray-700 bg-sage-50/30"
+							rows="6"
+						></textarea>
+
+						<!-- Drawing Canvas -->
+						<div id="drawing-container" class="mt-4 hidden">
+							<div class="bg-sage-50/50 rounded-2xl p-4">
+								<div class="flex items-center justify-between mb-3">
+									<span class="text-sm font-medium text-gray-700"
+										>Express with drawing</span
+									>
+									<div class="flex items-center space-x-2">
+										<button
+											class="canvas-color w-6 h-6 bg-gray-800 rounded-full active"
+											data-color="#1f2937"
+										></button>
+										<button
+											class="canvas-color w-6 h-6 bg-sage-600 rounded-full"
+											data-color="#6b816b"
+										></button>
+										<button
+											class="canvas-color w-6 h-6 bg-warm-500 rounded-full"
+											data-color="#e8bf94"
+										></button>
+										<button
+											class="canvas-color w-6 h-6 bg-red-500 rounded-full"
+											data-color="#ef4444"
+										></button>
+										<button
+											id="clearCanvas"
+											class="p-1 text-gray-500 hover:text-gray-700"
+										>
+											<i class="fas fa-eraser text-xs"></i>
+										</button>
+									</div>
+								</div>
+								<canvas
+									id="drawingCanvas"
+									width="280"
+									height="160"
+									class="w-full border border-sage-200 rounded-xl"
+								></canvas>
+							</div>
+						</div>
+					</div>
+
+					<!-- Recent Entries -->
+					<div class="soft-shadow rounded-2xl bg-white p-6">
+						<h3 class="font-medium text-gray-800 mb-4">Recent Reflections</h3>
+						<div id="recent-entries" class="space-y-3">
+							<!-- Entries will be populated by JavaScript -->
+						</div>
+					</div>
+				</section>
+
+				<!-- Community Challenges -->
+				<section id="challenges-section" class="mb-8">
+					<div class="flex items-center justify-between mb-4">
+						<h2 class="text-xl font-semibold text-gray-800">Community</h2>
+						<button
+							id="myProgressBtn"
+							class="text-sage-600 text-sm font-medium"
+						>
+							My Progress
+						</button>
+					</div>
+
+					<!-- Active Challenge -->
+					<div
+						class="soft-shadow rounded-2xl bg-gradient-to-br from-warm-100 to-warm-50 p-6 mb-6"
+					>
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="font-semibold text-gray-800">
+								30-Day Mindfulness Journey
+							</h3>
+							<span
+								class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium"
+								>Day 12</span
+							>
+						</div>
+						<p class="text-gray-600 text-sm mb-4">
+							Practice mindfulness for 10 minutes daily. You're doing great!
+						</p>
+
+						<!-- Progress Circle -->
+						<div class="flex items-center justify-between mb-4">
+							<div class="relative w-16 h-16">
+								<svg class="w-16 h-16 progress-ring" viewBox="0 0 120 120">
+									<circle
+										cx="60"
+										cy="60"
+										r="54"
+										fill="none"
+										stroke="#e5e7eb"
+										stroke-width="8"
+									/>
+									<circle
+										cx="60"
+										cy="60"
+										r="54"
+										fill="none"
+										stroke="#6b816b"
+										stroke-width="8"
+										stroke-dasharray="339.292"
+										stroke-dashoffset="203.575"
+										class="transition-all duration-500"
+									/>
+								</svg>
+								<div class="absolute inset-0 flex items-center justify-center">
+									<span class="text-sm font-bold text-sage-700">40%</span>
+								</div>
+							</div>
+							<div class="text-right">
+								<div class="text-sm text-gray-600">12 of 30 days</div>
+								<div class="text-xs text-gray-500">2,847 participants</div>
+							</div>
+						</div>
+
+						<button
+							id="continueChallenge"
+							class="btn-primary text-white font-medium py-3 px-6 rounded-2xl w-full"
+						>
+							Continue Challenge
+						</button>
+					</div>
+
+					<!-- Swipeable Challenge Cards -->
+					<div class="mb-6">
+						<h3 class="font-medium text-gray-800 mb-4">
+							Discover New Challenges
+						</h3>
+						<div class="swipe-indicator h-1 bg-sage-100 rounded mb-3"></div>
+						<div class="overflow-x-auto custom-scrollbar">
+							<div
+								id="challenge-cards"
+								class="flex space-x-4 pb-4"
+								style="width: max-content"
+							>
+								<!-- Challenge cards will be populated by JavaScript -->
+							</div>
+						</div>
+					</div>
+
+					<!-- Community Feed -->
+					<div class="soft-shadow rounded-2xl bg-white p-6">
+						<h3 class="font-medium text-gray-800 mb-4">Community Highlights</h3>
+						<div id="community-feed" class="space-y-4">
+							<!-- Feed will be populated by JavaScript -->
+						</div>
+					</div>
+				</section>
+			</main>
+
+			<!-- Floating PiP Video -->
+			<div
+				id="pip-video"
+				class="fixed bottom-20 right-4 w-40 h-24 rounded-2xl overflow-hidden glass-dark z-50 hidden animate-slide-up"
+			>
+				<video
+					id="pip-video-element"
+					class="w-full h-full object-cover"
+					controls
+				>
+					<source src="" type="video/mp4" />
+				</video>
+				<button
+					id="closePip"
+					class="absolute top-2 right-2 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center text-xs"
+				>
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+
+			<!-- Bottom Navigation -->
+			<nav
+				class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-dark rounded-t-3xl p-4"
+			>
+				<div class="flex justify-around items-center">
+					<button
+						id="homeBtn"
+						class="nav-btn active p-3 rounded-2xl transition-all duration-300"
+					>
+						<i class="fas fa-home text-lg"></i>
+					</button>
+					<button
+						id="meditateBtn"
+						class="nav-btn p-3 rounded-2xl transition-all duration-300"
+					>
+						<i class="fas fa-spa text-lg"></i>
+					</button>
+					<button
+						id="journalBtn"
+						class="nav-btn p-3 rounded-2xl transition-all duration-300"
+					>
+						<i class="fas fa-book text-lg"></i>
+					</button>
+					<button
+						id="communityBtn"
+						class="nav-btn p-3 rounded-2xl transition-all duration-300"
+					>
+						<i class="fas fa-users text-lg"></i>
+					</button>
+					<button
+						id="profileBtn"
+						class="nav-btn p-3 rounded-2xl transition-all duration-300"
+					>
+						<i class="fas fa-user text-lg"></i>
+					</button>
+				</div>
+			</nav>
+
+			<!-- Toast Notification -->
+			<div
+				id="toast"
+				class="fixed top-4 right-4 glass rounded-2xl p-4 z-50 transform translate-x-full transition-transform duration-300"
+			>
+				<div class="flex items-center space-x-3">
+					<div
+						id="toast-icon"
+						class="w-8 h-8 rounded-full flex items-center justify-center"
+					>
+						<i class="fas fa-check text-white text-sm"></i>
+					</div>
+					<span
+						id="toast-message"
+						class="text-gray-800 font-medium text-sm"
+					></span>
+				</div>
+			</div>
+
+			<!-- Breathing Exercise Modal -->
+			<div
+				id="breathing-modal"
+				class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4"
+			>
+				<div class="bg-white rounded-3xl p-8 max-w-sm w-full animate-scale-in">
+					<div class="text-center mb-6">
+						<h3 class="text-xl font-semibold text-gray-800 mb-2">
+							Breathing Exercise
+						</h3>
+						<p class="text-gray-600 text-sm">
+							Follow the rhythm and breathe deeply
+						</p>
+					</div>
+
+					<div class="relative w-32 h-32 mx-auto mb-6">
+						<div
+							id="breathing-circle"
+							class="w-full h-full bg-gradient-to-br from-sage-400 to-sage-600 rounded-full flex items-center justify-center transition-transform duration-4000"
+						>
+							<span id="breathing-text" class="text-white font-medium"
+								>Breathe In</span
+							>
+						</div>
+					</div>
+
+					<div class="flex space-x-3">
+						<button
+							id="stopBreathing"
+							class="flex-1 py-3 px-6 bg-gray-100 text-gray-700 rounded-2xl font-medium"
+						>
+							Stop
+						</button>
+						<button
+							id="pauseBreathing"
+							class="flex-1 btn-primary text-white py-3 px-6 rounded-2xl font-medium"
+						>
+							Pause
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// App State
+			let appState = {
+				currentMode: "video",
+				currentMood: null,
+				isDrawing: false,
+				canvasColor: "#1f2937",
+				journalEntries: JSON.parse(
+					localStorage.getItem("journalEntries") || "[]"
+				),
+				userStats: JSON.parse(
+					localStorage.getItem("userStats") ||
+						'{"totalMinutes": 240, "totalSessions": 42, "currentStreak": 7, "todayMinutes": 15}'
+				),
+				challenges: [
+					{
+						id: "gratitude",
+						title: "21-Day Gratitude",
+						description: "Write down three things you're grateful for each day",
+						participants: 1234,
+						image:
+							"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop",
+						duration: "21 days",
+					},
+					{
+						id: "sleep",
+						title: "Better Sleep",
+						description: "Improve your sleep quality with evening routines",
+						participants: 987,
+						image:
+							"https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=300&h=200&fit=crop",
+						duration: "14 days",
+					},
+					{
+						id: "movement",
+						title: "Daily Movement",
+						description: "Gentle yoga and stretching for body wellness",
+						participants: 2156,
+						image:
+							"https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=300&h=200&fit=crop",
+						duration: "30 days",
+					},
+				],
+				communityPosts: [
+					{
+						user: "Sarah M.",
+						avatar:
+							"https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=40&h=40&fit=crop&crop=face",
+						time: "2 hours ago",
+						content:
+							"Just completed my morning meditation! The breathing exercise really helped me center myself before a busy day. 🧘‍♀️",
+						likes: 24,
+						comments: 5,
+					},
+					{
+						user: "Mike R.",
+						avatar:
+							"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face",
+						time: "4 hours ago",
+						content:
+							"Day 15 of the mindfulness challenge! Feeling more present and aware each day. The community support is amazing! ✨",
+						likes: 18,
+						comments: 3,
+					},
+					{
+						user: "Emma L.",
+						avatar:
+							"https://images.unsplash.com/photo-1494790108755-2616c0763c5c?w=40&h=40&fit=crop&crop=face",
+						time: "6 hours ago",
+						content:
+							"The body scan meditation helped me release so much tension I didn't even know I was carrying. Grateful for this practice! 🙏",
+						likes: 31,
+						comments: 8,
+					},
+				],
+			};
+
+			// Initialize App
+			document.addEventListener("DOMContentLoaded", function () {
+				initializeApp();
+				setupEventListeners();
+				setupCanvas();
+				loadUserData();
+				populateChallengeCards();
+				populateCommunityFeed();
+				populateRecentEntries();
+				startBreathingAnimation();
+			});
+
+			function initializeApp() {
+				updateUserStats();
+				setupModeSelector();
+				setupNavigation();
+
+				// Add haptic feedback to all buttons
+				document.querySelectorAll("button").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						this.classList.add("haptic-click");
+						setTimeout(() => this.classList.remove("haptic-click"), 150);
+					});
+				});
+			}
+
+			function setupEventListeners() {
+				// Featured video play
+				document
+					.getElementById("playFeaturedBtn")
+					.addEventListener("click", function (e) {
+						e.stopPropagation();
+						playVideo("featured", "Morning Clarity Meditation");
+					});
+
+				// Video cards
+				document.querySelectorAll(".video-card").forEach((card) => {
+					card.addEventListener("click", function () {
+						const videoType = this.dataset.video;
+						const title = this.querySelector("h4").textContent;
+						playVideo(videoType, title);
+					});
+				});
+
+				// Audio cards
+				document.querySelectorAll(".audio-card").forEach((card) => {
+					card.addEventListener("click", function () {
+						const audioType = this.dataset.audio;
+						const title = this.querySelector("h4").textContent;
+						playAudio(audioType, title);
+					});
+				});
+
+				// Mode selector
+				document.querySelectorAll(".mode-btn").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						switchMode(this.dataset.mode);
+					});
+				});
+
+				// Mood selector
+				document.querySelectorAll(".mood-btn").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						selectMood(this.dataset.mood);
+					});
+				});
+
+				// Journal controls
+				document
+					.getElementById("drawingToggle")
+					.addEventListener("click", toggleDrawing);
+				document
+					.getElementById("saveJournalBtn")
+					.addEventListener("click", saveJournalEntry);
+
+				// PiP controls
+				document.getElementById("closePip").addEventListener("click", closePiP);
+
+				// Breathing exercise
+				document
+					.getElementById("startGuideBtn")
+					.addEventListener("click", startBreathingExercise);
+				document
+					.getElementById("stopBreathing")
+					.addEventListener("click", stopBreathingExercise);
+				document
+					.getElementById("pauseBreathing")
+					.addEventListener("click", pauseBreathingExercise);
+
+				// Navigation
+				document.querySelectorAll(".nav-btn").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						switchNavigation(this.id);
+					});
+				});
+
+				// Challenge continue
+				document
+					.getElementById("continueChallenge")
+					.addEventListener("click", function () {
+						showToast("Great job! Challenge updated 🎉", "success");
+						updateChallengeProgress();
+					});
+			}
+
+			function setupCanvas() {
+				const canvas = document.getElementById("drawingCanvas");
+				const ctx = canvas.getContext("2d");
+
+				// Set up drawing properties
+				ctx.lineCap = "round";
+				ctx.lineJoin = "round";
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = appState.canvasColor;
+
+				let isDrawing = false;
+				let lastX = 0;
+				let lastY = 0;
+
+				function startDrawing(e) {
+					isDrawing = true;
+					const rect = canvas.getBoundingClientRect();
+					const x = (e.clientX || e.touches[0].clientX) - rect.left;
+					const y = (e.clientY || e.touches[0].clientY) - rect.top;
+					lastX = x;
+					lastY = y;
+				}
+
+				function draw(e) {
+					if (!isDrawing) return;
+					e.preventDefault();
+
+					const rect = canvas.getBoundingClientRect();
+					const x = (e.clientX || e.touches[0].clientX) - rect.left;
+					const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+					ctx.beginPath();
+					ctx.moveTo(lastX, lastY);
+					ctx.lineTo(x, y);
+					ctx.stroke();
+
+					lastX = x;
+					lastY = y;
+				}
+
+				function stopDrawing() {
+					isDrawing = false;
+				}
+
+				// Mouse events
+				canvas.addEventListener("mousedown", startDrawing);
+				canvas.addEventListener("mousemove", draw);
+				canvas.addEventListener("mouseup", stopDrawing);
+				canvas.addEventListener("mouseout", stopDrawing);
+
+				// Touch events
+				canvas.addEventListener("touchstart", startDrawing);
+				canvas.addEventListener("touchmove", draw);
+				canvas.addEventListener("touchend", stopDrawing);
+
+				// Color picker
+				document.querySelectorAll(".canvas-color").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						document
+							.querySelectorAll(".canvas-color")
+							.forEach((b) => b.classList.remove("active"));
+						this.classList.add("active");
+						appState.canvasColor = this.dataset.color;
+						ctx.strokeStyle = appState.canvasColor;
+					});
+				});
+
+				// Clear canvas
+				document
+					.getElementById("clearCanvas")
+					.addEventListener("click", function () {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+						showToast("Canvas cleared 🎨", "info");
+					});
+			}
+
+			function switchMode(mode) {
+				appState.currentMode = mode;
+
+				// Update mode buttons
+				document.querySelectorAll(".mode-btn").forEach((btn) => {
+					const isActive = btn.dataset.mode === mode;
+					const container = btn.querySelector("div");
+
+					if (isActive) {
+						btn.classList.add("active");
+						container.classList.add("glass-dark");
+						container.classList.remove("bg-gray-50");
+						container.querySelector("i").classList.add("text-sage-600");
+						container.querySelector("i").classList.remove("text-gray-500");
+						container.querySelector("span").classList.add("text-gray-700");
+						container.querySelector("span").classList.remove("text-gray-500");
+					} else {
+						btn.classList.remove("active");
+						container.classList.remove("glass-dark");
+						container.classList.add("bg-gray-50");
+						container.querySelector("i").classList.remove("text-sage-600");
+						container.querySelector("i").classList.add("text-gray-500");
+						container.querySelector("span").classList.remove("text-gray-700");
+						container.querySelector("span").classList.add("text-gray-500");
+					}
+				});
+
+				// Show/hide content
+				document.querySelectorAll(".mode-content").forEach((content) => {
+					content.classList.add("hidden");
+				});
+
+				const targetContent = document.getElementById(mode + "-content");
+				if (targetContent) {
+					targetContent.classList.remove("hidden");
+					targetContent.classList.add("animate-fade-in");
+				}
+			}
+
+			function selectMood(mood) {
+				appState.currentMood = mood;
+
+				// Update mood buttons
+				document.querySelectorAll(".mood-btn").forEach((btn) => {
+					if (btn.dataset.mood === mood) {
+						btn.classList.add("bg-sage-100", "scale-110");
+						btn.classList.add("ring-2", "ring-sage-300");
+					} else {
+						btn.classList.remove("bg-sage-100", "scale-110");
+						btn.classList.remove("ring-2", "ring-sage-300");
+					}
+				});
+
+				// Show mood message
+				const moodMessages = {
+					amazing: "That's wonderful! Keep that positive energy flowing! ✨",
+					good: "Great to hear! You're doing well today! 😊",
+					okay: "It's okay to have neutral days. Take care of yourself! 🤗",
+					down: "I'm here for you. Consider some gentle meditation today. 💙",
+					tough: "You're not alone. Be gentle with yourself today. 🤍",
+				};
+
+				const messageEl = document.getElementById("mood-message");
+				messageEl.textContent = moodMessages[mood];
+				messageEl.classList.add("opacity-100");
+
+				showToast("Mood recorded", "success");
+			}
+
+			function toggleDrawing() {
+				const container = document.getElementById("drawing-container");
+				const isHidden = container.classList.contains("hidden");
+
+				if (isHidden) {
+					container.classList.remove("hidden");
+					container.classList.add("animate-fade-in");
+					showToast("Drawing mode enabled 🎨", "info");
+				} else {
+					container.classList.add("hidden");
+					showToast("Drawing mode disabled", "info");
+				}
+			}
+
+			function saveJournalEntry() {
+				const text = document.getElementById("journalText").value;
+				const canvas = document.getElementById("drawingCanvas");
+				const canvasData = canvas.toDataURL();
+
+				if (!text.trim() && !canvasData) {
+					showToast("Please write something or draw first!", "warning");
+					return;
+				}
+
+				const entry = {
+					id: Date.now(),
+					text: text,
+					drawing: canvasData,
+					mood: appState.currentMood,
+					date: new Date().toISOString(),
+					timestamp: new Date().toLocaleDateString(),
+				};
+
+				appState.journalEntries.unshift(entry);
+				localStorage.setItem(
+					"journalEntries",
+					JSON.stringify(appState.journalEntries)
+				);
+
+				// Clear inputs
+				document.getElementById("journalText").value = "";
+				canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+				populateRecentEntries();
+				showToast("Journal entry saved! 📝", "success");
+			}
+
+			function playVideo(videoType, title) {
+				const pipVideo = document.getElementById("pip-video");
+				const videoElement = document.getElementById("pip-video-element");
+
+				// For demo purposes, using a sample video
+				videoElement.src =
+					"https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4";
+
+				pipVideo.classList.remove("hidden");
+				videoElement.play();
+
+				showToast(`Playing: ${title} 🎬`, "info");
+
+				// Update stats
+				appState.userStats.todayMinutes += 15;
+				appState.userStats.totalSessions += 1;
+				updateUserStats();
+			}
+
+			function playAudio(audioType, title) {
+				showToast(`Playing: ${title} 🎵`, "info");
+
+				// Simulate audio playback
+				setTimeout(() => {
+					showToast("Audio session started", "success");
+				}, 1000);
+			}
+
+			function closePiP() {
+				const pipVideo = document.getElementById("pip-video");
+				const videoElement = document.getElementById("pip-video-element");
+
+				videoElement.pause();
+				pipVideo.classList.add("hidden");
+			}
+
+			function startBreathingExercise() {
+				document.getElementById("breathing-modal").classList.remove("hidden");
+
+				let breathingActive = true;
+				let inhaling = true;
+				const circle = document.getElementById("breathing-circle");
+				const text = document.getElementById("breathing-text");
+
+				function breatheCycle() {
+					if (!breathingActive) return;
+
+					if (inhaling) {
+						circle.style.transform = "scale(1.3)";
+						text.textContent = "Breathe In";
+						setTimeout(() => {
+							if (breathingActive) {
+								circle.style.transform = "scale(1)";
+								text.textContent = "Breathe Out";
+								inhaling = false;
+								setTimeout(breatheCycle, 4000);
+							}
+						}, 4000);
+					} else {
+						inhaling = true;
+						setTimeout(breatheCycle, 4000);
+					}
+				}
+
+				breatheCycle();
+
+				window.breathingActive = breathingActive;
+			}
+
+			function stopBreathingExercise() {
+				window.breathingActive = false;
+				document.getElementById("breathing-modal").classList.add("hidden");
+				showToast("Breathing exercise completed 🧘‍♀️", "success");
+			}
+
+			function pauseBreathingExercise() {
+				window.breathingActive = !window.breathingActive;
+				const btn = document.getElementById("pauseBreathing");
+				btn.textContent = window.breathingActive ? "Pause" : "Resume";
+			}
+
+			function populateChallengeCards() {
+				const container = document.getElementById("challenge-cards");
+				container.innerHTML = appState.challenges
+					.map(
+						(challenge) => `
+                <div class="challenge-card soft-shadow rounded-2xl bg-white overflow-hidden cursor-pointer transform transition-all duration-300 hover:scale-105" style="min-width: 280px;" data-challenge="${
+									challenge.id
+								}">
+                    <div class="relative h-32">
+                        <img src="${challenge.image}" alt="${
+							challenge.title
+						}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/20"></div>
+                        <div class="absolute bottom-2 left-2 text-white">
+                            <div class="text-xs opacity-80">${
+															challenge.duration
+														}</div>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-gray-800 mb-2">${
+													challenge.title
+												}</h4>
+                        <p class="text-sm text-gray-600 mb-3">${
+													challenge.description
+												}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-500">${challenge.participants.toLocaleString()} participants</span>
+                            <button class="bg-sage-600 text-white px-4 py-2 rounded-xl text-xs font-medium">Join</button>
+                        </div>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
+
+				// Add event listeners
+				document.querySelectorAll(".challenge-card").forEach((card) => {
+					card.addEventListener("click", function () {
+						const challengeId = this.dataset.challenge;
+						joinChallenge(challengeId);
+					});
+				});
+			}
+
+			function populateCommunityFeed() {
+				const container = document.getElementById("community-feed");
+				container.innerHTML = appState.communityPosts
+					.map(
+						(post) => `
+                <div class="glass rounded-2xl p-4">
+                    <div class="flex items-center mb-3">
+                        <img src="${post.avatar}" alt="${post.user}" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <h5 class="font-medium text-gray-800 text-sm">${post.user}</h5>
+                            <span class="text-xs text-gray-500">${post.time}</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-700 mb-3 leading-relaxed">${post.content}</p>
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center space-x-1 text-gray-500 hover:text-red-500 transition-colors">
+                            <i class="fas fa-heart text-xs"></i>
+                            <span class="text-xs">${post.likes}</span>
+                        </button>
+                        <button class="flex items-center space-x-1 text-gray-500 hover:text-sage-600 transition-colors">
+                            <i class="fas fa-comment text-xs"></i>
+                            <span class="text-xs">${post.comments}</span>
+                        </button>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
+			}
+
+			function populateRecentEntries() {
+				const container = document.getElementById("recent-entries");
+				const recentEntries = appState.journalEntries.slice(0, 3);
+
+				if (recentEntries.length === 0) {
+					container.innerHTML =
+						'<p class="text-gray-500 text-sm text-center py-4">No entries yet. Start writing to see your reflections here!</p>';
+					return;
+				}
+
+				container.innerHTML = recentEntries
+					.map(
+						(entry) => `
+                <div class="glass rounded-xl p-4 cursor-pointer hover:bg-sage-50/50 transition-colors">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-800">${
+													entry.timestamp
+												}</span>
+                        ${
+													entry.mood
+														? `<div class="text-lg">${getMoodEmoji(
+																entry.mood
+														  )}</div>`
+														: ""
+												}
+                    </div>
+                    <p class="text-sm text-gray-600 line-clamp-2">${
+											entry.text
+										}</p>
+                </div>
+            `
+					)
+					.join("");
+			}
+
+			function getMoodEmoji(mood) {
+				const emojis = {
+					amazing: "🤩",
+					good: "😊",
+					okay: "😐",
+					down: "😔",
+					tough: "😢",
+				};
+				return emojis[mood] || "😊";
+			}
+
+			function joinChallenge(challengeId) {
+				const challenge = appState.challenges.find((c) => c.id === challengeId);
+				if (challenge) {
+					showToast(`Joined ${challenge.title}! 🎉`, "success");
+				}
+			}
+
+			function updateUserStats() {
+				document.getElementById("todayMinutes").textContent =
+					appState.userStats.todayMinutes;
+				document.getElementById("totalSessions").textContent =
+					appState.userStats.totalSessions;
+				document.getElementById("streakDays").textContent =
+					appState.userStats.currentStreak;
+
+				localStorage.setItem("userStats", JSON.stringify(appState.userStats));
+			}
+
+			function updateChallengeProgress() {
+				// Simulate progress update
+				const progressCircle = document.querySelector(
+					".progress-ring circle:last-child"
+				);
+				const currentProgress = 40;
+				const newProgress = Math.min(currentProgress + 3.33, 100);
+				const circumference = 339.292;
+				const offset = circumference - (newProgress / 100) * circumference;
+
+				progressCircle.style.strokeDashoffset = offset;
+
+				// Update day counter
+				const dayBadge = document.querySelector(".bg-green-100");
+				const currentDay = parseInt(dayBadge.textContent.replace("Day ", ""));
+				dayBadge.textContent = `Day ${currentDay + 1}`;
+			}
+
+			function switchNavigation(btnId) {
+				// Update nav buttons
+				document.querySelectorAll(".nav-btn").forEach((btn) => {
+					if (btn.id === btnId) {
+						btn.classList.add("active", "bg-sage-600", "text-white");
+						btn.classList.remove("text-gray-500");
+					} else {
+						btn.classList.remove("active", "bg-sage-600", "text-white");
+						btn.classList.add("text-gray-500");
+					}
+				});
+
+				// Handle navigation
+				const actions = {
+					homeBtn: () => scrollToTop(),
+					meditateBtn: () => scrollToSection("meditation-section"),
+					journalBtn: () => scrollToSection("journal-section"),
+					communityBtn: () => scrollToSection("challenges-section"),
+					profileBtn: () =>
+						showToast("Profile feature coming soon! 👤", "info"),
+				};
+
+				if (actions[btnId]) {
+					actions[btnId]();
+				}
+			}
+
+			function scrollToSection(sectionId) {
+				document.getElementById(sectionId).scrollIntoView({
+					behavior: "smooth",
+					block: "start",
+				});
+			}
+
+			function scrollToTop() {
+				window.scrollTo({ top: 0, behavior: "smooth" });
+			}
+
+			function showToast(message, type = "info") {
+				const toast = document.getElementById("toast");
+				const icon = document.getElementById("toast-icon");
+				const messageEl = document.getElementById("toast-message");
+
+				const config = {
+					success: { icon: "fas fa-check", bg: "bg-green-500" },
+					error: { icon: "fas fa-times", bg: "bg-red-500" },
+					warning: { icon: "fas fa-exclamation-triangle", bg: "bg-yellow-500" },
+					info: { icon: "fas fa-info", bg: "bg-sage-500" },
+				};
+
+				const typeConfig = config[type] || config.info;
+
+				icon.className = `${typeConfig.icon} text-white text-sm`;
+				icon.parentElement.className = `w-8 h-8 rounded-full flex items-center justify-center ${typeConfig.bg}`;
+				messageEl.textContent = message;
+
+				toast.classList.remove("translate-x-full");
+
+				setTimeout(() => {
+					toast.classList.add("translate-x-full");
+				}, 3000);
+			}
+
+			function loadUserData() {
+				// Load saved data from localStorage
+				const savedStats = localStorage.getItem("userStats");
+				if (savedStats) {
+					appState.userStats = JSON.parse(savedStats);
+				}
+
+				const savedEntries = localStorage.getItem("journalEntries");
+				if (savedEntries) {
+					appState.journalEntries = JSON.parse(savedEntries);
+				}
+			}
+
+			function setupModeSelector() {
+				// Initialize with video mode
+				switchMode("video");
+			}
+
+			function setupNavigation() {
+				// Initialize with home active
+				switchNavigation("homeBtn");
+			}
+
+			function startBreathingAnimation() {
+				// Subtle breathing animation for the main logo
+				const logo = document.querySelector("header .fa-spa");
+				if (logo) {
+					setInterval(() => {
+						logo.style.transform = "scale(1.1)";
+						setTimeout(() => {
+							logo.style.transform = "scale(1)";
+						}, 1000);
+					}, 3000);
+				}
+			}
+
+			// Touch gestures for better mobile experience
+			let touchStartX = 0;
+			let touchStartY = 0;
+
+			document.addEventListener("touchstart", (e) => {
+				touchStartX = e.changedTouches[0].screenX;
+				touchStartY = e.changedTouches[0].screenY;
+			});
+
+			document.addEventListener("touchend", (e) => {
+				const touchEndX = e.changedTouches[0].screenX;
+				const touchEndY = e.changedTouches[0].screenY;
+				const deltaX = touchEndX - touchStartX;
+				const deltaY = touchEndY - touchStartY;
+
+				// Horizontal swipe for challenge cards
+				if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+					const challengeCards = document.getElementById("challenge-cards");
+					if (challengeCards && challengeCards.contains(e.target)) {
+						if (deltaX > 0) {
+							challengeCards.scrollLeft -= 100;
+						} else {
+							challengeCards.scrollLeft += 100;
+						}
+					}
+				}
+			});
+
+			// Service Worker for offline functionality
+			if ("serviceWorker" in navigator) {
+				const swCode = `
+                const CACHE_NAME = 'zenflow-v1';
+                const urlsToCache = [
+                    '/',
+                    '/offline.html'
+                ];
+
+                self.addEventListener('install', event => {
+                    event.waitUntil(
+                        caches.open(CACHE_NAME)
+                            .then(cache => cache.addAll(urlsToCache))
+                    );
+                });
+
+                self.addEventListener('fetch', event => {
+                    event.respondWith(
+                        caches.match(event.request)
+                            .then(response => {
+                                return response || fetch(event.request);
+                            })
+                    );
+                });
+            `;
+
+				const blob = new Blob([swCode], { type: "application/javascript" });
+				const swUrl = URL.createObjectURL(blob);
+				navigator.serviceWorker.register(swUrl).catch(console.error);
+			}
+		</script>
+	</body>
+</html>
