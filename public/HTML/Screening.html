@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Moving Rectangle Game</title>
+		<style>
+			canvas {
+				border: 2px solid black;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="gameCanvas" width="800" height="600"></canvas>
+
+		<script>
+			const canvas = document.getElementById("gameCanvas");
+			const ctx = canvas.getContext("2d");
+
+			class Rectangle {
+				constructor(x, y, width, height) {
+					this.x = x;
+					this.y = y;
+					this.width = width;
+					this.height = height;
+					this.vx = 0;
+					this.vy = 0;
+					this.speed = 200;
+				}
+
+				update(deltaTime) {
+					this.x += this.vx * deltaTime;
+					this.y += this.vy * deltaTime;
+
+					const movement =
+						Math.sqrt(this.vx * this.vx + this.vy * this.vy) * deltaTime;
+
+					if (this.x < 0) this.x = 0;
+					else if (this.x > canvas.width - this.width)
+						this.x = canvas.width - this.width;
+
+					if (this.y < 0) this.y = 0;
+					else if (this.y > canvas.height - this.height)
+						this.y = canvas.height - this.height;
+
+					this.vx = 0;
+					this.vy = 0;
+				}
+
+				draw() {
+					ctx.fillStyle = "#3498db";
+					ctx.fillRect(this.x, this.y, this.width, this.height);
+				}
+			}
+
+			const rect = new Rectangle(
+				canvas.width / 2 - 25,
+				canvas.height / 2 - 25,
+				50,
+				50
+			);
+
+			const keys = {
+				ArrowLeft: false,
+				ArrowRight: false,
+				ArrowUp: false,
+				ArrowDown: false,
+			};
+
+			document.addEventListener("keydown", (e) => {
+				if (keys.hasOwnProperty(e.key)) {
+					keys[e.key] = true;
+				}
+			});
+
+			document.addEventListener("keyup", (e) => {
+				if (keys.hasOwnProperty(e.key)) {
+					keys[e.key] = false;
+				}
+			});
+
+			const speed = 200;
+			function handleInput() {
+				if (keys.ArrowLeft) rect.vx -= speed;
+				if (keys.ArrowRight) rect.vx += speed;
+				if (keys.ArrowUp) rect.vy -= speed;
+				if (keys.ArrowDown) rect.vy += speed;
+			}
+
+			let lastTime = 0;
+			function gameLoop(timestamp) {
+				const deltaTime = (timestamp - lastTime) / 1000;
+				lastTime = timestamp;
+
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				handleInput();
+				rect.update(deltaTime);
+				rect.draw();
+
+				requestAnimationFrame(gameLoop);
+			}
+
+			gameLoop(0);
+		</script>
+	</body>
+</html>

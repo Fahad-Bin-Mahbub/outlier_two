@@ -1,0 +1,3774 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Sports Activity Tracker Pro</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://unpkg.com/lucide@latest"></script>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap");
+
+			/* Design System */
+			:root {
+				/* Light theme - Neumorphic colors */
+				--light-primary: #e6e9f0;
+				--light-secondary: #eaecf5;
+				--light-accent: #6c63ff;
+				--light-accent-hover: #5a52e0;
+				--light-text: #2d3748;
+				--light-text-secondary: #4a5568;
+				--light-muted: #718096;
+				--light-shadow-1: #ffffff;
+				--light-shadow-2: #d1d9e6;
+				--light-success: #48bb78;
+				--light-warning: #f59e0b;
+				--light-danger: #ef4444;
+				--light-info: #3b82f6;
+
+				/* Activity colors */
+				--running-color: #f59e0b;
+				--cycling-color: #ef4444;
+				--swimming-color: #3b82f6;
+				--strength-color: #8b5cf6;
+				--yoga-color: #10b981;
+				--hiking-color: #6d28d9;
+
+				/* Dark theme - Neumorphic colors */
+				--dark-primary: #292d3e;
+				--dark-secondary: #252a3c;
+				--dark-accent: #6c63ff;
+				--dark-accent-hover: #5a52e0;
+				--dark-text: #e0e0e0;
+				--dark-text-secondary: #bdbdbd;
+				--dark-muted: #9e9e9e;
+				--dark-shadow-1: #323846;
+				--dark-shadow-2: #1e2235;
+				--dark-success: #48bb78;
+				--dark-warning: #f59e0b;
+				--dark-danger: #ef4444;
+				--dark-info: #3b82f6;
+
+				/* Spacing system */
+				--space-xs: 0.25rem;
+				--space-sm: 0.5rem;
+				--space-md: 1rem;
+				--space-lg: 1.5rem;
+				--space-xl: 2rem;
+				--space-2xl: 3rem;
+
+				/* Border radius */
+				--radius-sm: 6px;
+				--radius-md: 12px;
+				--radius-lg: 20px;
+				--radius-full: 9999px;
+
+				/* Transition */
+				--transition-fast: 0.2s ease;
+				--transition-normal: 0.3s ease;
+				--transition-slow: 0.5s ease;
+			}
+
+			main {
+				padding-top: 80px;
+				/* Default padding, will be overridden by JS */
+			}
+
+			/* Base styles */
+			body {
+				font-family: "Inter", sans-serif;
+				transition: background-color var(--transition-normal),
+					color var(--transition-normal);
+				background-color: var(--light-primary);
+				color: var(--light-text);
+				line-height: 1.6;
+				overflow-x: hidden;
+			}
+
+			body.dark {
+				background-color: var(--dark-primary);
+				color: var(--dark-text);
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6,
+			.brand {
+				font-family: "Poppins", sans-serif;
+				font-weight: 600;
+				line-height: 1.3;
+			}
+
+			/* Typography utility classes */
+			.text-primary {
+				color: var(--light-text);
+			}
+
+			.dark .text-primary {
+				color: var(--dark-text);
+			}
+
+			.text-secondary {
+				color: var(--light-text-secondary);
+			}
+
+			.dark .text-secondary {
+				color: var(--dark-text-secondary);
+			}
+
+			.text-muted {
+				color: var(--light-muted);
+			}
+
+			.dark .text-muted {
+				color: var(--dark-muted);
+			}
+
+			.text-accent {
+				color: var(--light-accent);
+			}
+
+			.dark .text-accent {
+				color: var(--dark-accent);
+			}
+
+			.text-success {
+				color: var(--light-success);
+			}
+
+			.dark .text-success {
+				color: var(--dark-success);
+			}
+
+			.text-warning {
+				color: var(--light-warning);
+			}
+
+			.dark .text-warning {
+				color: var(--dark-warning);
+			}
+
+			.text-danger {
+				color: var(--light-danger);
+			}
+
+			.dark .text-danger {
+				color: var(--dark-danger);
+			}
+
+			.text-info {
+				color: var(--light-info);
+			}
+
+			.dark .text-info {
+				color: var(--dark-info);
+			}
+
+			/* Container styles */
+			.chart-container {
+				position: relative;
+				height: 300px;
+				width: 100%;
+			}
+
+			/* Neumorphism effects */
+			.neumorph-nav {
+				background-color: var(--light-primary);
+				box-shadow: 8px 8px 16px var(--light-shadow-2),
+					-8px -8px 16px var(--light-shadow-1);
+				border-radius: var(--radius-lg);
+				margin: var(--space-sm);
+				transition: box-shadow var(--transition-normal);
+			}
+
+			.dark .neumorph-nav {
+				background-color: var(--dark-primary);
+				box-shadow: 8px 8px 16px var(--dark-shadow-2),
+					-8px -8px 16px var(--dark-shadow-1);
+			}
+
+			.neumorph-card {
+				background-color: var(--light-primary);
+				box-shadow: 8px 8px 16px var(--light-shadow-2),
+					-8px -8px 16px var(--light-shadow-1);
+				border-radius: var(--radius-md);
+				transition: all var(--transition-normal);
+			}
+
+			.dark .neumorph-card {
+				background-color: var(--dark-primary);
+				box-shadow: 8px 8px 16px var(--dark-shadow-2),
+					-8px -8px 16px var(--dark-shadow-1);
+			}
+
+			.neumorph-button {
+				background-color: var(--light-primary);
+				box-shadow: 4px 4px 8px var(--light-shadow-2),
+					-4px -4px 8px var(--light-shadow-1);
+				border-radius: var(--radius-full);
+				transition: all var(--transition-fast);
+			}
+
+			.neumorph-button:hover,
+			.neumorph-button:focus {
+				box-shadow: 2px 2px 4px var(--light-shadow-2),
+					-2px -2px 4px var(--light-shadow-1),
+					inset 2px 2px 4px var(--light-shadow-2),
+					inset -2px -2px 4px var(--light-shadow-1);
+				transform: translateY(-2px);
+			}
+
+			.dark .neumorph-button {
+				background-color: var(--dark-primary);
+				box-shadow: 4px 4px 8px var(--dark-shadow-2),
+					-4px -4px 8px var(--dark-shadow-1);
+			}
+
+			.dark .neumorph-button:hover,
+			.dark .neumorph-button:focus {
+				box-shadow: 2px 2px 4px var(--dark-shadow-2),
+					-2px -2px 4px var(--dark-shadow-1),
+					inset 2px 2px 4px var(--dark-shadow-2),
+					inset -2px -2px 4px var(--dark-shadow-1);
+				transform: translateY(-2px);
+			}
+
+			.neumorph-icon-container {
+				border-radius: var(--radius-full);
+				background-color: var(--light-primary);
+				box-shadow: 4px 4px 8px var(--light-shadow-2),
+					-4px -4px 8px var(--light-shadow-1);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all var(--transition-fast);
+			}
+
+			.dark .neumorph-icon-container {
+				background-color: var(--dark-primary);
+				box-shadow: 4px 4px 8px var(--dark-shadow-2),
+					-4px -4px 8px var(--dark-shadow-1);
+			}
+
+			.neumorph-icon-container:hover {
+				transform: translateY(-2px);
+			}
+
+			.nav-tooltip {
+				visibility: hidden;
+				position: absolute;
+				left: 100%;
+				margin-left: var(--space-md);
+				background-color: var(--light-primary);
+				color: var(--light-text);
+				padding: var(--space-sm) var(--space-md);
+				border-radius: var(--radius-sm);
+				font-size: 12px;
+				white-space: nowrap;
+				z-index: 20;
+				transition: opacity var(--transition-normal),
+					transform var(--transition-normal);
+				opacity: 0;
+				transform: translateX(-10px);
+				box-shadow: 4px 4px 8px var(--light-shadow-2),
+					-4px -4px 8px var(--light-shadow-1);
+			}
+
+			.dark .nav-tooltip {
+				background-color: var(--dark-primary);
+				color: var(--dark-text);
+				box-shadow: 4px 4px 8px var(--dark-shadow-2),
+					-4px -4px 8px var(--dark-shadow-1);
+			}
+
+			.nav-link:hover .nav-tooltip {
+				visibility: visible;
+				opacity: 1;
+				transform: translateX(0);
+			}
+
+			.neumorph-progress {
+				height: 10px;
+				border-radius: var(--radius-sm);
+				background-color: var(--light-primary);
+				box-shadow: inset 2px 2px 4px var(--light-shadow-2),
+					inset -2px -2px 4px var(--light-shadow-1);
+				overflow: hidden;
+			}
+
+			.dark .neumorph-progress {
+				background-color: var(--dark-primary);
+				box-shadow: inset 2px 2px 4px var(--dark-shadow-2),
+					inset -2px -2px 4px var(--dark-shadow-1);
+			}
+
+			.neumorph-progress-bar {
+				height: 100%;
+				border-radius: var(--radius-sm);
+				background: linear-gradient(
+					90deg,
+					var(--light-accent),
+					var(--light-accent-hover)
+				);
+				transition: width var(--transition-normal);
+			}
+
+			.dark .neumorph-progress-bar {
+				background: linear-gradient(
+					90deg,
+					var(--dark-accent),
+					var(--dark-accent-hover)
+				);
+			}
+
+			/* Card hover effects */
+			.neumorph-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 10px 10px 20px var(--light-shadow-2),
+					-10px -10px 20px var(--light-shadow-1);
+			}
+
+			.dark .neumorph-card:hover {
+				box-shadow: 10px 10px 20px var(--dark-shadow-2),
+					-10px -10px 20px var(--dark-shadow-1);
+			}
+
+			/* Button styling */
+			.primary-button {
+				background: linear-gradient(
+					135deg,
+					var(--light-accent),
+					var(--light-accent-hover)
+				);
+				color: white;
+				border-radius: var(--radius-md);
+				padding: var(--space-md) var(--space-lg);
+				font-weight: 600;
+				transition: all var(--transition-normal);
+				box-shadow: 4px 4px 8px var(--light-shadow-2),
+					-4px -4px 8px var(--light-shadow-1);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.primary-button:hover {
+				transform: translateY(-3px);
+				box-shadow: 6px 6px 12px var(--light-shadow-2),
+					-6px -6px 12px var(--light-shadow-1);
+			}
+
+			.dark .primary-button {
+				background: linear-gradient(
+					135deg,
+					var(--dark-accent),
+					var(--dark-accent-hover)
+				);
+				box-shadow: 4px 4px 8px var(--dark-shadow-2),
+					-4px -4px 8px var(--dark-shadow-1);
+			}
+
+			.dark .primary-button:hover {
+				box-shadow: 6px 6px 12px var(--dark-shadow-2),
+					-6px -6px 12px var(--dark-shadow-1);
+			}
+
+			/* Section title styling */
+			.section-title {
+				position: relative;
+				display: inline-block;
+				margin-bottom: 1.5rem;
+			}
+
+			.section-title::after {
+				content: "";
+				position: absolute;
+				left: 0;
+				bottom: -10px;
+				width: 60px;
+				height: 4px;
+				background: linear-gradient(
+					90deg,
+					var(--light-accent),
+					var(--light-accent-hover)
+				);
+				border-radius: 2px;
+				transition: width var(--transition-normal);
+			}
+
+			.section-title:hover::after {
+				width: 100px;
+			}
+
+			.dark .section-title::after {
+				background: linear-gradient(
+					90deg,
+					var(--dark-accent),
+					var(--dark-accent-hover)
+				);
+			}
+
+			/* Activity icon colors */
+			.icon-running {
+				color: var(--running-color);
+			}
+
+			.icon-cycling {
+				color: var(--cycling-color);
+			}
+
+			.icon-swimming {
+				color: var(--swimming-color);
+			}
+
+			.icon-strength {
+				color: var(--strength-color);
+			}
+
+			.icon-yoga {
+				color: var(--yoga-color);
+			}
+
+			.icon-hiking {
+				color: var(--hiking-color);
+			}
+
+			/* Header & User Profile */
+			.user-avatar {
+				width: 40px;
+				height: 40px;
+				border-radius: var(--radius-full);
+				object-fit: cover;
+				border: 2px solid var(--light-accent);
+				transition: transform var(--transition-fast);
+			}
+
+			.dark .user-avatar {
+				border-color: var(--dark-accent);
+			}
+
+			.user-avatar:hover {
+				transform: scale(1.1);
+			}
+
+			.header-container {
+				background-color: var(--light-primary);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+				border-radius: var(--radius-md);
+				transition: background-color var(--transition-normal);
+				position: relative;
+				z-index: 40;
+				margin: 0.75rem;
+			}
+
+			.dark .header-container {
+				background-color: var(--dark-primary);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+			}
+
+			.header-wrapper {
+				position: fixed;
+				top: 0;
+				right: 0;
+				left: 0;
+				z-index: 40;
+				padding-left: 5rem;
+				/* 20px (ml-20) */
+				pointer-events: none;
+				/* Allow clicks to pass through the wrapper */
+			}
+
+			/* Notification styles */
+			.notification-badge {
+				position: absolute;
+				top: -5px;
+				right: -5px;
+				background-color: var(--accent);
+				color: white;
+				font-size: 10px;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#notificationMenu {
+				width: 320px;
+				/* Increased width from default */
+				max-width: 90vw;
+			}
+
+			.notification-item {
+				padding: var(--space-md);
+				display: flex;
+				align-items: flex-start;
+				transition: background-color var(--transition-fast);
+				border-bottom: 1px solid var(--light-shadow-2);
+			}
+
+			.dark .notification-item {
+				border-bottom: 1px solid var(--dark-shadow-2);
+			}
+
+			.notification-item:hover {
+				background-color: var(--light-secondary);
+			}
+
+			.dark .notification-item:hover {
+				background-color: var(--dark-secondary);
+			}
+
+			.notification-item.unread::before {
+				content: "";
+				display: block;
+				width: 8px;
+				height: 8px;
+				background-color: var(--accent);
+				border-radius: 50%;
+				position: absolute;
+				left: 12px;
+				margin-top: 6px;
+			}
+
+			/* Dropdown menu */
+			.dropdown-menu {
+				position: absolute;
+				top: 100%;
+				right: 0;
+				margin-top: var(--space-sm);
+				background-color: var(--light-primary);
+				border-radius: var(--radius-md);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				min-width: 200px;
+				z-index: 30;
+				opacity: 0;
+				visibility: hidden;
+				transform: translateY(-10px);
+				transition: all var(--transition-normal);
+			}
+
+			.dropdown-menu.active {
+				opacity: 1;
+				visibility: visible;
+				transform: translateY(0);
+			}
+
+			.dark .dropdown-menu {
+				background-color: var(--dark-primary);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			}
+
+			.dropdown-item {
+				padding: var(--space-md);
+				display: flex;
+				align-items: center;
+				transition: background-color var(--transition-fast);
+			}
+
+			.dropdown-item:hover {
+				background-color: var(--light-secondary);
+			}
+
+			.dark .dropdown-item:hover {
+				background-color: var(--dark-secondary);
+			}
+
+			.dropdown-divider {
+				height: 1px;
+				background-color: var(--light-shadow-2);
+				margin: var(--space-xs) 0;
+			}
+
+			.dark .dropdown-divider {
+				background-color: var(--dark-shadow-2);
+			}
+
+			/* Animations */
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+
+				50% {
+					transform: scale(1.05);
+				}
+
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			.pulse-on-hover:hover {
+				animation: pulse 1.5s infinite ease-in-out;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.fade-in {
+				animation: fadeIn 0.5s ease-out forwards;
+			}
+
+			/* Scrollbar styling */
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: var(--light-primary);
+			}
+
+			.dark ::-webkit-scrollbar-track {
+				background: var(--dark-primary);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--light-muted);
+				border-radius: var(--radius-full);
+			}
+
+			.dark ::-webkit-scrollbar-thumb {
+				background: var(--dark-muted);
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--light-text-secondary);
+			}
+
+			.dark ::-webkit-scrollbar-thumb:hover {
+				background: var(--dark-text-secondary);
+			}
+
+			/* Footer styling */
+			.footer {
+				background-color: var(--light-primary);
+				border-top: 1px solid var(--light-shadow-2);
+				transition: background-color var(--transition-normal);
+			}
+
+			.dark .footer {
+				background-color: var(--dark-primary);
+				border-top: 1px solid var(--dark-shadow-2);
+			}
+
+			@keyframes fadeOut {
+				from {
+					opacity: 1;
+					transform: translateY(0);
+				}
+
+				to {
+					opacity: 0;
+					transform: translateY(-10px);
+				}
+			}
+
+			.social-icon {
+				width: 36px;
+				height: 36px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--radius-full);
+				transition: all var(--transition-fast);
+				background-color: var(--light-primary);
+				box-shadow: 2px 2px 4px var(--light-shadow-2),
+					-2px -2px 4px var(--light-shadow-1);
+			}
+
+			.activity-options-popup {
+				box-shadow: var(--neumorph-shadow);
+				border-radius: 12px;
+				transform-origin: top right;
+				animation: popup-fade-in 0.2s ease;
+			}
+
+			.activity-options-popup button {
+				transition: background-color 0.2s;
+			}
+
+			.activity-options-popup .delete-activity-btn {
+				color: var(--danger-color);
+			}
+
+			.activity-options-popup .delete-activity-btn:hover {
+				background-color: rgba(239, 68, 68, 0.1);
+			}
+
+			@keyframes popup-fade-in {
+				from {
+					opacity: 0;
+					transform: scale(0.95);
+				}
+
+				to {
+					opacity: 1;
+					transform: scale(1);
+				}
+			}
+
+			/* Dark mode styles for popup */
+			.dark .activity-options-popup {
+				background-color: var(--dark-primary);
+				border: 1px solid var(--dark-shadow-1);
+			}
+
+			.dark .activity-options-popup button:hover {
+				background-color: var(--dark-shadow-1);
+			}
+
+			.dark .activity-options-popup .delete-activity-btn:hover {
+				background-color: rgba(239, 68, 68, 0.2);
+			}
+
+			.social-icon:hover {
+				transform: translateY(-3px);
+				box-shadow: 4px 4px 8px var(--light-shadow-2),
+					-4px -4px 8px var(--light-shadow-1);
+			}
+
+			.dark .social-icon {
+				background-color: var(--dark-primary);
+				box-shadow: 2px 2px 4px var(--dark-shadow-2),
+					-2px -2px 4px var(--dark-shadow-1);
+			}
+
+			.dark .social-icon:hover {
+				box-shadow: 4px 4px 8px var(--dark-shadow-2),
+					-4px -4px 8px var(--dark-shadow-1);
+			}
+
+			/* Tooltip */
+			.tooltip {
+				position: relative;
+			}
+
+			.tooltip::after {
+				content: attr(data-tooltip);
+				position: absolute;
+				bottom: 100%;
+				left: 50%;
+				transform: translateX(-50%) translateY(-5px);
+				background-color: var(--light-text);
+				color: white;
+				padding: var(--space-xs) var(--space-sm);
+				border-radius: var(--radius-sm);
+				font-size: 12px;
+				white-space: nowrap;
+				opacity: 0;
+				visibility: hidden;
+				transition: all var(--transition-fast);
+				z-index: 10;
+			}
+
+			.tooltip:hover::after {
+				opacity: 1;
+				visibility: visible;
+				transform: translateX(-50%) translateY(-10px);
+			}
+
+			.dark .tooltip::after {
+				background-color: var(--dark-text);
+				color: var(--dark-primary);
+			}
+
+			/* Color scheme option styles */
+			.color-scheme-option {
+				@apply neumorph-button p-2 flex items-center justify-center;
+				transition: all 0.2s ease;
+			}
+
+			.color-scheme-option.active {
+				@apply ring-2 ring-accent;
+			}
+
+			/* Toast notification styles */
+			.toast-notification {
+				animation: slide-in 0.3s ease forwards;
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+			}
+
+			.toast-notification.fade-out {
+				animation: slide-out 0.3s ease forwards;
+			}
+
+			@keyframes slide-in {
+				from {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes slide-out {
+				from {
+					transform: translateX(0);
+					opacity: 1;
+				}
+
+				to {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+			}
+
+			/* Activity options menu */
+			.activity-options-menu {
+				animation: fade-in 0.2s ease;
+			}
+
+			/* Progress visualization styles */
+			.achievement-card {
+				transition: all 0.3s ease;
+			}
+
+			.achievement-card:hover {
+				transform: translateY(-5px);
+			}
+
+			/* Print styles for reports */
+			@media print {
+				.neumorph-nav,
+				#theme-toggle,
+				.neumorph-button,
+				.header-container,
+				.footer {
+					display: none;
+				}
+
+				body {
+					background-color: white;
+					color: black;
+				}
+
+				.neumorph-card {
+					box-shadow: none;
+					border: 1px solid #eaeaea;
+				}
+
+				.chart-container {
+					page-break-inside: avoid;
+				}
+			}
+
+			/* Responsive adjustments */
+			@media (max-width: 768px) {
+				/* Navigation tooltips */
+				.nav-tooltip {
+					display: none;
+				}
+
+				/* Section title adjustments */
+				.section-title::after {
+					width: 40px;
+				}
+
+				.section-title:hover::after {
+					width: 60px;
+				}
+
+				/* Mobile sidebar optimization */
+				.neumorph-nav {
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 280px;
+					height: 100vh;
+					z-index: 50;
+					transform: translateX(-100%);
+					/* Start off-screen */
+					transition: transform 0.3s ease;
+					overflow-y: auto;
+					padding-top: 3rem;
+					/* Make room for close button */
+				}
+
+				.neumorph-nav.mobile-nav-open {
+					transform: translateX(0);
+					/* Move into view when open */
+				}
+
+				/* Brand and logo adjustments */
+				.brand {
+					font-size: 1rem;
+					padding: 0.25rem;
+				}
+
+				.logo-container {
+					width: 28px;
+					height: 28px;
+				}
+
+				/* Adjust main content margin for mobile */
+				main.ml-20 {
+					margin-left: 0;
+				}
+
+				header.ml-20 {
+					margin-left: 0;
+				}
+
+				/* Adjust header for mobile */
+				.header-container {
+					padding-left: 16px;
+				}
+
+				/* Header layout for mobile */
+				.header-container .flex.items-center {
+					display: flex;
+					align-items: center;
+				}
+
+				/* Mobile menu toggle button */
+				.mobile-menu-toggle {
+					display: none;
+					position: relative;
+					z-index: 60;
+					width: 40px;
+					height: 40px;
+					border-radius: 50%;
+					background-color: var(--light-primary);
+					box-shadow: var(--neumorph-shadow);
+					align-items: center;
+					justify-content: center;
+					transition: all 0.3s ease;
+					margin-right: 10px;
+				}
+
+				.dark .mobile-menu-toggle {
+					background-color: var(--dark-primary);
+				}
+
+				.mobile-menu-toggle {
+					display: flex !important;
+				}
+
+				/* Mobile nav overlay */
+				.mobile-nav-overlay {
+					display: none;
+					position: fixed;
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					background-color: rgba(0, 0, 0, 0.5);
+					z-index: 40;
+					opacity: 0;
+					transition: opacity 0.3s ease;
+				}
+
+				.mobile-nav-overlay.active {
+					display: block;
+					opacity: 1;
+				}
+
+				body.overflow-hidden {
+					overflow: hidden;
+				}
+
+				.main-content {
+					margin-left: 0 !important;
+					width: 100% !important;
+				}
+			}
+		</style>
+	</head>
+
+	<body class="transition-colors duration-500">
+		<!-- Mobile Nav Overlay -->
+		<div class="mobile-nav-overlay"></div>
+		<!-- Header -->
+		<header class="fixed top-0 right-0 left-0 ml-20 z-40">
+			<div class="header-container p-4 flex justify-between items-center">
+				<div class="flex items-center">
+					<!-- Mobile Menu Toggle - Moved inside header -->
+					<button class="mobile-menu-toggle md:hidden">
+						<i data-lucide="menu" class="w-5 h-5 text-accent"></i>
+					</button>
+					<h1 class="text-xl font-bold text-primary hidden md:block">
+						Sports Activity Tracker Pro
+					</h1>
+					<span class="text-accent text-lg font-bold md:hidden">SAT Pro</span>
+				</div>
+				<div class="flex items-center space-x-4">
+					<!-- Notifications -->
+					<div class="relative" id="notificationDropdown">
+						<button class="neumorph-button p-2 relative">
+							<i data-lucide="bell" class="w-5 h-5 text-accent"></i>
+							<span class="notification-badge">3</span>
+						</button>
+
+						<!-- Notification dropdown menu -->
+						<div class="dropdown-menu" id="notificationMenu">
+							<div
+								class="p-4 border-b border-light-shadow-2 dark:border-dark-shadow-2"
+							>
+								<div class="flex justify-between items-center">
+									<p class="font-medium text-primary">Notifications</p>
+									<span
+										class="text-xs px-2 py-1 bg-accent bg-opacity-20 text-accent rounded-full"
+										>3 new</span
+									>
+								</div>
+							</div>
+
+							<div class="notification-item unread">
+								<div class="neumorph-icon-container p-2 mr-3 flex-shrink-0">
+									<i data-lucide="trophy" class="w-4 h-4 text-success"></i>
+								</div>
+								<div class="flex-grow">
+									<p class="text-primary text-sm font-medium">Goal Achieved!</p>
+									<p class="text-muted text-xs">
+										You've completed your running goal of 100km
+									</p>
+									<p class="text-xs text-accent mt-1">Just now</p>
+								</div>
+							</div>
+
+							<div class="notification-item unread">
+								<div class="neumorph-icon-container p-2 mr-3 flex-shrink-0">
+									<i data-lucide="medal" class="w-4 h-4 text-accent"></i>
+								</div>
+								<div class="flex-grow">
+									<p class="text-primary text-sm font-medium">
+										New Badge Unlocked
+									</p>
+									<p class="text-muted text-xs">
+										You earned the "Early Bird" badge
+									</p>
+									<p class="text-xs text-accent mt-1">2 hours ago</p>
+								</div>
+							</div>
+
+							<div class="notification-item unread">
+								<div class="neumorph-icon-container p-2 mr-3 flex-shrink-0">
+									<i data-lucide="trending-up" class="w-4 h-4 text-info"></i>
+								</div>
+								<div class="flex-grow">
+									<p class="text-primary text-sm font-medium">Weekly Summary</p>
+									<p class="text-muted text-xs">
+										Your activity increased by 24% this week
+									</p>
+									<p class="text-xs text-accent mt-1">Yesterday</p>
+								</div>
+							</div>
+
+							<div class="notification-item">
+								<div class="neumorph-icon-container p-2 mr-3 flex-shrink-0">
+									<i data-lucide="users" class="w-4 h-4 text-muted"></i>
+								</div>
+								<div class="flex-grow">
+									<p class="text-primary text-sm font-medium">Friend Request</p>
+									<p class="text-muted text-xs">
+										Sarah wants to connect with you
+									</p>
+									<p class="text-xs text-accent mt-1">2 days ago</p>
+								</div>
+							</div>
+
+							<div
+								class="p-3 border-t border-light-shadow-2 dark:border-dark-shadow-2 text-center"
+							>
+								<a
+									href="#"
+									id="clearNotifications"
+									class="text-danger text-sm hover:underline"
+									>Clear all notifications</a
+								>
+							</div>
+						</div>
+					</div>
+
+					<!-- User profile -->
+					<div class="relative" id="userProfileDropdown">
+						<button class="flex items-center space-x-2 neumorph-card p-2 pr-4">
+							<img
+								src="https://randomuser.me/api/portraits/men/32.jpg"
+								alt="User Avatar"
+								class="user-avatar"
+							/>
+							<span class="text-primary font-medium hidden md:block"
+								>John Doe</span
+							>
+							<i
+								data-lucide="chevron-down"
+								class="w-4 h-4 text-muted hidden md:block"
+							></i>
+						</button>
+
+						<!-- User dropdown menu -->
+						<div class="dropdown-menu" id="userDropdown">
+							<div
+								class="p-4 border-b border-light-shadow-2 dark:border-dark-shadow-2"
+							>
+								<p class="font-medium text-primary">John Doe</p>
+								<p class="text-sm text-muted">john.doe@example.com</p>
+							</div>
+							<a href="#" class="dropdown-item">
+								<i data-lucide="user" class="w-4 h-4 mr-3 text-muted"></i>
+								<span class="text-primary">My Profile</span>
+							</a>
+							<a href="#" class="dropdown-item">
+								<i data-lucide="settings" class="w-4 h-4 mr-3 text-muted"></i>
+								<span class="text-primary">Settings</span>
+							</a>
+							<a href="#" class="dropdown-item">
+								<i data-lucide="activity" class="w-4 h-4 mr-3 text-muted"></i>
+								<span class="text-primary">Activity Log</span>
+							</a>
+							<div class="dropdown-divider"></div>
+							<a href="#" class="dropdown-item">
+								<i data-lucide="log-out" class="w-4 h-4 mr-3 text-danger"></i>
+								<span class="text-primary">Log Out</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- Sidebar Navigation -->
+		<nav
+			class="fixed left-0 top-0 h-full w-20 neumorph-nav flex flex-col items-center py-8 z-50"
+		>
+			<div class="brand text-2xl font-bold text-accent">SAT</div>
+
+			<div class="flex flex-col space-y-6 mt-8">
+				<a
+					href="#dashboard"
+					class="nav-link relative p-3 neumorph-button flex items-center justify-center"
+				>
+					<i data-lucide="layout-dashboard" class="w-6 h-6 text-accent"></i>
+					<span class="nav-tooltip">Dashboard</span>
+				</a>
+
+				<a
+					href="#activities"
+					class="nav-link relative p-3 neumorph-button flex items-center justify-center"
+				>
+					<i data-lucide="activity" class="w-6 h-6 text-accent"></i>
+					<span class="nav-tooltip">Activities</span>
+				</a>
+
+				<a
+					href="#goals"
+					class="nav-link relative p-3 neumorph-button flex items-center justify-center"
+				>
+					<i data-lucide="target" class="w-6 h-6 text-accent"></i>
+					<span class="nav-tooltip">Goals</span>
+				</a>
+			</div>
+
+			<div class="mt-auto mb-8">
+				<button
+					id="theme-toggle"
+					class="relative p-3 neumorph-button flex items-center justify-center"
+				>
+					<i data-lucide="moon" class="w-6 h-6 text-accent"></i>
+					<span class="nav-tooltip">Toggle Theme</span>
+				</button>
+			</div>
+		</nav>
+
+		<!-- Main Content -->
+		<main class="ml-20 pt-28 p-6 lg:px-10 lg:pb-10 min-h-screen">
+			<!-- Dashboard Section -->
+			<section
+				id="dashboard"
+				class="mb-16 fade-in"
+				style="animation-delay: 0.1s"
+			>
+				<div
+					class="flex flex-col md:flex-row md:items-center md:justify-between mb-8"
+				>
+					<div>
+						<h1 class="text-3xl font-bold mb-2 section-title text-primary">
+							Activity Dashboard
+						</h1>
+						<p class="text-muted">
+							Track your fitness journey with precision and elegance
+						</p>
+					</div>
+				</div>
+				<!-- Stats Overview -->
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 fade-in"
+					style="animation-delay: 0.2s"
+				>
+					<div class="neumorph-card p-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="text-lg font-semibold text-primary">
+								Total Activities
+							</h3>
+							<div class="neumorph-icon-container p-2">
+								<i data-lucide="activity" class="w-5 h-5 text-accent"></i>
+							</div>
+						</div>
+						<div class="flex items-end">
+							<span class="text-3xl font-bold text-primary">248</span>
+							<span class="text-success ml-2 flex items-center text-sm">
+								<i data-lucide="trending-up" class="w-4 h-4 mr-1"></i>12%
+							</span>
+						</div>
+						<p class="text-muted text-sm mt-2">Compared to last month</p>
+					</div>
+
+					<div class="neumorph-card p-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="text-lg font-semibold text-primary">Total Distance</h3>
+							<div class="neumorph-icon-container p-2">
+								<i data-lucide="map-pin" class="w-5 h-5 text-accent"></i>
+							</div>
+						</div>
+						<div class="flex items-end">
+							<span class="text-3xl font-bold text-primary">486</span>
+							<span class="text-sm text-primary ml-1">km</span>
+							<span class="text-success ml-2 flex items-center text-sm">
+								<i data-lucide="trending-up" class="w-4 h-4 mr-1"></i>8%
+							</span>
+						</div>
+						<p class="text-muted text-sm mt-2">Compared to last month</p>
+					</div>
+
+					<div class="neumorph-card p-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="text-lg font-semibold text-primary">
+								Calories Burned
+							</h3>
+							<div class="neumorph-icon-container p-2">
+								<i data-lucide="flame" class="w-5 h-5 text-accent"></i>
+							</div>
+						</div>
+						<div class="flex items-end">
+							<span class="text-3xl font-bold text-primary">24,568</span>
+							<span class="text-danger ml-2 flex items-center text-sm">
+								<i data-lucide="trending-down" class="w-4 h-4 mr-1"></i>3%
+							</span>
+						</div>
+						<p class="text-muted text-sm mt-2">Compared to last month</p>
+					</div>
+
+					<div class="neumorph-card p-6">
+						<div class="flex items-center justify-between mb-4">
+							<h3 class="text-lg font-semibold text-primary">Active Time</h3>
+							<div class="neumorph-icon-container p-2">
+								<i data-lucide="clock" class="w-5 h-5 text-accent"></i>
+							</div>
+						</div>
+						<div class="flex items-end">
+							<span class="text-3xl font-bold text-primary">42</span>
+							<span class="text-sm text-primary ml-1">hrs</span>
+							<span class="text-success ml-2 flex items-center text-sm">
+								<i data-lucide="trending-up" class="w-4 h-4 mr-1"></i>15%
+							</span>
+						</div>
+						<p class="text-muted text-sm mt-2">Compared to last month</p>
+					</div>
+				</div>
+
+				<!-- Activity Charts -->
+				<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+					<div
+						class="neumorph-card p-6 lg:col-span-2 fade-in"
+						style="animation-delay: 0.3s"
+					>
+						<div class="flex items-center justify-between mb-6">
+							<h3 class="text-lg font-semibold text-primary">
+								Weekly Activity
+							</h3>
+						</div>
+						<div class="chart-container">
+							<canvas id="activityChart" height="250"></canvas>
+						</div>
+					</div>
+
+					<div class="neumorph-card p-6 fade-in" style="animation-delay: 0.4s">
+						<div class="flex items-center justify-between mb-6">
+							<h3 class="text-lg font-semibold text-primary">
+								Activity Breakdown
+							</h3>
+						</div>
+						<div class="chart-container">
+							<canvas id="breakdownChart" height="250"></canvas>
+						</div>
+					</div>
+				</div>
+
+				<!-- Recent Activities -->
+				<div
+					class="neumorph-card p-6 mb-8 fade-in"
+					style="animation-delay: 0.5s"
+					id="activities"
+				>
+					<div class="flex items-center justify-between mb-6">
+						<h3 class="text-lg font-semibold text-primary">
+							Recent Activities
+						</h3>
+					</div>
+					<div class="overflow-x-auto">
+						<table class="w-full">
+							<thead>
+								<tr
+									class="text-left text-muted border-b border-light-shadow-2 dark:border-dark-shadow-2"
+								>
+									<th class="pb-3 font-medium">Activity</th>
+									<th class="pb-3 font-medium">Date</th>
+									<th class="pb-3 font-medium">Duration</th>
+									<th class="pb-3 font-medium">Distance</th>
+									<th class="pb-3 font-medium">Calories</th>
+									<th class="pb-3 font-medium">Status</th>
+									<th class="pb-3 font-medium"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									class="border-b border-light-shadow-2 dark:border-dark-shadow-2"
+								>
+									<td class="py-4">
+										<div class="flex items-center">
+											<div class="neumorph-icon-container p-2 mr-3">
+												<i
+													data-lucide="person-standing"
+													class="w-4 h-4 icon-running"
+												></i>
+											</div>
+											<span class="font-medium text-primary">Morning Run</span>
+										</div>
+									</td>
+									<td class="py-4 text-muted">Today, 7:30 AM</td>
+									<td class="py-4 text-muted">45 min</td>
+									<td class="py-4 text-muted">5.2 km</td>
+									<td class="py-4 text-muted">420 kcal</td>
+									<td class="py-4">
+										<span
+											class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-20 text-success"
+											>Completed</span
+										>
+									</td>
+									<td class="py-4">
+										<div class="relative">
+											<button class="neumorph-button p-2 activity-options-btn">
+												<i
+													data-lucide="more-vertical"
+													class="w-4 h-4 text-muted"
+												></i>
+											</button>
+											<div
+												class="activity-options-popup neumorph-card absolute right-0 mt-2 py-2 px-1 z-10 hidden dark:bg-dark-primary dark:border dark:border-dark-shadow-1"
+												style="min-width: 120px"
+											>
+												<button
+													class="w-full text-left p-2 hover:bg-light-shadow-1 dark:hover:bg-dark-shadow-1 rounded text-danger text-sm flex items-center delete-activity-btn"
+												>
+													<i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+													Delete
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr
+									class="border-b border-light-shadow-2 dark:border-dark-shadow-2"
+								>
+									<td class="py-4">
+										<div class="flex items-center">
+											<div class="neumorph-icon-container p-2 mr-3">
+												<i data-lucide="bike" class="w-4 h-4 icon-cycling"></i>
+											</div>
+											<span class="font-medium text-primary">Evening Ride</span>
+										</div>
+									</td>
+									<td class="py-4 text-muted">Yesterday, 6:15 PM</td>
+									<td class="py-4 text-muted">1 hr 20 min</td>
+									<td class="py-4 text-muted">18.5 km</td>
+									<td class="py-4 text-muted">750 kcal</td>
+									<td class="py-4">
+										<span
+											class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-20 text-success"
+											>Completed</span
+										>
+									</td>
+
+									<td class="py-4">
+										<div class="relative">
+											<button class="neumorph-button p-2 activity-options-btn">
+												<i
+													data-lucide="more-vertical"
+													class="w-4 h-4 text-muted"
+												></i>
+											</button>
+											<div
+												class="activity-options-popup neumorph-card absolute right-0 mt-2 py-2 px-1 z-10 hidden dark:bg-dark-primary dark:border dark:border-dark-shadow-1"
+												style="min-width: 120px"
+											>
+												<button
+													class="w-full text-left p-2 hover:bg-light-shadow-1 dark:hover:bg-dark-shadow-1 rounded text-danger text-sm flex items-center delete-activity-btn"
+												>
+													<i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+													Delete
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr
+									class="border-b border-light-shadow-2 dark:border-dark-shadow-2"
+								>
+									<td class="py-4">
+										<div class="flex items-center">
+											<div class="neumorph-icon-container p-2 mr-3">
+												<i
+													data-lucide="waves"
+													class="w-4 h-4 icon-swimming"
+												></i>
+											</div>
+											<span class="font-medium text-primary">Pool Session</span>
+										</div>
+									</td>
+									<td class="py-4 text-muted">May 12, 8:00 AM</td>
+									<td class="py-4 text-muted">50 min</td>
+									<td class="py-4 text-muted">1.5 km</td>
+									<td class="py-4 text-muted">380 kcal</td>
+									<td class="py-4">
+										<span
+											class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-20 text-success"
+											>Completed</span
+										>
+									</td>
+									<td class="py-4">
+										<div class="relative">
+											<button class="neumorph-button p-2 activity-options-btn">
+												<i
+													data-lucide="more-vertical"
+													class="w-4 h-4 text-muted"
+												></i>
+											</button>
+											<div
+												class="activity-options-popup neumorph-card absolute right-0 mt-2 py-2 px-1 z-10 hidden dark:bg-dark-primary dark:border dark:border-dark-shadow-1"
+												style="min-width: 120px"
+											>
+												<button
+													class="w-full text-left p-2 hover:bg-light-shadow-1 dark:hover:bg-dark-shadow-1 rounded text-danger text-sm flex items-center delete-activity-btn"
+												>
+													<i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+													Delete
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td class="py-4">
+										<div class="flex items-center">
+											<div class="neumorph-icon-container p-2 mr-3">
+												<i
+													data-lucide="dumbbell"
+													class="w-4 h-4 icon-strength"
+												></i>
+											</div>
+											<span class="font-medium text-primary"
+												>Strength Training</span
+											>
+										</div>
+									</td>
+									<td class="py-4 text-muted">May 10, 5:30 PM</td>
+									<td class="py-4 text-muted">1 hr</td>
+									<td class="py-4 text-muted">-</td>
+									<td class="py-4 text-muted">320 kcal</td>
+									<td class="py-4">
+										<span
+											class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-20 text-success"
+											>Completed</span
+										>
+									</td>
+									<td class="py-4">
+										<div class="relative">
+											<button class="neumorph-button p-2 activity-options-btn">
+												<i
+													data-lucide="more-vertical"
+													class="w-4 h-4 text-muted"
+												></i>
+											</button>
+											<div
+												class="activity-options-popup neumorph-card absolute right-0 mt-2 py-2 px-1 z-10 hidden dark:bg-dark-primary dark:border dark:border-dark-shadow-1"
+												style="min-width: 120px"
+											>
+												<button
+													class="w-full text-left p-2 hover:bg-light-shadow-1 dark:hover:bg-dark-shadow-1 rounded text-danger text-sm flex items-center delete-activity-btn"
+												>
+													<i data-lucide="trash-2" class="w-4 h-4 mr-2"></i>
+													Delete
+												</button>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</section>
+
+			<!-- Goals Section -->
+			<section id="goals" class="mb-16 fade-in" style="animation-delay: 0.6s">
+				<h2 class="text-2xl font-bold mb-8 section-title text-primary">
+					Fitness Goals
+				</h2>
+
+				<div
+					class="flex flex-col md:flex-row md:items-center md:justify-between mb-6"
+				>
+					<p class="text-muted mb-4 md:mb-0">
+						Track your progress towards your fitness goals
+					</p>
+					<button id="addGoalBtn" class="primary-button text-sm py-2">
+						<i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+						Add New Goal
+					</button>
+				</div>
+
+				<div id="goalsList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div class="neumorph-card p-5 flex items-center justify-between">
+						<div>
+							<p class="font-semibold text-primary text-lg">Run 100km</p>
+							<p class="text-sm text-muted mt-1">Progress: 70km (70%)</p>
+							<div class="w-48 neumorph-progress mt-3">
+								<div class="neumorph-progress-bar" style="width: 70%"></div>
+							</div>
+						</div>
+						<div
+							class="w-24 h-24 neumorph-icon-container flex items-center justify-center"
+						>
+							<canvas id="goalChart1"></canvas>
+						</div>
+					</div>
+
+					<div class="neumorph-card p-5 flex items-center justify-between">
+						<div>
+							<p class="font-semibold text-primary text-lg">Cycle 500km</p>
+							<p class="text-sm text-muted mt-1">Progress: 200km (40%)</p>
+							<div class="w-48 neumorph-progress mt-3">
+								<div class="neumorph-progress-bar" style="width: 40%"></div>
+							</div>
+						</div>
+						<div
+							class="w-24 h-24 neumorph-icon-container flex items-center justify-center"
+						>
+							<canvas id="goalChart2"></canvas>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Footer -->
+			<footer class="footer mt-16 py-8 px-6">
+				<div class="container mx-auto">
+					<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+						<div>
+							<h3 class="text-xl font-bold text-primary mb-4">
+								Sports Activity Tracker
+							</h3>
+							<p class="text-muted mb-4">
+								Track your fitness journey with precision and elegance. Our
+								neumorphic design provides a modern and intuitive experience.
+							</p>
+							<div class="flex space-x-3">
+								<a href="#" class="social-icon">
+									<i data-lucide="facebook" class="w-4 h-4 text-accent"></i>
+								</a>
+								<a href="#" class="social-icon">
+									<i data-lucide="twitter" class="w-4 h-4 text-accent"></i>
+								</a>
+								<a href="#" class="social-icon">
+									<i data-lucide="instagram" class="w-4 h-4 text-accent"></i>
+								</a>
+								<a href="#" class="social-icon">
+									<i data-lucide="linkedin" class="w-4 h-4 text-accent"></i>
+								</a>
+							</div>
+						</div>
+
+						<div>
+							<h4 class="text-lg font-semibold text-primary mb-4">
+								Quick Links
+							</h4>
+							<ul class="space-y-2">
+								<li>
+									<a
+										href="#dashboard"
+										class="text-muted hover:text-accent transition-colors"
+										>Dashboard</a
+									>
+								</li>
+								<li>
+									<a
+										href="#progress"
+										class="text-muted hover:text-accent transition-colors"
+										>Progress</a
+									>
+								</li>
+								<li>
+									<a
+										href="#goals"
+										class="text-muted hover:text-accent transition-colors"
+										>Goals</a
+									>
+								</li>
+								<li>
+									<a
+										href="#activities"
+										class="text-muted hover:text-accent transition-colors"
+										>Activities</a
+									>
+								</li>
+								<li>
+									<a
+										href="#calendar"
+										class="text-muted hover:text-accent transition-colors"
+										>Calendar</a
+									>
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<h4 class="text-lg font-semibold text-primary mb-4">Resources</h4>
+							<ul class="space-y-2">
+								<li>
+									<a
+										href="#"
+										class="text-muted hover:text-accent transition-colors"
+										>Help Center</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-muted hover:text-accent transition-colors"
+										>Community</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-muted hover:text-accent transition-colors"
+										>Tutorials</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-muted hover:text-accent transition-colors"
+										>API Documentation</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-muted hover:text-accent transition-colors"
+										>Blog</a
+									>
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<h4 class="text-lg font-semibold text-primary mb-4">
+								Contact Us
+							</h4>
+							<ul class="space-y-2">
+								<li class="flex items-start">
+									<i
+										data-lucide="map-pin"
+										class="w-5 h-5 text-accent mr-2 mt-0.5"
+									></i>
+									<span class="text-muted"
+										>123 Fitness Street, Exercise City, 10001</span
+									>
+								</li>
+								<li class="flex items-center">
+									<i data-lucide="mail" class="w-5 h-5 text-accent mr-2"></i>
+									<span class="text-muted">support@sportstracker.com</span>
+								</li>
+								<li class="flex items-center">
+									<i data-lucide="phone" class="w-5 h-5 text-accent mr-2"></i>
+									<span class="text-muted">+1 (555) 123-4567</span>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div
+						class="border-t border-light-shadow-2 dark:border-dark-shadow-2 mt-8 pt-8 flex flex-col md:flex-row md:justify-between md:items-center"
+					>
+						<p class="text-muted text-sm mb-4 md:mb-0">
+							&copy; 2025 Sports Activity Tracker Pro. All rights reserved.
+						</p>
+						<div class="flex flex-wrap gap-4">
+							<a
+								href="#"
+								class="text-muted text-sm hover:text-accent transition-colors"
+								>Privacy Policy</a
+							>
+							<a
+								href="#"
+								class="text-muted text-sm hover:text-accent transition-colors"
+								>Terms of Service</a
+							>
+							<a
+								href="#"
+								class="text-muted text-sm hover:text-accent transition-colors"
+								>Cookie Policy</a
+							>
+							<a
+								href="#"
+								class="text-muted text-sm hover:text-accent transition-colors"
+								>Accessibility</a
+							>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</main>
+
+		<script>
+			// Initialize Lucide Icons
+			lucide.createIcons();
+
+			// Theme Toggle with Color Palette Switching
+			const themeToggle = document.getElementById("theme-toggle");
+			const isDarkMode = localStorage.getItem("darkMode") === "true";
+			if (isDarkMode) document.body.classList.add("dark");
+
+			themeToggle.addEventListener("click", () => {
+				document.body.classList.toggle("dark");
+				const isDark = document.body.classList.contains("dark");
+				localStorage.setItem("darkMode", isDark);
+				updateThemeIcon();
+				updateChartColors(isDark);
+			});
+
+			// Initialize icon based on current theme
+			const updateThemeIcon = () => {
+				const isDark = document.body.classList.contains("dark");
+				themeToggle.innerHTML = "";
+				const icon = document.createElement("i");
+				icon.setAttribute("data-lucide", isDark ? "sun" : "moon");
+				icon.className = "w-6 h-6 text-accent";
+				themeToggle.appendChild(icon);
+				lucide.createIcons();
+			};
+			updateThemeIcon();
+
+			// User dropdown toggle
+			const userProfileDropdown = document.getElementById(
+				"userProfileDropdown"
+			);
+			const userDropdown = document.getElementById("userDropdown");
+
+			userProfileDropdown.addEventListener("click", () => {
+				userDropdown.classList.toggle("active");
+			});
+
+			// Close dropdown when clicking outside
+			document.addEventListener("click", (e) => {
+				if (!userProfileDropdown.contains(e.target)) {
+					userDropdown.classList.remove("active");
+				}
+			});
+
+			// Fixed mobile navigation handling
+			document.addEventListener("DOMContentLoaded", () => {
+				const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+				const mobileNavOverlay = document.querySelector(".mobile-nav-overlay");
+				const nav = document.querySelector(".neumorph-nav");
+
+				if (!mobileMenuToggle || !mobileNavOverlay || !nav) return;
+
+				// Function to close mobile nav
+				function closeMobileNav() {
+					nav.classList.remove("mobile-nav-open");
+					document.body.classList.remove("overflow-hidden");
+					mobileNavOverlay.classList.remove("active");
+
+					const icon = mobileMenuToggle.querySelector("i");
+					if (icon) {
+						icon.setAttribute("data-lucide", "menu");
+						lucide.createIcons();
+					}
+				}
+
+				// Function to open mobile nav
+				function openMobileNav() {
+					nav.classList.add("mobile-nav-open");
+					document.body.classList.add("overflow-hidden");
+					mobileNavOverlay.classList.add("active");
+
+					const icon = mobileMenuToggle.querySelector("i");
+					if (icon) {
+						icon.setAttribute("data-lucide", "x");
+						lucide.createIcons();
+					}
+				}
+
+				// Toggle mobile menu
+				mobileMenuToggle.addEventListener("click", (e) => {
+					e.stopPropagation();
+					if (nav.classList.contains("mobile-nav-open")) {
+						closeMobileNav();
+					} else {
+						openMobileNav();
+					}
+				});
+
+				// Close mobile nav when clicking on overlay
+				mobileNavOverlay.addEventListener("click", () => {
+					closeMobileNav();
+				});
+
+				// Close mobile nav when clicking on links
+				document.querySelectorAll(".nav-link").forEach((link) => {
+					link.addEventListener("click", () => {
+						if (window.innerWidth <= 768) {
+							closeMobileNav();
+						}
+					});
+				});
+
+				// Handle window resize
+				window.addEventListener("resize", () => {
+					if (
+						window.innerWidth > 768 &&
+						nav.classList.contains("mobile-nav-open")
+					) {
+						closeMobileNav();
+					}
+				});
+
+				// Ensure sidebar is closed on mobile by default
+				if (window.innerWidth <= 768) {
+					closeMobileNav();
+				}
+			});
+
+			// Smooth scroll for navbar links
+			const navLinks = document.querySelectorAll(".nav-link");
+			navLinks.forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					const targetId = link.getAttribute("href").substring(1);
+					document
+						.getElementById(targetId)
+						.scrollIntoView({ behavior: "smooth" });
+				});
+			});
+
+			// User data storage and management
+			const userData = {
+				name: localStorage.getItem("userName") || "User",
+				activities: JSON.parse(localStorage.getItem("userActivities")) || [
+					{
+						type: "running",
+						date: "2025-05-15",
+						duration: 45,
+						distance: 5.2,
+						calories: 420,
+						status: "completed",
+					},
+					{
+						type: "cycling",
+						date: "2025-05-14",
+						duration: 80,
+						distance: 18.5,
+						calories: 750,
+						status: "completed",
+					},
+					{
+						type: "swimming",
+						date: "2025-05-12",
+						duration: 50,
+						distance: 1.5,
+						calories: 380,
+						status: "completed",
+					},
+					{
+						type: "strength",
+						date: "2025-05-10",
+						duration: 60,
+						distance: 0,
+						calories: 320,
+						status: "completed",
+					},
+				],
+				goals: JSON.parse(localStorage.getItem("userGoals")) || [
+					{
+						id: 1,
+						type: "running",
+						target: 100,
+						unit: "km",
+						current: 70,
+						deadline: "2025-06-30",
+					},
+					{
+						id: 2,
+						type: "cycling",
+						target: 500,
+						unit: "km",
+						current: 200,
+						deadline: "2025-07-15",
+					},
+				],
+				preferences: JSON.parse(localStorage.getItem("userPreferences")) || {
+					chartStyle: "gradient",
+					metricSystem: "metric",
+					weekStart: "monday",
+					colorScheme: "default",
+				},
+			};
+
+			// Save user data to localStorage
+			function saveUserData() {
+				localStorage.setItem("userName", userData.name);
+				localStorage.setItem(
+					"userActivities",
+					JSON.stringify(userData.activities)
+				);
+				localStorage.setItem("userGoals", JSON.stringify(userData.goals));
+				localStorage.setItem(
+					"userPreferences",
+					JSON.stringify(userData.preferences)
+				);
+			}
+
+			// Add new activity
+			function addActivity(activity) {
+				userData.activities.unshift(activity);
+				saveUserData();
+				updateActivityTable();
+				updateActivityCharts();
+				updateGoalProgress();
+			}
+
+			// Add new goal
+			function addGoal(goal) {
+				goal.id =
+					userData.goals.length > 0
+						? Math.max(...userData.goals.map((g) => g.id)) + 1
+						: 1;
+				userData.goals.push(goal);
+				saveUserData();
+				updateGoalsList();
+			}
+
+			// Update activity table
+			function updateActivityTable() {
+				const tableBody = document.querySelector(
+					"#recentActivitiesTable tbody"
+				);
+				if (!tableBody) return;
+
+				tableBody.innerHTML = "";
+
+				userData.activities.slice(0, 5).forEach((activity) => {
+					const row = document.createElement("tr");
+					row.className =
+						"border-b border-light-shadow-2 dark:border-dark-shadow-2";
+
+					const activityIcons = {
+						running: "run",
+						cycling: "bike",
+						swimming: "swimming",
+						strength: "dumbbell",
+						yoga: "heart",
+						hiking: "map",
+					};
+
+					const activityColors = {
+						running: "icon-running",
+						cycling: "icon-cycling",
+						swimming: "icon-swimming",
+						strength: "icon-strength",
+						yoga: "icon-yoga",
+						hiking: "icon-hiking",
+					};
+
+					const date = new Date(activity.date);
+					const formattedDate = date.toLocaleDateString("en-US", {
+						month: "short",
+						day: "numeric",
+						hour: "numeric",
+						minute: "numeric",
+					});
+
+					row.innerHTML = `
+                    <td class="py-4">
+                        <div class="flex items-center">
+                            <div class="neumorph-icon-container p-2 mr-3">
+                                <i data-lucide="${
+																	activityIcons[activity.type] || "activity"
+																}" class="w-4 h-4 ${
+						activityColors[activity.type]
+					}"></i>
+                            </div>
+                            <span class="font-medium text-primary">${
+															activity.type.charAt(0).toUpperCase() +
+															activity.type.slice(1)
+														}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 text-muted">${formattedDate}</td>
+                    <td class="py-4 text-muted">${activity.duration} min</td>
+                    <td class="py-4 text-muted">${
+											activity.distance > 0 ? activity.distance + " km" : "-"
+										}</td>
+                    <td class="py-4 text-muted">${activity.calories} kcal</td>
+                    <td class="py-4">
+                        <span class="px-2 py-1 text-xs rounded-full bg-success bg-opacity-20 text-success">
+                            ${
+															activity.status.charAt(0).toUpperCase() +
+															activity.status.slice(1)
+														}
+                        </span>
+                    </td>
+                    <td class="py-4">
+                        <button class="neumorph-button p-2 activity-options" data-id="${
+													activity.date
+												}">
+                            <i data-lucide="more-vertical" class="w-4 h-4 text-muted"></i>
+                        </button>
+                    </td>
+                `;
+
+					tableBody.appendChild(row);
+				});
+
+				lucide.createIcons();
+
+				// Add event listeners to activity option buttons
+				document.querySelectorAll(".activity-options").forEach((button) => {
+					button.addEventListener("click", () => {
+						const activityId = button.getAttribute("data-id");
+						showActivityOptions(activityId, button);
+					});
+				});
+			}
+
+			// Show activity options menu
+			function showActivityOptions(activityId, buttonEl) {
+				// Remove any existing menus
+				document
+					.querySelectorAll(".activity-options-menu")
+					.forEach((menu) => menu.remove());
+
+				const menu = document.createElement("div");
+				menu.className =
+					"activity-options-menu neumorph-card absolute z-10 p-2 min-w-[150px]";
+				menu.style.top = `${buttonEl.offsetTop + buttonEl.offsetHeight}px`;
+				menu.style.right = `${
+					window.innerWidth - (buttonEl.offsetLeft + buttonEl.offsetWidth)
+				}px`;
+
+				menu.innerHTML = `
+                <button class="w-full text-left p-2 hover:bg-light-shadow-1 dark:hover:bg-dark-shadow-1 rounded text-primary text-sm edit-activity" data-id="${activityId}">
+                    <i data-lucide="edit" class="w-4 h-4 inline mr-2"></i> Edit
+                </button>
+                <button class="w-full text-left p-2 hover:bg-light-shadow-1 dark:hover:bg-dark-shadow-1 rounded text-primary text-sm delete-activity" data-id="${activityId}">
+                    <i data-lucide="trash" class="w-4 h-4 inline mr-2"></i> Delete
+                </button>
+            `;
+
+				document.body.appendChild(menu);
+				lucide.createIcons();
+
+				// Add event listeners
+				menu.querySelector(".edit-activity").addEventListener("click", () => {
+					editActivity(activityId);
+					menu.remove();
+				});
+
+				menu.querySelector(".delete-activity").addEventListener("click", () => {
+					deleteActivity(activityId);
+					menu.remove();
+				});
+
+				// Close menu when clicking outside
+				document.addEventListener("click", function closeMenu(e) {
+					if (!menu.contains(e.target) && e.target !== buttonEl) {
+						menu.remove();
+						document.removeEventListener("click", closeMenu);
+					}
+				});
+			}
+
+			// Edit activity
+			function editActivity(activityId) {
+				const activity = userData.activities.find((a) => a.date === activityId);
+				if (!activity) return;
+
+				showActivityModal(activity);
+			}
+
+			// Delete activity
+			function deleteActivity(activityId) {
+				const index = userData.activities.findIndex(
+					(a) => a.date === activityId
+				);
+				if (index === -1) return;
+
+				if (confirm("Are you sure you want to delete this activity?")) {
+					userData.activities.splice(index, 1);
+					saveUserData();
+					updateActivityTable();
+					updateActivityCharts();
+					updateGoalProgress();
+				}
+			}
+
+			// Chart color configuration
+			let chartColors = {
+				running: "#F59E0B",
+				cycling: "#EF4444",
+				swimming: "#3B82F6",
+				strength: "#8B5CF6",
+				yoga: "#10B981",
+				hiking: "#6D28D9",
+				background: document.body.classList.contains("dark")
+					? "#2D3748"
+					: "#E6E9F0",
+				gridLines: document.body.classList.contains("dark")
+					? "rgba(255, 255, 255, 0.1)"
+					: "rgba(0, 0, 0, 0.1)",
+				text: document.body.classList.contains("dark") ? "#E2E8F0" : "#2D3748",
+			};
+
+			// Update chart colors when theme changes
+			function updateChartColors(isDark) {
+				chartColors.background = isDark ? "#2D3748" : "#E6E9F0";
+				chartColors.gridLines = isDark
+					? "rgba(255, 255, 255, 0.1)"
+					: "rgba(0, 0, 0, 0.1)";
+				chartColors.text = isDark ? "#E2E8F0" : "#2D3748";
+
+				// Redraw charts with new colors
+				updateActivityCharts();
+				updateGoalCharts();
+			}
+
+			// Initialize and update activity charts
+			let activityChart, breakdownChart;
+
+			// Update activity charts with user data
+			function updateActivityCharts() {
+				// Weekly activity chart
+				const activityCtx = document.getElementById("activityChart");
+				if (!activityCtx) {
+					console.error("Activity chart canvas not found");
+					return;
+				}
+
+				// Activity breakdown chart
+				const breakdownCtx = document.getElementById("breakdownChart");
+				if (!breakdownCtx) {
+					console.error("Breakdown chart canvas not found");
+					return;
+				}
+
+				// Process activity data for charts
+				const activityData = processActivityData();
+
+				// Destroy existing charts if they exist
+				if (activityChart) {
+					activityChart.destroy();
+				}
+
+				if (breakdownChart) {
+					breakdownChart.destroy();
+				}
+
+				// Create new weekly activity chart
+				activityChart = new Chart(activityCtx, {
+					type: "bar",
+					data: {
+						labels: activityData.labels,
+						datasets: [
+							{
+								label: "Running (km)",
+								data: activityData.running,
+								backgroundColor: chartColors.running,
+								borderRadius: 6,
+							},
+							{
+								label: "Cycling (km)",
+								data: activityData.cycling,
+								backgroundColor: chartColors.cycling,
+								borderRadius: 6,
+							},
+							{
+								label: "Swimming (km)",
+								data: activityData.swimming,
+								backgroundColor: chartColors.swimming,
+								borderRadius: 6,
+							},
+							{
+								label: "Strength (min)",
+								data: activityData.strength,
+								backgroundColor: chartColors.strength,
+								borderRadius: 6,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "top",
+								labels: {
+									color: chartColors.text,
+									font: {
+										family: "Inter, sans-serif",
+									},
+								},
+							},
+						},
+						scales: {
+							x: {
+								grid: {
+									display: false,
+								},
+								ticks: {
+									color: chartColors.text,
+								},
+							},
+							y: {
+								grid: {
+									color: chartColors.gridLines,
+								},
+								ticks: {
+									color: chartColors.text,
+								},
+							},
+						},
+					},
+				});
+
+				// Create new activity breakdown chart
+				breakdownChart = new Chart(breakdownCtx, {
+					type: "doughnut",
+					data: {
+						labels: ["Running", "Cycling", "Swimming", "Strength"],
+						datasets: [
+							{
+								data: [
+									activityData.totals.running,
+									activityData.totals.cycling,
+									activityData.totals.swimming,
+									activityData.totals.strength,
+								],
+								backgroundColor: [
+									chartColors.running,
+									chartColors.cycling,
+									chartColors.swimming,
+									chartColors.strength,
+								],
+								borderWidth: 0,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						cutout: "70%",
+						plugins: {
+							legend: {
+								position: "bottom",
+								labels: {
+									color: chartColors.text,
+									font: {
+										family: "Inter, sans-serif",
+									},
+								},
+							},
+						},
+					},
+				});
+			}
+
+			// Initialize and update goal charts
+			let goalChart1, goalChart2;
+
+			function updateGoalCharts() {
+				// Goal progress charts
+				if (userData.goals.length > 0) {
+					const goal1Ctx = document.getElementById("goalChart1");
+					if (goal1Ctx) {
+						if (goalChart1) goalChart1.destroy();
+
+						const goal = userData.goals[0];
+						const progress = (goal.current / goal.target) * 100;
+
+						goalChart1 = new Chart(goal1Ctx, {
+							type: "doughnut",
+							data: {
+								datasets: [
+									{
+										data: [progress, 100 - progress],
+										backgroundColor: [
+											chartColors[goal.type] || chartColors.accent,
+											"rgba(0,0,0,0.1)",
+										],
+										borderWidth: 0,
+									},
+								],
+							},
+							options: {
+								responsive: true,
+								maintainAspectRatio: false,
+								cutout: "80%",
+								plugins: {
+									legend: {
+										display: false,
+									},
+									tooltip: {
+										enabled: false,
+									},
+								},
+							},
+						});
+					}
+
+					if (userData.goals.length > 1) {
+						const goal2Ctx = document.getElementById("goalChart2");
+						if (goal2Ctx) {
+							if (goalChart2) goalChart2.destroy();
+
+							const goal = userData.goals[1];
+							const progress = (goal.current / goal.target) * 100;
+
+							goalChart2 = new Chart(goal2Ctx, {
+								type: "doughnut",
+								data: {
+									datasets: [
+										{
+											data: [progress, 100 - progress],
+											backgroundColor: [
+												chartColors[goal.type] || chartColors.accent,
+												"rgba(0,0,0,0.1)",
+											],
+											borderWidth: 0,
+										},
+									],
+								},
+								options: {
+									responsive: true,
+									maintainAspectRatio: false,
+									cutout: "80%",
+									plugins: {
+										legend: {
+											display: false,
+										},
+										tooltip: {
+											enabled: false,
+										},
+									},
+								},
+							});
+						}
+					}
+				}
+			}
+
+			// Initialize the application
+			document.addEventListener("DOMContentLoaded", () => {
+				// Update activity table
+				updateActivityTable();
+
+				// Update goals list
+				updateGoalsList();
+				// Add click event listeners to all option buttons
+				document.querySelectorAll(".activity-options-btn").forEach((button) => {
+					button.addEventListener("click", (e) => {
+						e.stopPropagation(); // Prevent event from bubbling up
+
+						// Close any open popups first
+						document
+							.querySelectorAll(".activity-options-popup")
+							.forEach((popup) => {
+								if (popup !== button.nextElementSibling) {
+									popup.classList.add("hidden");
+								}
+							});
+						// Add click event listeners to delete buttons
+						document
+							.querySelectorAll(".delete-activity-btn")
+							.forEach((deleteBtn) => {
+								deleteBtn.addEventListener("click", (e) => {
+									e.stopPropagation();
+
+									// Find the table row
+									const row = deleteBtn.closest("tr");
+
+									// Show confirmation dialog
+									if (
+										confirm("Are you sure you want to delete this activity?")
+									) {
+										// Add fade-out animation
+										row.style.transition = "opacity 0.3s, transform 0.3s";
+										row.style.opacity = "0";
+										row.style.transform = "translateX(20px)";
+
+										// Remove the row after animation completes
+										setTimeout(() => {
+											row.remove();
+										}, 300);
+
+										// Here you would also remove the activity from your userData
+										// This is a placeholder for where you'd add that logic
+										// deleteActivityFromUserData(activityId);
+									}
+									// Close popups when clicking outside
+									document.addEventListener("click", () => {
+										document
+											.querySelectorAll(".activity-options-popup")
+											.forEach((popup) => {
+												popup.classList.add("hidden");
+											});
+									});
+
+									// Hide the popup
+									deleteBtn
+										.closest(".activity-options-popup")
+										.classList.add("hidden");
+								});
+							});
+
+						// Toggle the popup for this button
+						const popup = button.nextElementSibling;
+						popup.classList.toggle("hidden");
+					});
+				});
+				// Make sure Chart.js is loaded before initializing charts
+				if (typeof Chart !== "undefined") {
+					// Initialize charts
+					updateActivityCharts();
+					updateGoalCharts();
+
+					// Add resize handler for charts when switching tabs
+					document.querySelectorAll(".nav-link").forEach((link) => {
+						link.addEventListener("click", () => {
+							setTimeout(() => {
+								if (activityChart) activityChart.resize();
+								if (breakdownChart) breakdownChart.resize();
+							}, 100);
+						});
+					});
+				} else {
+					console.error("Chart.js library not loaded");
+				}
+
+				// Add event listener to "Add Activity" button
+				const addActivityBtn = document.querySelector(".add-activity-btn");
+				if (addActivityBtn) {
+					addActivityBtn.addEventListener("click", () => showActivityModal());
+				}
+
+				// Add event listener to "Add Goal" button
+				const addGoalBtn = document.getElementById("addGoalBtn");
+				if (addGoalBtn) {
+					addGoalBtn.addEventListener("click", showGoalModal);
+				}
+			});
+			// Show activity modal for adding/editing
+			function showActivityModal(activity = null) {
+				// Remove any existing modal
+				document
+					.querySelectorAll(".activity-modal")
+					.forEach((modal) => modal.remove());
+
+				const modal = document.createElement("div");
+				modal.className =
+					"activity-modal fixed inset-0 flex items-center justify-center z-50";
+				modal.innerHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+                <div class="neumorph-card p-6 max-w-md w-full z-10 relative">
+                    <button class="absolute top-4 right-4 neumorph-button p-2 close-modal">
+                        <i data-lucide="x" class="w-4 h-4 text-muted"></i>
+                    </button>
+                    <h3 class="text-xl font-bold text-primary mb-4">${
+											activity ? "Edit" : "Add"
+										} Activity</h3>
+                    <form id="activityForm" class="space-y-4">
+                        <div>
+                            <label class="block text-muted mb-2">Activity Type</label>
+                            <select id="activityType" class="w-full neumorph-input p-3 text-primary">
+                                <option value="running" ${
+																	activity && activity.type === "running"
+																		? "selected"
+																		: ""
+																}>Running</option>
+                                <option value="cycling" ${
+																	activity && activity.type === "cycling"
+																		? "selected"
+																		: ""
+																}>Cycling</option>
+                                <option value="swimming" ${
+																	activity && activity.type === "swimming"
+																		? "selected"
+																		: ""
+																}>Swimming</option>
+                                <option value="strength" ${
+																	activity && activity.type === "strength"
+																		? "selected"
+																		: ""
+																}>Strength Training</option>
+                                <option value="yoga" ${
+																	activity && activity.type === "yoga"
+																		? "selected"
+																		: ""
+																}>Yoga</option>
+                                <option value="hiking" ${
+																	activity && activity.type === "hiking"
+																		? "selected"
+																		: ""
+																}>Hiking</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Date & Time</label>
+                            <input type="datetime-local" id="activityDate" class="w-full neumorph-input p-3 text-primary" 
+                                value="${
+																	activity
+																		? new Date(activity.date)
+																				.toISOString()
+																				.slice(0, 16)
+																		: new Date().toISOString().slice(0, 16)
+																}" required>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Duration (minutes)</label>
+                            <input type="number" id="activityDuration" class="w-full neumorph-input p-3 text-primary" 
+                                value="${
+																	activity ? activity.duration : ""
+																}" min="1" required>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Distance (km)</label>
+                            <input type="number" id="activityDistance" class="w-full neumorph-input p-3 text-primary" 
+                                value="${
+																	activity ? activity.distance : ""
+																}" min="0" step="0.1">
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Calories Burned</label>
+                            <input type="number" id="activityCalories" class="w-full neumorph-input p-3 text-primary" 
+                                value="${
+																	activity ? activity.calories : ""
+																}" min="0" required>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" class="neumorph-button px-4 py-2 text-primary close-modal">Cancel</button>
+                            <button type="submit" class="primary-button px-4 py-2">Save Activity</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+				document.body.appendChild(modal);
+				lucide.createIcons();
+
+				// Close modal handlers
+				modal.querySelectorAll(".close-modal").forEach((button) => {
+					button.addEventListener("click", () => {
+						modal.remove();
+					});
+				});
+
+				// Background click to close
+				modal.querySelector(".fixed.inset-0").addEventListener("click", () => {
+					modal.remove();
+				});
+
+				// Form submission
+				const form = document.getElementById("activityForm");
+				form.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					const newActivity = {
+						type: document.getElementById("activityType").value,
+						date: document.getElementById("activityDate").value,
+						duration: parseInt(
+							document.getElementById("activityDuration").value
+						),
+						distance:
+							parseFloat(document.getElementById("activityDistance").value) ||
+							0,
+						calories: parseInt(
+							document.getElementById("activityCalories").value
+						),
+						status: "completed",
+					};
+
+					if (activity) {
+						// Edit existing activity
+						const index = userData.activities.findIndex(
+							(a) => a.date === activity.date
+						);
+						if (index !== -1) {
+							userData.activities[index] = newActivity;
+						}
+					} else {
+						// Add new activity
+						addActivity(newActivity);
+					}
+
+					saveUserData();
+					updateActivityTable();
+					updateActivityCharts();
+					updateGoalProgress();
+					modal.remove();
+				});
+			}
+			// Notification dropdown toggle
+			const notificationDropdown = document.getElementById(
+				"notificationDropdown"
+			);
+			const notificationMenu = document.getElementById("notificationMenu");
+
+			notificationDropdown.addEventListener("click", (e) => {
+				notificationMenu.classList.toggle("active");
+				e.stopPropagation();
+			});
+
+			// Close notification dropdown when clicking outside
+			document.addEventListener("click", (e) => {
+				if (!notificationDropdown.contains(e.target)) {
+					notificationMenu.classList.remove("active");
+				}
+			});
+
+			// Clear all notifications functionality
+			document
+				.getElementById("clearNotifications")
+				.addEventListener("click", (e) => {
+					e.preventDefault();
+
+					// Remove all notification items
+					const notificationItems =
+						document.querySelectorAll(".notification-item");
+					notificationItems.forEach((item) => {
+						item.style.animation = "fadeOut 0.3s forwards";
+						setTimeout(() => {
+							item.remove();
+						}, 300);
+					});
+
+					// Update notification badge
+					const badge = document.querySelector(".notification-badge");
+					if (badge) {
+						badge.textContent = "0";
+					}
+
+					// Update the "new" count in the header
+					const newCount = document.querySelector(
+						"#notificationMenu .text-xs.px-2.py-1"
+					);
+					if (newCount) {
+						newCount.textContent = "0 new";
+					}
+
+					// Add a "no notifications" message
+					setTimeout(() => {
+						const noNotifications = document.createElement("div");
+						noNotifications.className = "p-4 text-center text-muted";
+						noNotifications.textContent = "No notifications";
+
+						const container = document.querySelector("#notificationMenu");
+						const clearButton = document.querySelector(
+							"#notificationMenu .p-3.border-t"
+						);
+						if (container && clearButton) {
+							container.insertBefore(noNotifications, clearButton);
+						}
+
+						// Close the dropdown after a delay
+						setTimeout(() => {
+							notificationMenu.classList.remove("active");
+						}, 1500);
+					}, 350);
+				});
+
+			function updateGoalsList() {
+				const goalsList = document.getElementById("goalsList");
+				if (!goalsList) return;
+
+				goalsList.innerHTML = "";
+
+				userData.goals.forEach((goal) => {
+					const progress = Math.round((goal.current / goal.target) * 100);
+					const goalElement = document.createElement("div");
+					goalElement.className =
+						"neumorph-card p-5 flex items-center justify-between";
+
+					goalElement.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-primary text-lg">${
+													goal.type.charAt(0).toUpperCase() + goal.type.slice(1)
+												} ${goal.target}${goal.unit}</p>
+                        <p class="text-sm text-muted mt-1">Progress: ${
+													goal.current
+												}${goal.unit} (${progress}%)</p>
+                        <div class="w-48 neumorph-progress mt-3">
+                            <div class="neumorph-progress-bar" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="w-24 h-24 neumorph-icon-container flex items-center justify-center">
+                        <canvas id="goalChart${goal.id}"></canvas>
+                    </div>
+                `;
+
+					goalsList.appendChild(goalElement);
+				});
+
+				// Add event listener to "Add New Goal" button
+				const addGoalBtn = document.getElementById("addGoalBtn");
+				if (addGoalBtn) {
+					// Remove any existing event listeners to prevent duplicates
+					const newAddGoalBtn = addGoalBtn.cloneNode(true);
+					addGoalBtn.parentNode.replaceChild(newAddGoalBtn, addGoalBtn);
+					newAddGoalBtn.addEventListener("click", showGoalModal);
+				}
+
+				// Update goal charts
+				updateGoalCharts();
+			}
+
+			// Show goal modal for adding new goals
+			function showGoalModal() {
+				// Remove any existing modal
+				document
+					.querySelectorAll(".goal-modal")
+					.forEach((modal) => modal.remove());
+
+				const modal = document.createElement("div");
+				modal.className =
+					"goal-modal fixed inset-0 flex items-center justify-center z-50";
+				modal.innerHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+                <div class="neumorph-card p-6 max-w-md w-full z-10 relative dark:bg-dark-primary dark:border dark:border-dark-shadow-1">
+                    <button class="absolute top-4 right-4 neumorph-button p-2 close-modal dark:bg-dark-secondary dark:hover:bg-dark-shadow-1">
+                        <i data-lucide="x" class="w-4 h-4 text-muted dark:text-dark-text-secondary"></i>
+                    </button>
+                    <h3 class="text-xl font-bold text-primary dark:text-dark-text-primary mb-4">Add New Goal</h3>
+                    <form id="goalForm" class="space-y-4">
+                        <div>
+                            <label class="block text-muted dark:text-dark-text-secondary mb-2">Activity Type</label>
+                            <select id="goalType" class="w-full neumorph-input p-3 text-primary dark:text-dark-text-primary dark:bg-dark-secondary dark:border-dark-shadow-1">
+                                <option value="running">Running</option>
+                                <option value="cycling">Cycling</option>
+                                <option value="swimming">Swimming</option>
+                                <option value="strength">Strength Training</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-muted dark:text-dark-text-secondary mb-2">Target</label>
+                                <input type="number" id="goalTarget" class="w-full neumorph-input p-3 text-primary dark:text-dark-text-primary dark:bg-dark-secondary dark:border-dark-shadow-1" min="1" step="0.1" required>
+                            </div>
+                            <div>
+                                <label class="block text-muted dark:text-dark-text-secondary mb-2">Unit</label>
+                                <select id="goalUnit" class="w-full neumorph-input p-3 text-primary dark:text-dark-text-primary dark:bg-dark-secondary dark:border-dark-shadow-1">
+                                    <option value="km">Kilometers (km)</option>
+                                    <option value="min">Minutes (min)</option>
+                                    <option value="kcal">Calories (kcal)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-muted dark:text-dark-text-secondary mb-2">Deadline</label>
+                            <input type="date" id="goalDeadline" class="w-full neumorph-input p-3 text-primary dark:text-dark-text-primary dark:bg-dark-secondary dark:border-dark-shadow-1" required>
+                        </div>
+                        <div class="mt-2">
+                            <label class="block text-muted dark:text-dark-text-secondary mb-2">Description (optional)</label>
+                            <textarea id="goalDescription" class="w-full neumorph-input p-3 text-primary dark:text-dark-text-primary dark:bg-dark-secondary dark:border-dark-shadow-1 resize-none" rows="2" placeholder="Add a note about your goal"></textarea>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" class="neumorph-button px-4 py-2 text-primary dark:text-dark-text-primary dark:bg-dark-secondary dark:hover:bg-dark-shadow-1">Cancel</button>
+                            <button type="submit" class="primary-button px-4 py-2 dark:bg-dark-accent dark:hover:bg-dark-accent-hover dark:text-white">Save Goal</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+				document.body.appendChild(modal);
+				lucide.createIcons();
+
+				// Set default deadline to 30 days from now
+				const deadlineInput = document.getElementById("goalDeadline");
+				if (deadlineInput) {
+					const defaultDeadline = new Date();
+					defaultDeadline.setDate(defaultDeadline.getDate() + 30);
+					deadlineInput.value = defaultDeadline.toISOString().split("T")[0];
+				}
+
+				// Add dark mode specific styles for form elements
+				if (document.body.classList.contains("dark")) {
+					document
+						.querySelectorAll(
+							"#goalForm input, #goalForm select, #goalForm textarea"
+						)
+						.forEach((el) => {
+							el.style.color = "var(--dark-text-primary, #E2E8F0)";
+							el.style.backgroundColor = "var(--dark-secondary, #2D3748)";
+							el.style.borderColor = "var(--dark-shadow-1, #1A202C)";
+						});
+
+					// Fix placeholder text color in dark mode
+					document
+						.querySelectorAll("#goalForm textarea::placeholder")
+						.forEach((el) => {
+							el.style.color = "var(--dark-text-secondary, #A0AEC0)";
+						});
+				}
+
+				// Close modal handlers
+				modal.querySelectorAll(".close-modal").forEach((button) => {
+					button.addEventListener("click", () => {
+						modal.remove();
+					});
+				});
+
+				// Background click to close
+				modal.querySelector(".fixed.inset-0").addEventListener("click", () => {
+					modal.remove();
+				});
+
+				// Form submission
+				const form = document.getElementById("goalForm");
+				form.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					const newGoal = {
+						type: document.getElementById("goalType").value,
+						target: parseFloat(document.getElementById("goalTarget").value),
+						unit: document.getElementById("goalUnit").value,
+						current: 0,
+						deadline: document.getElementById("goalDeadline").value,
+						description: document.getElementById("goalDescription").value || "",
+					};
+
+					addGoal(newGoal);
+					modal.remove();
+
+					// Show success toast
+					showToast("New goal added successfully!");
+				});
+			}
+
+			// Update goal progress based on activities
+			// Update goal progress based on activities
+			function updateGoalProgress() {
+				userData.goals.forEach((goal) => {
+					// Reset current progress
+					goal.current = 0;
+
+					// Calculate progress based on activities
+					userData.activities.forEach((activity) => {
+						if (activity.type === goal.type) {
+							if (goal.unit === "km") {
+								goal.current += activity.distance;
+							} else if (goal.unit === "min") {
+								goal.current += activity.duration;
+							} else if (goal.unit === "kcal") {
+								goal.current += activity.calories;
+							}
+						}
+					});
+
+					// Round to one decimal place
+					goal.current = Math.round(goal.current * 10) / 10;
+				});
+
+				saveUserData();
+				updateGoalsList();
+				updateGoalCharts();
+			}
+
+			// Process activity data for charts
+			function processActivityData() {
+				const now = new Date();
+				const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+				const days = [];
+
+				// Get the last 7 days
+				for (let i = 6; i >= 0; i--) {
+					const date = new Date(now);
+					date.setDate(date.getDate() - i);
+					days.push({
+						date: date,
+						dayName: dayNames[date.getDay()],
+					});
+				}
+
+				// Initialize data structure
+				const data = {
+					labels: days.map((d) => d.dayName),
+					running: Array(7).fill(0),
+					cycling: Array(7).fill(0),
+					swimming: Array(7).fill(0),
+					strength: Array(7).fill(0),
+					yoga: Array(7).fill(0),
+					hiking: Array(7).fill(0),
+					totals: {
+						running: 0,
+						cycling: 0,
+						swimming: 0,
+						strength: 0,
+						yoga: 0,
+						hiking: 0,
+					},
+				};
+
+				// Process activities
+				userData.activities.forEach((activity) => {
+					const activityDate = new Date(activity.date);
+
+					// Update totals for breakdown chart
+					if (data.totals[activity.type] !== undefined) {
+						data.totals[activity.type] += activity.duration;
+					}
+
+					// Update daily data for weekly chart
+					for (let i = 0; i < days.length; i++) {
+						const day = days[i];
+						// Compare only the date part (ignoring time)
+						if (activityDate.toDateString() === day.date.toDateString()) {
+							if (data[activity.type] && Array.isArray(data[activity.type])) {
+								// For distance-based activities, use distance
+								if (
+									["running", "cycling", "swimming"].includes(activity.type)
+								) {
+									data[activity.type][i] += activity.distance;
+								} else {
+									// For time-based activities, use duration
+									data[activity.type][i] += activity.duration;
+								}
+							}
+							break;
+						}
+					}
+				});
+
+				// Always add dummy data for the weekly activity chart for demonstration purposes
+				// Running data (km)
+				data.running = [3.2, 0, 5.7, 2.1, 0, 8.3, 4.5];
+
+				// Cycling data (km)
+				data.cycling = [0, 12.5, 0, 15.2, 8.7, 0, 20.3];
+
+				// Swimming data (km)
+				data.swimming = [1.2, 0, 0, 0.8, 0, 1.5, 0];
+
+				// Strength training data (minutes)
+				data.strength = [45, 0, 60, 0, 30, 0, 0];
+
+				// Update totals for breakdown chart if they're empty
+				if (data.totals.running === 0) data.totals.running = 120; // 120 minutes
+				if (data.totals.cycling === 0) data.totals.cycling = 180; // 180 minutes
+				if (data.totals.swimming === 0) data.totals.swimming = 60; // 60 minutes
+				if (data.totals.strength === 0) data.totals.strength = 135; // 135 minutes
+				if (data.totals.yoga === 0) data.totals.yoga = 90; // 90 minutes
+				if (data.totals.hiking === 0) data.totals.hiking = 150; // 150 minutes
+
+				return data;
+			}
+
+			// Show user settings modal
+			function showSettingsModal() {
+				// Remove any existing modal
+				document
+					.querySelectorAll(".settings-modal")
+					.forEach((modal) => modal.remove());
+
+				const modal = document.createElement("div");
+				modal.className =
+					"settings-modal fixed inset-0 flex items-center justify-center z-50";
+				modal.innerHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+                <div class="neumorph-card p-6 max-w-md w-full z-10 relative">
+                    <button class="absolute top-4 right-4 neumorph-button p-2 close-modal">
+                        <i data-lucide="x" class="w-4 h-4 text-muted"></i>
+                    </button>
+                    <h3 class="text-xl font-bold text-primary mb-4">User Settings</h3>
+                    <form id="settingsForm" class="space-y-4">
+                        <div>
+                            <label class="block text-muted mb-2">Display Name</label>
+                            <input type="text" id="userName" class="w-full neumorph-input p-3 text-primary" 
+                                value="${userData.name}" required>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Measurement System</label>
+                            <select id="metricSystem" class="w-full neumorph-input p-3 text-primary">
+                                <option value="metric" ${
+																	userData.preferences.metricSystem === "metric"
+																		? "selected"
+																		: ""
+																}>Metric (km, kg)</option>
+                                <option value="imperial" ${
+																	userData.preferences.metricSystem ===
+																	"imperial"
+																		? "selected"
+																		: ""
+																}>Imperial (mi, lb)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Week Start Day</label>
+                            <select id="weekStart" class="w-full neumorph-input p-3 text-primary">
+                                <option value="monday" ${
+																	userData.preferences.weekStart === "monday"
+																		? "selected"
+																		: ""
+																}>Monday</option>
+                                <option value="sunday" ${
+																	userData.preferences.weekStart === "sunday"
+																		? "selected"
+																		: ""
+																}>Sunday</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Chart Style</label>
+                            <select id="chartStyle" class="w-full neumorph-input p-3 text-primary">
+                                <option value="gradient" ${
+																	userData.preferences.chartStyle === "gradient"
+																		? "selected"
+																		: ""
+																}>Gradient Fill</option>
+                                <option value="solid" ${
+																	userData.preferences.chartStyle === "solid"
+																		? "selected"
+																		: ""
+																}>Solid Lines</option>
+                                <option value="bar" ${
+																	userData.preferences.chartStyle === "bar"
+																		? "selected"
+																		: ""
+																}>Bar Chart</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-muted mb-2">Color Scheme</label>
+                            <div class="grid grid-cols-4 gap-3 mt-2">
+                                <button type="button" class="color-scheme-option ${
+																	userData.preferences.colorScheme === "default"
+																		? "active"
+																		: ""
+																}" data-scheme="default">
+                                    <div class="flex">
+                                        <div class="w-4 h-4 rounded-full bg-[#F59E0B]"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#EF4444] -ml-1"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#3B82F6] -ml-1"></div>
+                                    </div>
+                                </button>
+                                <button type="button" class="color-scheme-option ${
+																	userData.preferences.colorScheme === "pastel"
+																		? "active"
+																		: ""
+																}" data-scheme="pastel">
+                                    <div class="flex">
+                                        <div class="w-4 h-4 rounded-full bg-[#FCD34D]"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#F87171] -ml-1"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#93C5FD] -ml-1"></div>
+                                    </div>
+                                </button>
+                                <button type="button" class="color-scheme-option ${
+																	userData.preferences.colorScheme === "vibrant"
+																		? "active"
+																		: ""
+																}" data-scheme="vibrant">
+                                    <div class="flex">
+                                        <div class="w-4 h-4 rounded-full bg-[#F97316]"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#EC4899] -ml-1"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#8B5CF6] -ml-1"></div>
+                                    </div>
+                                </button>
+                                <button type="button" class="color-scheme-option ${
+																	userData.preferences.colorScheme ===
+																	"monochrome"
+																		? "active"
+																		: ""
+																}" data-scheme="monochrome">
+                                    <div class="flex">
+                                        <div class="w-4 h-4 rounded-full bg-[#111827]"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#4B5563] -ml-1"></div>
+                                        <div class="w-4 h-4 rounded-full bg-[#9CA3AF] -ml-1"></div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-3 pt-4">
+                            <button type="button" class="neumorph-button px-4 py-2 text-primary close-modal">Cancel</button>
+                            <button type="submit" class="primary-button px-4 py-2">Save Settings</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+
+				document.body.appendChild(modal);
+				lucide.createIcons();
+
+				// Style color scheme options
+				const colorSchemeOptions = document.querySelectorAll(
+					".color-scheme-option"
+				);
+				colorSchemeOptions.forEach((option) => {
+					option.addEventListener("click", () => {
+						colorSchemeOptions.forEach((opt) => opt.classList.remove("active"));
+						option.classList.add("active");
+					});
+				});
+
+				// Close modal handlers
+				modal.querySelectorAll(".close-modal").forEach((button) => {
+					button.addEventListener("click", () => {
+						modal.remove();
+					});
+				});
+
+				// Background click to close
+				modal.querySelector(".fixed.inset-0").addEventListener("click", () => {
+					modal.remove();
+				});
+
+				// Form submission
+				const form = document.getElementById("settingsForm");
+				form.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					// Update user preferences
+					userData.name = document.getElementById("userName").value;
+					userData.preferences.metricSystem =
+						document.getElementById("metricSystem").value;
+					userData.preferences.weekStart =
+						document.getElementById("weekStart").value;
+					userData.preferences.chartStyle =
+						document.getElementById("chartStyle").value;
+
+					// Get selected color scheme
+					const activeScheme = document.querySelector(
+						".color-scheme-option.active"
+					);
+					if (activeScheme) {
+						userData.preferences.colorScheme =
+							activeScheme.getAttribute("data-scheme");
+					}
+
+					saveUserData();
+					applyUserPreferences();
+					modal.remove();
+
+					// Show confirmation toast
+					showToast("Settings saved successfully!");
+				});
+			}
+
+			// Apply user preferences to the UI
+			function applyUserPreferences() {
+				// Update user name in the header
+				const userNameElement = document.querySelector(".user-name");
+				if (userNameElement) {
+					userNameElement.textContent = userData.name;
+				}
+
+				// Apply chart style preferences
+				updateChartStyles();
+
+				// Apply measurement system
+				updateMeasurementSystem();
+			}
+
+			// Update chart styles based on user preferences
+			function updateChartStyles() {
+				if (!activityChart) return;
+
+				const chartStyle = userData.preferences.chartStyle;
+				const colorScheme = userData.preferences.colorScheme;
+
+				// Destroy existing charts
+				activityChart.destroy();
+				breakdownChart.destroy();
+
+				// Reinitialize with new styles
+				initializeCharts(chartStyle, colorScheme);
+			}
+
+			// Update measurement system display
+			function updateMeasurementSystem() {
+				const isMetric = userData.preferences.metricSystem === "metric";
+				const distanceUnit = isMetric ? "km" : "mi";
+				const weightUnit = isMetric ? "kg" : "lb";
+
+				// Update distance units in the UI
+				document.querySelectorAll(".distance-unit").forEach((el) => {
+					el.textContent = distanceUnit;
+				});
+
+				// Update weight units in the UI
+				document.querySelectorAll(".weight-unit").forEach((el) => {
+					el.textContent = weightUnit;
+				});
+
+				// Convert values if needed
+				if (isMetric) {
+					// Convert imperial to metric
+				} else {
+					// Convert metric to imperial
+				}
+			}
+
+			// Show toast notification
+			function showToast(message, type = "success") {
+				// Remove any existing toasts
+				document
+					.querySelectorAll(".toast-notification")
+					.forEach((toast) => toast.remove());
+
+				const toast = document.createElement("div");
+				toast.className = `toast-notification fixed bottom-4 right-4 neumorph-card p-4 flex items-center z-50 ${
+					type === "error"
+						? "bg-danger bg-opacity-10"
+						: "bg-success bg-opacity-10"
+				}`;
+
+				const iconName = type === "error" ? "alert-circle" : "check-circle";
+				const iconClass = type === "error" ? "text-danger" : "text-success";
+
+				toast.innerHTML = `
+                <i data-lucide="${iconName}" class="w-5 h-5 ${iconClass} mr-3"></i>
+                <span class="text-primary">${message}</span>
+            `;
+
+				document.body.appendChild(toast);
+				lucide.createIcons();
+
+				// Auto-remove after 3 seconds
+				setTimeout(() => {
+					toast.classList.add("fade-out");
+					setTimeout(() => toast.remove(), 300);
+				}, 3000);
+			}
+
+			// Progress visualization - create a progress report
+			function generateProgressReport() {
+				// Calculate activity stats
+				const stats = calculateActivityStats();
+
+				// Create report modal
+				const modal = document.createElement("div");
+				modal.className =
+					"progress-report-modal fixed inset-0 flex items-center justify-center z-50";
+				modal.innerHTML = `
+                <div class="fixed inset-0 bg-black bg-opacity-50"></div>
+                <div class="neumorph-card p-6 max-w-4xl w-full z-10 relative">
+                    <button class="absolute top-4 right-4 neumorph-button p-2 close-modal">
+                        <i data-lucide="x" class="w-4 h-4 text-muted"></i>
+                    </button>
+                    <h3 class="text-xl font-bold text-primary mb-4">Your Progress Report</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="neumorph-card p-4">
+                            <h4 class="text-lg font-semibold text-primary mb-2">Activity Summary</h4>
+                            <p class="text-muted mb-4">Last 30 days</p>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-primary">Total Activities</span>
+                                    <span class="font-semibold text-primary">${
+																			stats.totalActivities
+																		}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-primary">Active Days</span>
+                                    <span class="font-semibold text-primary">${
+																			stats.activeDays
+																		}</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-primary">Consistency</span>
+                                    <span class="font-semibold text-primary">${
+																			stats.consistency
+																		}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="neumorph-card p-4">
+                            <h4 class="text-lg font-semibold text-primary mb-2">Distance & Time</h4>
+                            <p class="text-muted mb-4">Last 30 days</p>
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-primary">Total Distance</span>
+                                    <span class="font-semibold text-primary">${
+																			stats.totalDistance
+																		} km</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-primary">Active Time</span>
+                                    <span class="font-semibold text-primary">${
+																			stats.activeTime
+																		} hrs</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-primary">Calories Burned</span>
+                                    <span class="font-semibold text-primary">${
+																			stats.caloriesBurned
+																		}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="neumorph-card p-4">
+                            <h4 class="text-lg font-semibold text-primary mb-2">Goal Progress</h4>
+                            <p class="text-muted mb-4">Current goals</p>
+                            <div class="space-y-3">
+                                ${generateGoalProgressHTML()}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="neumorph-card p-4 mb-6">
+                        <h4 class="text-lg font-semibold text-primary mb-4">Activity Trends</h4>
+                        <div class="h-64">
+                            <canvas id="progressTrendsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="neumorph-card p-4">
+                        <h4 class="text-lg font-semibold text-primary mb-4">Personal Achievements</h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            ${generateAchievementsHTML(stats)}
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 mt-6">
+                        <button class="neumorph-button px-4 py-2 text-primary close-modal">Close</button>
+                        <button class="primary-button px-4 py-2" id="downloadReportBtn">
+                            <i data-lucide="download" class="w-4 h-4 mr-2"></i>
+                            Download Report
+                        </button>
+                    </div>
+                </div>
+            `;
+
+				document.body.appendChild(modal);
+				lucide.createIcons();
+
+				// Initialize progress trends chart
+				initializeProgressTrendsChart(stats);
+
+				// Close modal handlers
+				modal.querySelectorAll(".close-modal").forEach((button) => {
+					button.addEventListener("click", () => {
+						modal.remove();
+					});
+				});
+
+				// Background click to close
+				modal.querySelector(".fixed.inset-0").addEventListener("click", () => {
+					modal.remove();
+				});
+
+				// Download report button
+				document
+					.getElementById("downloadReportBtn")
+					.addEventListener("click", () => {
+						// Simulate download
+						showToast("Report downloaded successfully!");
+					});
+			}
+
+			// Generate HTML for goal progress
+			function generateGoalProgressHTML() {
+				if (userData.goals.length === 0) {
+					return '<p class="text-muted">No active goals</p>';
+				}
+
+				let html = "";
+				userData.goals.forEach((goal) => {
+					const progress = Math.round((goal.current / goal.target) * 100);
+					html += `
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-primary">${
+															goal.type.charAt(0).toUpperCase() +
+															goal.type.slice(1)
+														}</span>
+                            <span class="text-primary">${progress}%</span>
+                        </div>
+                        <div class="neumorph-progress">
+                            <div class="neumorph-progress-bar" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+				});
+
+				return html;
+			}
+
+			// Generate HTML for achievements
+			function generateAchievementsHTML(stats) {
+				const achievements = [
+					{
+						title: "Consistent Athlete",
+						description: "Worked out 3+ days per week",
+						icon: "award",
+						unlocked: stats.consistency >= 42, // 3/7 days = ~42%
+					},
+					{
+						title: "Distance Master",
+						description: "Covered over 100km total",
+						icon: "map-pin",
+						unlocked: stats.totalDistance >= 100,
+					},
+					{
+						title: "Calorie Crusher",
+						description: "Burned over 10,000 calories",
+						icon: "flame",
+						unlocked: stats.caloriesBurned >= 10000,
+					},
+					{
+						title: "Goal Getter",
+						description: "Completed at least one goal",
+						icon: "target",
+						unlocked: stats.completedGoals > 0,
+					},
+				];
+
+				let html = "";
+				achievements.forEach((achievement) => {
+					html += `
+                    <div class="neumorph-card p-3 text-center ${
+											achievement.unlocked ? "" : "opacity-50"
+										}">
+                        <div class="neumorph-icon-container p-2 mx-auto mb-2 ${
+													achievement.unlocked ? "bg-accent bg-opacity-10" : ""
+												}">
+                            <i data-lucide="${
+															achievement.icon
+														}" class="w-5 h-5 ${
+						achievement.unlocked ? "text-accent" : "text-muted"
+					}"></i>
+                        </div>
+                        <h5 class="font-medium text-primary text-sm">${
+													achievement.title
+												}</h5>
+                        <p class="text-muted text-xs mt-1">${
+													achievement.description
+												}</p>
+                    </div>
+                `;
+				});
+
+				return html;
+			}
+
+			// Initialize progress trends chart
+			function initializeProgressTrendsChart(stats) {
+				const ctx = document
+					.getElementById("progressTrendsChart")
+					.getContext("2d");
+				const isDark = document.body.classList.contains("dark");
+				const textColor = isDark ? "#BDBDBD" : "#718096";
+
+				new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: stats.trendLabels,
+						datasets: [
+							{
+								label: "Distance (km)",
+								data: stats.distanceTrend,
+								borderColor: "#3B82F6",
+								backgroundColor: "rgba(59, 130, 246, 0.1)",
+								borderWidth: 2,
+								tension: 0.4,
+								fill: true,
+							},
+							{
+								label: "Duration (min)",
+								data: stats.durationTrend,
+								borderColor: "#F59E0B",
+								backgroundColor: "rgba(245, 158, 11, 0.1)",
+								borderWidth: 2,
+								tension: 0.4,
+								fill: true,
+								yAxisID: "y1",
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								labels: {
+									color: textColor,
+									font: {
+										family: "Montserrat",
+										size: 12,
+									},
+								},
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								title: {
+									display: true,
+									text: "Distance (km)",
+									color: textColor,
+								},
+								grid: {
+									color: isDark
+										? "rgba(255, 255, 255, 0.05)"
+										: "rgba(0, 0, 0, 0.05)",
+								},
+								ticks: {
+									color: textColor,
+								},
+							},
+							y1: {
+								beginAtZero: true,
+								position: "right",
+								title: {
+									display: true,
+									text: "Duration (min)",
+									color: textColor,
+								},
+								grid: {
+									display: false,
+								},
+								ticks: {
+									color: textColor,
+								},
+							},
+							x: {
+								grid: {
+									display: false,
+								},
+								ticks: {
+									color: textColor,
+								},
+							},
+						},
+					},
+				});
+			}
+
+			// Calculate activity statistics for reports
+			function calculateActivityStats() {
+				const now = new Date();
+				const thirtyDaysAgo = new Date(now);
+				thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+				// Filter activities in the last 30 days
+				const recentActivities = userData.activities.filter((activity) => {
+					const activityDate = new Date(activity.date);
+					return activityDate >= thirtyDaysAgo;
+				});
+
+				// Calculate total activities
+				const totalActivities = recentActivities.length;
+
+				// Calculate active days (unique days with activities)
+				const activeDaysSet = new Set();
+				recentActivities.forEach((activity) => {
+					const date = new Date(activity.date).toDateString();
+					activeDaysSet.add(date);
+				});
+				const activeDays = activeDaysSet.size;
+
+				// Calculate consistency (percentage of days active)
+				const consistency = Math.round((activeDays / 30) * 100);
+
+				// Calculate total distance
+				const totalDistance = recentActivities.reduce(
+					(sum, activity) => sum + activity.distance,
+					0
+				);
+
+				// Calculate active time in hours
+				const activeTimeMinutes = recentActivities.reduce(
+					(sum, activity) => sum + activity.duration,
+					0
+				);
+				const activeTime = Math.round((activeTimeMinutes / 60) * 10) / 10; // Round to 1 decimal
+
+				// Calculate calories burned
+				const caloriesBurned = recentActivities.reduce(
+					(sum, activity) => sum + activity.calories,
+					0
+				);
+
+				// Calculate completed goals
+				const completedGoals = userData.goals.filter(
+					(goal) => goal.current >= goal.target
+				).length;
+
+				// Generate trend data (last 7 days)
+				const trendLabels = [];
+				const distanceTrend = [];
+				const durationTrend = [];
+
+				for (let i = 6; i >= 0; i--) {
+					const date = new Date(now);
+					date.setDate(date.getDate() - i);
+					const dateString = date.toLocaleDateString("en-US", {
+						month: "short",
+						day: "numeric",
+					});
+					trendLabels.push(dateString);
+
+					// Find activities for this day
+					const dayActivities = recentActivities.filter((activity) => {
+						const activityDate = new Date(activity.date);
+						return activityDate.toDateString() === date.toDateString();
+					});
+
+					// Calculate totals for the day
+					const dayDistance = dayActivities.reduce(
+						(sum, activity) => sum + activity.distance,
+						0
+					);
+					const dayDuration = dayActivities.reduce(
+						(sum, activity) => sum + activity.duration,
+						0
+					);
+
+					distanceTrend.push(dayDistance);
+					durationTrend.push(dayDuration);
+				}
+
+				return {
+					totalActivities,
+					activeDays,
+					consistency,
+					totalDistance: Math.round(totalDistance * 10) / 10, // Round to 1 decimal
+					activeTime,
+					caloriesBurned,
+					completedGoals,
+					trendLabels,
+					distanceTrend,
+					durationTrend,
+				};
+			}
+
+			// Initialize the application
+			function initializeApp() {
+				// Apply user preferences
+				applyUserPreferences();
+
+				// Update activity table with user data
+				updateActivityTable();
+
+				// Update goals list
+				updateGoalsList();
+
+				// Update goal progress based on activities
+				updateGoalProgress();
+
+				// Add event listeners for main functionality
+				document
+					.querySelector(".primary-button")
+					?.addEventListener("click", () => {
+						showActivityModal();
+					});
+
+				document.getElementById("addGoalBtn")?.addEventListener("click", () => {
+					showGoalModal();
+				});
+
+				// Add settings button event listener
+				document
+					.getElementById("settingsBtn")
+					?.addEventListener("click", () => {
+						showSettingsModal();
+					});
+
+				// Add progress report button event listener
+				document
+					.getElementById("progressReportBtn")
+					?.addEventListener("click", () => {
+						generateProgressReport();
+					});
+
+				// Mobile menu toggle
+				const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+				const mobileNavOverlay = document.querySelector(".mobile-nav-overlay");
+				const nav = document.querySelector(".neumorph-nav");
+
+				mobileMenuToggle?.addEventListener("click", () => {
+					nav.classList.toggle("mobile-nav-open");
+					mobileNavOverlay.classList.toggle("active");
+
+					// Change icon based on menu state
+					const icon = mobileMenuToggle.querySelector("i");
+					if (nav.classList.contains("mobile-nav-open")) {
+						icon.setAttribute("data-lucide", "x");
+					} else {
+						icon.setAttribute("data-lucide", "menu");
+					}
+					lucide.createIcons();
+				});
+
+				// Close mobile nav when clicking on overlay
+				mobileNavOverlay?.addEventListener("click", () => {
+					nav.classList.remove("mobile-nav-open");
+					mobileNavOverlay.classList.remove("active");
+
+					const icon = mobileMenuToggle.querySelector("i");
+					icon.setAttribute("data-lucide", "menu");
+					lucide.createIcons();
+				});
+
+				// Close mobile nav when clicking on a nav link
+				document.querySelectorAll(".nav-link").forEach((link) => {
+					link.addEventListener("click", () => {
+						if (window.innerWidth <= 768) {
+							nav.classList.remove("mobile-nav-open");
+							mobileNavOverlay.classList.remove("active");
+
+							const icon = mobileMenuToggle.querySelector("i");
+							icon.setAttribute("data-lucide", "menu");
+							lucide.createIcons();
+						}
+					});
+				});
+			}
+		</script>
+	</body>
+</html>
+
+
+
+
