@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="NewsHub - Your one-stop destination for the latest news across tech, business, sports, entertainment and more."
+		/>
+		<title>NewsHub | Latest News from Around the Globe</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				darkMode: "class",
+				theme: {
+					extend: {
+						colors: {
+							primary: "#3A506B",
+							secondary: "#5BC0BE",
+							accent: "#FF9F1C",
+							bglight: "#F5F7FA",
+							textdark: "#1C2541",
+							bgdark: "#121A2B",
+							textlight: "#F8FAFC",
+							cardbg: "#FFFFFF",
+							carddark: "#1E293B",
+							footerbg: "#1C2541",
+							footerdark: "#0B1529",
+							mutedtext: "#718096",
+							muteddark: "#94A3B8",
+							highlightbg: "rgba(91, 192, 190, 0.1)",
+							highlightdark: "rgba(91, 192, 190, 0.15)",
+							selectedbg: "rgba(91, 192, 190, 0.05)",
+							selecteddark: "rgba(91, 192, 190, 0.2)",
+
+							primarydark: "#4A6285",
+							accentdark: "#FFAF3F",
+						},
+						fontFamily: {
+							poppins: ["Poppins", "sans-serif"],
+							playfair: ['"Playfair Display"', "serif"],
+						},
+						boxShadow: {
+							custom: "0 8px 20px rgba(0, 0, 0, 0.08)",
+							customdark: "0 8px 20px rgba(0, 0, 0, 0.2)",
+						},
+						animation: {
+							"pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			@keyframes scrollText {
+				0% {
+					transform: translateX(100%);
+				}
+				100% {
+					transform: translateX(-100%);
+				}
+			}
+			.breaking-news-text {
+				white-space: nowrap;
+				animation: scrollText 20s linear infinite;
+			}
+			#detailsPanel.active {
+				transform: translateX(0);
+				opacity: 1;
+			}
+			#overlay.active {
+				opacity: 1;
+				pointer-events: auto;
+				backdrop-filter: blur(2px);
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f1f1;
+			}
+			.dark ::-webkit-scrollbar-track {
+				background: #1e293b;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e0;
+				border-radius: 4px;
+			}
+			.dark ::-webkit-scrollbar-thumb {
+				background: #4a5568;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #718096;
+			}
+			.dark ::-webkit-scrollbar-thumb:hover {
+				background: #5bc0be;
+			}
+
+			input[type="checkbox"] {
+				position: relative;
+				width: 1.2em;
+				height: 1.2em;
+				color: #363839;
+				border: 1px solid #5bc0be;
+				border-radius: 4px;
+				appearance: none;
+				outline: 0;
+				cursor: pointer;
+				transition: background 175ms cubic-bezier(0.1, 0.1, 0.25, 1);
+			}
+			input[type="checkbox"]::before {
+				position: absolute;
+				content: "";
+				display: block;
+				top: 2px;
+				left: 7px;
+				width: 5px;
+				height: 10px;
+				border-style: solid;
+				border-color: white;
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+				opacity: 0;
+			}
+			input[type="checkbox"]:checked {
+				color: white;
+				border-color: #5bc0be;
+				background: #5bc0be;
+			}
+			input[type="checkbox"]:checked::before {
+				opacity: 1;
+			}
+
+			.news-card {
+				transition: all 0.3s ease;
+			}
+			.news-card:hover {
+				transform: translateY(-8px);
+				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+			}
+			.dark .news-card:hover {
+				box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+			}
+			.dark .nav-link.active {
+				color: #ffaf3f !important;
+				background-color: rgba(91, 192, 190, 0.25) !important;
+				font-weight: 600;
+				text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+			}
+
+			.dark .category.active {
+				color: #ffaf3f !important;
+				background-color: #1e293b !important;
+				border: 1px solid rgba(91, 192, 190, 0.3);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			}
+
+			.form-input:focus {
+				box-shadow: 0 0 0 3px rgba(91, 192, 190, 0.3);
+				outline: none;
+				border-color: #5bc0be;
+			}
+
+			@keyframes slideIn {
+				from {
+					opacity: 0;
+					transform: translateY(-10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			.mobile-menu-active {
+				animation: slideIn 0.3s ease forwards;
+			}
+
+			.gradient-text {
+				background: linear-gradient(90deg, #3a506b, #5bc0be);
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+			.dark .gradient-text {
+				background: linear-gradient(90deg, #5bc0be, #ffaf3f);
+				-webkit-background-clip: text;
+				background-clip: text;
+				-webkit-text-fill-color: transparent;
+			}
+
+			.dark .improved-text-contrast {
+				color: #f8fafc;
+				text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+			}
+
+			.glass-effect {
+				background: rgba(255, 255, 255, 0.9);
+				backdrop-filter: blur(8px);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+			.dark .glass-effect {
+				background: rgba(30, 41, 59, 0.8);
+				backdrop-filter: blur(8px);
+				border: 1px solid rgba(91, 192, 190, 0.1);
+			}
+
+			.img-transition {
+				transition: transform 0.5s ease, filter 0.5s ease;
+			}
+			.img-transition:hover {
+				transform: scale(1.05);
+				filter: brightness(1.05);
+			}
+
+			.interactive-btn {
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+			}
+			.interactive-btn:after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.2);
+				transform: translateX(-100%);
+				transition: transform 0.3s ease;
+			}
+			.interactive-btn:hover:after {
+				transform: translateX(0);
+			}
+		</style>
+	</head>
+
+	<body
+		class="font-poppins bg-bglight text-textdark dark:bg-bgdark dark:text-textlight transition-colors duration-300"
+	>
+
+		<header
+			class="bg-white dark:bg-carddark shadow-custom dark:shadow-customdark sticky top-0 z-50 transition-all duration-300"
+		>
+			<div class="w-[92%] max-w-[1280px] mx-auto">
+				<nav class="flex justify-between items-center py-4">
+					<a
+						href="#"
+						class="text-3xl font-bold text-primary dark:text-secondary font-playfair flex items-center gap-2 no-underline tracking-wide"
+					>
+						<i class="fas fa-newspaper text-accent dark:text-accentdark"></i>
+						NewsHub
+					</a>
+					<button
+						class="md:hidden bg-transparent border-0 text-2xl cursor-pointer text-textdark dark:text-textlight transition-transform duration-300 hover:rotate-90"
+						id="mobileNavToggle"
+					>
+						<i class="fas fa-bars"></i>
+					</button>
+					<div class="hidden md:flex gap-3 items-center" id="navMenu">
+						<a
+							href="#home"
+							class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link active"
+							data-section="home"
+							>Home</a
+						>
+						<a
+							href="#trending"
+							class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+							>Trending</a
+						>
+						<a
+							href="#about"
+							class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+							>About</a
+						>
+						<a
+							href="#subscribe"
+							class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+							>Subscribe</a
+						>
+						<button
+							class="bg-transparent border-0 text-2xl cursor-pointer text-textdark dark:text-textlight h-10 w-10 flex items-center justify-center rounded-full transition-all duration-300 hover:rotate-12 hover:bg-highlightbg dark:hover:bg-highlightdark"
+							id="themeToggle"
+							aria-label="Toggle theme"
+						>
+							<i class="fas fa-moon"></i>
+						</button>
+					</div>
+				</nav>
+			</div>
+
+			<div
+				id="mobileMenu"
+				class="md:hidden hidden py-4 px-6 bg-white dark:bg-carddark border-t border-highlightbg dark:border-highlightdark mobile-menu-active"
+			>
+				<div class="flex flex-col gap-4">
+					<a
+						href="#home"
+						class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+						data-section="home"
+						>Home</a
+					>
+					<a
+						href="#trending"
+						class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+						>Trending</a
+					>
+					<a
+						href="#about"
+						class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+						>About</a
+					>
+					<a
+						href="#subscribe"
+						class="px-4 py-2 text-base font-medium text-textdark dark:text-textlight no-underline rounded-full transition duration-300 hover:bg-highlightbg hover:text-accent dark:hover:bg-highlightdark dark:hover:text-accentdark nav-link"
+						>Subscribe</a
+					>
+				</div>
+			</div>
+			<div class="bg-highlightbg dark:bg-highlightdark py-2.5">
+				<div class="w-[92%] max-w-[1280px] mx-auto">
+					<div
+						class="flex gap-2.5 items-center overflow-x-auto py-1.5 scrollbar-hide"
+					>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category active text-accent dark:text-accentdark bg-cardbg dark:bg-carddark shadow-custom"
+							data-category="all"
+							>All News</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="tech"
+							>Technology</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="business"
+							>Business</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="sports"
+							>Sports</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="politics"
+							>Politics</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="entertainment"
+							>Entertainment</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="health"
+							>Health</span
+						>
+						<span
+							class="px-4 py-1.5 text-sm font-medium uppercase text-primary dark:text-textlight cursor-pointer relative transition-all duration-300 hover:text-accent dark:hover:text-accentdark hover:-translate-y-0.5 rounded-full whitespace-nowrap category"
+							data-category="science"
+							>Science</span
+						>
+					</div>
+				</div>
+			</div>
+		</header>
+
+
+		<div
+			id="toast"
+			class="fixed bottom-5 right-5 bg-primary dark:bg-carddark text-white py-3 px-6 rounded-lg shadow-lg z-50 opacity-0 translate-y-5 transition-all duration-300 flex items-center gap-2 border-l-4 border-accent dark:border-accentdark"
+		></div>
+
+
+		<section id="home" class="block">
+			<div
+				class="py-12 bg-gradient-to-r from-white to-highlightbg dark:from-bgdark dark:to-carddark mb-5 relative overflow-hidden"
+			>
+				<div
+					class="absolute inset-0 bg-[radial-gradient(var(--highlightbg)_1px,transparent_1px)] dark:bg-[radial-gradient(var(--highlightdark)_1px,transparent_1px)] bg-[size:20px_20px] opacity-50"
+				></div>
+				<div class="w-[92%] max-w-[1280px] mx-auto">
+					<div
+						class="flex flex-col lg:flex-row items-center gap-8 relative z-10"
+					>
+						<div class="flex-1">
+							<h1
+								class="text-5xl md:text-4xl sm:text-3xl font-extrabold mb-5 text-primary dark:text-secondary font-playfair leading-tight improved-text-contrast"
+							>
+								Discover the World Through
+								<span class="text-accent dark:text-accentdark relative">
+									Quality Journalism
+									<span
+										class="absolute bottom-1 left-0 w-full h-2 bg-highlightbg dark:bg-highlightdark -z-10"
+									></span>
+								</span>
+							</h1>
+							<p
+								class="text-xl sm:text-base mb-8 text-mutedtext dark:text-muteddark max-w-[600px]"
+							>
+								Stay informed with the latest news, in-depth analysis, and
+								expert opinions from around the globe. NewsHub brings you
+								reliable reporting on the stories that matter.
+							</p>
+							<a
+								href="#trending"
+								class="px-5 py-2 bg-primary dark:bg-primarydark text-white rounded-full text-base font-semibold cursor-pointer transition-all duration-300 hover:bg-[#2d4156] dark:hover:bg-[#5A7296] hover:-translate-y-0.5 mr-2.5 inline-flex items-center interactive-btn"
+							>
+								Trending Stories <i class="fas fa-fire ml-1.5 text-sm"></i>
+							</a>
+						</div>
+						<div class="flex-1 max-w-[500px]">
+							<div
+								class="rounded-xl overflow-hidden shadow-custom dark:shadow-customdark transform transition-all duration-500 hover:rotate-1"
+							>
+								<img
+									src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&h=400&fit=crop"
+									alt="Journalism in action"
+									class="w-full h-auto block scale-105 transition-transform duration-1000 hover:scale-100 img-transition"
+									loading="lazy"
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="w-[92%] max-w-[1280px] mx-auto">
+				<div
+					class="bg-gradient-to-r from-accent to-primary dark:from-accentdark dark:to-primarydark text-white py-2.5 px-5 mb-10 rounded-lg relative overflow-hidden flex items-center shadow-md"
+				>
+					<span
+						class="font-bold uppercase mr-4 py-1.5 px-2.5 bg-white/20 rounded text-xs tracking-wider z-10"
+						>Breaking</span
+					>
+					<div class="relative w-[calc(100%-100px)] overflow-hidden">
+						<p class="font-medium breaking-news-text">
+							Global tech conference announces breakthrough in renewable energy
+							storage • Markets respond positively to new economic data •
+							International peace talks show signs of progress
+						</p>
+					</div>
+				</div>
+
+				<div
+					id="filters"
+					class="py-5 px-8 flex items-center flex-wrap gap-4 bg-cardbg dark:bg-carddark shadow-custom dark:shadow-customdark rounded-xl mb-8 glass-effect"
+				>
+					<div class="relative flex-1 min-w-[250px]">
+						<input
+							type="text"
+							id="searchInput"
+							placeholder="Search news..."
+							aria-label="Search news"
+							class="w-full py-3 px-5 pr-10 border-2 border-secondary dark:border-secondary rounded-full text-base outline-none bg-cardbg dark:bg-carddark text-textdark dark:text-textlight transition-all duration-300 focus:border-accent dark:focus:border-accentdark focus:shadow-[0_0_0_4px_rgba(255,159,28,0.1)] dark:focus:shadow-[0_0_0_4px_rgba(255,175,63,0.1)] form-input"
+						/>
+						<div
+							class="absolute right-4 top-1/2 -translate-y-1/2 text-xl pointer-events-none text-mutedtext dark:text-muteddark"
+						>
+							🔍
+						</div>
+					</div>
+					<div class="flex flex-wrap gap-4 items-center">
+						<div class="flex flex-wrap gap-2.5">
+							<div class="flex items-center gap-1.5">
+								<input
+									type="checkbox"
+									id="source1"
+									value="TechWire"
+									checked
+									class="cursor-pointer"
+								/>
+								<label for="source1" class="text-sm font-medium cursor-pointer"
+									>TechWire</label
+								>
+							</div>
+							<div class="flex items-center gap-1.5">
+								<input
+									type="checkbox"
+									id="source2"
+									value="Global News"
+									checked
+									class="cursor-pointer"
+								/>
+								<label for="source2" class="text-sm font-medium cursor-pointer"
+									>Global News</label
+								>
+							</div>
+							<div class="flex items-center gap-1.5">
+								<input
+									type="checkbox"
+									id="source3"
+									value="Daily Report"
+									checked
+									class="cursor-pointer"
+								/>
+								<label for="source3" class="text-sm font-medium cursor-pointer"
+									>Daily Report</label
+								>
+							</div>
+						</div>
+						<button
+							class="py-2.5 px-5 bg-secondary dark:bg-secondary text-white border-0 rounded-full cursor-pointer font-semibold text-sm flex items-center gap-2 transition-all duration-300 hover:bg-[#4aafad] hover:-translate-y-0.5 interactive-btn"
+							id="filterBtn"
+						>
+							<span>Filter by Newest</span>
+							<i class="fas fa-sort-down"></i>
+						</button>
+					</div>
+				</div>
+
+				<div id="main" class="flex gap-8 relative transition-all duration-300">
+					<div id="newsFeed" class="flex-1">
+						<div
+							class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-[fadeIn_0.3s_ease-out]"
+							id="newsGrid"
+						></div>
+					</div>
+					<div
+						id="detailsPanel"
+						role="dialog"
+						class="fixed right-0 top-0 lg:top-[150px] bottom-0 lg:bottom-8 w-full lg:w-[40%] bg-cardbg dark:bg-carddark p-4 lg:p-8 shadow-custom dark:shadow-customdark lg:rounded-2xl transform translate-x-full opacity-0 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] overflow-y-auto z-50 glass-effect"
+					>
+						<button
+							class="absolute top-5 right-5 bg-primary dark:bg-primarydark border-0 w-9 h-9 rounded-full text-xl cursor-pointer text-white flex items-center justify-center transition-all duration-300 hover:bg-[#2d4156] hover:rotate-90"
+							id="closeDetails"
+						>
+							<i class="fas fa-times"></i>
+						</button>
+						<div id="detailsContent"></div>
+					</div>
+					<div
+						id="overlay"
+						class="fixed inset-0 bg-black/50 z-40 opacity-0 pointer-events-none transition-opacity duration-300"
+					></div>
+				</div>
+			</div>
+
+			<div class="bg-cardbg dark:bg-carddark py-16 my-12">
+				<div class="w-[92%] max-w-[1280px] mx-auto">
+					<div class="mb-10 text-center">
+						<h2
+							class="text-4xl font-bold text-primary dark:text-secondary mb-4 font-playfair gradient-text"
+						>
+							Trending Stories
+						</h2>
+						<p
+							class="text-lg max-w-[700px] mx-auto text-mutedtext dark:text-muteddark"
+						>
+							Stay up to date with the most discussed news from around the world
+						</p>
+					</div>
+					<div
+						class="flex overflow-x-auto gap-5 py-2.5 scrollbar-hide"
+						id="trendingGrid"
+					></div>
+				</div>
+			</div>
+		</section>
+
+
+		<section id="trending" class="hidden">
+			<div class="w-[92%] max-w-[1280px] mx-auto py-16">
+				<div class="mb-10 text-center">
+					<h2
+						class="text-4xl font-bold text-primary dark:text-secondary mb-4 font-playfair gradient-text"
+					>
+						Trending Stories
+					</h2>
+					<p
+						class="text-lg max-w-[700px] mx-auto text-mutedtext dark:text-muteddark"
+					>
+						The most popular and discussed news from around the world
+					</p>
+				</div>
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
+					id="trendingNewsGrid"
+				></div>
+			</div>
+		</section>
+
+
+		<section id="about" class="hidden">
+			<div
+				class="bg-gradient-to-br from-highlightbg to-bglight dark:from-highlightdark dark:to-bgdark py-20"
+			>
+				<div class="w-[92%] max-w-[1280px] mx-auto">
+					<div class="mb-10 text-center">
+						<h2
+							class="text-4xl font-bold text-primary dark:text-secondary mb-4 font-playfair gradient-text"
+						>
+							About NewsHub
+						</h2>
+						<p
+							class="text-lg max-w-[700px] mx-auto text-mutedtext dark:text-muteddark"
+						>
+							Your trusted source for quality journalism since 2018
+						</p>
+					</div>
+					<div class="flex flex-col lg:flex-row items-center gap-12">
+						<div class="flex-1 max-w-full lg:max-w-[500px] relative">
+							<img
+								src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop"
+								alt="The NewsHub team"
+								class="w-full rounded-2xl shadow-custom dark:shadow-customdark img-transition"
+								loading="lazy"
+							/>
+							<div
+								class="absolute w-full h-full border-2 border-accent dark:border-accentdark rounded-2xl top-4 left-4 -z-10"
+							></div>
+						</div>
+						<div class="flex-1">
+							<p class="mb-5 text-textdark dark:text-textlight">
+								Founded in 2018, NewsHub is dedicated to bringing you reliable,
+								fact-checked news from around the globe. Our team of experienced
+								journalists works tirelessly to cover stories that matter.
+							</p>
+							<p class="mb-5 text-textdark dark:text-textlight">
+								We believe in journalism that informs, educates, and empowers.
+								Our mission is to provide our readers with accurate,
+								comprehensive coverage of important events and issues across
+								multiple categories.
+							</p>
+							<div class="grid grid-cols-2 md:grid-cols-4 gap-5 mt-8">
+								<div
+									class="bg-cardbg dark:bg-carddark p-5 rounded-xl text-center shadow-custom dark:shadow-customdark hover:scale-105 transition-transform duration-300"
+								>
+									<div
+										class="text-3xl font-bold text-accent dark:text-accentdark mb-2.5"
+									>
+										50+
+									</div>
+									<div
+										class="text-sm text-mutedtext dark:text-muteddark font-medium"
+									>
+										Journalists
+									</div>
+								</div>
+								<div
+									class="bg-cardbg dark:bg-carddark p-5 rounded-xl text-center shadow-custom dark:shadow-customdark hover:scale-105 transition-transform duration-300"
+								>
+									<div
+										class="text-3xl font-bold text-accent dark:text-accentdark mb-2.5"
+									>
+										120
+									</div>
+									<div
+										class="text-sm text-mutedtext dark:text-muteddark font-medium"
+									>
+										Countries Covered
+									</div>
+								</div>
+								<div
+									class="bg-cardbg dark:bg-carddark p-5 rounded-xl text-center shadow-custom dark:shadow-customdark hover:scale-105 transition-transform duration-300"
+								>
+									<div
+										class="text-3xl font-bold text-accent dark:text-accentdark mb-2.5"
+									>
+										5M+
+									</div>
+									<div
+										class="text-sm text-mutedtext dark:text-muteddark font-medium"
+									>
+										Monthly Readers
+									</div>
+								</div>
+								<div
+									class="bg-cardbg dark:bg-carddark p-5 rounded-xl text-center shadow-custom dark:shadow-customdark hover:scale-105 transition-transform duration-300"
+								>
+									<div
+										class="text-3xl font-bold text-accent dark:text-accentdark mb-2.5"
+									>
+										24/7
+									</div>
+									<div
+										class="text-sm text-mutedtext dark:text-muteddark font-medium"
+									>
+										News Coverage
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+
+
+		<section id="subscribe" class="hidden">
+			<div
+				class="bg-gradient-to-br from-highlightbg to-bglight dark:bg-gradient-to-r dark:from-footerdark dark:to-[#121A2B] py-16 relative overflow-hidden"
+			>
+
+				<div
+					class="absolute inset-0 bg-[radial-gradient(rgba(0,0,0,0.05)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-20"
+				></div>
+
+				<div class="w-[92%] max-w-[1280px] mx-auto relative z-10">
+					<div class="mb-12 text-center">
+						<h2
+							class="text-4xl font-bold text-primary dark:text-white mb-4 font-playfair"
+						>
+							Subscribe to Our Newsletter
+						</h2>
+						<p
+							class="text-lg max-w-[700px] mx-auto text-mutedtext dark:text-white/90"
+						>
+							Get the latest news delivered directly to your inbox
+						</p>
+					</div>
+
+					<div class="flex flex-col lg:flex-row items-stretch gap-12">
+						<div class="flex-1 text-textdark dark:text-white">
+							<div
+								class="bg-cardbg/90 dark:bg-white/10 backdrop-blur-md p-8 rounded-2xl h-full shadow-custom dark:shadow-customdark"
+							>
+								<h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+									<i
+										class="fas fa-newspaper text-accent dark:text-accentdark"
+									></i>
+									Why Subscribe?
+								</h3>
+								<ul class="space-y-4">
+									<li class="flex items-start gap-3">
+										<div
+											class="bg-accent dark:bg-accentdark h-6 w-6 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+										>
+											<i class="fas fa-check text-white text-xs"></i>
+										</div>
+										<p>Daily curated news tailored to your interests</p>
+									</li>
+									<li class="flex items-start gap-3">
+										<div
+											class="bg-accent dark:bg-accentdark h-6 w-6 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+										>
+											<i class="fas fa-check text-white text-xs"></i>
+										</div>
+										<p>Exclusive interviews and deep dive analyses</p>
+									</li>
+									<li class="flex items-start gap-3">
+										<div
+											class="bg-accent dark:bg-accentdark h-6 w-6 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+										>
+											<i class="fas fa-check text-white text-xs"></i>
+										</div>
+										<p>Early access to special features and reports</p>
+									</li>
+									<li class="flex items-start gap-3">
+										<div
+											class="bg-accent dark:bg-accentdark h-6 w-6 rounded-full flex items-center justify-center mt-0.5 flex-shrink-0"
+										>
+											<i class="fas fa-check text-white text-xs"></i>
+										</div>
+										<p>Invitation to reader-exclusive events and webinars</p>
+									</li>
+								</ul>
+
+								<div class="mt-8 flex flex-wrap gap-4">
+									<div class="flex items-center gap-2">
+										<div
+											class="bg-accent/20 dark:bg-white/20 h-12 w-12 rounded-full flex items-center justify-center"
+										>
+											<i
+												class="fas fa-envelope text-accent dark:text-accentdark"
+											></i>
+										</div>
+										<div>
+											<p class="font-bold">Frequency</p>
+											<p class="text-sm opacity-80">Choose daily or weekly</p>
+										</div>
+									</div>
+
+									<div class="flex items-center gap-2">
+										<div
+											class="bg-accent/20 dark:bg-white/20 h-12 w-12 rounded-full flex items-center justify-center"
+										>
+											<i
+												class="fas fa-shield-alt text-accent dark:text-accentdark"
+											></i>
+										</div>
+										<div>
+											<p class="font-bold">Privacy First</p>
+											<p class="text-sm opacity-80">Your data stays secure</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="flex-1 bg-cardbg/90 dark:bg-white/10 backdrop-blur-md p-8 rounded-2xl shadow-custom dark:shadow-lg border border-highlightbg dark:border-white/20"
+						>
+							<form class="space-y-5">
+								<div>
+									<label
+										for="name"
+										class="block mb-2 font-medium text-textdark dark:text-white"
+										>Full Name</label
+									>
+									<div class="relative">
+										<span
+											class="absolute left-4 top-1/2 -translate-y-1/2 text-mutedtext dark:text-white/60"
+										>
+											<i class="far fa-user"></i>
+										</span>
+										<input
+											type="text"
+											id="name"
+											placeholder="Enter your name"
+											class="w-full py-3 pl-10 pr-4 rounded-lg border border-highlightbg dark:border-white/30 bg-white dark:bg-white/5 text-textdark dark:text-white text-base focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentdark/50 transition-all duration-300 form-input"
+										/>
+									</div>
+								</div>
+
+								<div>
+									<label
+										for="email"
+										class="block mb-2 font-medium text-textdark dark:text-white"
+										>Email Address</label
+									>
+									<div class="relative">
+										<span
+											class="absolute left-4 top-1/2 -translate-y-1/2 text-mutedtext dark:text-white/60"
+										>
+											<i class="far fa-envelope"></i>
+										</span>
+										<input
+											type="email"
+											id="email"
+											placeholder="Enter your email"
+											class="w-full py-3 pl-10 pr-4 rounded-lg border border-highlightbg dark:border-white/30 bg-white dark:bg-white/5 text-textdark dark:text-white text-base focus:outline-none focus:ring-2 focus:ring-accent dark:focus:ring-accentdark/50 transition-all duration-300 form-input"
+										/>
+									</div>
+								</div>
+
+								<div>
+									<label
+										class="block mb-3 font-medium text-textdark dark:text-white"
+										>Delivery Preference</label
+									>
+									<div class="flex gap-4 flex-wrap">
+										<label
+											class="flex items-center gap-2 bg-white dark:bg-white/5 p-3 rounded-lg border border-highlightbg dark:border-white/20 cursor-pointer transition-all duration-300 hover:bg-highlightbg dark:hover:bg-white/10 flex-1"
+										>
+											<input
+												type="radio"
+												name="frequency"
+												value="daily"
+												class="accent-accent dark:accent-accentdark"
+												checked
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Daily Digest</span
+											>
+										</label>
+										<label
+											class="flex items-center gap-2 bg-white dark:bg-white/5 p-3 rounded-lg border border-highlightbg dark:border-white/20 cursor-pointer transition-all duration-300 hover:bg-highlightbg dark:hover:bg-white/10 flex-1"
+										>
+											<input
+												type="radio"
+												name="frequency"
+												value="weekly"
+												class="accent-accent dark:accent-accentdark"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Weekly Roundup</span
+											>
+										</label>
+									</div>
+								</div>
+
+								<div>
+									<label
+										class="block mb-3 font-medium text-textdark dark:text-white"
+										>Interests</label
+									>
+									<div class="grid grid-cols-2 gap-3">
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												id="tech-interest"
+												checked
+												class="accent-accent dark:accent-accentdark w-4 h-4"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Technology</span
+											>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												id="business-interest"
+												class="accent-accent dark:accent-accentdark w-4 h-4"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Business</span
+											>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												id="politics-interest"
+												class="accent-accent dark:accent-accentdark w-4 h-4"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Politics</span
+											>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												id="sports-interest"
+												class="accent-accent dark:accent-accentdark w-4 h-4"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Sports</span
+											>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												id="health-interest"
+												class="accent-accent dark:accent-accentdark w-4 h-4"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Health</span
+											>
+										</label>
+										<label class="flex items-center gap-2 cursor-pointer">
+											<input
+												type="checkbox"
+												id="entertainment-interest"
+												class="accent-accent dark:accent-accentdark w-4 h-4"
+											/>
+											<span class="text-textdark dark:text-white/90"
+												>Entertainment</span
+											>
+										</label>
+									</div>
+								</div>
+
+								<div class="mt-4 pt-2">
+									<button
+										type="submit"
+										class="w-full py-3.5 text-base bg-accent dark:bg-accentdark text-white border-0 rounded-lg cursor-pointer transition-all duration-300 hover:bg-[#4aafad] dark:hover:bg-[#ffbb55] hover:-translate-y-0.5 font-semibold flex items-center justify-center gap-2 interactive-btn"
+									>
+										<i class="fas fa-paper-plane"></i>
+										Subscribe Now
+									</button>
+									<p
+										class="text-mutedtext dark:text-white/60 text-xs mt-3 text-center"
+									>
+										By subscribing, you agree to our
+										<a
+											href="#"
+											class="text-accent dark:text-accentdark hover:underline"
+											>Privacy Policy</a
+										>
+									</p>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+
+		<footer class="bg-footerbg dark:bg-footerdark text-white pt-16">
+			<div class="w-[92%] max-w-[1280px] mx-auto">
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-10"
+				>
+					<div>
+						<a
+							href="#"
+							class="text-3xl font-bold text-white mb-4 inline-block font-playfair"
+							>NewsHub</a
+						>
+						<p class="mb-5 opacity-80 leading-7">
+							Your trusted source for the latest news, in-depth analysis, and
+							expert opinions from around the globe. Quality journalism for a
+							well-informed world.
+						</p>
+						<div class="flex gap-4">
+							<a
+								href="#"
+								class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white text-lg transition-all duration-300 hover:bg-accent dark:hover:bg-accentdark hover:-translate-y-0.5 no-underline"
+								><i class="fab fa-facebook-f"></i
+							></a>
+							<a
+								href="#"
+								class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white text-lg transition-all duration-300 hover:bg-accent dark:hover:bg-accentdark hover:-translate-y-0.5 no-underline"
+								><i class="fab fa-twitter"></i
+							></a>
+							<a
+								href="#"
+								class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white text-lg transition-all duration-300 hover:bg-accent dark:hover:bg-accentdark hover:-translate-y-0.5 no-underline"
+								><i class="fab fa-instagram"></i
+							></a>
+							<a
+								href="#"
+								class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white text-lg transition-all duration-300 hover:bg-accent dark:hover:bg-accentdark hover:-translate-y-0.5 no-underline"
+								><i class="fab fa-linkedin-in"></i
+							></a>
+							<a
+								href="#"
+								class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white text-lg transition-all duration-300 hover:bg-accent dark:hover:bg-accentdark hover:-translate-y-0.5 no-underline"
+								><i class="fab fa-youtube"></i
+							></a>
+						</div>
+					</div>
+					<div>
+						<h3
+							class="text-xl mb-5 relative pb-2.5 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-8 after:h-0.5 after:bg-accent dark:after:bg-accentdark"
+						>
+							Explore
+						</h3>
+						<ul class="list-none">
+							<li class="mb-4">
+								<a
+									href="#home"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Home</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#trending"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Trending
+									Stories</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#about"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> About Us</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#subscribe"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Subscribe</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Authors</a
+								>
+							</li>
+						</ul>
+					</div>
+					<div>
+						<h3
+							class="text-xl mb-5 relative pb-2.5 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-8 after:h-0.5 after:bg-accent dark:after:bg-accentdark"
+						>
+							Categories
+						</h3>
+						<ul class="list-none">
+							<li class="mb-4">
+								<a
+									href="#"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Technology</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Business</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Science</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Health</a
+								>
+							</li>
+							<li class="mb-4">
+								<a
+									href="#"
+									class="text-white/70 no-underline transition-all duration-300 hover:text-white hover:translate-x-1 inline-flex items-center gap-1.5"
+									><i class="fas fa-chevron-right text-xs"></i> Entertainment</a
+								>
+							</li>
+						</ul>
+					</div>
+					<div>
+						<h3
+							class="text-xl mb-5 relative pb-2.5 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-8 after:h-0.5 after:bg-accent dark:after:bg-accentdark"
+						>
+							Contact
+						</h3>
+						<ul class="list-none">
+							<li class="flex gap-2.5 mb-4">
+								<i
+									class="fas fa-map-marker-alt text-accent dark:text-accentdark"
+								></i>
+								123 Media Street, New York, USA
+							</li>
+							<li class="flex gap-2.5 mb-4">
+								<i
+									class="fas fa-phone-alt text-accent dark:text-accentdark"
+								></i>
+								+1 (555) 123-4567
+							</li>
+							<li class="flex gap-2.5 mb-4">
+								<i class="fas fa-envelope text-accent dark:text-accentdark"></i>
+								info@newshub.com
+							</li>
+							<li class="flex gap-2.5 mb-4">
+								<i class="fas fa-clock text-accent dark:text-accentdark"></i>
+								Monday-Friday: 9am to 5pm
+							</li>
+						</ul>
+
+
+						<div class="mt-6 bg-white/5 p-4 rounded-lg">
+							<h4 class="text-sm font-bold mb-2">Quick Subscribe</h4>
+							<div class="flex">
+								<input
+									type="email"
+									placeholder="Your email"
+									class="flex-1 py-2 px-3 bg-white/10 border border-white/20 rounded-l-lg text-white text-sm focus:outline-none"
+								/>
+								<button
+									class="bg-accent dark:bg-accentdark text-white py-2 px-3 rounded-r-lg"
+								>
+									<i class="fas fa-arrow-right"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="text-center py-6 border-t border-white/10 text-sm opacity-70"
+				>
+					<p>
+						© 2025 NewsHub. All rights reserved. | Designed with
+						<i class="fas fa-heart text-accent dark:text-accentdark"></i> for
+						quality journalism
+					</p>
+				</div>
+			</div>
+		</footer>
+
+		<script>
+			const newsData = {
+				tech: [
+					{
+						title: "Revolutionary AI Model Breaks Efficiency Barriers",
+						content: "A new AI model is revolutionizing the tech industry...",
+						snippet: "A new AI model is revolutionizing the tech industry...",
+						img: "https://images.unsplash.com/photo-1591453089816-0fbb971b454c?w=600&h=400&fit=crop",
+						date: "2025-03-28",
+						author: "Dr. Maya Rodriguez",
+						source: "TechWire",
+						category: "Technology",
+						trending: true,
+						featured: true,
+					},
+					{
+						title: "Quantum Computing Reaches Commercial Viability Milestone",
+						content:
+							"Scientists have achieved a major milestone in quantum computing...",
+						snippet:
+							"Scientists have achieved a major milestone in quantum computing...",
+						img: "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600&h=400&fit=crop",
+						date: "2025-03-26",
+						author: "James Chen",
+						source: "Global News",
+						category: "Technology",
+					},
+					{
+						title: "Tech Giants Collaborate on Open-Source Climate Solution",
+						content:
+							"In an unprecedented move, five major technology companies...",
+						snippet:
+							"Five major technology companies have announced a joint initiative...",
+						img: "https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&h=400&fit=crop",
+						date: "2025-03-23",
+						author: "Sophia Martinez",
+						source: "Daily Report",
+						category: "Technology",
+					},
+					{
+						title: "Revolutionary Microchip Uses 90% Less Energy",
+						content:
+							"Engineers have developed a groundbreaking microchip architecture...",
+						snippet:
+							"Engineers have developed a groundbreaking microchip architecture...",
+						img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop",
+						date: "2025-03-21",
+						author: "Dr. Akira Tanaka",
+						source: "TechWire",
+						category: "Technology",
+					},
+				],
+				business: [
+					{
+						title: "Global Markets Rally on Surprising Economic Data",
+						content: "Stock markets worldwide surged today following...",
+						snippet: "Stock markets worldwide surged today following...",
+						img: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=400&fit=crop",
+						date: "2025-03-27",
+						author: "Alexandra Winters",
+						source: "Global News",
+						category: "Business",
+						trending: true,
+					},
+					{
+						title: "Sustainable Investment Funds See Record Inflows",
+						content:
+							"Sustainable and ESG-focused investment funds have attracted...",
+						snippet:
+							"Sustainable and ESG-focused investment funds have attracted...",
+						img: "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=600&h=400&fit=crop",
+						date: "2025-03-25",
+						author: "Marcus Johnson",
+						source: "Daily Report",
+						category: "Business",
+					},
+					{
+						title: "Retail Giant Unveils Revolutionary Supply Chain Model",
+						content:
+							"One of the world's largest retail corporations has announced...",
+						snippet:
+							"One of the world's largest retail corporations has announced...",
+						img: "https://images.unsplash.com/photo-1534723452862-4c874018d66d?w=600&h=400&fit=crop",
+						date: "2025-03-22",
+						author: "Victoria Reed",
+						source: "Global News",
+						category: "Business",
+					},
+				],
+				sports: [
+					{
+						title: "Underdogs Make Historic Championship Run",
+						content:
+							"In one of the most remarkable sports stories of the year...",
+						snippet:
+							"In one of the most remarkable sports stories of the year...",
+						img: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&h=400&fit=crop",
+						date: "2025-03-27",
+						author: "Carlos Mendez",
+						source: "Daily Report",
+						category: "Sports",
+					},
+					{
+						title: "Athlete Shatters World Record in Historic Performance",
+						content: "The sporting world witnessed history yesterday...",
+						snippet: "The sporting world witnessed history yesterday...",
+						img: "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=600&h=400&fit=crop",
+						date: "2025-03-24",
+						author: "Jamal Washington",
+						source: "Global News",
+						category: "Sports",
+						featured: true,
+					},
+				],
+				politics: [
+					{
+						title: "Historic International Climate Agreement Reached",
+						content:
+							"After intense negotiations, world leaders have reached...",
+						snippet:
+							"After intense negotiations, world leaders have reached...",
+						img: "https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=600&h=400&fit=crop",
+						date: "2025-03-26",
+						author: "Elena Gonzalez",
+						source: "Global News",
+						category: "Politics",
+						trending: true,
+					},
+					{
+						title:
+							"Landmark Healthcare Reform Bill Passes with Bipartisan Support",
+						content: "In a rare display of cross-party cooperation...",
+						snippet: "In a rare display of cross-party cooperation...",
+						img: "https://images.unsplash.com/photo-1584036561566-baf8f5f1b144?w=600&h=400&fit=crop",
+						date: "2025-03-23",
+						author: "Robert Williamson",
+						source: "Daily Report",
+						category: "Politics",
+					},
+				],
+				entertainment: [
+					{
+						title: "Groundbreaking Film Pushes Cinematic Boundaries",
+						content: "A visionary director's latest work is being hailed...",
+						snippet: "A visionary director's latest work is being hailed...",
+						img: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=600&h=400&fit=crop",
+						date: "2025-03-27",
+						author: "Olivia Bennett",
+						source: "Daily Report",
+						category: "Entertainment",
+					},
+					{
+						title: "Virtual Reality Concert Draws Record Global Audience",
+						content:
+							"A pioneering virtual reality concert experience has shattered...",
+						snippet:
+							"A pioneering virtual reality concert experience has shattered...",
+						img: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=400&fit=crop",
+						date: "2025-03-25",
+						author: "Tyler Jackson",
+						source: "TechWire",
+						category: "Entertainment",
+					},
+				],
+				health: [
+					{
+						title: "Breakthrough Treatment Shows Promise for Chronic Condition",
+						content: "Medical researchers have announced promising results...",
+						snippet: "Medical researchers have announced promising results...",
+						img: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=600&h=400&fit=crop",
+						date: "2025-03-24",
+						author: "Dr. Sarah Johnson",
+						source: "Global News",
+						category: "Health",
+						featured: true,
+					},
+					{
+						title:
+							"Study Reveals Surprising Benefits of Ancient Wellness Practice",
+						content: "A comprehensive research study has documented...",
+						snippet: "A comprehensive research study has documented...",
+						img: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&h=400&fit=crop",
+						date: "2025-03-22",
+						author: "Dr. Michael Patel",
+						source: "Daily Report",
+						category: "Health",
+					},
+				],
+				science: [
+					{
+						title: "Astronomers Discover Potentially Habitable Exoplanet",
+						content: "In a significant astronomical finding...",
+						snippet: "In a significant astronomical finding...",
+						img: "https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?w=600&h=400&fit=crop",
+						date: "2025-03-28",
+						author: "Dr. Jonathan Miller",
+						source: "Global News",
+						category: "Science",
+						trending: true,
+					},
+					{
+						title:
+							"Marine Biologists Document Unprecedented Ocean Ecosystem Recovery",
+						content: "A protected marine zone has demonstrated remarkable...",
+						snippet: "A protected marine zone has demonstrated remarkable...",
+						img: "https://images.unsplash.com/photo-1559253664-ca249d4608c6?w=600&h=400&fit=crop",
+						date: "2025-03-23",
+						author: "Dr. Amara Okafor",
+						source: "Daily Report",
+						category: "Science",
+					},
+				],
+			};
+
+			const newsFeed = document.getElementById("newsGrid");
+			const trendingNewsGrid = document.getElementById("trendingNewsGrid");
+			const detailsPanel = document.getElementById("detailsPanel");
+			const detailsContent = document.getElementById("detailsContent");
+			const searchInput = document.getElementById("searchInput");
+			const filterBtn = document.getElementById("filterBtn");
+			const trendingGrid = document.getElementById("trendingGrid");
+			const mobileNavToggle = document.getElementById("mobileNavToggle");
+			const navMenu = document.getElementById("navMenu");
+			const mobileMenu = document.getElementById("mobileMenu");
+			const closeDetailsBtn = document.getElementById("closeDetails");
+			const sections = document.querySelectorAll("section");
+			const navLinks = document.querySelectorAll(".nav-link");
+
+			let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+			let readLater = JSON.parse(localStorage.getItem("readLater")) || [];
+			let sortOrder = "newest";
+			let activeArticle = null;
+			let currentSection = "home";
+
+			const savedTheme = localStorage.getItem("theme") || "light";
+			document.documentElement.classList.toggle("dark", savedTheme === "dark");
+			updateThemeToggleButton(savedTheme);
+
+			document.addEventListener("DOMContentLoaded", () => {
+				document
+					.querySelectorAll(".nav-link")
+					.forEach((link) =>
+						link.classList.remove(
+							"active",
+							"bg-highlightbg",
+							"dark:bg-highlightdark",
+							"text-primary",
+							"dark:text-primary",
+							"font-semibold"
+						)
+					);
+				document
+					.querySelectorAll(".category")
+					.forEach((cat) =>
+						cat.classList.remove(
+							"active",
+							"text-accent",
+							"bg-cardbg",
+							"dark:bg-carddark",
+							"shadow-custom"
+						)
+					);
+				const homeNavLink = document.querySelector('.nav-link[href="#home"]');
+				homeNavLink.classList.add(
+					"active",
+					"bg-highlightbg",
+					"dark:bg-highlightdark",
+					"text-primary",
+					"dark:text-white",
+					"font-semibold"
+				);
+				const allNewsCategory = document.querySelector(
+					'.category[data-category="all"]'
+				);
+				allNewsCategory.classList.add(
+					"active",
+					"text-accent",
+					"dark:text-accentdark",
+					"bg-cardbg",
+					"dark:bg-carddark",
+					"shadow-custom"
+				);
+				sections.forEach((section) => {
+					section.classList.add("hidden");
+					section.classList.remove("block", "active");
+				});
+				document.getElementById("home").classList.remove("hidden");
+				document.getElementById("home").classList.add("block", "active");
+				initializeNavigation();
+				initializeCategories();
+				initializeFilters();
+				updateFeed();
+				populateTrendingSection();
+				populateTrendingNewsGrid();
+				initializeEventListeners();
+			});
+
+			function initializeNavigation() {
+				mobileNavToggle.addEventListener("click", () => {
+					mobileMenu.classList.toggle("hidden");
+					mobileNavToggle.querySelector("i").classList.toggle("fa-bars");
+					mobileNavToggle.querySelector("i").classList.toggle("fa-times");
+				});
+				navLinks.forEach((link) => {
+					link.addEventListener("click", (e) => {
+						e.preventDefault();
+						navLinks.forEach((l) =>
+							l.classList.remove(
+								"active",
+								"bg-highlightbg",
+								"dark:bg-highlightdark",
+								"text-primary",
+								"font-semibold"
+							)
+						);
+
+						link.classList.add(
+							"active",
+							"bg-highlightbg",
+							"dark:bg-highlightdark",
+							"dark:text-white",
+							"font-semibold"
+						);
+						const sectionId = link.getAttribute("href").substring(1);
+						sections.forEach((section) => {
+							section.classList.add("hidden");
+							section.classList.remove("block", "active");
+							if (section.id === sectionId) {
+								section.classList.remove("hidden");
+								section.classList.add("block", "active");
+								currentSection = sectionId;
+							}
+						});
+						if (mobileMenu.classList.contains("active")) {
+							mobileMenu.classList.add("hidden");
+							mobileNavToggle.querySelector("i").classList.remove("fa-times");
+							mobileNavToggle.querySelector("i").classList.add("fa-bars");
+						}
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					});
+				});
+			}
+
+			function initializeCategories() {
+				const categories = document.querySelectorAll(".category");
+				categories.forEach((cat) => {
+					cat.addEventListener("click", () => {
+						categories.forEach((c) =>
+							c.classList.remove(
+								"active",
+								"text-accent",
+								"dark:text-accentdark",
+								"bg-cardbg",
+								"dark:bg-carddark",
+								"shadow-custom"
+							)
+						);
+						cat.classList.add(
+							"active",
+							"text-accent",
+							"dark:text-accentdark",
+							"bg-cardbg",
+							"dark:bg-carddark",
+							"shadow-custom"
+						);
+						cat.animate(
+							[
+								{ transform: "translateY(-8px)" },
+								{ transform: "translateY(-2px)" },
+								{ transform: "translateY(-5px)" },
+							],
+							{ duration: 400, easing: "ease-out" }
+						);
+						updateFeed();
+					});
+				});
+			}
+
+			function initializeFilters() {
+				const sourceCheckboxes = document.querySelectorAll(
+					'input[id^="source"]'
+				);
+				sourceCheckboxes.forEach((checkbox) =>
+					checkbox.addEventListener("change", updateFeed)
+				);
+				searchInput.addEventListener("input", debounce(updateFeed, 300));
+				filterBtn.addEventListener("click", () => {
+					sortOrder = sortOrder === "newest" ? "oldest" : "newest";
+					filterBtn.querySelector("span").textContent = `Filter by ${
+						sortOrder === "newest" ? "Newest" : "Oldest"
+					}`;
+					filterBtn.querySelector("i").className =
+						sortOrder === "newest" ? "fas fa-sort-down" : "fas fa-sort-up";
+					updateFeed();
+				});
+			}
+
+			function initializeEventListeners() {
+				document
+					.getElementById("themeToggle")
+					.addEventListener("click", toggleTheme);
+				closeDetailsBtn.addEventListener("click", closeDetails);
+				document
+					.getElementById("overlay")
+					.addEventListener("click", closeDetails);
+				document.addEventListener("keydown", (e) => {
+					if (e.key === "Escape" && detailsPanel.classList.contains("active"))
+						closeDetails();
+				});
+				document
+					.querySelector('a[href="#trending"].interactive-btn')
+					.addEventListener("click", (e) => {
+						e.preventDefault();
+						const trendingNavLink = document.querySelector(
+							'.nav-link[href="#trending"]'
+						);
+						if (trendingNavLink) trendingNavLink.click();
+					});
+				document.querySelectorAll("footer a[href^='#']").forEach((link) => {
+					link.addEventListener("click", (e) => {
+						e.preventDefault();
+						const sectionId = link.getAttribute("href").substring(1);
+						const navLink = document.querySelector(
+							`.nav-link[href="#${sectionId}"]`
+						);
+						if (navLink) navLink.click();
+						window.scrollTo({ top: 0, behavior: "smooth" });
+					});
+				});
+			}
+
+			function toggleTheme() {
+				document.documentElement.classList.toggle("dark");
+				const isDark = document.documentElement.classList.contains("dark");
+				localStorage.setItem("theme", isDark ? "dark" : "light");
+				updateThemeToggleButton(isDark ? "dark" : "light");
+			}
+
+			function updateThemeToggleButton(theme) {
+				const themeToggle = document
+					.getElementById("themeToggle")
+					.querySelector("i");
+				themeToggle.className = theme === "dark" ? "fas fa-sun" : "fas fa-moon";
+			}
+
+			function showSkeleton(container) {
+				container.innerHTML = "";
+				for (let i = 0; i < 6; i++) {
+					const skeleton = document.createElement("div");
+					skeleton.className =
+						"bg-cardbg dark:bg-carddark rounded-xl overflow-hidden shadow-custom dark:shadow-customdark transition-all duration-300 relative h-[540px] flex flex-col animate-pulse";
+					skeleton.innerHTML = `
+						<div class="w-full h-[200px] bg-highlightbg dark:bg-highlightdark"></div>
+						<div class="p-5 flex flex-col flex-grow">
+							<div class="h-6 w-4/5 mb-4 rounded bg-highlightbg dark:bg-highlightdark"></div>
+							<div class="h-4 w-full rounded bg-highlightbg dark:bg-highlightdark mb-2.5"></div>
+							<div class="h-4 w-11/12 rounded bg-highlightbg dark:bg-highlightdark mb-2.5"></div>
+							<div class="h-4 w-4/5 rounded bg-highlightbg dark:bg-highlightdark mb-2.5"></div>
+							<div class="h-4 w-2/5 rounded bg-highlightbg dark:bg-highlightdark mb-2.5"></div>
+						</div>
+					`;
+					container.appendChild(skeleton);
+				}
+			}
+
+			function updateFeed() {
+				showSkeleton(newsFeed);
+				if (!detailsPanel.classList.contains("active"))
+					document.getElementById("newsFeed").style.width = "100%";
+				setTimeout(() => {
+					const activeCategoryElement =
+						document.querySelector(".category.active");
+					if (!activeCategoryElement) return;
+					const selectedCategory = activeCategoryElement.dataset.category;
+					const sourceCheckboxes = document.querySelectorAll(
+						'input[id^="source"]'
+					);
+					const selectedSources = Array.from(sourceCheckboxes)
+						.filter((ch) => ch.checked)
+						.map((ch) => ch.value);
+					let articles = [];
+					for (const category in newsData) {
+						if (selectedCategory === "all" || category === selectedCategory)
+							articles = articles.concat(newsData[category]);
+					}
+					articles = articles.filter((article) =>
+						selectedSources.includes(article.source)
+					);
+					if (searchInput.value) {
+						const searchQuery = searchInput.value.toLowerCase();
+						articles = articles.filter(
+							(article) =>
+								article.title.toLowerCase().includes(searchQuery) ||
+								article.content.toLowerCase().includes(searchQuery) ||
+								article.category.toLowerCase().includes(searchQuery)
+						);
+					}
+					articles.sort((a, b) => {
+						const dateA = new Date(a.date);
+						const dateB = new Date(b.date);
+						return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+					});
+					newsFeed.innerHTML = "";
+					if (selectedSources.length === 0) {
+						newsFeed.innerHTML =
+							'<div class="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-10 bg-cardbg dark:bg-carddark rounded-xl shadow-custom dark:shadow-customdark"><i class="fas fa-exclamation-circle text-4xl text-accent dark:text-accentdark mb-4"></i><p class="text-xl font-medium">Please select at least one source!</p></div>';
+						return;
+					}
+					if (articles.length === 0) {
+						newsFeed.innerHTML =
+							'<div class="col-span-1 sm:col-span-2 lg:col-span-3 text-center py-10 bg-cardbg dark:bg-carddark rounded-xl shadow-custom dark:shadow-customdark"><i class="fas fa-search text-4xl text-accent dark:text-accentdark mb-4"></i><p class="text-xl font-medium">No articles found. Try adjusting your filters!</p></div>';
+						return;
+					}
+					articles.forEach((article) => {
+						const card = document.createElement("div");
+						const isFavorite = favorites.includes(article.title);
+						const isReadLater = readLater.includes(article.title);
+						card.className = `bg-cardbg dark:bg-carddark rounded-xl overflow-hidden shadow-custom dark:shadow-customdark transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative flex flex-col ${
+							article.featured ? "sm:col-span-2" : ""
+						} ${
+							activeArticle === article.title
+								? "border-2 border-secondary bg-selectedbg dark:bg-selecteddark"
+								: ""
+						} news-card`;
+						card.innerHTML = `
+							<div class="overflow-hidden">
+								<img src="${article.img}" alt="${
+							article.title
+						}" loading="lazy" class="w-full h-[200px] object-cover block img-transition">
+							</div>
+							<div class="p-5 flex flex-grow flex-col">
+								<span class="inline-flex py-1 px-1.5 self-start bg-highlightbg dark:bg-highlightdark text-primary dark:text-secondary rounded-full text-xs font-semibold mb-2.5 uppercase">${
+									article.category
+								}</span>
+								<h3 class="text-xl font-bold mb-3 text-textdark dark:text-textlight leading-snug line-clamp-2 overflow-hidden">${
+									article.title
+								}</h3>
+								<p class="text-base mb-4 text-mutedtext dark:text-muteddark flex-grow line-clamp-3 overflow-hidden">${
+									article.snippet
+								}</p>
+								<div class="flex justify-between items-center text-sm text-mutedtext dark:text-muteddark mt-auto">
+									<span class="inline-flex items-center gap-1 py-1 px-2 bg-highlightbg dark:bg-highlightdark rounded-full font-medium text-xs">
+										<img src="https://img.freepik.com/free-vector/abstract-shape-colorful-logo_1017-977.jpg" alt="${
+											article.source
+										}" class="w-4 h-4 rounded-full">
+										${article.source}
+									</span>
+									<span>${formatDate(article.date)}</span>
+								</div>
+								<div class="flex justify-between items-center mt-4 pt-4 border-t border-highlightbg dark:border-highlightdark">
+									<div class="flex gap-2.5">
+										<button class="bg-transparent border-0 text-lg cursor-pointer text-mutedtext dark:text-muteddark transition-all duration-200 hover:text-accent dark:hover:text-accentdark flex items-center gap-1 ${
+											isFavorite ? "text-red-600 dark:text-red-600" : ""
+										}" onclick="toggleFavorite('${
+							article.title
+						}', event)" aria-label="Toggle favorite">
+											<i class="${isFavorite ? "fas fa-heart" : "far fa-heart"}"></i>
+										</button>
+										<button class="bg-transparent border-0 text-lg cursor-pointer text-mutedtext dark:text-muteddark transition-all duration-200 hover:text-accent dark:hover:text-accentdark flex items-center gap-1" onclick="toggleReadLater('${
+											article.title
+										}', event)" aria-label="Read later">
+											<i class="${isReadLater ? "fas fa-bookmark" : "far fa-bookmark"}"></i>
+										</button>
+										<button class="bg-transparent border-0 text-lg cursor-pointer text-mutedtext dark:text-muteddark transition-all duration-200 hover:text-accent dark:hover:text-accentdark flex items-center gap-1" onclick="shareArticle('${
+											article.title
+										}', event)" aria-label="Share article">
+											<i class="fas fa-share-alt"></i>
+										</button>
+									</div>
+									<button class="py-2 px-4 bg-primary dark:bg-primarydark text-white border-0 rounded-full text-sm font-semibold cursor-pointer transition-all duration-300 hover:bg-[#2d4156] dark:hover:bg-[#5A7296] hover:-translate-y-0.5 interactive-btn" onclick="viewMore('${
+										article.title
+									}')">
+										Read More <i class="fas fa-arrow-right text-xs ml-1"></i>
+									</button>
+								</div>
+							</div>
+						`;
+						newsFeed.appendChild(card);
+					});
+				}, 800);
+			}
+
+			function populateTrendingSection() {
+				trendingGrid.innerHTML = "";
+				let trendingArticles = [];
+				for (const category in newsData) {
+					trendingArticles = trendingArticles.concat(
+						newsData[category].filter((article) => article.trending)
+					);
+				}
+				trendingArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
+				trendingArticles.forEach((article, index) => {
+					const card = document.createElement("div");
+					card.className =
+						"min-w-[250px] bg-bglight dark:bg-bgdark rounded-lg overflow-hidden shadow-custom dark:shadow-customdark transition-all duration-300 hover:-translate-y-1 cursor-pointer news-card";
+					card.style.position = "relative";
+					card.innerHTML = `
+						<div class="absolute top-2.5 left-2.5 w-6 h-6 bg-accent dark:bg-accentdark text-white rounded-full flex items-center justify-center font-bold text-sm">${
+							index + 1
+						}</div>
+						<div class="overflow-hidden">
+							<img src="${article.img}" alt="${
+						article.title
+					}" loading="lazy" class="w-full h-[150px] object-cover img-transition">
+						</div>
+						<div class="p-4">
+							<h4 class="text-base font-medium mb-2 leading-snug line-clamp-2 overflow-hidden">${
+								article.title
+							}</h4>
+							<div class="text-xs text-mutedtext dark:text-muteddark">
+								<span>${article.source}</span> • <span>${formatDate(article.date)}</span>
+							</div>
+						</div>
+					`;
+					card.addEventListener("click", () => viewMore(article.title));
+					trendingGrid.appendChild(card);
+				});
+			}
+
+			function populateTrendingNewsGrid() {
+				showSkeleton(trendingNewsGrid);
+				setTimeout(() => {
+					let trendingArticles = [];
+					for (const category in newsData) {
+						trendingArticles = trendingArticles.concat(
+							newsData[category].filter((article) => article.trending)
+						);
+					}
+					trendingArticles.sort((a, b) => new Date(b.date) - new Date(a.date));
+					trendingNewsGrid.innerHTML = "";
+					trendingArticles.forEach((article) => {
+						const card = document.createElement("div");
+						const isFavorite = favorites.includes(article.title);
+						const isReadLater = readLater.includes(article.title);
+						card.className =
+							"bg-cardbg dark:bg-carddark rounded-xl overflow-hidden shadow-custom dark:shadow-customdark transition-all duration-300 hover:-translate-y-1 hover:shadow-lg relative flex flex-col animate-[fadeIn_0.5s_ease-out] news-card";
+						card.innerHTML = `
+							<div class="overflow-hidden">
+								<img src="${article.img}" alt="${
+							article.title
+						}" loading="lazy" class="w-full h-[200px] object-cover block img-transition">
+							</div>
+							<div class="p-5 flex flex-col flex-grow">
+								<span class="inline-flex py-1 px-1.5 self-start text-amber-500 bg-highlightbg dark:bg-highlightdark text-primary dark:text-secondary rounded-full text-xs font-semibold mb-2.5 uppercase">${
+									article.category
+								}</span>
+								<h3 class="text-xl font-bold mb-3 text-textdark dark:text-textlight leading-snug line-clamp-2 overflow-hidden">${
+									article.title
+								}</h3>
+								<p class="text-base mb-4 text-mutedtext dark:text-muteddark flex-grow line-clamp-3 overflow-hidden">${
+									article.snippet
+								}</p>
+								<div class="flex justify-between items-center text-sm text-mutedtext dark:text-muteddark mt-auto">
+									<span class="inline-flex items-center gap-1 py-1 px-2 bg-highlightbg dark:bg-highlightdark rounded-full font-medium text-xs">
+										<img src="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?w=16&h=16&fit=crop" alt="${
+											article.source
+										}" class="w-4 h-4 rounded-full">
+										${article.source}
+									</span>
+									<span>${formatDate(article.date)}</span>
+								</div>
+								<div class="flex justify-between items-center mt-4 pt-4 border-t border-highlightbg dark:border-highlightdark">
+									<div class="flex gap-2.5">
+										<button class="bg-transparent border-0 text-lg cursor-pointer text-mutedtext dark:text-muteddark transition-all duration-200 hover:text-accent dark:hover:text-accentdark flex items-center gap-1 ${
+											isFavorite ? "text-red-600 dark:text-red-600" : ""
+										}" onclick="toggleFavorite('${
+							article.title
+						}', event)" aria-label="Toggle favorite">
+											<i class="${isFavorite ? "fas fa-heart" : "far fa-heart"}"></i>
+										</button>
+										<button class="bg-transparent border-0 text-lg cursor-pointer text-mutedtext dark:text-muteddark transition-all duration-200 hover:text-accent dark:hover:text-accentdark flex items-center gap-1" onclick="toggleReadLater('${
+											article.title
+										}', event)" aria-label="Read later">
+											<i class="${isReadLater ? "fas fa-bookmark" : "far fa-bookmark"}"></i>
+										</button>
+										<button class="bg-transparent border-0 text-lg cursor-pointer text-mutedtext dark:text-muteddark transition-all duration-200 hover:text-accent dark:hover:text-accentdark flex items-center gap-1" onclick="shareArticle('${
+											article.title
+										}', event)" aria-label="Share article">
+											<i class="fas fa-share-alt"></i>
+										</button>
+									</div>
+									<button class="py-2 px-4 bg-primary dark:bg-primarydark text-white border-0 rounded-full text-sm font-semibold cursor-pointer transition-all duration-300 hover:bg-[#2d4156] dark:hover:bg-[#5A7296] hover:-translate-y-0.5 interactive-btn" onclick="viewMore('${
+										article.title
+									}')">
+										Read More <i class="fas fa-arrow-right text-xs ml-1"></i>
+									</button>
+								</div>
+							</div>
+						`;
+						trendingNewsGrid.appendChild(card);
+					});
+				}, 800);
+			}
+
+			function formatDate(dateString) {
+				const options = { year: "numeric", month: "short", day: "numeric" };
+				return new Date(dateString).toLocaleDateString(undefined, options);
+			}
+
+			function toggleFavorite(title, event) {
+				event.stopPropagation();
+				if (favorites.includes(title)) {
+					favorites = favorites.filter((f) => f !== title);
+					showToast(
+						'<i class="fas fa-heart-broken mr-2"></i> Removed from favorites'
+					);
+				} else {
+					favorites.push(title);
+					showToast('<i class="fas fa-heart mr-2"></i> Added to favorites');
+				}
+				localStorage.setItem("favorites", JSON.stringify(favorites));
+				updateCardButtons(title);
+			}
+
+			function toggleReadLater(title, event) {
+				event.stopPropagation();
+				if (readLater.includes(title)) {
+					readLater = readLater.filter((r) => r !== title);
+					showToast(
+						'<i class="fas fa-times mr-2"></i> Removed from read later'
+					);
+				} else {
+					readLater.push(title);
+					showToast('<i class="fas fa-bookmark mr-2"></i> Added to read later');
+				}
+				localStorage.setItem("readLater", JSON.stringify(readLater));
+				updateCardButtons(title);
+				if (activeArticle === title) {
+					const saveButton = detailsContent.querySelector("button");
+					const isReadLater = readLater.includes(title);
+					saveButton.querySelector("i").className = isReadLater
+						? "fas fa-bookmark"
+						: "far fa-bookmark";
+					saveButton.querySelector("span").textContent = isReadLater
+						? "Saved for Later"
+						: "Save for Later";
+				}
+			}
+
+			function shareArticle(title, event) {
+				event.stopPropagation();
+				showToast(
+					'<i class="fas fa-share-alt mr-2"></i> Sharing feature coming soon!'
+				);
+			}
+
+			function updateCardButtons(title) {
+				const cards = document.querySelectorAll(
+					".bg-cardbg.dark\\:bg-carddark.rounded-xl"
+				);
+				cards.forEach((card) => {
+					const cardTitle = card.querySelector("h3")?.textContent;
+					if (cardTitle === title) {
+						const favoriteBtn = card.querySelector(
+							'button[aria-label="Toggle favorite"]'
+						);
+						const readLaterBtn = card.querySelector(
+							'button[aria-label="Read later"]'
+						);
+						const isFavorite = favorites.includes(title);
+						const isReadLater = readLater.includes(title);
+						favoriteBtn.classList.toggle("text-red-600", isFavorite);
+						favoriteBtn.querySelector("i").className = isFavorite
+							? "fas fa-heart"
+							: "far fa-heart";
+						readLaterBtn.querySelector("i").className = isReadLater
+							? "fas fa-bookmark"
+							: "far fa-bookmark";
+					}
+				});
+			}
+
+			function viewMore(title) {
+				activeArticle = title;
+				let selectedArticle = null;
+				for (const category in newsData) {
+					const found = newsData[category].find(
+						(article) => article.title === title
+					);
+					if (found) {
+						selectedArticle = found;
+						break;
+					}
+				}
+				if (!selectedArticle) return;
+				detailsContent.innerHTML = `
+					<div class="flex items-center flex-wrap gap-4 mb-6 text-sm text-mutedtext dark:text-muteddark">
+						<div class="inline-flex items-center gap-2 py-1 px-3 bg-highlightbg dark:bg-highlightdark rounded-full font-semibold text-primary dark:text-secondary">
+							<i class="fas fa-newspaper"></i>
+							${selectedArticle.source}
+						</div>
+						<div class="inline-flex items-center gap-1">
+							<i class="far fa-calendar-alt"></i>
+							${formatDate(selectedArticle.date)}
+						</div>
+						<div class="inline-flex items-center gap-1">
+							<i class="far fa-user"></i>
+							${selectedArticle.author || "NewsHub Staff"}
+						</div>
+					</div>
+					<h2 class="text-3xl font-bold text-textdark dark:text-textlight mb-5 leading-snug font-playfair">${
+						selectedArticle.title
+					}</h2>
+					<div class="overflow-hidden rounded-lg mb-6 shadow-custom dark:shadow-customdark">
+						<img src="${selectedArticle.img}" alt="${
+					selectedArticle.title
+				}" class="w-full img-transition" loading="lazy">
+					</div>
+					<p class="text-base leading-7 mb-5 text-textdark dark:text-textlight">${
+						selectedArticle.content
+					}</p>
+					<div class="flex justify-between items-center mt-8 pt-5 border-t border-highlightbg dark:border-highlightdark">
+						<div class="flex gap-4">
+							<button class="w-10 h-10 rounded-full flex items-center justify-center bg-highlightbg dark:bg-highlightdark text-primary dark:text-secondary border-0 text-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:bg-[#1DA1F2] hover:text-white" aria-label="Share on Twitter" onclick="showToast('<i class=\\'fab fa-twitter mr-2\\'></i> Shared on Twitter!')">
+								<i class="fab fa-twitter"></i>
+							</button>
+							<button class="w-10 h-10 rounded-full flex items-center justify-center bg-highlightbg dark:bg-highlightdark text-primary dark:text-secondary border-0 text-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:bg-[#4267B2] hover:text-white" aria-label="Share on Facebook" onclick="showToast('<i class=\\'fab fa-facebook-f mr-2\\'></i> Shared on Facebook!')">
+								<i class="fab fa-facebook-f"></i>
+							</button>
+							<button class="w-10 h-10 rounded-full flex items-center justify-center bg-highlightbg dark:bg-highlightdark text-primary dark:text-secondary border-0 text-lg cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:bg-[#0077B5] hover:text-white" aria-label="Share on LinkedIn" onclick="showToast('<i class=\\'fab fa-linkedin-in mr-2\\'></i> Shared on LinkedIn!')">
+								<i class="fab fa-linkedin-in"></i>
+							</button>
+						</div>
+						<button class="py-2 px-5 bg-primary dark:bg-primarydark text-white border-0 rounded-full text-base font-semibold cursor-pointer flex items-center gap-2 transition-all duration-300 hover:bg-[#2d4156] dark:hover:bg-[#5A7296] hover:-translate-y-0.5 interactive-btn" onclick="toggleReadLater('${
+							selectedArticle.title
+						}', event)">
+							<i class="${
+								readLater.includes(selectedArticle.title)
+									? "fas fa-bookmark"
+									: "far fa-bookmark"
+							}"></i>
+							<span>${
+								readLater.includes(selectedArticle.title)
+									? "Saved for Later"
+									: "Save for Later"
+							}</span>
+						</button>
+					</div>
+				`;
+				detailsPanel.classList.add("active");
+				document.getElementById("overlay").classList.add("active");
+				const cards = document.querySelectorAll(
+					".bg-cardbg.dark\\:bg-carddark.rounded-xl"
+				);
+				cards.forEach((card) => {
+					const cardTitle = card.querySelector("h3")?.textContent;
+					if (cardTitle === title) {
+						card.classList.add(
+							"border-2",
+							"border-secondary",
+							"bg-selectedbg",
+							"dark:bg-selecteddark"
+						);
+					} else {
+						card.classList.remove(
+							"border-2",
+							"border-secondary",
+							"bg-selectedbg",
+							"dark:bg-selecteddark"
+						);
+					}
+				});
+				if (window.innerWidth > 900)
+					document.getElementById("newsFeed").style.width = "60%";
+			}
+
+			function closeDetails() {
+				detailsPanel.classList.remove("active");
+				document.getElementById("overlay").classList.remove("active");
+				activeArticle = null;
+				document
+					.querySelectorAll(".bg-cardbg.dark\\:bg-carddark.rounded-xl")
+					.forEach((card) => {
+						card.classList.remove(
+							"border-2",
+							"border-secondary",
+							"bg-selectedbg",
+							"dark:bg-selecteddark"
+						);
+					});
+				document.getElementById("newsFeed").style.width = "100%";
+			}
+
+			function showToast(message) {
+				const toast = document.getElementById("toast");
+				toast.innerHTML = message;
+				toast.classList.add("opacity-100", "translate-y-0");
+				setTimeout(() => {
+					toast.classList.remove("opacity-100", "translate-y-0");
+				}, 3000);
+			}
+
+			function debounce(func, delay) {
+				let timeout;
+				return function () {
+					const context = this;
+					const args = arguments;
+					clearTimeout(timeout);
+					timeout = setTimeout(() => func.apply(context, args), delay);
+				};
+			}
+
+			window.toggleFavorite = toggleFavorite;
+			window.toggleReadLater = toggleReadLater;
+			window.shareArticle = shareArticle;
+			window.viewMore = viewMore;
+			window.showToast = showToast;
+		</script>
+	</body>
+</html>
