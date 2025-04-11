@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>World Capitals Quest</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			body {
+				font-family: "Poppins", sans-serif;
+			}
+
+			#hero {
+				position: relative;
+				height: 100vh;
+				width: 100%;
+			}
+
+			#quiz-content {
+				min-height: 100vh;
+				padding-top: 2rem;
+				padding-bottom: 4rem;
+			}
+
+			.glass {
+				background: rgba(15, 23, 42, 0.7);
+				backdrop-filter: blur(10px);
+				-webkit-backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+			}
+
+			.parallax-bg {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: -1;
+				background: radial-gradient(
+						circle at 20% 30%,
+						rgba(74, 222, 128, 0.15) 0%,
+						transparent 25%
+					),
+					radial-gradient(
+						circle at 80% 70%,
+						rgba(110, 231, 183, 0.1) 0%,
+						transparent 25%
+					),
+					linear-gradient(to bottom, #0a0b16 0%, #10111d 50%, #1a2e28 100%);
+				animation: gradientPulse 15s ease infinite alternate;
+			}
+
+			@keyframes gradientPulse {
+				0% {
+					background: radial-gradient(
+							circle at 20% 30%,
+							rgba(74, 222, 128, 0.15) 0%,
+							transparent 25%
+						),
+						radial-gradient(
+							circle at 80% 70%,
+							rgba(110, 231, 183, 0.1) 0%,
+							transparent 25%
+						),
+						linear-gradient(to bottom, #0a0b16 0%, #10111d 50%, #1a2e28 100%);
+				}
+				100% {
+					background: radial-gradient(
+							circle at 25% 35%,
+							rgba(74, 222, 128, 0.2) 0%,
+							transparent 30%
+						),
+						radial-gradient(
+							circle at 75% 65%,
+							rgba(110, 231, 183, 0.15) 0%,
+							transparent 30%
+						),
+						linear-gradient(to bottom, #0a0b16 0%, #10111d 45%, #1a2e28 100%);
+				}
+			}
+
+			.continent-card {
+				transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+			}
+
+			.continent-card:hover {
+				transform: translateY(-10px) scale(1.05);
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+			}
+
+			.ripple-btn {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.ripple-btn::after {
+				content: "";
+				position: absolute;
+				width: 200%;
+				height: 200%;
+				background: rgba(255, 255, 255, 0.2);
+				border-radius: 50%;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%) scale(0);
+				transition: transform 0.6s ease-out;
+			}
+
+			.ripple-btn:hover:not(:disabled)::after {
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: rgba(255, 255, 255, 0.3);
+				border-radius: 4px;
+			}
+		</style>
+	</head>
+	<body class="bg-black text-white font-sans overflow-x-hidden">
+		<!-- gradient for the entire bg -->
+		<div
+			class="fixed inset-0 -z-10 bg-gradient-to-b from-[#10111D] via-[#1a2e28] to-[#2d5a4a]"
+		></div>
+
+		<!-- hero section -->
+		<section
+			id="hero"
+			class="w-full flex items-center justify-center h-screen overflow-hidden relative"
+		>
+			<!-- slight overlay -->
+			<!-- <div class="absolute inset-0 bg-black bg-opacity-10"></div> -->
+
+			<!-- hero content -->
+			<div class="relative z-10 container mx-auto px-4 text-center text-white">
+				<h1
+					class="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
+					style="line-height: 1.2"
+				>
+					World
+					<span
+						class="relative whitespace-nowrap text-green-300 dark:text-green-400"
+					>
+						<svg
+							aria-hidden="true"
+							viewBox="0 0 418 42"
+							class="absolute top-2/3 left-0 h-[0.58em] w-full fill-pink-400/70 dark:fill-pink-300/60"
+							preserveAspectRatio="none"
+						>
+							<path
+								d="M203.371.916c-26.013-2.078-76.686 1.963-124.73 9.946L67.3 12.749C35.421 18.062 18.2 21.766 6.004 25.934 1.244 27.561.828 27.778.874 28.61c.07 1.214.828 1.121 9.595-1.176 9.072-2.377 17.15-3.92 39.246-7.496C123.565 7.986 157.869 4.492 195.942 5.046c7.461.108 19.25 1.696 19.17 2.582-.107 1.183-7.874 4.31-25.75 10.366-21.992 7.45-35.43 12.534-36.701 13.884-2.173 2.308-.202 4.407 4.442 4.734 2.654.187 3.263.157 15.593-.780 35.401-2.686 57.944-3.488 88.365-3.143 46.327.526 75.721 2.23 130.788 7.584 19.787 1.924 20.814 1.98 24.557 1.332l.066-.011c1.201-.203 1.53-1.825.399-2.335-2.911-1.31-4.893-1.604-22.048-3.261-57.509-5.556-87.871-7.36-132.059-7.842-23.239-.254-33.617-.116-50.627.674-11.629.540-42.371 2.494-46.696 2.967-2.359.259 8.133-3.625 26.504-9.810 23.239-7.825 27.934-10.149 28.304-14.005 .417-4.348-3.529-6-16.878-7.066Z"
+							></path>
+						</svg>
+						<span class="relative">Capitals</span>
+					</span>
+					Quest
+				</h1>
+				<p class="mx-auto mb-8 max-w-2xl text-lg">
+					Test your knowledge of world capitals across different continents. How
+					many can you get right?
+				</p>
+
+				<!-- button to smooth scroll -->
+				<div class="flex justify-center items-center mt-8">
+					<button
+						onclick="smoothScrollToQuiz()"
+						class="relative flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-blue-600 text-white text-lg font-semibold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200 hover:shadow-green-500/30"
+					>
+						<span
+							class="absolute inset-0 rounded-full bg-gradient-to-r from-green-500 to-blue-500 opacity-50 animate-pulse"
+						></span>
+						<span class="relative z-10">Begin Your Journey</span>
+					</button>
+				</div>
+			</div>
+
+			<!-- scroll icon -->
+			<div
+				class="absolute sm:bottom-14 bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce"
+			>
+				<a
+					href="#quiz-content"
+					class="cursor-pointer"
+					onclick="event.preventDefault(); smoothScrollToQuiz()"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-12 w-12 text-white"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						stroke-width="2"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="M19 9l-7 7-7-7"
+						/>
+					</svg>
+				</a>
+			</div>
+		</section>
+
+		<!-- quiz section -->
+		<main id="quiz-content" class="mx-auto px-4 py-12 relative">
+			<!-- name entry section -->
+			<section
+				id="name-entry"
+				class="flex items-center justify-center px-6 min-h-screen"
+			>
+				<div
+					class="glass p-8 rounded-3xl max-w-md w-full text-center border border-green-500/20"
+				>
+					<h1
+						class="text-4xl md:text-5xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500"
+					>
+						World Capitals Quest
+					</h1>
+					<p class="text-lg text-gray-300 mb-6">
+						Enter your name to begin your journey
+					</p>
+					<input
+						id="player-name"
+						type="text"
+						placeholder="Enter your name"
+						name="name"
+						class="w-full p-4 rounded-xl bg-[#10111D] text-white border border-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+						autocomplete="off"
+						readonly
+						onfocus="this.removeAttribute('readonly')"
+					/>
+					<button
+						id="start-btn"
+						class="mt-6 w-full p-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+					>
+						Start Quiz
+					</button>
+				</div>
+			</section>
+
+			<!-- select your continet -->
+			<section id="continent-select" class="hidden py-12 px-6">
+				<div class="container mx-auto mb-5">
+					<div class="text-center mb-12">
+						<h2
+							id="welcome-text"
+							class="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500"
+						></h2>
+						<p class="text-xl text-gray-300">
+							Select a continent to test your knowledge
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+						<!-- Africa Card -->
+						<div
+							class="continent-card relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-green-500/20"
+							data-continent="africa"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									class="w-full h-full object-cover"
+									src="https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ"
+									alt="African landscape"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-[#10111D] via-transparent to-transparent"
+								></div>
+							</div>
+							<div class="p-6 bg-[#10111D]/80 backdrop-blur-sm">
+								<div class="text-center">
+									<h3 class="text-2xl font-bold text-green-300 mb-1">Africa</h3>
+									<p class="text-gray-400">54 Countries</p>
+								</div>
+								<div class="mt-6 text-center">
+									<button
+										class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+									>
+										Select Continent
+									</button>
+								</div>
+							</div>
+							<div
+								class="absolute inset-0 border border-green-500/30 rounded-2xl pointer-events-none"
+							></div>
+						</div>
+
+						<!-- Asia Card -->
+						<div
+							class="continent-card relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-green-500/20"
+							data-continent="asia"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									class="w-full h-full object-cover"
+									src="https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ"
+									alt="Asian landscape"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-[#10111D] via-transparent to-transparent"
+								></div>
+							</div>
+							<div class="p-6 bg-[#10111D]/80 backdrop-blur-sm">
+								<div class="text-center">
+									<h3 class="text-2xl font-bold text-green-300 mb-1">Asia</h3>
+									<p class="text-gray-400">48 Countries</p>
+								</div>
+								<div class="mt-6 text-center">
+									<button
+										class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+									>
+										Select Continent
+									</button>
+								</div>
+							</div>
+							<div
+								class="absolute inset-0 border border-green-500/30 rounded-2xl pointer-events-none"
+							></div>
+						</div>
+
+						<!-- Europe Card -->
+						<div
+							class="continent-card relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-green-500/20"
+							data-continent="europe"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									class="w-full h-full object-cover"
+									src="https://images.unsplash.com/photo-1491557345352-5929e343eb89?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ"
+									alt="European landscape"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-[#10111D] via-transparent to-transparent"
+								></div>
+							</div>
+							<div class="p-6 bg-[#10111D]/80 backdrop-blur-sm">
+								<div class="text-center">
+									<h3 class="text-2xl font-bold text-green-300 mb-1">Europe</h3>
+									<p class="text-gray-400">44 Countries</p>
+								</div>
+								<div class="mt-6 text-center">
+									<button
+										class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+									>
+										Select Continent
+									</button>
+								</div>
+							</div>
+							<div
+								class="absolute inset-0 border border-green-500/30 rounded-2xl pointer-events-none"
+							></div>
+						</div>
+
+						<!-- North America Card -->
+						<div
+							class="continent-card relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-green-500/20"
+							data-continent="northAmerica"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									class="w-full h-full object-cover"
+									src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ"
+									alt="North American landscape"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-[#10111D] via-transparent to-transparent"
+								></div>
+							</div>
+							<div class="p-6 bg-[#10111D]/80 backdrop-blur-sm">
+								<div class="text-center">
+									<h3 class="text-2xl font-bold text-green-300 mb-1">
+										North America
+									</h3>
+									<p class="text-gray-400">23 Countries</p>
+								</div>
+								<div class="mt-6 text-center">
+									<button
+										class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+									>
+										Select Continent
+									</button>
+								</div>
+							</div>
+							<div
+								class="absolute inset-0 border border-green-500/30 rounded-2xl pointer-events-none"
+							></div>
+						</div>
+
+						<!-- South America Card -->
+						<div
+							class="continent-card relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-green-500/20"
+							data-continent="southAmerica"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									class="w-full h-full object-cover"
+									src="https://images.unsplash.com/photo-1498855926480-d98e83099315?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ"
+									alt="South American landscape"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-[#10111D] via-transparent to-transparent"
+								></div>
+							</div>
+							<div class="p-6 bg-[#10111D]/80 backdrop-blur-sm">
+								<div class="text-center">
+									<h3 class="text-2xl font-bold text-green-300 mb-1">
+										South America
+									</h3>
+									<p class="text-gray-400">12 Countries</p>
+								</div>
+								<div class="mt-6 text-center">
+									<button
+										class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+									>
+										Select Continent
+									</button>
+								</div>
+							</div>
+							<div
+								class="absolute inset-0 border border-green-500/30 rounded-2xl pointer-events-none"
+							></div>
+						</div>
+
+						<!-- Oceania Card -->
+						<div
+							class="continent-card relative overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 hover:scale-105 hover:shadow-green-500/20"
+							data-continent="oceania"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									class="w-full h-full object-cover"
+									src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=800&fit=max&ixid=eyJhcHBfaWQiOjE0NTg5fQ"
+									alt="Oceania landscape"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-[#10111D] via-transparent to-transparent"
+								></div>
+							</div>
+							<div class="p-6 bg-[#10111D]/80 backdrop-blur-sm">
+								<div class="text-center">
+									<h3 class="text-2xl font-bold text-green-300 mb-1">
+										Oceania
+									</h3>
+									<p class="text-gray-400">14 Countries</p>
+								</div>
+								<div class="mt-6 text-center">
+									<button
+										class="px-6 py-2 bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold rounded-full hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300"
+									>
+										Select Continent
+									</button>
+								</div>
+							</div>
+							<div
+								class="absolute inset-0 border border-green-500/30 rounded-2xl pointer-events-none"
+							></div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Quiz question selection -->
+			<section
+				id="quiz-section"
+				class="hidden min-h-screen flex items-center justify-center py-20 px-6"
+			>
+				<div
+					class="max-w-5xl mx-auto glass p-8 rounded-3xl border border-green-500/20"
+				>
+					<div class="flex justify-between items-center mb-6">
+						<h2 class="text-2xl font-semibold text-green-300">
+							Score: <span id="score" class="text-white">0</span>
+						</h2>
+						<button
+							id="exit-quiz"
+							class="text-gray-400 hover:text-green-300 transition-colors"
+						>
+							Exit
+						</button>
+					</div>
+					<div
+						id="question"
+						class="text-xl md:text-2xl font-medium mb-8 text-white"
+					></div>
+					<div id="options" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+					<div
+						id="feedback"
+						class="hidden mt-6 p-4 rounded-xl text-center text-lg"
+					></div>
+				</div>
+			</section>
+
+			<!-- Quiz history section -->
+			<section
+				id="history-section"
+				class="hidden min-h-screen flex items-center justify-center py-20 px-6"
+			>
+				<div
+					class="max-w-5xl mx-auto glass p-8 rounded-3xl border border-green-500/20"
+				>
+					<h2
+						class="text-3xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500"
+					>
+						Your Quest History
+					</h2>
+					<div
+						id="history-list"
+						class="space-y-4 max-h-96 overflow-y-auto pr-2"
+					>
+						<!-- history entries will appear here -->
+					</div>
+					<button
+						id="play-again"
+						class="mt-8 w-full p-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl hover:shadow-lg hover:shadow-green-500/30 transition-all duration-300 font-semibold"
+					>
+						Play Again
+					</button>
+				</div>
+			</section>
+		</main>
+
+		<!-- about section -->
+		<section id="about" class="py-20 px-6">
+			<div class="max-w-7xl mx-auto px-6 md:px-12 xl:px-6">
+				<div class="md:w-2/3 lg:w-1/2 mx-auto text-center">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="currentColor"
+						class="w-12 h-12 text-green-400 mx-auto"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M9 4.5a.75.75 0 01.721.544l.813 2.846a3.75 3.75 0 002.576 2.576l2.846.813a.75.75 0 010 1.442l-2.846.813a3.75 3.75 0 00-2.576 2.576l-.813 2.846a.75.75 0 01-1.442 0l-.813-2.846a3.75 3.75 0 00-2.576-2.576l-2.846-.813a.75.75 0 010-1.442l2.846-.813A3.75 3.75 0 007.466 7.89l.813-2.846A.75.75 0 019 4.5zM18 1.5a.75.75 0 01.728.568l.258 1.036c.236.94.97 1.674 1.91 1.91l1.036.258a.75.75 0 010 1.456l-1.036.258c-.94.236-1.674.97-1.91 1.91l-.258 1.036a.75.75 0 01-1.456 0l-.258-1.036a2.625 2.625 0 00-1.91-1.91l-1.036-.258a.75.75 0 010-1.456l1.036-.258a2.625 2.625 0 001.91-1.91l.258-1.036A.75.75 0 0118 1.5zM16.5 15a.75.75 0 01.712.513l.394 1.183c.15.447.5.799.948.948l1.183.395a.75.75 0 010 1.422l-1.183.395c-.447.15-.799.5-.948.948l-.395 1.183a.75.75 0 01-1.422 0l-.395-1.183a1.5 1.5 0 00-.948-.948l-1.183-.395a.75.75 0 010-1.422l1.183-.395c.447-.15.799-.5.948-.948l.395-1.183A.75.75 0 0116.5 15z"
+							clip-rule="evenodd"
+						></path>
+					</svg>
+					<h2 class="my-8 text-3xl font-bold text-white md:text-4xl">
+						How The Quiz Works
+					</h2>
+					<p class="text-gray-300">
+						Test your geography knowledge with our engaging continent capitals
+						challenge
+					</p>
+				</div>
+				<div
+					class="mt-16 grid divide-x divide-y divide-gray-800 overflow-hidden rounded-3xl border border-gray-800 sm:grid-cols-2 lg:grid-cols-4 lg:divide-y-0"
+				>
+					<div
+						class="group relative bg-gray-900/50 transition hover:z-[1] hover:shadow-2xl hover:shadow-green-500/10"
+					>
+						<div class="relative space-y-8 py-12 p-8">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-green-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+								/>
+							</svg>
+							<div class="space-y-2">
+								<h5 class="text-xl font-semibold text-white">
+									Choose Your Continent
+								</h5>
+								<p class="text-gray-400">
+									Select from Africa, Asia, Europe, Americas or Oceania to focus
+									your capital knowledge test
+								</p>
+							</div>
+						</div>
+					</div>
+					<div
+						class="group relative bg-gray-900/50 transition hover:z-[1] hover:shadow-2xl hover:shadow-green-500/10"
+					>
+						<div class="relative space-y-8 py-12 p-8">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-green-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+								/>
+							</svg>
+							<div class="space-y-2">
+								<h5 class="text-xl font-semibold text-white">
+									Answer Questions
+								</h5>
+								<p class="text-gray-400">
+									Test your knowledge with multiple-choice questions about world
+									capitals
+								</p>
+							</div>
+						</div>
+					</div>
+					<div
+						class="group relative bg-gray-900/50 transition hover:z-[1] hover:shadow-2xl hover:shadow-green-500/10"
+					>
+						<div class="relative space-y-8 py-12 p-8">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-green-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+								/>
+							</svg>
+							<div class="space-y-2">
+								<h5 class="text-xl font-semibold text-white">Learn Facts</h5>
+								<p class="text-gray-400">
+									Get interesting geographical facts with each answer to expand
+									your knowledge
+								</p>
+							</div>
+						</div>
+					</div>
+					<div
+						class="group relative bg-gray-900/50 transition hover:z-[1] hover:shadow-2xl hover:shadow-green-500/10"
+					>
+						<div class="relative space-y-8 py-12 p-8">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-green-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+								/>
+							</svg>
+							<div class="space-y-2">
+								<h5 class="text-xl font-semibold text-white">Track Progress</h5>
+								<p class="text-gray-400">
+									Review your quiz history and see your improvement over time
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- footer section -->
+		<footer class="py-12 px-6">
+			<div class="text-center">
+				<a
+					href="#"
+					class="flex items-center justify-center mb-5 text-2xl font-semibold text-white"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-12 mr-3 text-green-400"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+					World Capitals Quest
+				</a>
+
+				<span class="block text-sm text-center text-gray-400"
+					>© 2025 World Capitals Quest™. All Rights Reserved. Built with
+					<a
+						href="https://tailwindcss.com"
+						class="text-green-400 hover:underline"
+						>Tailwind CSS</a
+					>.
+				</span>
+
+				<ul class="flex justify-center mt-5 space-x-5">
+					<li>
+						<a
+							href="#"
+							class="text-gray-400 hover:text-green-400 transition-colors"
+						>
+							<svg
+								class="w-5 h-5"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+									clip-rule="evenodd"
+								></path>
+							</svg>
+						</a>
+					</li>
+					<li>
+						<a
+							href="#"
+							class="text-gray-400 hover:text-green-400 transition-colors"
+						>
+							<svg
+								class="w-5 h-5"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+									clip-rule="evenodd"
+								></path>
+							</svg>
+						</a>
+					</li>
+					<li>
+						<a
+							href="#"
+							class="text-gray-400 hover:text-green-400 transition-colors"
+						>
+							<svg
+								class="w-5 h-5"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+								aria-hidden="true"
+							>
+								<path
+									d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+								></path>
+							</svg>
+						</a>
+					</li>
+				</ul>
+			</div>
+		</footer>
+
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ["Poppins", "sans-serif"],
+						},
+					},
+				},
+			};
+
+			function smoothScrollToQuiz() {
+				const quizContent = document.getElementById("quiz-content");
+				quizContent.scrollIntoView({
+					behavior: "smooth",
+				});
+			}
+
+			const quizData = {
+				africa: [
+					{
+						question: "What is the capital of Nigeria?",
+						options: ["Lagos", "Abuja", "Kano", "Ibadan"],
+						answer: "Abuja",
+						fact: "Abuja was purpose-built as Nigeria's capital and became official in 1991!",
+					},
+					{
+						question: "What is the capital of Egypt?",
+						options: ["Alexandria", "Giza", "Cairo", "Luxor"],
+						answer: "Cairo",
+						fact: "Cairo is home to the famous Giza Pyramids and the Sphinx!",
+					},
+					{
+						question: "What is the capital of South Africa?",
+						options: ["Johannesburg", "Cape Town", "Pretoria", "Durban"],
+						answer: "Pretoria",
+						fact: "South Africa has three capitals - Pretoria (executive), Cape Town (legislative), and Bloemfontein (judicial)!",
+					},
+					{
+						question: "What is the capital of Kenya?",
+						options: ["Mombasa", "Nairobi", "Kisumu", "Nakuru"],
+						answer: "Nairobi",
+						fact: "Nairobi National Park is the only wildlife park in the world located within a capital city!",
+					},
+					{
+						question: "What is the capital of Morocco?",
+						options: ["Casablanca", "Marrakesh", "Fes", "Rabat"],
+						answer: "Rabat",
+						fact: "Rabat is known for its historic Kasbah of the Udayas overlooking the Atlantic Ocean!",
+					},
+				],
+				asia: [
+					{
+						question: "What is the capital of Japan?",
+						options: ["Osaka", "Tokyo", "Kyoto", "Hiroshima"],
+						answer: "Tokyo",
+						fact: "Tokyo is the world's most populous metropolitan area!",
+					},
+					{
+						question: "What is the capital of India?",
+						options: ["Mumbai", "New Delhi", "Bangalore", "Kolkata"],
+						answer: "New Delhi",
+						fact: "New Delhi was designed by British architects Edwin Lutyens and Herbert Baker in the early 20th century!",
+					},
+					{
+						question: "What is the capital of China?",
+						options: ["Shanghai", "Beijing", "Guangzhou", "Shenzhen"],
+						answer: "Beijing",
+						fact: "Beijing hosted the 2008 Summer Olympics and will host the 2022 Winter Olympics!",
+					},
+					{
+						question: "What is the capital of Thailand?",
+						options: ["Phuket", "Chiang Mai", "Bangkok", "Pattaya"],
+						answer: "Bangkok",
+						fact: "Bangkok's full ceremonial name is 168 letters long - the world's longest city name!",
+					},
+					{
+						question: "What is the capital of South Korea?",
+						options: ["Busan", "Incheon", "Seoul", "Daegu"],
+						answer: "Seoul",
+						fact: "Seoul has been the capital of Korea for over 600 years, since the Joseon Dynasty!",
+					},
+				],
+				europe: [
+					{
+						question: "What is the capital of France?",
+						options: ["Paris", "Lyon", "Marseille", "Nice"],
+						answer: "Paris",
+						fact: "Paris is known as the 'City of Light' and home to the Eiffel Tower!",
+					},
+					{
+						question: "What is the capital of Germany?",
+						options: ["Munich", "Hamburg", "Berlin", "Frankfurt"],
+						answer: "Berlin",
+						fact: "Berlin has more bridges than Venice - about 1,700 in total!",
+					},
+					{
+						question: "What is the capital of Italy?",
+						options: ["Milan", "Rome", "Venice", "Florence"],
+						answer: "Rome",
+						fact: "Rome is nicknamed 'The Eternal City' and was founded in 753 BC!",
+					},
+					{
+						question: "What is the capital of Spain?",
+						options: ["Barcelona", "Madrid", "Valencia", "Seville"],
+						answer: "Madrid",
+						fact: "Madrid is the highest capital city in Europe at 667 meters above sea level!",
+					},
+					{
+						question: "What is the capital of the United Kingdom?",
+						options: ["Manchester", "London", "Liverpool", "Birmingham"],
+						answer: "London",
+						fact: "London has been a major settlement for nearly 2,000 years since the Romans founded Londinium!",
+					},
+				],
+				northAmerica: [
+					{
+						question: "What is the capital of Canada?",
+						options: ["Toronto", "Vancouver", "Ottawa", "Montreal"],
+						answer: "Ottawa",
+						fact: "Ottawa was chosen as capital by Queen Victoria in 1857!",
+					},
+					{
+						question: "What is the capital of Mexico?",
+						options: ["Guadalajara", "Monterrey", "Mexico City", "Cancún"],
+						answer: "Mexico City",
+						fact: "Mexico City is built on the ancient Aztec capital Tenochtitlan and is sinking about 12 cm per year!",
+					},
+					{
+						question: "What is the capital of the United States?",
+						options: ["New York", "Los Angeles", "Washington D.C.", "Chicago"],
+						answer: "Washington D.C.",
+						fact: "Washington D.C. was named after George Washington and designed by Pierre Charles L'Enfant!",
+					},
+					{
+						question: "What is the capital of Cuba?",
+						options: ["Santiago de Cuba", "Havana", "Camagüey", "Holguín"],
+						answer: "Havana",
+						fact: "Havana's historic center is a UNESCO World Heritage Site with beautiful colonial architecture!",
+					},
+					{
+						question: "What is the capital of Jamaica?",
+						options: ["Montego Bay", "Kingston", "Ocho Rios", "Negril"],
+						answer: "Kingston",
+						fact: "Kingston is home to the famous Bob Marley Museum at his former residence!",
+					},
+				],
+				southAmerica: [
+					{
+						question: "What is the capital of Brazil?",
+						options: ["Rio de Janeiro", "São Paulo", "Brasília", "Salvador"],
+						answer: "Brasília",
+						fact: "Brasília was built in just 41 months and designed to resemble an airplane!",
+					},
+					{
+						question: "What is the capital of Argentina?",
+						options: ["Córdoba", "Rosario", "Buenos Aires", "Mendoza"],
+						answer: "Buenos Aires",
+						fact: "Buenos Aires is sometimes called the 'Paris of South America' for its European-style architecture!",
+					},
+					{
+						question: "What is the capital of Peru?",
+						options: ["Arequipa", "Trujillo", "Lima", "Cusco"],
+						answer: "Lima",
+						fact: "Lima is the second-driest world capital after Cairo, with less than 1 inch of rain per year!",
+					},
+					{
+						question: "What is the capital of Chile?",
+						options: ["Valparaíso", "Santiago", "Concepción", "Antofagasta"],
+						answer: "Santiago",
+						fact: "Santiago is located in a valley surrounded by the Andes mountains!",
+					},
+					{
+						question: "What is the capital of Colombia?",
+						options: ["Medellín", "Cali", "Barranquilla", "Bogotá"],
+						answer: "Bogotá",
+						fact: "Bogotá is the third-highest capital city in the world at 2,640 meters above sea level!",
+					},
+				],
+				oceania: [
+					{
+						question: "What is the capital of Australia?",
+						options: ["Sydney", "Melbourne", "Canberra", "Perth"],
+						answer: "Canberra",
+						fact: "Canberra means 'meeting place' in the local Indigenous language!",
+					},
+					{
+						question: "What is the capital of New Zealand?",
+						options: ["Auckland", "Christchurch", "Wellington", "Queenstown"],
+						answer: "Wellington",
+						fact: "Wellington is the southernmost capital city in the world and known for its strong winds!",
+					},
+					{
+						question: "What is the capital of Fiji?",
+						options: ["Lautoka", "Nadi", "Suva", "Savusavu"],
+						answer: "Suva",
+						fact: "Suva receives about 3,000 mm of rain annually, making it one of the wettest capitals!",
+					},
+					{
+						question: "What is the capital of Papua New Guinea?",
+						options: ["Lae", "Port Moresby", "Madang", "Mount Hagen"],
+						answer: "Port Moresby",
+						fact: "Port Moresby is one of the few capital cities located in a tropical savanna climate!",
+					},
+					{
+						question: "What is the capital of Samoa?",
+						options: ["Apia", "Salelologa", "Vaitele", "Faleula"],
+						answer: "Apia",
+						fact: "Apia is home to the historic Robert Louis Stevenson Museum at the author's former home!",
+					},
+				],
+			};
+
+			const heroSection = document.getElementById("hero");
+			const nameEntry = document.getElementById("name-entry");
+			const continentSelect = document.getElementById("continent-select");
+			const quizSection = document.getElementById("quiz-section");
+			const historySection = document.getElementById("history-section");
+			const playerNameInput = document.getElementById("player-name");
+			const startBtn = document.getElementById("start-btn");
+			const welcomeText = document.getElementById("welcome-text");
+			const continentCards = document.querySelectorAll(".continent-card");
+			const questionElement = document.getElementById("question");
+			const optionsElement = document.getElementById("options");
+			const feedbackElement = document.getElementById("feedback");
+			const scoreElement = document.getElementById("score");
+			const exitQuizBtn = document.getElementById("exit-quiz");
+			const historyList = document.getElementById("history-list");
+			const playAgainBtn = document.getElementById("play-again");
+
+			let playerName = "";
+			let currentQuiz = [];
+			let currentQuestionIndex = 0;
+			let score = 0;
+			let quizActive = false;
+			let history = JSON.parse(localStorage.getItem("quizHistory")) || [];
+
+			nameEntry.classList.remove("hidden");
+
+			startBtn.addEventListener("click", () => {
+				playerName = playerNameInput.value.trim();
+				if (playerName) {
+					nameEntry.classList.add("hidden");
+					continentSelect.classList.remove("hidden");
+					welcomeText.textContent = `Welcome, ${playerName}! Choose a Continent`;
+
+					document
+						.getElementById("quiz-content")
+						.scrollIntoView({ behavior: "smooth" });
+				}
+			});
+
+			continentCards.forEach((card) => {
+				card.addEventListener("click", () => {
+					if (!quizActive) {
+						const selectedContinent = card.dataset.continent;
+						currentQuiz = [...quizData[selectedContinent]].sort(
+							() => Math.random() - 0.5
+						);
+						currentQuestionIndex = 0;
+						score = 0;
+						scoreElement.textContent = score;
+						continentSelect.classList.add("hidden");
+						quizSection.classList.remove("hidden");
+						quizActive = true;
+						loadQuestion();
+					}
+				});
+			});
+
+			exitQuizBtn.addEventListener("click", () => {
+				endQuiz(true);
+			});
+
+			playAgainBtn.addEventListener("click", () => {
+				historySection.classList.add("hidden");
+				continentSelect.classList.remove("hidden");
+				quizActive = false;
+			});
+
+			function loadQuestion() {
+				feedbackElement.classList.add("hidden");
+				optionsElement.innerHTML = "";
+
+				if (currentQuestionIndex < currentQuiz.length) {
+					const currentQuestion = currentQuiz[currentQuestionIndex];
+					questionElement.textContent = currentQuestion.question;
+
+					currentQuestion.options.forEach((option) => {
+						const button = document.createElement("button");
+						button.className =
+							"w-full p-4 rounded-xl text-white font-medium hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed bg-[#10111D] border border-green-500/30 hover:border-green-500/50 hover:bg-[#10111D]/90";
+						button.textContent = option;
+						button.addEventListener("click", () => checkAnswer(option));
+						optionsElement.appendChild(button);
+					});
+				} else {
+					endQuiz();
+				}
+			}
+
+			function checkAnswer(selectedOption) {
+				const buttons = optionsElement.querySelectorAll("button");
+				buttons.forEach((button) => {
+					button.disabled = true;
+					button.classList.add("opacity-50", "cursor-not-allowed");
+				});
+
+				quizActive = false;
+
+				const currentQuestion = currentQuiz[currentQuestionIndex];
+				feedbackElement.classList.remove("hidden");
+
+				if (selectedOption === currentQuestion.answer) {
+					score += 10;
+					scoreElement.textContent = score;
+					feedbackElement.textContent = `Correct! ${currentQuestion.fact}`;
+					feedbackElement.className =
+						"feedback mt-6 p-4 rounded-xl text-center text-lg bg-green-500/20 border border-green-500/50 text-green-300";
+				} else {
+					feedbackElement.textContent = `Incorrect. The correct answer is ${currentQuestion.answer}.`;
+					feedbackElement.className =
+						"feedback mt-6 p-4 rounded-xl text-center text-lg bg-red-500/20 border border-red-500/50 text-red-300";
+
+					buttons.forEach((button) => {
+						if (button.textContent === currentQuestion.answer) {
+							button.classList.add("bg-green-500/30", "border-green-500/70");
+						}
+					});
+				}
+
+				setTimeout(() => {
+					currentQuestionIndex++;
+					if (currentQuestionIndex < currentQuiz.length) {
+						quizActive = true;
+						loadQuestion();
+					} else {
+						endQuiz();
+					}
+				}, 3000);
+			}
+
+			function endQuiz(manualExit = false) {
+				quizActive = false;
+				quizSection.classList.add("hidden");
+				historySection.classList.remove("hidden");
+
+				if (!manualExit) {
+					const quizResult = {
+						name: playerName,
+						continent: currentQuiz[0].question.split(" ")[5].replace("?", ""),
+						score: score,
+						date: new Date().toLocaleString(),
+					};
+					history.push(quizResult);
+					localStorage.setItem("quizHistory", JSON.stringify(history));
+				}
+
+				historyList.innerHTML = "";
+
+				history.forEach((entry, index) => {
+					const entryDiv = document.createElement("div");
+					entryDiv.className =
+						"glass p-4 rounded-xl border border-green-500/20 hover:border-green-500/40 transition-colors";
+					entryDiv.innerHTML = `
+                    <p class="font-semibold text-green-300">Quiz #${
+											index + 1
+										}</p>
+                    <p class="text-gray-300"><span class="text-gray-400">Name:</span> ${
+											entry.name
+										}</p>
+                    <p class="text-gray-300"><span class="text-gray-400">Continent:</span> ${
+											entry.continent
+										}</p>
+                    <p class="text-gray-300"><span class="text-gray-400">Score:</span> <span class="font-medium ${
+											entry.score >= 70
+												? "text-green-300"
+												: entry.score >= 40
+												? "text-yellow-300"
+												: "text-red-300"
+										}">${entry.score}</span></p>
+                    <p class="text-gray-300"><span class="text-gray-400">Date:</span> ${
+											entry.date
+										}</p>
+                `;
+					historyList.appendChild(entryDiv);
+				});
+			}
+		</script>
+	</body>
+</html>
