@@ -1,0 +1,3511 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Sonar - Premium Headphones Shop</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			/* Custom Styles */
+
+			html {
+				scroll-behavior: smooth !important;
+			}
+
+			body {
+				background-color: black;
+				color: white;
+				font-family: system-ui, -apple-system, sans-serif;
+				scroll-behavior: smooth !important;
+			}
+
+			.font-dancing {
+				font-family: "Dancing Script", cursive;
+			}
+
+			.animation-delay-200 {
+				animation-delay: 0.2s;
+			}
+
+			.animation-delay-300 {
+				animation-delay: 0.3s;
+			}
+
+			.animation-delay-400 {
+				animation-delay: 0.4s;
+			}
+
+			@keyframes fadeInUp {
+				from {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.animate-fadeInUp {
+				animation: fadeInUp 0.8s forwards;
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border-width: 0;
+			}
+
+			.sr-only:focus {
+				position: absolute;
+				width: auto;
+				height: auto;
+				overflow: visible;
+				clip: auto;
+				white-space: normal;
+			}
+
+			.bg-clip-text {
+				-webkit-background-clip: text;
+				background-clip: text;
+			}
+
+			.will-change-transform {
+				will-change: transform;
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Skip to Content -->
+		<a
+			href="#main-content"
+			class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-500 focus:text-white focus:rounded-md"
+		>
+			Skip to main content
+		</a>
+
+		<!-- Navigation -->
+		<nav
+			id="navbar"
+			class="fixed w-full z-50 transition-all duration-300 bg-transparent py-6"
+			aria-label="Main navigation"
+			style="background-color: black !important"
+		>
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex items-center justify-between">
+					<!-- Logo -->
+					<div class="flex items-center">
+						<div class="flex items-center">
+							<i class="fas fa-headphones text-yellow-400 text-2xl"></i>
+							<span class="ml-2 text-xl font-bold tracking-wider">
+								<span class="text-yellow-400">S</span>
+								<span
+									class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-200"
+									>ONAR</span
+								>
+							</span>
+						</div>
+					</div>
+
+					<!-- Desktop Menu -->
+					<div class="hidden md:block">
+						<ul class="flex items-center space-x-8">
+							<li>
+								<a
+									href="#home"
+									class="text-sm tracking-widest hover:text-gray-300 transition-colors relative group"
+									aria-current="page"
+								>
+									HOME
+									<span
+										class="absolute left-0 right-0 bottom-0 h-px bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+									></span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#gallery"
+									class="text-sm tracking-widest hover:text-gray-300 transition-colors relative group"
+								>
+									GALLERY
+									<span
+										class="absolute left-0 right-0 bottom-0 h-px bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+									></span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#about"
+									class="text-sm tracking-widest hover:text-gray-300 transition-colors relative group"
+								>
+									ABOUT
+									<span
+										class="absolute left-0 right-0 bottom-0 h-px bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+									></span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#features"
+									class="text-sm tracking-widest hover:text-gray-300 transition-colors relative group"
+								>
+									FEATURES
+									<span
+										class="absolute left-0 right-0 bottom-0 h-px bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+									></span>
+								</a>
+							</li>
+							<li>
+								<a
+									href="#contact"
+									class="text-sm tracking-widest hover:text-gray-300 transition-colors relative group"
+								>
+									CONTACT
+									<span
+										class="absolute left-0 right-0 bottom-0 h-px bg-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+									></span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<!-- Right Icons -->
+					<div class="flex items-center space-x-6">
+						<button
+							id="search-button"
+							class="p-2 hover:bg-white/10 rounded-full transition-colors"
+							aria-label="Search"
+						>
+							<i class="fas fa-search"></i>
+						</button>
+
+						<div class="relative">
+							<button
+								id="cart-button"
+								class="relative p-2 hover:bg-white/10 rounded-full transition-colors"
+								aria-label="Shopping cart with 0 items"
+							>
+								<i class="fas fa-shopping-cart"></i>
+								<span
+									id="cart-count"
+									class="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs w-5 h-5 flex items-center justify-center rounded-full hidden"
+									>0</span
+								>
+							</button>
+						</div>
+
+						<div class="relative">
+							<button
+								id="wishlist-button"
+								class="relative p-2 hover:bg-white/10 rounded-full transition-colors"
+								aria-label="Wishlist with 0 items"
+							>
+								<i class="fas fa-heart"></i>
+								<span
+									id="wishlist-count"
+									class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full hidden"
+									>0</span
+								>
+							</button>
+						</div>
+
+						<button
+							id="mobile-menu-button"
+							class="md:hidden"
+							aria-label="Open menu"
+							aria-expanded="false"
+						>
+							<i class="fas fa-bars text-xl"></i>
+						</button>
+					</div>
+				</div>
+
+				<!-- Mobile Menu -->
+				<div
+					id="mobile-menu"
+					class="md:hidden transition-all duration-300 ease-in-out max-h-0 opacity-0 mt-4 overflow-hidden"
+					aria-hidden="true"
+				>
+					<ul class="flex flex-col space-y-4 py-4">
+						<li>
+							<a
+								href="#home"
+								class="text-sm tracking-widest hover:text-gray-300 transition-colors py-2 block"
+							>
+								HOME
+							</a>
+						</li>
+						<li>
+							<a
+								href="#gallery"
+								class="text-sm tracking-widest hover:text-gray-300 transition-colors py-2 block"
+							>
+								GALLERY
+							</a>
+						</li>
+						<li>
+							<a
+								href="#about"
+								class="text-sm tracking-widest hover:text-gray-300 transition-colors py-2 block"
+							>
+								ABOUT
+							</a>
+						</li>
+						<li>
+							<a
+								href="#features"
+								class="text-sm tracking-widest hover:text-gray-300 transition-colors py-2 block"
+							>
+								FEATURES
+							</a>
+						</li>
+						<li>
+							<a
+								href="#contact"
+								class="text-sm tracking-widest hover:text-gray-300 transition-colors py-2 block"
+							>
+								CONTACT
+							</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Cart Modal -->
+		<div id="cart-modal" class="fixed inset-0 bg-black/95 z-50 hidden">
+			<div class="bg-gray-900 h-full w-full max-w-md ml-auto">
+				<div class="flex flex-col h-full">
+					<div
+						class="flex items-center justify-between p-6 border-b border-white/10"
+					>
+						<div class="flex items-center">
+							<i class="fas fa-shopping-cart mr-2"></i>
+							<h2 class="text-xl font-bold" id="cart-title">Shopping Cart</h2>
+						</div>
+						<button
+							id="close-cart"
+							class="p-2 hover:bg-white/10 rounded-full transition-colors"
+							aria-label="Close cart"
+						>
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+
+					<div class="flex-1 overflow-y-auto p-6">
+						<!-- Cart Content -->
+						<div id="cart-content" class="space-y-6"></div>
+
+						<!-- Empty Cart -->
+						<div id="empty-cart" class="text-center py-12">
+							<i class="fas fa-shopping-cart text-gray-500 text-4xl mb-4"></i>
+							<p class="text-gray-300">Your cart is empty</p>
+						</div>
+
+						<!-- Checkout Steps -->
+						<div id="checkout-steps" class="hidden">
+							<div id="checkout-progress" class="py-4">
+								<!-- Progress bar generated by JS -->
+							</div>
+
+							<!-- Step content -->
+							<div id="step-content"></div>
+						</div>
+
+						<!-- Order Confirmation -->
+						<div id="order-confirmation" class="text-center py-8 px-4 hidden">
+							<div
+								class="w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6"
+							>
+								<i class="fas fa-check-circle text-black text-2xl"></i>
+							</div>
+							<h2 class="text-2xl font-bold mb-2">
+								Order Successfully Placed!
+							</h2>
+							<p class="text-gray-300 mb-6">
+								Your order #SN78923 has been confirmed.
+							</p>
+
+							<div class="max-w-md mx-auto bg-gray-800 rounded-lg p-6 mb-8">
+								<div class="flex items-center mb-4">
+									<i class="fas fa-envelope text-yellow-400 mr-2"></i>
+									<p class="text-gray-300">
+										We've sent a confirmation email to your inbox.
+									</p>
+								</div>
+								<div class="flex items-center mb-4">
+									<i class="fas fa-truck text-yellow-400 mr-2"></i>
+									<p class="text-gray-300">
+										Your order will be shipped within 1-2 business days.
+									</p>
+								</div>
+								<div class="flex items-center">
+									<i class="fas fa-info-circle text-yellow-400 mr-2"></i>
+									<p class="text-gray-300">
+										You can track your order status in your account.
+									</p>
+								</div>
+							</div>
+
+							<button
+								id="continue-shopping"
+								class="px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+							>
+								Continue Shopping
+							</button>
+						</div>
+					</div>
+
+					<footer id="cart-footer" class="p-6 border-t border-white/10">
+						<div class="flex items-center justify-between mb-4">
+							<span class="text-gray-300">Subtotal</span>
+							<span class="font-semibold" id="cart-subtotal">$0.00</span>
+						</div>
+						<div class="flex items-center justify-between mb-6">
+							<span class="text-gray-300">Shipping</span>
+							<span class="text-green-400">Free</span>
+						</div>
+						<button
+							id="proceed-checkout"
+							class="w-full flex items-center justify-center px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							<i class="fas fa-credit-card mr-2"></i>
+							Proceed to Checkout
+						</button>
+					</footer>
+				</div>
+			</div>
+		</div>
+
+		<!-- Product Detail Modal -->
+		<div
+			id="product-detail-modal"
+			class="fixed inset-0 bg-black/95 z-50 overflow-y-auto hidden"
+		>
+			<div class="min-h-screen py-8">
+				<div class="max-w-7xl mx-auto px-4">
+					<button
+						id="close-product-detail"
+						class="absolute top-4 right-4 p-2 hover:bg-white/10 rounded-full transition-colors"
+						aria-label="Close product details"
+					>
+						<i class="fas fa-times text-xl"></i>
+					</button>
+
+					<div
+						id="product-detail-content"
+						class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12"
+					>
+						<!-- Product details will be inserted here by JS -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Notification Area -->
+		<div
+			id="notification-area"
+			class="fixed bottom-4 right-4 z-50 space-y-2"
+		></div>
+
+		<!-- Main Content -->
+		<main id="main-content">
+			<!-- Hero Section -->
+			<div class="relative h-screen overflow-hidden" id="home">
+				<div
+					id="hero-slides"
+					class="relative h-full"
+					style="position: relative"
+				>
+					<div
+						style="
+							background: black;
+							position: absolute;
+							width: 500px;
+							height: 100h;
+							z-index: 1000;
+							top: 50;
+							left: 0;
+						"
+					></div>
+				</div>
+
+				<div
+					class="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center space-x-8"
+				>
+					<button
+						id="slide-play-pause"
+						class="p-2 hover:bg-white/10 rounded-full transition-colors"
+						aria-label="Pause slideshow"
+					>
+						<i id="play-pause-icon" class="fas fa-pause w-5 h-5"></i>
+					</button>
+
+					<div
+						id="slide-indicators"
+						class="flex space-x-3"
+						role="tablist"
+						aria-label="Image gallery"
+					>
+						<!-- Indicators will be added by JS -->
+					</div>
+				</div>
+
+				<button
+					id="prev-slide"
+					class="absolute left-8 top-1/2 -translate-y-1/2 p-4 hover:bg-white/10 rounded-full transition-colors group"
+					aria-label="Previous slide"
+				>
+					<i
+						class="fas fa-chevron-left group-hover:scale-125 transition-transform"
+					></i>
+				</button>
+				<button
+					id="next-slide"
+					class="absolute right-8 top-1/2 -translate-y-1/2 p-4 hover:bg-white/10 rounded-full transition-colors group"
+					aria-label="Next slide"
+				>
+					<i
+						class="fas fa-chevron-right group-hover:scale-125 transition-transform"
+					></i>
+				</button>
+			</div>
+
+			<!-- Categories Section -->
+			<section class="py-20 px-4" id="gallery">
+				<div class="max-w-7xl mx-auto">
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+						<div
+							class="group relative border border-yellow-400 p-8 text-center hover:bg-white/5 transition-colors duration-300"
+							tabindex="0"
+							role="button"
+							aria-label="Over-ear category"
+						>
+							<i
+								class="fas fa-headphones w-12 h-12 mx-auto mb-4 text-yellow-400 text-4xl group-hover:scale-110 transition-transform duration-300"
+							></i>
+							<h3 class="text-xl font-semibold mb-2">Over-Ear</h3>
+							<p class="text-gray-300">Full immersive sound experience</p>
+						</div>
+						<div
+							class="group relative border border-yellow-400 p-8 text-center hover:bg-white/5 transition-colors duration-300"
+							tabindex="0"
+							role="button"
+							aria-label="In-ear category"
+						>
+							<i
+								class="fas fa-music w-12 h-12 mx-auto mb-4 text-yellow-400 text-4xl group-hover:scale-110 transition-transform duration-300"
+							></i>
+							<h3 class="text-xl font-semibold mb-2">In-Ear</h3>
+							<p class="text-gray-300">Compact and portable designs</p>
+						</div>
+						<div
+							class="group relative border border-yellow-400 p-8 text-center hover:bg-white/5 transition-colors duration-300"
+							tabindex="0"
+							role="button"
+							aria-label="Wireless category"
+						>
+							<i
+								class="fas fa-bluetooth-b w-12 h-12 mx-auto mb-4 text-yellow-400 text-4xl group-hover:scale-110 transition-transform duration-300"
+							></i>
+							<h3 class="text-xl font-semibold mb-2">Wireless</h3>
+							<p class="text-gray-300">Freedom from cables</p>
+						</div>
+						<div
+							class="group relative border border-yellow-400 p-8 text-center hover:bg-white/5 transition-colors duration-300"
+							tabindex="0"
+							role="button"
+							aria-label="Noise-cancelling category"
+						>
+							<i
+								class="fas fa-volume-mute w-12 h-12 mx-auto mb-4 text-yellow-400 text-4xl group-hover:scale-110 transition-transform duration-300"
+							></i>
+							<h3 class="text-xl font-semibold mb-2">Noise-Cancelling</h3>
+							<p class="text-gray-300">
+								Immerse in your music, block the world
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- About Section -->
+			<section
+				id="about"
+				class="py-20 px-4 bg-gradient-to-b from-black to-gray-900"
+			>
+				<div class="max-w-7xl mx-auto">
+					<div class="text-center mb-16">
+						<h2 class="text-5xl font-bold mb-4 font-dancing">About Sonar</h2>
+						<div class="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+						<p class="text-gray-300 max-w-3xl mx-auto text-lg leading-relaxed">
+							Sonar is a premium headphone store dedicated to providing audio
+							enthusiasts with the finest equipment and exceptional service. Our
+							curated selection of headphones, earbuds, and accessories is
+							designed to inspire and deliver the perfect sound experience for
+							any lifestyle.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+						<div class="relative">
+							<div class="w-full h-[500px] rounded-lg overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=1000"
+									alt="Person wearing headphones"
+									class="w-full h-full object-cover"
+									loading="lazy"
+								/>
+							</div>
+							<div
+								class="absolute -bottom-6 -right-6 w-32 h-32 bg-yellow-400 rounded-full flex items-center justify-center"
+							>
+								<span class="text-black font-bold text-xl">10+ Years</span>
+							</div>
+						</div>
+
+						<div class="space-y-6">
+							<h3 class="text-3xl font-bold mb-4">Our Mission</h3>
+							<p class="text-gray-300 leading-relaxed">
+								At Sonar, we believe that great audio is about more than just
+								equipment—it's about connecting you with your music, podcasts,
+								and calls in the most immersive way possible. Our mission is to
+								provide audiophiles of all levels with the tools they need to
+								experience sound in its purest form.
+							</p>
+
+							<div class="space-y-4 mt-8">
+								<div class="flex items-start">
+									<div
+										class="w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+									>
+										<i class="fas fa-check-circle text-yellow-400 text-xl"></i>
+									</div>
+									<div>
+										<h4 class="font-bold mb-1">Premium Selection</h4>
+										<p class="text-gray-300">
+											Carefully curated high-quality headphones and accessories
+											from top brands.
+										</p>
+									</div>
+								</div>
+
+								<div class="flex items-start">
+									<div
+										class="w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+									>
+										<i class="fas fa-check-circle text-yellow-400 text-xl"></i>
+									</div>
+									<div>
+										<h4 class="font-bold mb-1">Expert Guidance</h4>
+										<p class="text-gray-300">
+											Professional advice to help you find the perfect audio
+											equipment for your needs.
+										</p>
+									</div>
+								</div>
+
+								<div class="flex items-start">
+									<div
+										class="w-12 h-12 bg-yellow-400/20 rounded-full flex items-center justify-center mr-4 flex-shrink-0"
+									>
+										<i class="fas fa-check-circle text-yellow-400 text-xl"></i>
+									</div>
+									<div>
+										<h4 class="font-bold mb-1">Exceptional Service</h4>
+										<p class="text-gray-300">
+											Dedicated support from purchase to after-sales service.
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<button
+								class="mt-6 px-8 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+							>
+								Learn More
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Featured Headphones Section -->
+			<section
+				class="py-20 px-4 bg-gradient-to-b from-black via-gray-900 to-black"
+				id="featured-products"
+			>
+				<div class="max-w-7xl mx-auto">
+					<div class="text-center mb-16">
+						<h2 class="text-5xl font-bold mb-4 font-dancing">
+							Featured Headphones
+						</h2>
+						<div class="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+						<p class="text-gray-300 max-w-2xl mx-auto text-lg">
+							Discover our selection of premium headphones that deliver
+							exceptional sound quality and comfort.
+						</p>
+						<div class="flex flex-wrap justify-center gap-4 md:gap-8 mt-8">
+							<div class="flex items-center text-gray-300">
+								<i class="fas fa-truck text-yellow-400 mr-2"></i>
+								<span>Free Shipping</span>
+							</div>
+							<div class="flex items-center text-gray-300">
+								<i class="fas fa-shield-alt text-yellow-400 mr-2"></i>
+								<span>2-Year Warranty</span>
+							</div>
+							<div class="flex items-center text-gray-300">
+								<i class="fas fa-box text-yellow-400 mr-2"></i>
+								<span>30-Day Returns</span>
+							</div>
+						</div>
+					</div>
+
+					<div
+						id="camera-products"
+						class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+					>
+						<!-- Headphone products will be inserted here by JS -->
+					</div>
+				</div>
+			</section>
+
+			<!-- Features Section -->
+			<section id="features" class="py-20 px-4 bg-gray-900">
+				<div class="max-w-7xl mx-auto">
+					<div class="text-center mb-16">
+						<h2 class="text-5xl font-bold mb-4 font-dancing">Our Features</h2>
+						<div class="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+						<p class="text-gray-300 max-w-3xl mx-auto text-lg">
+							Discover the exceptional features and services that make Sonar the
+							preferred destination for audio enthusiasts.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+						<div
+							class="bg-gray-800 rounded-lg p-8 hover:bg-gray-700 transition-colors duration-300 transform hover:-translate-y-2"
+						>
+							<div
+								class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6"
+							>
+								<i class="fas fa-headphones text-yellow-400 text-2xl"></i>
+							</div>
+							<h3 class="text-xl font-bold mb-3">Premium Equipment</h3>
+							<p class="text-gray-300">
+								Access to the latest and highest quality headphones and audio
+								accessories.
+							</p>
+						</div>
+						<div
+							class="bg-gray-800 rounded-lg p-8 hover:bg-gray-700 transition-colors duration-300 transform hover:-translate-y-2"
+						>
+							<div
+								class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6"
+							>
+								<i class="fas fa-shield-alt text-yellow-400 text-2xl"></i>
+							</div>
+							<h3 class="text-xl font-bold mb-3">Extended Warranty</h3>
+							<p class="text-gray-300">
+								Exclusive extended warranty options to protect your valuable
+								audio equipment.
+							</p>
+						</div>
+						<div
+							class="bg-gray-800 rounded-lg p-8 hover:bg-gray-700 transition-colors duration-300 transform hover:-translate-y-2"
+						>
+							<div
+								class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6"
+							>
+								<i class="fas fa-gift text-yellow-400 text-2xl"></i>
+							</div>
+							<h3 class="text-xl font-bold mb-3">Reward Program</h3>
+							<p class="text-gray-300">
+								Earn points with every purchase that can be redeemed for
+								discounts and gifts.
+							</p>
+						</div>
+						<div
+							class="bg-gray-800 rounded-lg p-8 hover:bg-gray-700 transition-colors duration-300 transform hover:-translate-y-2"
+						>
+							<div
+								class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6"
+							>
+								<i class="fas fa-music text-yellow-400 text-2xl"></i>
+							</div>
+							<h3 class="text-xl font-bold mb-3">Sound Testing</h3>
+							<p class="text-gray-300">
+								Try before you buy with our in-store sound testing stations.
+							</p>
+						</div>
+						<div
+							class="bg-gray-800 rounded-lg p-8 hover:bg-gray-700 transition-colors duration-300 transform hover:-translate-y-2"
+						>
+							<div
+								class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6"
+							>
+								<i class="fas fa-cog text-yellow-400 text-2xl"></i>
+							</div>
+							<h3 class="text-xl font-bold mb-3">Expert Maintenance</h3>
+							<p class="text-gray-300">
+								Professional cleaning and repair services to keep your gear in
+								perfect condition.
+							</p>
+						</div>
+						<div
+							class="bg-gray-800 rounded-lg p-8 hover:bg-gray-700 transition-colors duration-300 transform hover:-translate-y-2"
+						>
+							<div
+								class="w-16 h-16 bg-yellow-400/20 rounded-full flex items-center justify-center mb-6"
+							>
+								<i class="fas fa-clock text-yellow-400 text-2xl"></i>
+							</div>
+							<h3 class="text-xl font-bold mb-3">Fast Shipping</h3>
+							<p class="text-gray-300">
+								Quick and reliable shipping options to get your equipment when
+								you need it.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Newsletter Section -->
+			<section class="py-16 px-4 bg-gradient-to-r from-gray-900 to-black">
+				<div
+					class="max-w-6xl mx-auto bg-black/50 backdrop-blur-sm border border-yellow-400/20 rounded-xl p-8 md:p-12"
+				>
+					<div class="flex flex-col md:flex-row items-center justify-between">
+						<div class="md:w-1/2 mb-6 md:mb-0">
+							<h3 class="text-3xl font-bold mb-3">Join Our Newsletter</h3>
+							<p class="text-gray-300">
+								Subscribe to get exclusive offers, audio tips, and be the first
+								to hear about new products.
+							</p>
+						</div>
+
+						<div class="md:w-1/2 w-full">
+							<div class="flex flex-col sm:flex-row gap-4">
+								<input
+									type="email"
+									placeholder="Your email address"
+									class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+								/>
+								<button
+									class="px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+								>
+									Subscribe
+								</button>
+							</div>
+							<p class="text-sm text-gray-400 mt-3">
+								By subscribing, you agree to our Privacy Policy. We respect your
+								privacy.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Contact Section -->
+			<section id="contact" class="py-20 px-4 bg-black">
+				<div class="max-w-7xl mx-auto">
+					<div class="text-center mb-16">
+						<h2 class="text-5xl font-bold mb-4 font-dancing">Contact Us</h2>
+						<div class="w-24 h-1 bg-yellow-400 mx-auto mb-8"></div>
+						<p class="text-gray-300 max-w-3xl mx-auto text-lg">
+							Have questions about our products or services? Reach out to our
+							team and we'll be happy to assist you.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+						<div>
+							<form id="contact-form" class="space-y-6">
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div>
+										<label for="name" class="block text-sm text-gray-400 mb-1"
+											>Name *</label
+										>
+										<input
+											type="text"
+											id="name"
+											class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+											placeholder="Your name"
+										/>
+										<p id="name-error" class="text-red-500 text-sm mt-1 hidden">
+											Name is required
+										</p>
+									</div>
+									<div>
+										<label for="email" class="block text-sm text-gray-400 mb-1"
+											>Email *</label
+										>
+										<input
+											type="email"
+											id="email"
+											class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+											placeholder="your@email.com"
+										/>
+										<p
+											id="email-error"
+											class="text-red-500 text-sm mt-1 hidden"
+										>
+											Email is required
+										</p>
+									</div>
+								</div>
+
+								<div>
+									<label for="subject" class="block text-sm text-gray-400 mb-1"
+										>Subject *</label
+									>
+									<input
+										type="text"
+										id="subject"
+										class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+										placeholder="How can we help you?"
+									/>
+									<p
+										id="subject-error"
+										class="text-red-500 text-sm mt-1 hidden"
+									>
+										Subject is required
+									</p>
+								</div>
+
+								<div>
+									<label for="message" class="block text-sm text-gray-400 mb-1"
+										>Message *</label
+									>
+									<textarea
+										id="message"
+										rows="5"
+										class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+										placeholder="Your message..."
+									></textarea>
+									<p
+										id="message-error"
+										class="text-red-500 text-sm mt-1 hidden"
+									>
+										Message is required
+									</p>
+								</div>
+
+								<button
+									type="submit"
+									class="px-8 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+								>
+									Send Message
+								</button>
+							</form>
+						</div>
+
+						<div class="space-y-8">
+							<div class="bg-gray-800 rounded-lg p-8">
+								<h3 class="text-xl font-bold mb-6">Contact Information</h3>
+
+								<div class="space-y-4">
+									<div class="flex items-start">
+										<i
+											class="fas fa-map-marker-alt text-yellow-400 mr-4 text-xl"
+										></i>
+										<div>
+											<h4 class="font-semibold mb-1">Address</h4>
+											<p class="text-gray-300">
+												123 Audio Lane, New York, NY 10001, USA
+											</p>
+										</div>
+									</div>
+
+									<div class="flex items-start">
+										<i class="fas fa-phone text-yellow-400 mr-4 text-xl"></i>
+										<div>
+											<h4 class="font-semibold mb-1">Phone</h4>
+											<p class="text-gray-300">+1 (123) 456-7890</p>
+										</div>
+									</div>
+
+									<div class="flex items-start">
+										<i class="fas fa-envelope text-yellow-400 mr-4 text-xl"></i>
+										<div>
+											<h4 class="font-semibold mb-1">Email</h4>
+											<p class="text-gray-300">contact@sonarheadphones.com</p>
+										</div>
+									</div>
+
+									<div class="flex items-start">
+										<i class="fas fa-clock text-yellow-400 mr-4 text-xl"></i>
+										<div>
+											<h4 class="font-semibold mb-1">Hours</h4>
+											<p class="text-gray-300">Monday - Friday: 9AM - 6PM</p>
+											<p class="text-gray-300">Saturday: 10AM - 4PM</p>
+											<p class="text-gray-300">Sunday: Closed</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="bg-gray-800 rounded-lg p-8">
+								<h3 class="text-xl font-bold mb-4">Connect With Us</h3>
+								<p class="text-gray-300 mb-4">
+									Follow us on social media for updates, tips, and inspiration.
+								</p>
+
+								<div class="flex space-x-4">
+									<a
+										href="#"
+										class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
+									>
+										<i class="fab fa-facebook-f"></i>
+									</a>
+									<a
+										href="#"
+										class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors"
+									>
+										<i class="fab fa-twitter"></i>
+									</a>
+									<a
+										href="#"
+										class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors"
+									>
+										<i class="fab fa-instagram"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Footer -->
+		<footer class="bg-black border-t border-white/10 py-12" id="footer">
+			<div class="max-w-7xl mx-auto px-4">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+					<div>
+						<div class="flex items-center mb-4">
+							<i class="fas fa-headphones text-yellow-400 text-2xl"></i>
+							<span class="ml-2 text-xl font-bold tracking-wider">
+								<span class="text-yellow-400">S</span>
+								<span
+									class="bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-yellow-200"
+									>ONAR</span
+								>
+							</span>
+						</div>
+						<p class="text-gray-300">
+							Elevating your audio experience with premium headphones for every
+							lifestyle.
+						</p>
+						<div class="mt-6 flex space-x-4">
+							<a
+								href="#"
+								class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors duration-300"
+								aria-label="Instagram"
+							>
+								<i class="fab fa-instagram"></i>
+							</a>
+							<a
+								href="#"
+								class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors duration-300"
+								aria-label="Twitter"
+							>
+								<i class="fab fa-twitter"></i>
+							</a>
+							<a
+								href="#"
+								class="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-colors duration-300"
+								aria-label="Facebook"
+							>
+								<i class="fab fa-facebook-f"></i>
+							</a>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#home"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Home</a
+								>
+							</li>
+							<li>
+								<a
+									href="#gallery"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Gallery</a
+								>
+							</li>
+							<li>
+								<a
+									href="#about"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>About</a
+								>
+							</li>
+							<li>
+								<a
+									href="#features"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Features</a
+								>
+							</li>
+							<li>
+								<a
+									href="#contact"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Contact</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Categories</h3>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#gallery"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Over-Ear Headphones</a
+								>
+							</li>
+							<li>
+								<a
+									href="#gallery"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>In-Ear Headphones</a
+								>
+							</li>
+							<li>
+								<a
+									href="#gallery"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Wireless Headphones</a
+								>
+							</li>
+							<li>
+								<a
+									href="#gallery"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Noise-Cancelling</a
+								>
+							</li>
+							<li>
+								<a
+									href="#gallery"
+									class="text-gray-300 hover:text-yellow-400 transition-colors"
+									>Accessories</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Contact Us</h3>
+						<ul class="space-y-3">
+							<li class="flex items-start">
+								<i class="fas fa-map-marker-alt text-yellow-400 mr-3 mt-1"></i>
+								<span class="text-gray-300"
+									>123 Audio Lane, New York, NY 10001, USA</span
+								>
+							</li>
+							<li class="flex items-center">
+								<i class="fas fa-phone text-yellow-400 mr-3"></i>
+								<span class="text-gray-300">+1 (123) 456-7890</span>
+							</li>
+							<li class="flex items-center">
+								<i class="fas fa-envelope text-yellow-400 mr-3"></i>
+								<span class="text-gray-300">contact@sonarheadphones.com</span>
+							</li>
+							<li class="flex items-center">
+								<i class="fas fa-clock text-yellow-400 mr-3"></i>
+								<span class="text-gray-300">Mon-Fri: 9AM-6PM</span>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div
+					class="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between"
+				>
+					<p class="text-gray-300 mb-4 md:mb-0">
+						&copy; <span id="current-year"></span> Sonar Headphones. All rights
+						reserved.
+					</p>
+					<div class="flex space-x-6">
+						<a
+							href="#"
+							class="text-gray-300 hover:text-yellow-400 transition-colors"
+							>Privacy Policy</a
+						>
+						<a
+							href="#"
+							class="text-gray-300 hover:text-yellow-400 transition-colors"
+							>Terms of Service</a
+						>
+						<a
+							href="#"
+							class="text-gray-300 hover:text-yellow-400 transition-colors"
+							>Shipping</a
+						>
+						<a
+							href="#"
+							class="text-gray-300 hover:text-yellow-400 transition-colors"
+							>Returns</a
+						>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<script>
+			// Store data
+			const camerasData = [
+				{
+					id: 1,
+					name: "Sony WH-1000XM5",
+					image:
+						"https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=1000",
+					specs: {
+						type: "Over-Ear",
+						driver: "30mm Dynamic",
+						frequency: "4Hz-40,000Hz",
+						impedance: "47 ohms",
+						battery: "30 hours",
+						connectivity: "Bluetooth 5.2, 3.5mm",
+						features: "Active Noise Cancellation",
+						weight: "250g",
+					},
+					price: 399,
+					originalPrice: 449,
+					rating: 4.9,
+					stock: 15,
+					shipping: "Free Shipping",
+					warranty: "2 Years",
+					review: {
+						author: "Michael Chen",
+						text: "Exceptional sound quality and noise cancellation. Most comfortable headphones I've ever owned.",
+						date: "2024-03-15",
+					},
+					reviews: [
+						{
+							author: "Sarah Williams",
+							rating: 5,
+							text: "Amazing noise cancellation and battery life. Perfect for travel.",
+							date: "2024-03-10",
+						},
+						{
+							author: "John Davis",
+							rating: 4.8,
+							text: "Incredible sound quality and very comfortable for long sessions.",
+							date: "2024-03-08",
+						},
+					],
+					faqs: [
+						{
+							question: "How long does the battery last?",
+							answer:
+								"The battery lasts up to 30 hours with ANC on, and up to 40 hours with ANC off.",
+						},
+						{
+							question: "Can I use these for calls?",
+							answer:
+								"Yes, they have multiple microphones for clear call quality and voice assistant support.",
+						},
+					],
+				},
+				{
+					id: 2,
+					name: "Apple AirPods Pro 2",
+					image:
+						"https://i0.wp.com/www.ear-fidelity.com/wp-content/uploads/2022/10/P1054788s-scaled.jpg?fit=2560%2C1707&ssl=1",
+					specs: {
+						type: "In-Ear",
+						driver: "Custom Apple Driver",
+						frequency: "20Hz-20,000Hz",
+						impedance: "Not Specified",
+						battery: "6 hours (24 with case)",
+						connectivity: "Bluetooth 5.3",
+						features: "Active Noise Cancellation, Transparency Mode",
+						weight: "5.3g per earbud",
+					},
+					price: 249,
+					originalPrice: 279,
+					rating: 4.8,
+					stock: 10,
+					shipping: "Free Shipping",
+					warranty: "1 Year",
+					review: {
+						author: "Sarah Williams",
+						text: "The best earbuds for iOS users. ANC is incredible and the sound quality is excellent.",
+						date: "2024-03-12",
+					},
+					reviews: [
+						{
+							author: "David Miller",
+							rating: 4.9,
+							text: "Perfect integration with Apple devices and impressive noise cancellation.",
+							date: "2024-03-11",
+						},
+						{
+							author: "Emma Thompson",
+							rating: 4.7,
+							text: "Great sound and very comfortable for long listening sessions.",
+							date: "2024-03-09",
+						},
+					],
+					faqs: [
+						{
+							question: "Are these waterproof?",
+							answer:
+								"They have an IPX4 rating, making them resistant to sweat and water splashes but not fully waterproof.",
+						},
+						{
+							question: "Do they work with Android devices?",
+							answer:
+								"Yes, they work with Android devices as standard Bluetooth earbuds, but some features are limited to Apple devices.",
+						},
+					],
+				},
+				{
+					id: 3,
+					name: "Bose QuietComfort Ultra",
+					image:
+						"https://images.unsplash.com/photo-1578319439584-104c94d37305?q=80&w=1000",
+					specs: {
+						type: "Over-Ear",
+						driver: "TriPort Acoustic Architecture",
+						frequency: "10Hz-20,000Hz",
+						impedance: "32 ohms",
+						battery: "24 hours",
+						connectivity: "Bluetooth 5.1, 3.5mm",
+						features: "World-class Noise Cancellation",
+						weight: "240g",
+					},
+					price: 429,
+					originalPrice: 449,
+					rating: 4.7,
+					stock: 8,
+					shipping: "Free Shipping",
+					warranty: "2 Years",
+					review: {
+						author: "David Miller",
+						text: "The best noise cancellation on the market. Sound is balanced and refined.",
+						date: "2024-03-10",
+					},
+					reviews: [
+						{
+							author: "Michael Brown",
+							rating: 4.8,
+							text: "Incredible noise cancellation - perfect for frequent flyers.",
+							date: "2024-03-07",
+						},
+						{
+							author: "Lisa Anderson",
+							rating: 4.6,
+							text: "Very comfortable even for all-day wearing. Great sound profile.",
+							date: "2024-03-05",
+						},
+					],
+					faqs: [
+						{
+							question: "Can I use these while they're charging?",
+							answer:
+								"Yes, you can use them in wired mode while they are charging.",
+						},
+						{
+							question: "How many devices can I connect simultaneously?",
+							answer:
+								"You can connect up to two devices at the same time with Bose's multipoint technology.",
+						},
+					],
+				},
+				{
+					id: 4,
+					name: "Sennheiser Momentum 4",
+					image:
+						"https://images.unsplash.com/photo-1599669454699-248893623440?q=80&w=1000",
+					specs: {
+						type: "Over-Ear",
+						driver: "42mm Dynamic",
+						frequency: "6Hz-22,000Hz",
+						impedance: "18 ohms",
+						battery: "60 hours",
+						connectivity: "Bluetooth 5.2, 3.5mm",
+						features: "Adaptive Noise Cancellation",
+						weight: "293g",
+					},
+					price: 349,
+					originalPrice: 399,
+					rating: 4.8,
+					stock: 12,
+					shipping: "Free Shipping",
+					warranty: "2 Years",
+					review: {
+						author: "James Wilson",
+						text: "Incredible battery life and fantastic sound quality. The best Sennheiser headphones I've owned.",
+						date: "2024-03-08",
+					},
+					reviews: [
+						{
+							author: "Rachel Green",
+							rating: 4.9,
+							text: "Exceptional sound profile with detailed mids and controlled bass.",
+							date: "2024-03-06",
+						},
+						{
+							author: "Tom Harris",
+							rating: 4.7,
+							text: "60 hours of battery life is a game-changer for travel.",
+							date: "2024-03-04",
+						},
+					],
+					faqs: [
+						{
+							question: "How is the call quality?",
+							answer:
+								"Good call quality with multiple beamforming microphones that focus on your voice and filter out background noise.",
+						},
+						{
+							question: "Do they fold up for travel?",
+							answer:
+								"Yes, they have a folding design and come with a travel case for easy portability.",
+						},
+					],
+				},
+				{
+					id: 5,
+					name: "Samsung Galaxy Buds Pro 2",
+					image:
+						"https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=1000",
+					specs: {
+						type: "In-Ear",
+						driver: "10mm Woofer + 5.3mm Tweeter",
+						frequency: "20Hz-20,000Hz",
+						impedance: "Not Specified",
+						battery: "5 hours (18 with case)",
+						connectivity: "Bluetooth 5.3",
+						features: "Active Noise Cancellation, 360 Audio",
+						weight: "5.5g per earbud",
+					},
+					price: 229,
+					originalPrice: 249,
+					rating: 4.6,
+					stock: 20,
+					shipping: "Free Shipping",
+					warranty: "1 Year",
+					review: {
+						author: "Emily Chen",
+						text: "Great Samsung integration and excellent sound quality. Perfect companion for my Galaxy phone.",
+						date: "2024-03-07",
+					},
+					reviews: [
+						{
+							author: "Peter Wong",
+							rating: 4.7,
+							text: "Impressive noise cancellation for such small earbuds.",
+							date: "2024-03-03",
+						},
+						{
+							author: "Maria Garcia",
+							rating: 4.5,
+							text: "Comfortable fit and the 360 Audio feature is great for movies.",
+							date: "2024-03-01",
+						},
+					],
+					faqs: [
+						{
+							question: "Are they water-resistant?",
+							answer:
+								"Yes, they have an IPX7 rating, which means they can withstand immersion in water up to 1 meter for 30 minutes.",
+						},
+						{
+							question: "Do they work well with non-Samsung devices?",
+							answer:
+								"Yes, they work with all Bluetooth devices, but some features are optimized for Samsung Galaxy devices.",
+						},
+					],
+				},
+				{
+					id: 6,
+					name: "Beyerdynamic DT 900 Pro X",
+					image:
+						"https://cdn.shopify.com/s/files/1/0057/8938/4802/files/Rockerz_650_pp_renders_main_banner.124.png?v=1740735495",
+					specs: {
+						type: "Over-Ear",
+						driver: "45mm STELLAR.45 Dynamic",
+						frequency: "5Hz-40,000Hz",
+						impedance: "48 ohms",
+						battery: "N/A (Wired)",
+						connectivity: "3.5mm, 6.3mm adapter",
+						features: "Open-back, Studio Reference",
+						weight: "345g",
+					},
+					price: 299,
+					originalPrice: 349,
+					rating: 4.9,
+					stock: 5,
+					shipping: "Free Shipping",
+					warranty: "2 Years",
+					review: {
+						author: "Chris Taylor",
+						text: "Audiophile quality sound with incredible detail and soundstage. Perfect for critical listening.",
+						date: "2024-03-05",
+					},
+					reviews: [
+						{
+							author: "Mark Johnson",
+							rating: 5,
+							text: "The most accurate sound reproduction I've heard at this price point.",
+							date: "2024-02-28",
+						},
+						{
+							author: "Sophie Lee",
+							rating: 4.8,
+							text: "Incredibly comfortable and the sound detail is outstanding.",
+							date: "2024-02-25",
+						},
+					],
+					faqs: [
+						{
+							question: "Do these need an amplifier?",
+							answer:
+								"Their 48 ohm impedance means they can be driven by most devices without a dedicated amplifier, though they will sound better with one.",
+						},
+						{
+							question: "Can these be used for gaming?",
+							answer:
+								"Yes, the wide soundstage and accurate imaging make them excellent for gaming.",
+						},
+					],
+				},
+			];
+
+			// Hero slider data
+			const heroSlides = [
+				{
+					image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e",
+					title: "Premium Audio",
+					subtitle: "HEADPHONES",
+					description: "Experience sound like never before",
+				},
+				{
+					image: "https://images.unsplash.com/photo-1484704849700-f032a568e944",
+					title: "Wireless Freedom",
+					subtitle: "EARBUDS",
+					description: "Music without boundaries",
+				},
+				{
+					image:
+						"https://headphones.com/cdn/shop/articles/Focal_Bathys_Article_Cover_bc0bad32-0f55-488b-bdd0-2ec5b47b973b.jpg?v=1743647810&width=533",
+					title: "Noise Cancellation",
+					subtitle: "IMMERSION",
+					description: "Block the world, embrace your music",
+				},
+			];
+
+			// Global state
+			const state = {
+				cart: [],
+				wishlist: [],
+				currentSlide: 0,
+				isPlaying: true,
+				selectedCamera: null,
+				isMobileMenuOpen: false,
+				checkoutStep: 1,
+				orderCompleted: false,
+				isMobile: window.innerWidth < 768,
+			};
+
+			// Helper functions
+			function formatPrice(price) {
+				return new Intl.NumberFormat("en-US", {
+					style: "currency",
+					currency: "USD",
+				}).format(price);
+			}
+
+			function showNotification(message, type = "success") {
+				const notificationArea = document.getElementById("notification-area");
+				const id = Date.now();
+
+				const notification = document.createElement("div");
+				notification.className = `p-4 rounded-lg shadow-lg flex items-center ${
+					type === "success" ? "bg-yellow-400 text-black" : "bg-red-500"
+				}`;
+				notification.innerHTML = `
+                <i class="fas fa-${
+									type === "success" ? "check-circle" : "exclamation-circle"
+								} mr-2"></i>
+                <span>${message}</span>
+                <button 
+                    class="ml-4 p-1 rounded-full hover:bg-white/10"
+                    aria-label="Close notification"
+                >
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+
+				notification.querySelector("button").addEventListener("click", () => {
+					notification.remove();
+				});
+
+				notificationArea.appendChild(notification);
+
+				setTimeout(() => {
+					notification.remove();
+				}, 3000);
+			}
+
+			// Cart functions
+			function addToCart(item) {
+				const index = state.cart.findIndex((i) => i.id === item.id);
+
+				if (index !== -1) {
+					state.cart[index].quantity += item.quantity;
+					showNotification(`Updated ${item.name} quantity in cart`);
+				} else {
+					state.cart.push(item);
+					showNotification(`Added ${item.name} to cart`);
+				}
+
+				updateCartUI();
+			}
+
+			function removeFromCart(id) {
+				const itemToRemove = state.cart.find((item) => item.id === id);
+				if (itemToRemove) {
+					showNotification(`Removed ${itemToRemove.name} from cart`);
+				}
+
+				state.cart = state.cart.filter((item) => item.id !== id);
+				updateCartUI();
+			}
+
+			function updateQuantity(id, quantity) {
+				if (!Number.isInteger(quantity) || quantity < 1) {
+					showNotification("Quantity must be a positive integer", "error");
+					return;
+				}
+
+				const product = camerasData.find((camera) => camera.id === id);
+				if (product && quantity > product.stock) {
+					showNotification(
+						`Sorry, only ${product.stock} units available`,
+						"error"
+					);
+					state.cart = state.cart.map((item) =>
+						item.id === id ? { ...item, quantity: product.stock } : item
+					);
+					updateCartUI();
+					return;
+				}
+
+				state.cart = state.cart.map((item) =>
+					item.id === id ? { ...item, quantity } : item
+				);
+
+				updateCartUI();
+			}
+
+			function toggleWishlist(item) {
+				const index = state.wishlist.findIndex((i) => i.id === item.id);
+
+				if (index !== -1) {
+					state.wishlist.splice(index, 1);
+					showNotification(`Removed ${item.name} from wishlist`);
+				} else {
+					state.wishlist.push(item);
+					showNotification(`Added ${item.name} to wishlist`);
+				}
+
+				updateWishlistUI();
+			}
+
+			function clearCart() {
+				state.cart = [];
+				showNotification("Cart has been cleared");
+				updateCartUI();
+			}
+
+			function getCartTotal() {
+				return state.cart.reduce(
+					(total, item) => total + item.price * item.quantity,
+					0
+				);
+			}
+
+			function getCartCount() {
+				return state.cart.reduce((count, item) => count + item.quantity, 0);
+			}
+
+			// Update UI functions
+			function updateCartUI() {
+				const cartCount = document.getElementById("cart-count");
+				const cartTotal = getCartTotal();
+				const cartItemCount = getCartCount();
+
+				// Update cart icon counter
+				if (cartItemCount > 0) {
+					cartCount.textContent = cartItemCount;
+					cartCount.classList.remove("hidden");
+				} else {
+					cartCount.classList.add("hidden");
+				}
+
+				// Update cart items
+				const cartContent = document.getElementById("cart-content");
+				const emptyCart = document.getElementById("empty-cart");
+				const cartFooter = document.getElementById("cart-footer");
+				const proceedCheckout = document.getElementById("proceed-checkout");
+				const cartSubtotal = document.getElementById("cart-subtotal");
+
+				if (state.cart.length === 0) {
+					cartContent.innerHTML = "";
+					emptyCart.classList.remove("hidden");
+					cartFooter.classList.add("hidden");
+				} else {
+					emptyCart.classList.add("hidden");
+					cartFooter.classList.remove("hidden");
+
+					cartContent.innerHTML = state.cart
+						.map(
+							(item) => `
+                    <div class="flex items-start space-x-4 bg-white/5 p-4 rounded-lg">
+                        <img
+                            src="${item.image}"
+                            alt="${item.name}"
+                            class="w-24 h-24 object-cover rounded-lg"
+                            loading="lazy"
+                        />
+                        <div class="flex-1">
+                            <h3 class="font-semibold mb-1">${item.name}</h3>
+                            <p class="text-gray-300 mb-2">${formatPrice(
+															item.price
+														)}</p>
+                            <div class="flex items-center space-x-2">
+                                <button
+                                    data-id="${item.id}"
+                                    data-action="decrease"
+                                    class="px-2 py-1 bg-white/10 rounded hover:bg-white/20 transition-colors"
+                                    aria-label="Decrease quantity"
+                                >
+                                    -
+                                </button>
+                                <span class="w-8 text-center">${
+																	item.quantity
+																}</span>
+                                <button
+                                    data-id="${item.id}"
+                                    data-action="increase"
+                                    class="px-2 py-1 bg-white/10 rounded hover:bg-white/20 transition-colors"
+                                    aria-label="Increase quantity"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <button
+                            data-id="${item.id}"
+                            data-action="remove"
+                            class="p-2 hover:bg-white/10 rounded-full transition-colors"
+                            aria-label="Remove ${item.name} from cart"
+                        >
+                            <i class="fas fa-times text-red-400"></i>
+                        </button>
+                    </div>
+                `
+						)
+						.join("");
+
+					// Add event listeners
+					const decreaseButtons = cartContent.querySelectorAll(
+						'[data-action="decrease"]'
+					);
+					const increaseButtons = cartContent.querySelectorAll(
+						'[data-action="increase"]'
+					);
+					const removeButtons = cartContent.querySelectorAll(
+						'[data-action="remove"]'
+					);
+
+					decreaseButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const id = parseInt(button.getAttribute("data-id"));
+							const item = state.cart.find((item) => item.id === id);
+							if (item) {
+								updateQuantity(id, Math.max(1, item.quantity - 1));
+							}
+						});
+					});
+
+					increaseButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const id = parseInt(button.getAttribute("data-id"));
+							const item = state.cart.find((item) => item.id === id);
+							if (item) {
+								updateQuantity(id, item.quantity + 1);
+							}
+						});
+					});
+
+					removeButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const id = parseInt(button.getAttribute("data-id"));
+							removeFromCart(id);
+						});
+					});
+
+					// Update subtotal
+					cartSubtotal.textContent = formatPrice(cartTotal);
+
+					// Update proceed button
+					proceedCheckout.disabled = state.cart.length === 0;
+				}
+			}
+
+			function updateWishlistUI() {
+				const wishlistCount = document.getElementById("wishlist-count");
+
+				if (state.wishlist.length > 0) {
+					wishlistCount.textContent = state.wishlist.length;
+					wishlistCount.classList.remove("hidden");
+				} else {
+					wishlistCount.classList.add("hidden");
+				}
+			}
+
+			// Hero slider functions
+			function renderHeroSlides() {
+				const slidesContainer = document.getElementById("hero-slides");
+				const indicators = document.getElementById("slide-indicators");
+
+				// Render slides
+				slidesContainer.innerHTML = heroSlides
+					.map(
+						(slide, index) => `
+                <div
+                    class="absolute inset-0 transition-opacity duration-1000 ${
+											index === state.currentSlide ? "opacity-100" : "opacity-0"
+										}"
+                    aria-hidden="${index !== state.currentSlide}"
+                >
+                    <div 
+                        class="absolute inset-0 bg-cover bg-center transform scale-105 transition-transform duration-[2000ms] will-change-transform"
+                        style="background-image: url('${
+													slide.image
+												}?auto=format&fit=crop&w=2070&q=80')"
+                    >
+                        <div class="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/70"></div>
+                    </div>
+                    
+                    <div class="relative h-full flex flex-col items-center justify-center text-center px-4">
+                        <div class="max-w-4xl mx-auto">
+                            <h2 class="text-2xl font-light mb-4 tracking-[0.3em] opacity-0 animate-fadeInUp">
+                                ${slide.subtitle}
+                            </h2>
+                            <h1 class="text-6xl md:text-8xl font-bold mb-6 font-dancing opacity-0 animate-fadeInUp animation-delay-200">
+                                ${slide.title}
+                            </h1>
+                            <p class="text-xl text-gray-200 mb-8 opacity-0 animate-fadeInUp animation-delay-300">
+                                ${slide.description}
+                            </p>
+                            <button 
+                                class="border-2 border-yellow-400 px-12 py-4 hover:bg-yellow-400 hover:text-black transition-colors opacity-0 animate-fadeInUp animation-delay-400 text-lg tracking-wider"
+                                aria-label="Explore gallery"
+                            >
+                                Explore Collection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
+
+				// Render indicators
+				indicators.innerHTML = heroSlides
+					.map(
+						(_, index) => `
+                <button
+                    data-index="${index}"
+                    class="w-2 h-2 rounded-full transition-all ${
+											index === state.currentSlide
+												? "bg-yellow-400 w-8"
+												: "bg-white/50"
+										}"
+                    role="tab"
+                    aria-selected="${index === state.currentSlide}"
+                    aria-label="Slide ${index + 1} of ${heroSlides.length}"
+                ></button>
+            `
+					)
+					.join("");
+
+				// Add event listeners to indicators
+				const indicatorButtons = indicators.querySelectorAll("button");
+				indicatorButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const index = parseInt(button.getAttribute("data-index"));
+						state.currentSlide = index;
+						renderHeroSlides();
+					});
+				});
+			}
+
+			function startSlideshow() {
+				if (state.isPlaying) {
+					setTimeout(() => {
+						state.currentSlide = (state.currentSlide + 1) % heroSlides.length;
+						renderHeroSlides();
+						startSlideshow();
+					}, 5000);
+				}
+			}
+
+			function prevSlide() {
+				state.currentSlide =
+					(state.currentSlide - 1 + heroSlides.length) % heroSlides.length;
+				renderHeroSlides();
+			}
+
+			function nextSlide() {
+				state.currentSlide = (state.currentSlide + 1) % heroSlides.length;
+				renderHeroSlides();
+			}
+
+			function togglePlay() {
+				state.isPlaying = !state.isPlaying;
+				const playPauseIcon = document.getElementById("play-pause-icon");
+				const playPauseButton = document.getElementById("slide-play-pause");
+
+				if (state.isPlaying) {
+					playPauseIcon.className = "fas fa-pause w-5 h-5";
+					playPauseButton.setAttribute("aria-label", "Pause slideshow");
+					startSlideshow();
+				} else {
+					playPauseIcon.className = "fas fa-play w-5 h-5";
+					playPauseButton.setAttribute("aria-label", "Play slideshow");
+				}
+			}
+
+			// Product functions
+			function renderCameraProducts() {
+				const productsContainer = document.getElementById("camera-products");
+
+				productsContainer.innerHTML = camerasData
+					.map(
+						(camera) => `
+                <div class="group relative bg-black/50 rounded-xl overflow-hidden backdrop-blur-sm border border-white/10 hover:border-yellow-400/30 hover:scale-105 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
+                    
+                    <div class="relative aspect-[4/3] overflow-hidden">
+                        <img 
+                            src="${camera.image}?auto=format&fit=crop&w=${
+							window.innerWidth < 768 ? 600 : 1000
+						}&q=${window.innerWidth < 768 ? 70 : 80}"
+                            alt="${camera.name}" 
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                        />
+                        <button
+                            data-id="${camera.id}"
+                            data-action="toggle-wishlist"
+                            class="absolute top-4 left-4 p-2 bg-black/70 rounded-full hover:bg-black/90 transition-colors"
+                            aria-label="${
+															state.wishlist.some(
+																(item) => item.id === camera.id
+															)
+																? `Remove ${camera.name} from wishlist`
+																: `Add ${camera.name} to wishlist`
+														}"
+                        >
+                            <i class="fas fa-heart ${
+															state.wishlist.some(
+																(item) => item.id === camera.id
+															)
+																? "text-red-500"
+																: "text-white"
+														}"></i>
+                        </button>
+                        <div class="absolute top-4 right-4 bg-black/70 px-3 py-1 rounded-full flex items-center">
+                            <i class="fas fa-award text-yellow-400 mr-1"></i>
+                            <span class="text-sm">Top Rated</span>
+                        </div>
+                        ${
+													camera.originalPrice > camera.price
+														? `
+                            <div class="absolute top-16 right-4 bg-red-500 px-3 py-1 rounded-full">
+                                <span class="text-sm font-bold">
+                                    Save ${formatPrice(
+																			camera.originalPrice - camera.price
+																		)}
+                                </span>
+                            </div>
+                        `
+														: ""
+												}
+                    </div>
+
+                    <div class="relative p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-2xl font-bold">${camera.name}</h3>
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-1">${camera.rating}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 mb-6">
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-headphones mr-2"></i>
+                                <span>${camera.specs.type}</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-battery-full mr-2"></i>
+                                <span>${camera.specs.battery}</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-bluetooth-b mr-2"></i>
+                                <span>${camera.specs.connectivity}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/5 p-4 rounded-lg mb-6">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <i class="fas fa-comment text-yellow-400 mr-2"></i>
+                                    <span class="text-sm font-semibold">Latest Review</span>
+                                </div>
+                                <span class="text-sm text-gray-300">${
+																	camera.reviews.length
+																} reviews</span>
+                            </div>
+                            <div class="flex items-start mb-2">
+                                <i class="fas fa-quote-left mr-2 flex-shrink-0 text-gray-400"></i>
+                                <p class="text-sm text-gray-300 italic">${
+																	camera.review.text
+																}</p>
+                            </div>
+                            <div class="flex items-center justify-between text-sm text-gray-300">
+                                <span>${camera.review.author}</span>
+                                <span>${new Date(
+																	camera.review.date
+																).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-2xl font-bold">${formatPrice(
+																			camera.price
+																		)}</span>
+                                    ${
+																			camera.originalPrice > camera.price
+																				? `
+                                        <span class="ml-2 text-lg text-gray-500 line-through">
+                                            ${formatPrice(camera.originalPrice)}
+                                        </span>
+                                    `
+																				: ""
+																		}
+                                </div>
+                                <span class="text-sm ${
+																	camera.stock < 10
+																		? "text-red-400"
+																		: "text-green-400"
+																}">
+                                    ${camera.stock} in stock
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <button
+                                    data-id="${camera.id}"
+                                    data-action="add-to-cart"
+                                    class="flex items-center justify-center px-4 py-2 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+                                    aria-label="Add ${camera.name} to cart"
+                                >
+                                    <i class="fas fa-shopping-cart mr-2"></i>
+                                    Add to Cart
+                                </button>
+                                <button 
+                                    data-id="${camera.id}"
+                                    data-action="view-details"
+                                    class="px-4 py-2 border border-white/20 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                                    aria-label="View ${camera.name} details"
+                                >
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
+
+				// Add event listeners
+				const wishlistButtons = productsContainer.querySelectorAll(
+					'[data-action="toggle-wishlist"]'
+				);
+				const addToCartButtons = productsContainer.querySelectorAll(
+					'[data-action="add-to-cart"]'
+				);
+				const viewDetailsButtons = productsContainer.querySelectorAll(
+					'[data-action="view-details"]'
+				);
+
+				wishlistButtons.forEach((button) => {
+					button.addEventListener("click", (e) => {
+						e.stopPropagation();
+						const id = parseInt(button.getAttribute("data-id"));
+						const camera = camerasData.find((c) => c.id === id);
+						if (camera) {
+							toggleWishlist({
+								id: camera.id,
+								name: camera.name,
+								price: camera.price,
+								image: camera.image,
+							});
+						}
+						renderCameraProducts();
+					});
+				});
+
+				addToCartButtons.forEach((button) => {
+					button.addEventListener("click", (e) => {
+						e.stopPropagation();
+						const id = parseInt(button.getAttribute("data-id"));
+						const camera = camerasData.find((c) => c.id === id);
+						if (camera) {
+							addToCart({
+								id: camera.id,
+								name: camera.name,
+								price: camera.price,
+								image: camera.image,
+								quantity: 1,
+							});
+						}
+					});
+				});
+
+				viewDetailsButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const id = parseInt(button.getAttribute("data-id"));
+						openProductDetail(id);
+					});
+				});
+			}
+
+			function openProductDetail(id) {
+				state.selectedCamera = camerasData.find((c) => c.id === id);
+				if (!state.selectedCamera) return;
+
+				const modal = document.getElementById("product-detail-modal");
+				const content = document.getElementById("product-detail-content");
+
+				// Generate additional images array
+				const additionalImages = [
+					"https://images.unsplash.com/photo-1590658268037-6bf12165a8df?q=80&w=1000",
+					"https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=1000",
+					"https://images.unsplash.com/photo-1613040809024-b4ef7ba99bc3?q=80&w=1000",
+				];
+
+				// Generate features array
+				const features = [
+					{
+						icon: "headphones",
+						title: "Audio Quality",
+						description: state.selectedCamera.specs.driver,
+					},
+					{
+						icon: "bluetooth-b",
+						title: "Connectivity",
+						description: state.selectedCamera.specs.connectivity,
+					},
+					{
+						icon: "battery-full",
+						title: "Battery Life",
+						description: state.selectedCamera.specs.battery,
+					},
+					{
+						icon: "volume-up",
+						title: "Features",
+						description: state.selectedCamera.specs.features,
+					},
+				];
+
+				// Create content HTML
+				content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="relative aspect-[4/3] overflow-hidden rounded-xl">
+                        <img 
+                            src="${state.selectedCamera.image}"
+                            alt="${state.selectedCamera.name}"
+                            class="w-full h-full object-cover"
+                        />
+                        <div class="absolute top-4 right-4 bg-black/70 px-3 py-1 rounded-full flex items-center">
+                            <i class="fas fa-award text-yellow-400 mr-1"></i>
+                            <span class="text-sm">Top Rated</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4">
+                        ${additionalImages
+													.map(
+														(img, index) => `
+                            <div key="${index}" class="relative aspect-square rounded-lg overflow-hidden">
+                                <img 
+                                    src="${img}"
+                                    alt="${state.selectedCamera.name} view ${
+															index + 1
+														}"
+                                    class="w-full h-full object-cover"
+                                />
+                            </div>
+                        `
+													)
+													.join("")}
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <span class="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full text-sm">New Arrival</span>
+                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-sm">In Stock</span>
+                        </div>
+                        <h1 class="text-4xl font-bold mb-4">${
+													state.selectedCamera.name
+												}</h1>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-1">${
+																	state.selectedCamera.rating
+																}</span>
+                            </div>
+                            <span class="text-gray-300">|</span>
+                            <span class="text-gray-300">${
+															state.selectedCamera.stock
+														} units available</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-baseline space-x-4">
+                        <span class="text-4xl font-bold">${formatPrice(
+													state.selectedCamera.price
+												)}</span>
+                        ${
+													state.selectedCamera.originalPrice >
+													state.selectedCamera.price
+														? `
+                            <span class="text-2xl text-gray-500 line-through">
+                                ${formatPrice(
+																	state.selectedCamera.originalPrice
+																)}
+                            </span>
+                        `
+														: ""
+												}
+                    </div>
+
+                    <div class="flex space-x-4 py-6 border-y border-white/10" role="tablist" id="product-tabs">
+                        <button
+                            data-tab="overview"
+                            class="px-4 py-2 rounded-lg transition-colors bg-yellow-400 text-black"
+                            role="tab"
+                            aria-selected="true"
+                            aria-controls="overview-panel"
+                            id="overview-tab"
+                        >
+                            Overview
+                        </button>
+                        <button
+                            data-tab="specs"
+                            class="px-4 py-2 rounded-lg transition-colors hover:bg-white/10"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="specs-panel"
+                            id="specs-tab"
+                        >
+                            Specs
+                        </button>
+                        <button
+                            data-tab="reviews"
+                            class="px-4 py-2 rounded-lg transition-colors hover:bg-white/10"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="reviews-panel"
+                            id="reviews-tab"
+                        >
+                            Reviews
+                        </button>
+                        <button
+                            data-tab="faq"
+                            class="px-4 py-2 rounded-lg transition-colors hover:bg-white/10"
+                            role="tab"
+                            aria-selected="false"
+                            aria-controls="faq-panel"
+                            id="faq-tab"
+                        >
+                            FAQ
+                        </button>
+                    </div>
+
+                    <div id="tab-content">
+                        <!-- Overview Tab (default) -->
+                        <div
+                            id="overview-panel"
+                            role="tabpanel"
+                            aria-labelledby="overview-tab"
+                            class="space-y-6"
+                        >
+                            <p class="text-gray-300 leading-relaxed">
+                                Experience premium audio quality with the ${
+																	state.selectedCamera.name
+																}. These headphones combine 
+                                cutting-edge technology with comfortable design, making them perfect for both casual listening and 
+                                audiophile applications.
+                            </p>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                ${features
+																	.map(
+																		(feature, index) => `
+                                    <div key="${index}" class="bg-white/5 p-4 rounded-lg">
+                                        <i class="fas fa-${feature.icon} mb-2 text-yellow-400"></i>
+                                        <h3 class="font-semibold mb-1">${feature.title}</h3>
+                                        <p class="text-sm text-gray-300">${feature.description}</p>
+                                    </div>
+                                `
+																	)
+																	.join("")}
+                            </div>
+                        </div>
+
+                        <!-- Specs Tab (hidden by default) -->
+                        <div
+                            id="specs-panel"
+                            role="tabpanel"
+                            aria-labelledby="specs-tab"
+                            class="space-y-4 hidden"
+                        >
+                            <div class="grid grid-cols-2 gap-4">
+                                ${Object.entries(state.selectedCamera.specs)
+																	.map(
+																		([key, value]) => `
+                                    <div class="bg-white/5 p-4 rounded-lg">
+                                        <h3 class="text-sm text-gray-300 mb-1">${
+																					key.charAt(0).toUpperCase() +
+																					key.slice(1)
+																				}</h3>
+                                        <p class="font-semibold">${value}</p>
+                                    </div>
+                                `
+																	)
+																	.join("")}
+                            </div>
+                        </div>
+
+                        <!-- Reviews Tab (hidden by default) -->
+                        <div
+                            id="reviews-panel"
+                            role="tabpanel"
+                            aria-labelledby="reviews-tab"
+                            class="space-y-6 hidden"
+                        >
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-star text-yellow-400"></i>
+                                    <span class="text-2xl font-bold">${
+																			state.selectedCamera.rating
+																		}</span>
+                                    <span class="text-gray-300">/ 5.0</span>
+                                </div>
+                                <span class="text-gray-300">${
+																	state.selectedCamera.reviews.length
+																} reviews</span>
+                            </div>
+
+                            <div class="space-y-4">
+                                ${state.selectedCamera.reviews
+																	.map(
+																		(review, index) => `
+                                    <div class="bg-white/5 p-4 rounded-lg">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-semibold">${
+																							review.author
+																						}</span>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-star text-yellow-400"></i>
+                                                <span class="ml-1">${
+																									review.rating
+																								}</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-300">${
+																					review.text
+																				}</p>
+                                        <span class="text-sm text-gray-300 mt-2 block">
+                                            ${new Date(
+																							review.date
+																						).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                `
+																	)
+																	.join("")}
+                            </div>
+                        </div>
+
+                        <!-- FAQ Tab (hidden by default) -->
+                        <div
+                            id="faq-panel"
+                            role="tabpanel"
+                            aria-labelledby="faq-tab"
+                            class="space-y-4 hidden"
+                        >
+                            ${state.selectedCamera.faqs
+															.map(
+																(faq, index) => `
+                              <div class="bg-white/5 p-4 rounded-lg">
+                                    <h3 class="font-semibold mb-2">${faq.question}</h3>
+                                    <p class="text-gray-300">${faq.answer}</p>
+                                </div>
+                            `
+															)
+															.join("")}
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex items-center space-x-2">
+                                <button
+                                    id="decrease-quantity"
+                                    class="px-3 py-1 border border-white/20 rounded-lg hover:bg-white/10"
+                                    aria-label="Decrease quantity"
+                                >
+                                    -
+                                </button>
+                                <span id="product-quantity" class="w-12 text-center">1</span>
+                                <button
+                                    id="increase-quantity"
+                                    class="px-3 py-1 border border-white/20 rounded-lg hover:bg-white/10"
+                                    aria-label="Increase quantity"
+                                >
+                                    +
+                                </button>
+                            </div>
+                            <span class="text-gray-300">
+                                ${state.selectedCamera.stock} units available
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <button
+                                id="add-to-cart-detail"
+                                class="flex items-center justify-center px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+                                aria-label="Add ${
+																	state.selectedCamera.name
+																} to cart"
+                            >
+                                <i class="fas fa-shopping-cart mr-2"></i>
+                                Add to Cart
+                            </button>
+                            <button
+                                id="toggle-wishlist-detail"
+                                class="flex items-center justify-center px-6 py-3 border border-white/20 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                                aria-label="${
+																	state.wishlist.some(
+																		(item) =>
+																			item.id === state.selectedCamera.id
+																	)
+																		? `Remove ${state.selectedCamera.name} from wishlist`
+																		: `Add ${state.selectedCamera.name} to wishlist`
+																}"
+                            >
+                                <i class="fas fa-heart mr-2 ${
+																	state.wishlist.some(
+																		(item) =>
+																			item.id === state.selectedCamera.id
+																	)
+																		? "text-red-500"
+																		: ""
+																}"></i>
+                                ${
+																	state.wishlist.some(
+																		(item) =>
+																			item.id === state.selectedCamera.id
+																	)
+																		? "Remove from Wishlist"
+																		: "Add to Wishlist"
+																}
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-4 pt-6 border-t border-white/10">
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-truck text-yellow-400 mr-2"></i>
+                                <span>Free Shipping</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-shield-alt text-yellow-400 mr-2"></i>
+                                <span>2-Year Warranty</span>
+                            </div>
+                            <div class="flex items-center text-gray-300">
+                                <i class="fas fa-box text-yellow-400 mr-2"></i>
+                                <span>30-Day Returns</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+				// Show the modal
+				modal.classList.remove("hidden");
+
+				// Add event listeners for tab switching
+				const tabButtons = document.querySelectorAll("[data-tab]");
+				const tabPanels = document.querySelectorAll('[role="tabpanel"]');
+
+				tabButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const tabId = button.getAttribute("data-tab");
+
+						// Update button states
+						tabButtons.forEach((btn) => {
+							if (btn.getAttribute("data-tab") === tabId) {
+								btn.classList.add("bg-yellow-400", "text-black");
+								btn.classList.remove("hover:bg-white/10");
+								btn.setAttribute("aria-selected", "true");
+							} else {
+								btn.classList.remove("bg-yellow-400", "text-black");
+								btn.classList.add("hover:bg-white/10");
+								btn.setAttribute("aria-selected", "false");
+							}
+						});
+
+						// Update panel visibility
+						tabPanels.forEach((panel) => {
+							if (panel.id === `${tabId}-panel`) {
+								panel.classList.remove("hidden");
+							} else {
+								panel.classList.add("hidden");
+							}
+						});
+					});
+				});
+
+				// Add quantity control handlers
+				let quantity = 1;
+				const quantityDisplay = document.getElementById("product-quantity");
+				const decreaseButton = document.getElementById("decrease-quantity");
+				const increaseButton = document.getElementById("increase-quantity");
+
+				decreaseButton.addEventListener("click", () => {
+					quantity = Math.max(1, quantity - 1);
+					quantityDisplay.textContent = quantity;
+				});
+
+				increaseButton.addEventListener("click", () => {
+					quantity = Math.min(state.selectedCamera.stock, quantity + 1);
+					quantityDisplay.textContent = quantity;
+				});
+
+				// Add to cart handler
+				const addToCartButton = document.getElementById("add-to-cart-detail");
+				addToCartButton.addEventListener("click", () => {
+					addToCart({
+						id: state.selectedCamera.id,
+						name: state.selectedCamera.name,
+						price: state.selectedCamera.price,
+						image: state.selectedCamera.image,
+						quantity: quantity,
+					});
+				});
+
+				// Wishlist toggle handler
+				const wishlistButton = document.getElementById(
+					"toggle-wishlist-detail"
+				);
+				wishlistButton.addEventListener("click", () => {
+					toggleWishlist({
+						id: state.selectedCamera.id,
+						name: state.selectedCamera.name,
+						price: state.selectedCamera.price,
+						image: state.selectedCamera.image,
+					});
+
+					// Update button appearance
+					if (
+						state.wishlist.some((item) => item.id === state.selectedCamera.id)
+					) {
+						wishlistButton.innerHTML = `
+                        <i class="fas fa-heart mr-2 text-red-500"></i>
+                        Remove from Wishlist
+                    `;
+					} else {
+						wishlistButton.innerHTML = `
+                        <i class="fas fa-heart mr-2"></i>
+                        Add to Wishlist
+                    `;
+					}
+				});
+			}
+
+			function closeProductDetail() {
+				const modal = document.getElementById("product-detail-modal");
+				modal.classList.add("hidden");
+				state.selectedCamera = null;
+			}
+
+			// Checkout functions
+			function renderCheckoutSteps() {
+				const steps = [
+					{ name: "Cart", number: 1 },
+					{ name: "Information", number: 2 },
+					{ name: "Shipping", number: 3 },
+					{ name: "Payment", number: 4 },
+					{ name: "Review", number: 5 },
+				];
+
+				const progressBar = document.getElementById("checkout-progress");
+				progressBar.innerHTML = `
+                <div class="flex justify-between">
+                    ${steps
+											.map(
+												(step, index) => `
+                        <div class="flex flex-col items-center">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center mb-2 ${
+															step.number < state.checkoutStep
+																? "bg-green-500 text-white"
+																: step.number === state.checkoutStep
+																? "bg-blue-500 text-white"
+																: "bg-gray-700 text-white/70"
+														}">
+                                ${
+																	step.number < state.checkoutStep
+																		? `<i class="fas fa-check"></i>`
+																		: step.number
+																}
+                            </div>
+                            <span class="text-sm ${
+															step.number === state.checkoutStep
+																? "text-white font-semibold"
+																: "text-gray-400"
+														}">
+                                ${step.name}
+                            </span>
+                        </div>
+                    `
+											)
+											.join("")}
+                </div>
+                <div class="mt-2 grid grid-cols-4 gap-2">
+                    ${[...Array(4)]
+											.map(
+												(_, i) => `
+                        <div key="${i}" class="h-1 rounded-full ${
+													i < state.checkoutStep - 1
+														? "bg-green-500"
+														: "bg-gray-700"
+												}"></div>
+                    `
+											)
+											.join("")}
+                </div>
+            `;
+			}
+
+			function renderCheckoutStep() {
+				const stepContent = document.getElementById("step-content");
+
+				// Hide non-relevant containers
+				document.getElementById("cart-content").classList.add("hidden");
+				document.getElementById("empty-cart").classList.add("hidden");
+				document.getElementById("cart-footer").classList.add("hidden");
+				document.getElementById("checkout-steps").classList.remove("hidden");
+
+				// Change cart title based on step
+				document.getElementById("cart-title").textContent = "Checkout";
+
+				// Render appropriate step
+				if (state.checkoutStep === 2) {
+					// Information step
+					stepContent.innerHTML = `
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-semibold">Contact Information</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm text-gray-400 mb-1">Email *</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                    placeholder="your@email.com"
+                                />
+                                <p id="email-error" class="text-red-500 text-sm mt-1 hidden">Email is required</p>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="newsletter" class="mr-2" />
+                                <label for="newsletter" class="text-sm text-gray-400">Keep me updated with news and exclusive offers</label>
+                            </div>
+                        </div>
+                        
+                        <h3 class="text-xl font-semibold pt-4">Shipping Address</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="firstName" class="block text-sm text-gray-400 mb-1">First Name *</label>
+                                <input
+                                    type="text"
+                                    id="firstName"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="firstName-error" class="text-red-500 text-sm mt-1 hidden">First name is required</p>
+                            </div>
+                            <div>
+                                <label for="lastName" class="block text-sm text-gray-400 mb-1">Last Name *</label>
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="lastName-error" class="text-red-500 text-sm mt-1 hidden">Last name is required</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="address" class="block text-sm text-gray-400 mb-1">Address *</label>
+                                <input
+                                    type="text"
+                                    id="address"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="address-error" class="text-red-500 text-sm mt-1 hidden">Address is required</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="apartment" class="block text-sm text-gray-400 mb-1">Apartment, suite, etc. (optional)</label>
+                                <input
+                                    type="text"
+                                    id="apartment"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                            </div>
+                            <div>
+                                <label for="city" class="block text-sm text-gray-400 mb-1">City *</label>
+                                <input
+                                    type="text"
+                                    id="city"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="city-error" class="text-red-500 text-sm mt-1 hidden">City is required</p>
+                            </div>
+                            <div>
+                                <label for="country" class="block text-sm text-gray-400 mb-1">Country *</label>
+                                <select
+                                    id="country"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                >
+                                    <option value="US">United States</option>
+                                    <option value="CA">Canada</option>
+                                    <option value="UK">United Kingdom</option>
+                                    <option value="AU">Australia</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="state" class="block text-sm text-gray-400 mb-1">State/Province *</label>
+                                <input
+                                    type="text"
+                                    id="state"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="state-error" class="text-red-500 text-sm mt-1 hidden">State is required</p>
+                            </div>
+                            <div>
+                                <label for="zipCode" class="block text-sm text-gray-400 mb-1">ZIP / Postal Code *</label>
+                                <input
+                                    type="text"
+                                    id="zipCode"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="zipCode-error" class="text-red-500 text-sm mt-1 hidden">ZIP code is required</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label for="phone" class="block text-sm text-gray-400 mb-1">Phone *</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                />
+                                <p id="phone-error" class="text-red-500 text-sm mt-1 hidden">Phone is required</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end pt-4">
+                            <button
+                                id="continue-to-shipping"
+                                class="flex items-center px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+                            >
+                                Continue to Shipping
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+					// Add event listeners
+					document
+						.getElementById("continue-to-shipping")
+						.addEventListener("click", () => {
+							const requiredFields = [
+								"email",
+								"firstName",
+								"lastName",
+								"address",
+								"city",
+								"state",
+								"zipCode",
+								"phone",
+							];
+							let isValid = true;
+
+							requiredFields.forEach((field) => {
+								const input = document.getElementById(field);
+								const error = document.getElementById(`${field}-error`);
+
+								if (!input.value.trim()) {
+									error.classList.remove("hidden");
+									input.classList.add("border-red-500");
+									isValid = false;
+								} else {
+									error.classList.add("hidden");
+									input.classList.remove("border-red-500");
+								}
+							});
+
+							if (isValid) {
+								state.checkoutStep = 3;
+								renderCheckoutSteps();
+								renderCheckoutStep();
+							}
+						});
+				} else if (state.checkoutStep === 3) {
+					// Shipping step
+					stepContent.innerHTML = `
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-semibold">Shipping Method</h3>
+                        
+                        <div class="space-y-3" id="shipping-options">
+                            <div class="border border-yellow-400 rounded-md p-4 cursor-pointer" data-shipping="standard">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 rounded-full border-2 border-yellow-400 flex items-center justify-center mr-3">
+                                            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold">Standard Shipping</p>
+                                            <p class="text-sm text-gray-400">Delivery in 3-5 business days</p>
+                                        </div>
+                                    </div>
+                                    <span class="font-semibold">Free</span>
+                                </div>
+                            </div>
+                            <div class="border border-gray-700 rounded-md p-4 cursor-pointer" data-shipping="express">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 rounded-full border-2 border-gray-500 flex items-center justify-center mr-3">
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold">Express Shipping</p>
+                                            <p class="text-sm text-gray-400">Delivery in 1-2 business days</p>
+                                        </div>
+                                    </div>
+                                    <span class="font-semibold">$15.00</span>
+                                </div>
+                            </div>
+                            <div class="border border-gray-700 rounded-md p-4 cursor-pointer" data-shipping="overnight">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 rounded-full border-2 border-gray-500 flex items-center justify-center mr-3">
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold">Overnight Shipping</p>
+                                            <p class="text-sm text-gray-400">Delivery in 1 business day</p>
+                                        </div>
+                                    </div>
+                                    <span class="font-semibold">$30.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center pt-4">
+                            <div class="flex-1">
+                                <button
+                                    id="return-to-information"
+                                    class="text-gray-300 hover:underline"
+                                >
+                                    Return to Information
+                                </button>
+                            </div>
+                            <button
+                                id="continue-to-payment"
+                                class="flex items-center px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+                            >
+                                Continue to Payment
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+					// Add event listeners
+					document
+						.getElementById("return-to-information")
+						.addEventListener("click", () => {
+							state.checkoutStep = 2;
+							renderCheckoutSteps();
+							renderCheckoutStep();
+						});
+
+					document
+						.getElementById("continue-to-payment")
+						.addEventListener("click", () => {
+							state.checkoutStep = 4;
+							renderCheckoutSteps();
+							renderCheckoutStep();
+						});
+
+					// Shipping option selection
+					const shippingOptions = document.querySelectorAll("[data-shipping]");
+					shippingOptions.forEach((option) => {
+						option.addEventListener("click", () => {
+							const shippingType = option.getAttribute("data-shipping");
+
+							shippingOptions.forEach((opt) => {
+								if (opt.getAttribute("data-shipping") === shippingType) {
+									opt.classList.remove("border-gray-700");
+									opt.classList.add("border-yellow-400");
+									opt.querySelector(".w-5").classList.remove("border-gray-500");
+									opt.querySelector(".w-5").classList.add("border-yellow-400");
+
+									// Add the inner circle
+									if (!opt.querySelector(".w-3")) {
+										const innerCircle = document.createElement("div");
+										innerCircle.className =
+											"w-3 h-3 bg-yellow-400 rounded-full";
+										opt.querySelector(".w-5").appendChild(innerCircle);
+									}
+								} else {
+									opt.classList.remove("border-yellow-400");
+									opt.classList.add("border-gray-700");
+									opt
+										.querySelector(".w-5")
+										.classList.remove("border-yellow-400");
+									opt.querySelector(".w-5").classList.add("border-gray-500");
+
+									// Remove the inner circle
+									const innerCircle = opt.querySelector(".w-3");
+									if (innerCircle) {
+										innerCircle.remove();
+									}
+								}
+							});
+						});
+					});
+				} else if (state.checkoutStep === 4) {
+					// Payment step
+					stepContent.innerHTML = `
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-semibold">Payment Method</h3>
+                        
+                        <div class="space-y-4">
+                            <div class="border border-yellow-400 rounded-md p-4 cursor-pointer" id="credit-card-payment">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 rounded-full border-2 border-yellow-400 flex items-center justify-center mr-3">
+                                            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                        </div>
+                                        <p class="font-semibold">Credit Card</p>
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <div class="w-10 h-6 bg-blue-500 rounded"></div>
+                                        <div class="w-10 h-6 bg-red-500 rounded"></div>
+                                        <div class="w-10 h-6 bg-gray-500 rounded"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <div>
+                                        <label for="cardNumber" class="block text-sm text-gray-400 mb-1">Card Number *</label>
+                                        <input
+                                            type="text"
+                                            id="cardNumber"
+                                            class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                            placeholder="1234 5678 9012 3456"
+                                        />
+                                        <p id="cardNumber-error" class="text-red-500 text-sm mt-1 hidden">Card number is required</p>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="expiryDate" class="block text-sm text-gray-400 mb-1">Expiry Date *</label>
+                                            <input
+                                                type="text"
+                                                id="expiryDate"
+                                                class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                                placeholder="MM/YY"
+                                            />
+                                            <p id="expiryDate-error" class="text-red-500 text-sm mt-1 hidden">Expiry date is required</p>
+                                        </div>
+                                        <div>
+                                            <label for="cvc" class="block text-sm text-gray-400 mb-1">CVC *</label>
+                                            <input
+                                                type="text"
+                                                id="cvc"
+                                                class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                                placeholder="123"
+                                            />
+                                            <p id="cvc-error" class="text-red-500 text-sm mt-1 hidden">CVC is required</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="nameOnCard" class="block text-sm text-gray-400 mb-1">Name on Card *</label>
+                                        <input
+                                            type="text"
+                                            id="nameOnCard"
+                                            class="w-full bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                                            placeholder="John Doe"
+                                        />
+                                        <p id="nameOnCard-error" class="text-red-500 text-sm mt-1 hidden">Name on card is required</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-700 rounded-md p-4 cursor-pointer" id="paypal-payment">
+                                <div class="flex items-center">
+                                    <div class="w-5 h-5 rounded-full border-2 border-gray-500 flex items-center justify-center mr-3">
+                                    </div>
+                                    <p class="font-semibold">PayPal</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-700 mt-6">
+                            <h4 class="font-semibold mb-2">Billing Address</h4>
+                            <div class="flex items-center mb-4">
+                                <input type="checkbox" id="sameAsShipping" class="mr-2" checked />
+                                <label for="sameAsShipping" class="text-sm">Same as shipping address</label>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center pt-4">
+                            <div class="flex-1">
+                                <button
+                                    id="return-to-shipping"
+                                    class="text-gray-300 hover:underline"
+                                >
+                                    Return to Shipping
+                                </button>
+                            </div>
+                            <button
+                                id="continue-to-review"
+                                class="flex items-center px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+                            >
+                                Continue to Review
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+					// Add event listeners
+					document
+						.getElementById("return-to-shipping")
+						.addEventListener("click", () => {
+							state.checkoutStep = 3;
+							renderCheckoutSteps();
+							renderCheckoutStep();
+						});
+
+					document
+						.getElementById("continue-to-review")
+						.addEventListener("click", () => {
+							const requiredFields = [
+								"cardNumber",
+								"expiryDate",
+								"cvc",
+								"nameOnCard",
+							];
+							let isValid = true;
+
+							requiredFields.forEach((field) => {
+								const input = document.getElementById(field);
+								const error = document.getElementById(`${field}-error`);
+
+								if (!input.value.trim()) {
+									error.classList.remove("hidden");
+									input.classList.add("border-red-500");
+									isValid = false;
+								} else {
+									error.classList.add("hidden");
+									input.classList.remove("border-red-500");
+								}
+							});
+
+							if (isValid) {
+								state.checkoutStep = 5;
+								renderCheckoutSteps();
+								renderCheckoutStep();
+							}
+						});
+
+					// Payment method selection
+					const creditCardOption = document.getElementById(
+						"credit-card-payment"
+					);
+					const paypalOption = document.getElementById("paypal-payment");
+
+					paypalOption.addEventListener("click", () => {
+						paypalOption.classList.remove("border-gray-700");
+						paypalOption.classList.add("border-yellow-400");
+						paypalOption
+							.querySelector(".w-5")
+							.classList.remove("border-gray-500");
+						paypalOption
+							.querySelector(".w-5")
+							.classList.add("border-yellow-400");
+
+						// Add the inner circle
+						if (!paypalOption.querySelector(".w-3")) {
+							const innerCircle = document.createElement("div");
+							innerCircle.className = "w-3 h-3 bg-yellow-400 rounded-full";
+							paypalOption.querySelector(".w-5").appendChild(innerCircle);
+						}
+
+						// Update credit card option
+						creditCardOption.classList.remove("border-yellow-400");
+						creditCardOption.classList.add("border-gray-700");
+						creditCardOption
+							.querySelector(".w-5")
+							.classList.remove("border-yellow-400");
+						creditCardOption
+							.querySelector(".w-5")
+							.classList.add("border-gray-500");
+
+						// Remove the inner circle
+						const innerCircle = creditCardOption.querySelector(".w-3");
+						if (innerCircle) {
+							innerCircle.remove();
+						}
+
+						// Hide credit card form
+						const cardForm = creditCardOption.querySelector(".space-y-4");
+						cardForm.style.display = "none";
+					});
+
+					creditCardOption.addEventListener("click", () => {
+						creditCardOption.classList.remove("border-gray-700");
+						creditCardOption.classList.add("border-yellow-400");
+						creditCardOption
+							.querySelector(".w-5")
+							.classList.remove("border-gray-500");
+						creditCardOption
+							.querySelector(".w-5")
+							.classList.add("border-yellow-400");
+
+						// Add the inner circle
+						if (!creditCardOption.querySelector(".w-3")) {
+							const innerCircle = document.createElement("div");
+							innerCircle.className = "w-3 h-3 bg-yellow-400 rounded-full";
+							creditCardOption.querySelector(".w-5").appendChild(innerCircle);
+						}
+
+						// Update paypal option
+						paypalOption.classList.remove("border-yellow-400");
+						paypalOption.classList.add("border-gray-700");
+						paypalOption
+							.querySelector(".w-5")
+							.classList.remove("border-yellow-400");
+						paypalOption.querySelector(".w-5").classList.add("border-gray-500");
+
+						// Remove the inner circle
+						const innerCircle = paypalOption.querySelector(".w-3");
+						if (innerCircle) {
+							innerCircle.remove();
+						}
+
+						// Show credit card form
+						const cardForm = creditCardOption.querySelector(".space-y-4");
+						cardForm.style.display = "block";
+					});
+				} else if (state.checkoutStep === 5) {
+					// Review step
+					const cartTotal = getCartTotal();
+
+					stepContent.innerHTML = `
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-semibold">Review Your Order</h3>
+                        
+                        <div class="border-t border-gray-700 pt-4">
+                            <h4 class="font-semibold mb-4">Order Summary</h4>
+                            <div class="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                                ${state.cart
+																	.map(
+																		(item) => `
+                                    <div class="flex items-start">
+                                        <div class="relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0">
+                                            <img 
+                                                src="${item.image}"
+                                                alt="${item.name}"
+                                                class="w-full h-full object-cover"
+                                            />
+                                            <div class="absolute top-0 right-0 bg-yellow-400 text-black text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                                                ${item.quantity}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4 flex-1">
+                                            <h5 class="font-semibold">${
+																							item.name
+																						}</h5>
+                                            <p class="text-sm text-gray-400">Quantity: ${
+																							item.quantity
+																						}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="font-semibold">${formatPrice(
+																							item.price * item.quantity
+																						)}</span>
+                                        </div>
+                                    </div>
+                                `
+																	)
+																	.join("")}
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-700 pt-4 space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Subtotal</span>
+                                <span>${formatPrice(cartTotal)}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Shipping</span>
+                                <span>Free</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">Tax</span>
+                                <span>${formatPrice(cartTotal * 0.08)}</span>
+                            </div>
+                            <div class="flex justify-between pt-2 border-t border-gray-700 text-lg font-semibold">
+                                <span>Total</span>
+                                <span>${formatPrice(
+																	cartTotal + cartTotal * 0.08
+																)}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="border-t border-gray-700 pt-4">
+                            <h4 class="font-semibold mb-2">Shipping Information</h4>
+                            <p class="text-gray-300">John Doe</p>
+                            <p class="text-gray-300">123 Main St, Apt 4B</p>
+                            <p class="text-gray-300">New York, NY 10001</p>
+                            <p class="text-gray-300">United States</p>
+                            <p class="text-gray-300">+1 (123) 456-7890</p>
+                        </div>
+                        
+                        <div class="border-t border-gray-700 pt-4">
+                            <h4 class="font-semibold mb-2">Payment Method</h4>
+                            <p class="text-gray-300">Credit Card ending in 3456</p>
+                        </div>
+                        
+                        <div class="flex items-center pt-6">
+                            <div class="flex-1">
+                                <button
+                                    id="return-to-payment"
+                                    class="text-gray-300 hover:underline"
+                                >
+                                    Return to Payment
+                                </button>
+                            </div>
+                            <button
+                                id="complete-order"
+                                class="flex items-center px-6 py-3 bg-yellow-400 text-black rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+                            >
+                                Complete Order
+                                <i class="fas fa-lock ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+					// Add event listeners
+					document
+						.getElementById("return-to-payment")
+						.addEventListener("click", () => {
+							state.checkoutStep = 4;
+							renderCheckoutSteps();
+							renderCheckoutStep();
+						});
+
+					document
+						.getElementById("complete-order")
+						.addEventListener("click", () => {
+							state.orderCompleted = true;
+
+							// Hide checkout steps
+							document.getElementById("checkout-steps").classList.add("hidden");
+
+							// Show confirmation
+							document
+								.getElementById("order-confirmation")
+								.classList.remove("hidden");
+
+							// Change cart title
+							document.getElementById("cart-title").textContent =
+								"Order Confirmation";
+
+							// Clear cart
+							clearCart();
+						});
+				}
+			}
+
+			// Contact form submission
+			function handleContactForm() {
+				const form = document.getElementById("contact-form");
+				form.addEventListener("submit", (e) => {
+					e.preventDefault();
+
+					const name = document.getElementById("name");
+					const email = document.getElementById("email");
+					const subject = document.getElementById("subject");
+					const message = document.getElementById("message");
+
+					const nameError = document.getElementById("name-error");
+					const emailError = document.getElementById("email-error");
+					const subjectError = document.getElementById("subject-error");
+					const messageError = document.getElementById("message-error");
+
+					let isValid = true;
+
+					if (!name.value.trim()) {
+						nameError.classList.remove("hidden");
+						name.classList.add("border-red-500");
+						isValid = false;
+					} else {
+						nameError.classList.add("hidden");
+						name.classList.remove("border-red-500");
+					}
+
+					if (!email.value.trim()) {
+						emailError.classList.remove("hidden");
+						email.classList.add("border-red-500");
+						isValid = false;
+					} else {
+						emailError.classList.add("hidden");
+						email.classList.remove("border-red-500");
+					}
+
+					if (!subject.value.trim()) {
+						subjectError.classList.remove("hidden");
+						subject.classList.add("border-red-500");
+						isValid = false;
+					} else {
+						subjectError.classList.add("hidden");
+						subject.classList.remove("border-red-500");
+					}
+
+					if (!message.value.trim()) {
+						messageError.classList.remove("hidden");
+						message.classList.add("border-red-500");
+						isValid = false;
+					} else {
+						messageError.classList.add("hidden");
+						message.classList.remove("border-red-500");
+					}
+
+					if (isValid) {
+						showNotification("Message sent successfully!");
+						form.reset();
+					}
+				});
+			}
+
+			// Initialize the app
+			function initApp() {
+				// Update current year in footer
+				document.getElementById("current-year").textContent =
+					new Date().getFullYear();
+
+				// Navbar scroll effect
+				window.addEventListener("scroll", () => {
+					const navbar = document.getElementById("navbar");
+					if (window.scrollY > 50) {
+						navbar.classList.remove("bg-transparent", "py-6");
+						navbar.classList.add("bg-black", "py-2");
+					} else {
+						navbar.classList.add("bg-transparent", "py-6");
+						navbar.classList.remove("bg-black", "py-2");
+					}
+				});
+
+				// Mobile menu toggle
+				const mobileMenuButton = document.getElementById("mobile-menu-button");
+				const mobileMenu = document.getElementById("mobile-menu");
+
+				mobileMenuButton.addEventListener("click", () => {
+					state.isMobileMenuOpen = !state.isMobileMenuOpen;
+
+					if (state.isMobileMenuOpen) {
+						mobileMenu.classList.remove("max-h-0", "opacity-0");
+						mobileMenu.classList.add("max-h-96", "opacity-100");
+						mobileMenuButton.innerHTML = '<i class="fas fa-times text-xl"></i>';
+						mobileMenuButton.setAttribute("aria-label", "Close menu");
+						mobileMenuButton.setAttribute("aria-expanded", "true");
+						mobileMenu.setAttribute("aria-hidden", "false");
+					} else {
+						mobileMenu.classList.add("max-h-0", "opacity-0");
+						mobileMenu.classList.remove("max-h-96", "opacity-100");
+						mobileMenuButton.innerHTML = '<i class="fas fa-bars text-xl"></i>';
+						mobileMenuButton.setAttribute("aria-label", "Open menu");
+						mobileMenuButton.setAttribute("aria-expanded", "false");
+						mobileMenu.setAttribute("aria-hidden", "true");
+					}
+				});
+
+				// Cart modal
+				const cartButton = document.getElementById("cart-button");
+				const cartModal = document.getElementById("cart-modal");
+				const closeCart = document.getElementById("close-cart");
+
+				cartButton.addEventListener("click", () => {
+					cartModal.classList.remove("hidden");
+					document.body.style.overflow = "hidden";
+
+					// Reset checkout step
+					state.checkoutStep = 1;
+					state.orderCompleted = false;
+
+					// Show cart content
+					document.getElementById("cart-content").classList.remove("hidden");
+					document.getElementById("checkout-steps").classList.add("hidden");
+					document.getElementById("order-confirmation").classList.add("hidden");
+
+					// Update cart title
+					document.getElementById("cart-title").textContent = "Shopping Cart";
+
+					updateCartUI();
+				});
+
+				closeCart.addEventListener("click", () => {
+					cartModal.classList.add("hidden");
+					document.body.style.overflow = "auto";
+				});
+
+				// Checkout process
+				const proceedCheckout = document.getElementById("proceed-checkout");
+
+				proceedCheckout.addEventListener("click", () => {
+					if (state.cart.length > 0) {
+						state.checkoutStep = 2;
+						renderCheckoutSteps();
+						renderCheckoutStep();
+					}
+				});
+
+				// Continue shopping button
+				document
+					.getElementById("continue-shopping")
+					.addEventListener("click", () => {
+						cartModal.classList.add("hidden");
+						document.body.style.overflow = "auto";
+					});
+
+				// Product detail modal
+				const closeProductDetail = document.getElementById(
+					"close-product-detail"
+				);
+
+				closeProductDetail.addEventListener("click", () => {
+					closeProductDetail();
+				});
+
+				// Render hero slides
+				renderHeroSlides();
+
+				// Slide controls
+				document
+					.getElementById("prev-slide")
+					.addEventListener("click", prevSlide);
+				document
+					.getElementById("next-slide")
+					.addEventListener("click", nextSlide);
+				document
+					.getElementById("slide-play-pause")
+					.addEventListener("click", togglePlay);
+
+				// Keyboard navigation for slides
+				window.addEventListener("keydown", (e) => {
+					if (e.key === "ArrowLeft") {
+						prevSlide();
+					} else if (e.key === "ArrowRight") {
+						nextSlide();
+					} else if (
+						e.key === " " &&
+						document.activeElement.tagName !== "BUTTON" &&
+						document.activeElement.tagName !== "INPUT" &&
+						document.activeElement.tagName !== "TEXTAREA"
+					) {
+						e.preventDefault();
+						togglePlay();
+					}
+				});
+
+				// Start slideshow
+				startSlideshow();
+
+				// Render camera products
+				renderCameraProducts();
+
+				// Contact form handling
+				handleContactForm();
+
+				// Update UI
+				updateCartUI();
+				updateWishlistUI();
+
+				// Check screen size
+				window.addEventListener("resize", () => {
+					state.isMobile = window.innerWidth < 768;
+				});
+			}
+
+			// Initialize when DOM is loaded
+			document.addEventListener("DOMContentLoaded", initApp);
+		</script>
+	</body>
+</html>
