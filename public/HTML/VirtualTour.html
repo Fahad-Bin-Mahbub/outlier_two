@@ -1,0 +1,4161 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Virtual Museum</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+		<script src="https://unpkg.com/aframe-environment-component@1.3.1/dist/aframe-environment-component.min.js"></script>
+		<script src="https://unpkg.com/aframe-event-set-component@3.0.3/dist/aframe-event-set-component.min.js"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ["Inter", "sans-serif"],
+							display: ["Playfair Display", "serif"],
+						},
+						colors: {
+							primary: {
+								DEFAULT: "#F5B041",
+								50: "#FEF9E7",
+								100: "#FCF3CF",
+								200: "#F9E79F",
+								300: "#F7DC6F",
+								400: "#F4D03F",
+								500: "#F1C40F",
+								600: "#C29D0B",
+								700: "#927608",
+								800: "#634F05",
+								900: "#332802",
+								950: "#1A1401",
+							},
+							dark: {
+								DEFAULT: "#1A1A1A",
+								50: "#666666",
+								100: "#5C5C5C",
+								200: "#474747",
+								300: "#333333",
+								400: "#292929",
+								500: "#1A1A1A",
+								600: "#0D0D0D",
+								700: "#000000",
+								800: "#000000",
+								900: "#000000",
+								950: "#000000",
+							},
+						},
+						backgroundImage: {
+							"museum-pattern":
+								"url('https://www.toptal.com/designers/subtlepatterns/uploads/darkness.png')",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "Inter", sans-serif;
+				scroll-behavior: smooth;
+			}
+
+			body {
+				background-color: #1a1a1a;
+				background-image: url("https://www.toptal.com/designers/subtlepatterns/uploads/darkness.png");
+				color: #fff;
+				line-height: 1.5;
+				overflow-x: hidden;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			/* Custom scrollbar */
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #1a1a1a;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #f5b041;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #f1c40f;
+			}
+
+			/* Smooth transitions */
+			.transition-all {
+				transition: all 0.3s ease-in-out;
+			}
+
+			/* Artifact card hover effect */
+			.artifact-card {
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.artifact-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+					0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			}
+
+			/* Hero section parallax effect */
+			.parallax {
+				perspective: 1px;
+				height: 70vh;
+				overflow-x: hidden;
+				overflow-y: hidden;
+			}
+
+			.parallax-bg {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				transform: translateZ(-1px) scale(2);
+				z-index: -1;
+			}
+
+			/* Animations */
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			@keyframes slideUp {
+				from {
+					transform: translateY(20px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			.animate-fadeIn {
+				animation: fadeIn 0.5s ease-out forwards;
+			}
+
+			.animate-slideUp {
+				animation: slideUp 0.5s ease-out forwards;
+			}
+
+			/* Modal animation */
+			.modal-backdrop {
+				transition: opacity 0.3s ease;
+			}
+
+			.modal-content {
+				transition: transform 0.3s ease, opacity 0.3s ease;
+			}
+
+			.modal-entering {
+				opacity: 0;
+			}
+
+			.modal-entering .modal-content {
+				transform: translateY(20px);
+				opacity: 0;
+			}
+
+			.modal-visible {
+				opacity: 1;
+			}
+
+			.modal-visible .modal-content {
+				transform: translateY(0);
+				opacity: 1;
+			}
+
+			/* Loading indicator */
+			.loader {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.8);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 9999;
+				opacity: 1;
+				transition: opacity 0.5s ease;
+			}
+
+			.loader.hidden {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.spinner {
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+				border: 4px solid rgba(245, 176, 65, 0.1);
+				border-top-color: #f5b041;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			/* Tour progress bar */
+			.tour-progress {
+				height: 4px;
+				background: linear-gradient(to right, #f5b041, #f1c40f);
+				width: 0%;
+				position: fixed;
+				top: 0;
+				left: 0;
+				z-index: 100;
+				transition: width 0.5s ease;
+			}
+
+			/* Audio player styling */
+			.custom-audio-player {
+				width: 100%;
+				padding: 10px;
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 8px;
+				margin-top: 16px;
+			}
+
+			.audio-progress {
+				width: 100%;
+				height: 6px;
+				background: rgba(255, 255, 255, 0.2);
+				border-radius: 3px;
+				overflow: hidden;
+				margin-bottom: 10px;
+				cursor: pointer;
+			}
+
+			.audio-progress-bar {
+				height: 100%;
+				background: #f5b041;
+				width: 0%;
+				transition: width 0.1s linear;
+			}
+
+			.audio-controls {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.audio-button {
+				background: none;
+				border: none;
+				color: white;
+				font-size: 1.2rem;
+				cursor: pointer;
+				width: 36px;
+				height: 36px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				transition: background 0.2s;
+			}
+
+			.audio-button:hover {
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			.audio-time {
+				font-size: 0.8rem;
+				color: rgba(255, 255, 255, 0.8);
+			}
+
+			/* VR scene styles */
+			.vr-scene {
+				width: 100%;
+				height: 100vh;
+				background: #000;
+			}
+
+			/* Exhibition cards */
+			.exhibition-card {
+				overflow: hidden;
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.exhibition-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2),
+					0 10px 10px -5px rgba(0, 0, 0, 0.1);
+			}
+
+			.exhibition-image {
+				transition: transform 0.5s ease;
+			}
+
+			.exhibition-card:hover .exhibition-image {
+				transform: scale(1.05);
+			}
+
+			/* Navigation indicator */
+			.nav-indicator {
+				position: absolute;
+				bottom: -2px;
+				left: 0;
+				height: 2px;
+				background: #f5b041;
+				transition: all 0.3s ease;
+			}
+		</style>
+	</head>
+
+	<body class="font-sans text-white">
+		<!-- Loader -->
+		<div id="loader" class="loader">
+			<div class="spinner"></div>
+		</div>
+
+		<!-- Tour Progress Bar -->
+		<div id="tour-progress" class="tour-progress"></div>
+
+		<!-- Header -->
+		<header
+			class="fixed top-0 left-0 w-full z-50 bg-dark-500/90 backdrop-blur-md border-b border-gray-800 shadow-lg transition-all duration-300"
+		>
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+				<div class="flex items-center justify-between">
+					<!-- Logo -->
+					<a
+						href="#"
+						class="flex items-center space-x-2"
+						onclick="showSection('browse')"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-8 w-8 text-primary"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+							/>
+						</svg>
+						<h1
+							class="text-2xl font-display font-bold tracking-wider text-white"
+						>
+							<span class="text-primary">VIRTUAL</span> MUSEUM
+						</h1>
+					</a>
+
+					<!-- Desktop Navigation -->
+					<nav class="hidden md:flex items-center space-x-1">
+						<div class="relative">
+							<button
+								onclick="showSection('browse')"
+								class="px-4 py-2 text-sm font-medium text-white hover:text-primary transition-colors focus:outline-none nav-link"
+								data-target="browse"
+							>
+								Browse
+							</button>
+						</div>
+						<div class="relative">
+							<button
+								onclick="showSection('tours')"
+								class="px-4 py-2 text-sm font-medium text-white hover:text-primary transition-colors focus:outline-none nav-link"
+								data-target="tours"
+							>
+								Tours
+							</button>
+						</div>
+						<div class="relative">
+							<button
+								onclick="showSection('exhibitions')"
+								class="px-4 py-2 text-sm font-medium text-white hover:text-primary transition-colors focus:outline-none nav-link"
+								data-target="exhibitions"
+							>
+								Exhibitions
+							</button>
+						</div>
+						<div class="relative">
+							<button
+								onclick="showSection('vr')"
+								class="px-4 py-2 text-sm font-medium text-white hover:text-primary transition-colors focus:outline-none nav-link"
+								data-target="vr"
+							>
+								VR Tour
+							</button>
+						</div>
+						<div class="relative">
+							<button
+								onclick="showSection('about')"
+								class="px-4 py-2 text-sm font-medium text-white hover:text-primary transition-colors focus:outline-none nav-link"
+								data-target="about"
+							>
+								About
+							</button>
+						</div>
+						<div class="ml-2">
+							<button
+								onclick="showSection('donate')"
+								class="bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors text-sm"
+							>
+								Donate
+							</button>
+						</div>
+						<div id="nav-indicator" class="nav-indicator"></div>
+					</nav>
+
+					<!-- Mobile menu button -->
+					<button
+						id="mobile-menu-button"
+						class="md:hidden p-2 rounded-md text-white hover:text-primary focus:outline-none"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 6h16M4 12h16M4 18h16"
+							/>
+						</svg>
+					</button>
+				</div>
+
+				<!-- Mobile Menu -->
+				<div
+					id="mobile-menu"
+					class="md:hidden hidden pt-2 pb-4 space-y-1 border-t border-gray-800 mt-2"
+				>
+					<button
+						onclick="showSection('browse')"
+						class="block w-full text-left px-4 py-2 text-base font-medium text-white hover:bg-dark-400 rounded-md"
+					>
+						Browse
+					</button>
+					<button
+						onclick="showSection('tours')"
+						class="block w-full text-left px-4 py-2 text-base font-medium text-white hover:bg-dark-400 rounded-md"
+					>
+						Tours
+					</button>
+					<button
+						onclick="showSection('exhibitions')"
+						class="block w-full text-left px-4 py-2 text-base font-medium text-white hover:bg-dark-400 rounded-md"
+					>
+						Exhibitions
+					</button>
+					<button
+						onclick="showSection('vr')"
+						class="block w-full text-left px-4 py-2 text-base font-medium text-white hover:bg-dark-400 rounded-md"
+					>
+						VR Tour
+					</button>
+					<button
+						onclick="showSection('about')"
+						class="block w-full text-left px-4 py-2 text-base font-medium text-white hover:bg-dark-400 rounded-md"
+					>
+						About
+					</button>
+					<button
+						onclick="showSection('donate')"
+						class="block w-full text-left px-4 py-2 text-base font-medium text-white hover:bg-dark-400 rounded-md bg-primary-500/20"
+					>
+						Donate
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="flex-grow pt-20">
+			<!-- Browse Section -->
+			<section id="browse" class="section min-h-screen py-8">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<!-- Hero Section -->
+					<div
+						id="hero"
+						class="relative h-[70vh] mb-16 rounded-xl overflow-hidden shadow-2xl"
+					>
+						<!-- Hero content will be dynamically loaded by JS -->
+					</div>
+
+					<!-- Featured Artifacts -->
+					<div class="mb-16">
+						<h2
+							class="text-3xl font-display font-bold mb-8 border-b border-gray-800 pb-2"
+						>
+							<span class="text-primary">Featured</span> Artifacts
+						</h2>
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+							<!-- Artifact cards will be dynamically loaded by JS -->
+						</div>
+					</div>
+
+					<!-- Recent Acquisitions -->
+					<div class="mb-16">
+						<h2
+							class="text-3xl font-display font-bold mb-8 border-b border-gray-800 pb-2"
+						>
+							<span class="text-primary">Recent</span> Acquisitions
+						</h2>
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+							<!-- Recent acquisition cards will be dynamically loaded by JS -->
+						</div>
+					</div>
+
+					<!-- Collection Insights -->
+					<div class="mb-16">
+						<h2
+							class="text-3xl font-display font-bold mb-8 border-b border-gray-800 pb-2"
+						>
+							<span class="text-primary">Collection</span> Insights
+						</h2>
+
+						<!-- Filter Options -->
+						<div class="bg-dark-400/50 rounded-lg p-6 mb-8">
+							<h3 class="text-xl font-semibold mb-4 text-primary">
+								Filter Options
+							</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+								<div>
+									<label class="block text-gray-300 text-sm font-medium mb-2"
+										>Region</label
+									>
+									<select
+										id="regionFilter"
+										class="w-full px-4 py-2 rounded-md bg-dark-300 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+									>
+										<option value="All">All Regions</option>
+										<option value="Africa">Africa</option>
+										<option value="Asia">Asia</option>
+										<option value="Europe">Europe</option>
+										<option value="Americas">Americas</option>
+										<option value="Oceania">Oceania</option>
+									</select>
+								</div>
+								<div>
+									<label class="block text-gray-300 text-sm font-medium mb-2"
+										>Time Period:
+										<span id="timeLabel" class="text-primary"
+											>1000 CE</span
+										></label
+									>
+									<input
+										id="timeFilter"
+										type="range"
+										min="-5000"
+										max="2023"
+										value="1000"
+										class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+										oninput="document.getElementById('timeLabel').innerText = (this.value < 0 ? Math.abs(this.value) + ' BCE' : this.value + ' CE'); updateCharts();"
+									/>
+								</div>
+							</div>
+						</div>
+
+						<!-- Charts -->
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+							<div class="bg-dark-400/50 rounded-lg p-6 shadow-lg">
+								<h3 class="text-xl font-semibold mb-4 text-primary">
+									Artifacts by Region
+								</h3>
+								<div class="h-80">
+									<canvas id="areaChart"></canvas>
+								</div>
+							</div>
+							<div class="bg-dark-400/50 rounded-lg p-6 shadow-lg">
+								<h3 class="text-xl font-semibold mb-4 text-primary">
+									Artifacts by Time Period
+								</h3>
+								<div class="h-80">
+									<canvas id="periodChart"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Newsletter -->
+					<div class="bg-dark-400/50 rounded-lg p-8 shadow-lg">
+						<div class="md:flex items-center justify-between">
+							<div class="mb-6 md:mb-0 md:mr-8">
+								<h3 class="text-2xl font-display font-bold text-primary mb-2">
+									Stay Updated
+								</h3>
+								<p class="text-gray-300">
+									Subscribe to our newsletter for exclusive exhibits and virtual
+									events.
+								</p>
+							</div>
+							<div class="flex-1 max-w-md">
+								<form
+									onsubmit="event.preventDefault(); subscribeNewsletter();"
+									class="flex flex-col sm:flex-row gap-3"
+								>
+									<input
+										type="email"
+										placeholder="Your email address"
+										required
+										class="flex-1 px-4 py-3 rounded-md bg-dark-300 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+									/>
+									<button
+										type="submit"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-3 px-6 rounded-md transition-colors whitespace-nowrap"
+									>
+										Subscribe
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Tours Section -->
+			<section id="tours" class="section hidden min-h-screen py-8">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center mb-16">
+						<h2 class="text-4xl font-display font-bold mb-4">
+							<span class="text-primary">Curated</span> Tours
+						</h2>
+						<p class="text-gray-300 max-w-3xl mx-auto">
+							Embark on a guided journey through history with our expertly
+							curated tours. Each tour offers a unique perspective on our
+							collection, highlighting key artifacts and their historical
+							context.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+						<!-- General Tour -->
+						<div
+							class="bg-dark-400/50 rounded-lg overflow-hidden shadow-lg transition-all hover:shadow-xl hover:bg-dark-400/70"
+						>
+							<div class="relative h-48 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1566117086859-5770f46928ab?auto=format&fit=crop&w=800&q=80"
+									alt="General Tour"
+									class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-dark-500 to-transparent"
+								></div>
+								<h3
+									class="absolute bottom-4 left-4 text-2xl font-display font-bold text-white"
+								>
+									General Tour
+								</h3>
+							</div>
+							<div class="p-6">
+								<p class="text-gray-300 mb-6">
+									Experience the highlights of human civilization across
+									multiple regions and time periods. This tour showcases our
+									most significant artifacts spanning from ancient Egypt to
+									medieval Europe.
+								</p>
+								<div class="flex items-center justify-between">
+									<span class="text-sm text-gray-400"
+										>5 Artifacts • 30 min</span
+									>
+									<button
+										onclick="showTourDetails('general')"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors text-sm"
+									>
+										View Tour
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Roman Empire Tour -->
+						<div
+							class="bg-dark-400/50 rounded-lg overflow-hidden shadow-lg transition-all hover:shadow-xl hover:bg-dark-400/70"
+						>
+							<div class="relative h-48 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1727169703988-ad083dbd048d?auto=format&fit=crop&w=800&q=80"
+									alt="Roman Empire Tour"
+									class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-dark-500 to-transparent"
+								></div>
+								<h3
+									class="absolute bottom-4 left-4 text-2xl font-display font-bold text-white"
+								>
+									Roman Empire
+								</h3>
+							</div>
+							<div class="p-6">
+								<p class="text-gray-300 mb-6">
+									Discover the grandeur of ancient Rome through artifacts that
+									reflect its economic, military, and cultural dominance across
+									the Mediterranean world.
+								</p>
+								<div class="flex items-center justify-between">
+									<span class="text-sm text-gray-400"
+										>5 Artifacts • 25 min</span
+									>
+									<button
+										onclick="showTourDetails('roman')"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors text-sm"
+									>
+										View Tour
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Ancient Egypt Tour -->
+						<div
+							class="bg-dark-400/50 rounded-lg overflow-hidden shadow-lg transition-all hover:shadow-xl hover:bg-dark-400/70"
+						>
+							<div class="relative h-48 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1706727130951-817e44eb26c2?auto=format&fit=crop&w=800&q=80"
+									alt="Ancient Egypt Tour"
+									class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-dark-500 to-transparent"
+								></div>
+								<h3
+									class="absolute bottom-4 left-4 text-2xl font-display font-bold text-white"
+								>
+									Ancient Egypt
+								</h3>
+							</div>
+							<div class="p-6">
+								<p class="text-gray-300 mb-6">
+									Journey through the mystical world of ancient Egypt, exploring
+									artifacts that reveal the religious practices, artistic
+									achievements, and daily life of this fascinating civilization.
+								</p>
+								<div class="flex items-center justify-between">
+									<span class="text-sm text-gray-400"
+										>5 Artifacts • 20 min</span
+									>
+									<button
+										onclick="showTourDetails('egypt')"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors text-sm"
+									>
+										View Tour
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Tour Details Pages -->
+			<section id="tour-general" class="section hidden min-h-screen py-8">
+				<div class="max-w-4xl mx-auto px-4 sm:px-6">
+					<div class="mb-8">
+						<button
+							onclick="showSection('tours')"
+							class="inline-flex items-center text-primary hover:text-primary-400 transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							Back to Tours
+						</button>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg overflow-hidden shadow-lg">
+						<div class="relative h-64">
+							<img
+								src="https://images.unsplash.com/photo-1566117086859-5770f46928ab?auto=format&fit=crop&w=1500&q=80"
+								alt="General Tour"
+								class="w-full h-full object-cover"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-dark-500 to-transparent"
+							></div>
+							<div class="absolute bottom-0 left-0 p-6">
+								<h2 class="text-3xl font-display font-bold text-white">
+									General Tour
+								</h2>
+								<p class="text-gray-300">
+									A journey through human civilization
+								</p>
+							</div>
+						</div>
+
+						<div class="p-6">
+							<div class="prose prose-sm prose-invert max-w-none">
+								<p class="text-gray-300 text-lg mb-6">
+									This tour offers a broad overview of human history, spanning
+									multiple regions and eras, from ancient civilizations to
+									medieval times.
+								</p>
+
+								<h3 class="text-xl font-semibold text-primary mb-4">
+									About This Tour
+								</h3>
+								<p class="text-gray-300 mb-6">
+									Our general tour showcases key artifacts that represent
+									pivotal moments in human history. From the religious symbolism
+									of ancient Egypt to the technological achievements of the
+									Roman Empire and the artistic expressions of medieval Europe,
+									this tour provides a comprehensive view of human achievement
+									across millennia.
+								</p>
+
+								<h3 class="text-xl font-semibold text-primary mb-4">
+									Featured Artifacts
+								</h3>
+								<div class="space-y-2 mb-6">
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">2500 BCE</span>
+										<span class="text-white">Egyptian Statue</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">100 CE</span>
+										<span class="text-white">Roman Coin</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">250 CE </span>
+										<span class="text-white">Roman Glass Vessel</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">1200 CE</span>
+										<span class="text-white">Medieval Sword</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">1450 BCE</span>
+										<span class="text-white">Egyptian Scarab Seal</span>
+									</div>
+								</div>
+
+								<div class="flex justify-center mt-8">
+									<button
+										onclick="startTour('general')"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-3 px-8 rounded-md transition-colors text-lg"
+									>
+										Begin Tour
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="tour-roman" class="section hidden min-h-screen py-8">
+				<div class="max-w-4xl mx-auto px-4 sm:px-6">
+					<div class="mb-8">
+						<button
+							onclick="showSection('tours')"
+							class="inline-flex items-center text-primary hover:text-primary-400 transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							Back to Tours
+						</button>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg overflow-hidden shadow-lg">
+						<div class="relative h-64">
+							<img
+								src="https://images.unsplash.com/photo-1727169703988-ad083dbd048d?auto=format&fit=crop&w=1500&q=80"
+								alt="Roman Empire Tour"
+								class="w-full h-full object-cover"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-dark-500 to-transparent"
+							></div>
+							<div class="absolute bottom-0 left-0 p-6">
+								<h2 class="text-3xl font-display font-bold text-white">
+									Roman Empire Tour
+								</h2>
+								<p class="text-gray-300">The glory of ancient Rome</p>
+							</div>
+						</div>
+
+						<div class="p-6">
+							<div class="prose prose-sm prose-invert max-w-none">
+								<p class="text-gray-300 text-lg mb-6">
+									Explore the grandeur of the Roman Empire through artifacts
+									that reflect its economic, military, and cultural dominance.
+								</p>
+
+								<h3 class="text-xl font-semibold text-primary mb-4">
+									About This Tour
+								</h3>
+								<p class="text-gray-300 mb-6">
+									The Roman Empire was one of history's most powerful
+									civilizations, leaving an indelible mark on Western culture.
+									This tour examines Rome's extensive trade networks,
+									technological innovations, and cultural achievements through
+									carefully selected artifacts from our collection.
+								</p>
+
+								<h3 class="text-xl font-semibold text-primary mb-4">
+									Featured Artifacts
+								</h3>
+								<div class="space-y-2 mb-6">
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">100 CE</span>
+										<span class="text-white">Roman Coin</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">250 CE</span>
+										<span class="text-white">Roman Glass Vessel</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">150 CE</span>
+										<span class="text-white">Roman Sculpture</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">200 CE</span>
+										<span class="text-white">Roman Jewelry</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">75 CE</span>
+										<span class="text-white">Military Equipment</span>
+									</div>
+								</div>
+
+								<div class="flex justify-center mt-8">
+									<button
+										onclick="startTour('roman')"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-3 px-8 rounded-md transition-colors text-lg"
+									>
+										Begin Tour
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="tour-egypt" class="section hidden min-h-screen py-8">
+				<div class="max-w-4xl mx-auto px-4 sm:px-6">
+					<div class="mb-8">
+						<button
+							onclick="showSection('tours')"
+							class="inline-flex items-center text-primary hover:text-primary-400 transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+							Back to Tours
+						</button>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg overflow-hidden shadow-lg">
+						<div class="relative h-64">
+							<img
+								src="https://images.unsplash.com/photo-1706727130951-817e44eb26c2?auto=format&fit=crop&w=1500&q=80"
+								alt="Ancient Egypt Tour"
+								class="w-full h-full object-cover"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-dark-500 to-transparent"
+							></div>
+							<div class="absolute bottom-0 left-0 p-6">
+								<h2 class="text-3xl font-display font-bold text-white">
+									Ancient Egypt Tour
+								</h2>
+								<p class="text-gray-300">Mysteries of the Nile</p>
+							</div>
+						</div>
+
+						<div class="p-6">
+							<div class="prose prose-sm prose-invert max-w-none">
+								<p class="text-gray-300 text-lg mb-6">
+									Delve into the mysteries of Ancient Egypt, a civilization
+									renowned for its monumental architecture and divine rulership.
+								</p>
+
+								<h3 class="text-xl font-semibold text-primary mb-4">
+									About This Tour
+								</h3>
+								<p class="text-gray-300 mb-6">
+									For over 3,000 years, ancient Egypt stood as one of the
+									world's most advanced civilizations. This tour explores the
+									religious beliefs, artistic achievements, and technological
+									innovations of the Egyptians through artifacts that span from
+									the Old Kingdom to the New Kingdom periods.
+								</p>
+
+								<h3 class="text-xl font-semibold text-primary mb-4">
+									Featured Artifacts
+								</h3>
+								<div class="space-y-2 mb-6">
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">2500 BCE</span>
+										<span class="text-white">Egyptian Statue</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">1450 BCE</span>
+										<span class="text-white">Egyptian Scarab Seal</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">1350 BCE</span>
+										<span class="text-white">Canopic Jar</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">1800 BCE</span>
+										<span class="text-white">Papyrus Scroll</span>
+									</div>
+									<div
+										class="flex items-center border-l-4 border-primary pl-4 py-2"
+									>
+										<span class="text-gray-400 w-24">2000 BCE</span>
+										<span class="text-white">Jewelry Set</span>
+									</div>
+								</div>
+
+								<div class="flex justify-center mt-8">
+									<button
+										onclick="startTour('egypt')"
+										class="bg-primary hover:bg-primary-600 text-dark font-medium py-3 px-8 rounded-md transition-colors text-lg"
+									>
+										Begin Tour
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- VR Scene Section -->
+
+			<!-- About Section -->
+			<section id="about" class="section hidden min-h-screen py-8">
+				<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+					<h2 class="text-4xl font-display font-bold mb-10 text-center">
+						<span class="text-primary">About</span> the Museum
+					</h2>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+						<div class="bg-dark-400/50 p-6 rounded-lg shadow-lg">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-primary mb-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+								/>
+							</svg>
+							<h3 class="text-xl font-semibold mb-2">Our Mission</h3>
+							<p class="text-gray-300">
+								To preserve and showcase significant artifacts from around the
+								globe, making cultural heritage accessible to everyone through
+								immersive digital experiences.
+							</p>
+						</div>
+
+						<div class="bg-dark-400/50 p-6 rounded-lg shadow-lg">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-primary mb-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+								/>
+							</svg>
+							<h3 class="text-xl font-semibold mb-2">Our History</h3>
+							<p class="text-gray-300">
+								Established in 2023, our virtual museum merges cutting-edge
+								technology with historical expertise to create engaging and
+								educational experiences for visitors worldwide.
+							</p>
+						</div>
+
+						<div class="bg-dark-400/50 p-6 rounded-lg shadow-lg">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-12 w-12 text-primary mb-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+								/>
+							</svg>
+							<h3 class="text-xl font-semibold mb-2">Our Vision</h3>
+							<p class="text-gray-300">
+								We envision a world where anyone can explore, learn, and engage
+								with history without physical boundaries, democratizing access
+								to cultural heritage.
+							</p>
+						</div>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg shadow-lg p-8 mb-16">
+						<h3 class="text-2xl font-display font-bold mb-6">
+							Meet Our Curators
+						</h3>
+
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+							<div class="text-center">
+								<div
+									class="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 border-2 border-primary"
+								>
+									<img
+										src="https://i.pravatar.cc/256?img=32"
+										alt="Dr. Eleanor Grace"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<h4 class="text-lg font-semibold">Dr. Eleanor Grace</h4>
+								<p class="text-primary">Chief Historian</p>
+								<p class="text-gray-300 text-sm mt-2">
+									Expert in Ancient Egyptian history and artifacts, with over 20
+									years of experience.
+								</p>
+							</div>
+
+							<div class="text-center">
+								<div
+									class="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 border-2 border-primary"
+								>
+									<img
+										src="https://i.pravatar.cc/256?img=60"
+										alt="Marcus Li"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<h4 class="text-lg font-semibold">Marcus Li</h4>
+								<p class="text-primary">Roman Artifacts Specialist</p>
+								<p class="text-gray-300 text-sm mt-2">
+									Focuses on Roman coinage and the economic systems of the
+									ancient Mediterranean.
+								</p>
+							</div>
+
+							<div class="text-center">
+								<div
+									class="w-32 h-32 rounded-full overflow-hidden mx-auto mb-4 border-2 border-primary"
+								>
+									<img
+										src="https://i.pravatar.cc/256?img=5"
+										alt="Isabella Torres"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<h4 class="text-lg font-semibold">Isabella Torres</h4>
+								<p class="text-primary">Medieval History Specialist</p>
+								<p class="text-gray-300 text-sm mt-2">
+									Specializes in European medieval artifacts and their cultural
+									significance.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg shadow-lg p-8">
+						<h3 class="text-2xl font-display font-bold mb-6">Get Involved</h3>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+							<div>
+								<h4 class="text-lg font-semibold text-primary mb-2">
+									Volunteer
+								</h4>
+								<p class="text-gray-300 mb-4">
+									Help us expand our virtual collections and create engaging
+									content. We welcome experts and enthusiasts alike.
+								</p>
+								<button
+									class="bg-dark-300 hover:bg-dark-200 text-white font-medium py-2 px-4 rounded-md transition-colors"
+								>
+									Learn More
+								</button>
+							</div>
+
+							<div>
+								<h4 class="text-lg font-semibold text-primary mb-2">
+									Contribute
+								</h4>
+								<p class="text-gray-300 mb-4">
+									Have artifacts or knowledge to share? We're always looking to
+									expand our collection with new pieces and information.
+								</p>
+								<button
+									class="bg-dark-300 hover:bg-dark-200 text-white font-medium py-2 px-4 rounded-md transition-colors"
+								>
+									Contact Us
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Exhibitions Section -->
+			<section id="exhibitions" class="section hidden min-h-screen py-8">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<h2 class="text-4xl font-display font-bold mb-10 text-center">
+						<span class="text-primary">Current</span> Exhibitions
+					</h2>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+						<!-- Exhibition Card 1 -->
+						<div
+							class="exhibition-card bg-dark-400/50 rounded-lg overflow-hidden shadow-lg"
+						>
+							<div class="h-64 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1566117086859-5770f46928ab?auto=format&fit=crop&w=800&q=80"
+									alt="Treasures of Ancient Egypt"
+									class="w-full h-full object-cover exhibition-image"
+								/>
+							</div>
+							<div class="p-6">
+								<div class="flex justify-between items-start mb-2">
+									<h3 class="text-2xl font-display font-bold text-white">
+										Treasures of Ancient Egypt
+									</h3>
+									<span
+										class="bg-primary text-dark text-xs font-bold px-2 py-1 rounded-full"
+										>FEATURED</span
+									>
+								</div>
+								<p class="text-sm text-gray-400 mb-4">
+									January 15 - August 15, 2023
+								</p>
+								<p class="text-gray-300 mb-6">
+									Explore artifacts from ancient Egyptian tombs, temples, and
+									daily life, highlighting the mysteries and innovations of one
+									of the world's oldest civilizations.
+								</p>
+								<button
+									onclick="startTour('egypt')"
+									class="w-full bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors"
+								>
+									View Exhibition
+								</button>
+							</div>
+						</div>
+
+						<!-- Exhibition Card 2 -->
+						<div
+							class="exhibition-card bg-dark-400/50 rounded-lg overflow-hidden shadow-lg"
+						>
+							<div class="h-64 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1727169703988-ad083dbd048d?auto=format&fit=crop&w=800&q=80"
+									alt="The Roman Legacy"
+									class="w-full h-full object-cover exhibition-image"
+								/>
+							</div>
+							<div class="p-6">
+								<div class="flex justify-between items-start mb-2">
+									<h3 class="text-2xl font-display font-bold text-white">
+										The Roman Legacy
+									</h3>
+									<span
+										class="bg-primary text-dark text-xs font-bold px-2 py-1 rounded-full"
+										>NEW</span
+									>
+								</div>
+								<p class="text-sm text-gray-400 mb-4">
+									February 1 - November 30, 2023
+								</p>
+								<p class="text-gray-300 mb-6">
+									This exhibition showcases the vast influence of the Roman
+									Empire through a collection of coins, glassware, jewelry, and
+									military artifacts.
+								</p>
+								<button
+									onclick="startTour('roman')"
+									class="w-full bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors"
+								>
+									View Exhibition
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<h2 class="text-3xl font-display font-bold mb-8 text-center">
+						<span class="text-primary">Upcoming</span> Exhibitions
+					</h2>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+						<!-- Upcoming Exhibition 1 -->
+						<div
+							class="exhibition-card bg-dark-400/50 rounded-lg overflow-hidden shadow-lg"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1440711085503-89d8ec455791?auto=format&fit=crop&w=800&q=80"
+									alt="Medieval Marvels"
+									class="w-full h-full object-cover exhibition-image"
+								/>
+							</div>
+							<div class="p-6">
+								<h3 class="text-xl font-display font-bold text-white mb-2">
+									Medieval Marvels
+								</h3>
+								<p class="text-sm text-gray-400 mb-2">Starting July 2023</p>
+								<p class="text-gray-300">
+									Discover the complexities of medieval society, featuring arms,
+									armor, manuscripts, and artifacts from 500-1500 CE.
+								</p>
+							</div>
+						</div>
+
+						<!-- Upcoming Exhibition 2 -->
+						<div
+							class="exhibition-card bg-dark-400/50 rounded-lg overflow-hidden shadow-lg"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1561866193-31434d249af3?auto=format&fit=crop&w=800&q=80"
+									alt="Art of Asia"
+									class="w-full h-full object-cover exhibition-image"
+								/>
+							</div>
+							<div class="p-6">
+								<h3 class="text-xl font-display font-bold text-white mb-2">
+									Art of Asia
+								</h3>
+								<p class="text-sm text-gray-400 mb-2">September 2023</p>
+								<p class="text-gray-300">
+									An exploration of artistic traditions from China, Japan,
+									India, and Southeast Asia spanning over 3,000 years.
+								</p>
+							</div>
+						</div>
+
+						<!-- Upcoming Exhibition 3 -->
+						<div
+							class="exhibition-card bg-dark-400/50 rounded-lg overflow-hidden shadow-lg"
+						>
+							<div class="h-48 overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1599176828761-9811fbd64d69?auto=format&fit=crop&w=800&q=80"
+									alt="Indigenous Civilizations"
+									class="w-full h-full object-cover exhibition-image"
+								/>
+							</div>
+							<div class="p-6">
+								<h3 class="text-xl font-display font-bold text-white mb-2">
+									Indigenous Civilizations
+								</h3>
+								<p class="text-sm text-gray-400 mb-2">October 2023</p>
+								<p class="text-gray-300">
+									Celebrating the rich cultural heritage of indigenous peoples
+									across the Americas, Africa, and Oceania.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg p-6 shadow-lg">
+						<h3 class="text-2xl font-display font-bold mb-4">
+							Past Exhibitions Archive
+						</h3>
+						<div class="space-y-4">
+							<div
+								class="flex items-center space-x-4 p-3 hover:bg-dark-300 rounded-lg transition-colors"
+							>
+								<span class="text-gray-400 w-28">2022</span>
+								<span class="text-white"
+									>Prehistoric Journeys: From Cave Paintings to Bronze Age</span
+								>
+							</div>
+							<div
+								class="flex items-center space-x-4 p-3 hover:bg-dark-300 rounded-lg transition-colors"
+							>
+								<span class="text-gray-400 w-28">2022</span>
+								<span class="text-white"
+									>Bronze Age Wonders: Metalwork Revolution</span
+								>
+							</div>
+							<div
+								class="flex items-center space-x-4 p-3 hover:bg-dark-300 rounded-lg transition-colors"
+							>
+								<span class="text-gray-400 w-28">2021</span>
+								<span class="text-white">Vikings: Beyond the Myths</span>
+							</div>
+							<div
+								class="flex items-center space-x-4 p-3 hover:bg-dark-300 rounded-lg transition-colors"
+							>
+								<span class="text-gray-400 w-28">2021</span>
+								<span class="text-white">Ancient Scripts and Languages</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- VR Scene Section -->
+			<section id="vr" class="section hidden vr-scene">
+				<!-- Fixed overlay positioning to avoid header overlap -->
+				<div
+					class="vr-overlay fixed top-0 left-0 w-full z-10 p-4 flex justify-between items-start mt-16"
+				>
+					<div class="bg-dark-500/80 backdrop-blur-sm p-4 rounded-lg shadow-lg">
+						<h2 class="text-xl font-display font-bold text-primary">
+							VR Museum Tour
+						</h2>
+						<p class="text-sm text-white">
+							Navigate using WASD/Arrow keys and look around by dragging
+						</p>
+					</div>
+					<button
+						onclick="showSection('browse')"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						Exit VR Tour
+					</button>
+				</div>
+
+				<a-scene embedded vr-mode-ui="enabled: true">
+					<a-assets>
+						<!-- Optimized texture loading -->
+						<img
+							id="museum-texture"
+							src="https://cdn.aframe.io/a-painter/images/floor.jpg"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="wall-texture"
+							src="https://cdn.aframe.io/a-painter/images/floor.jpg"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="floor-texture"
+							src="https://cdn.aframe.io/a-painter/images/floor.jpg"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="ceiling-texture"
+							src="https://cdn.aframe.io/a-painter/images/floor.jpg"
+							crossorigin="anonymous"
+						/>
+
+						<!-- Artifact Images -->
+						<img
+							id="egyptian-img"
+							src="https://images.unsplash.com/photo-1566117086859-5770f46928ab?auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="roman-img"
+							src="https://images.unsplash.com/photo-1727169703988-ad083dbd048d?auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="medieval-sword-img"
+							src="https://images.unsplash.com/photo-1440711085503-89d8ec455791?auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="scarab-seal-img"
+							src="https://images.unsplash.com/photo-1706727130951-817e44eb26c2?auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="glass-vessel-img"
+							src="https://images.unsplash.com/photo-1743079595772-011a6f2b3d3d?auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="greek-vase-img"
+							src="https://cdn.shopify.com/s/files/1/0130/8502/products/panathamp15cm_2_2000x.jpg?v=1569077015&auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+						<img
+							id="indus-seal-img"
+							src="https://smarthistory.org/wp-content/uploads/2020/04/Shiva_Pashupati.jpg?auto=format&fit=crop&w=512&q=80"
+							crossorigin="anonymous"
+						/>
+
+						<!-- Information Panel Textures -->
+						<img
+							id="info-panel"
+							src="https://raw.githubusercontent.com/aframevr/sample-assets/master/assets/images/info-panel.jpg"
+							crossorigin="anonymous"
+						/>
+
+						<!-- Loading indicator for better UX -->
+						<img
+							id="loading-texture"
+							src="https://cdn.pixabay.com/photo/2017/09/25/13/14/hourglass-2785076_1280.jpg"
+							crossorigin="anonymous"
+						/>
+
+						<!-- Audio -->
+						<audio
+							id="ambient-audio"
+							src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_270f8b810c.mp3?filename=ambient-classical-guitar-144998.mp3"
+							preload="auto"
+						></audio>
+						<audio
+							id="click-sound"
+							src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_9478fa400d.mp3?filename=click-button-140881.mp3"
+							preload="auto"
+						></audio>
+					</a-assets>
+
+					<!-- Loading screen -->
+					<a-entity id="loading-screen" visible="true">
+						<a-plane
+							color="#000"
+							width="10"
+							height="6"
+							position="0 1.6 -3"
+							material="opacity: 0.8"
+						></a-plane>
+						<a-text
+							value="Loading VR Museum..."
+							color="#F5B041"
+							width="5"
+							position="0 1.8 -2.9"
+							align="center"
+						></a-text>
+						<a-image
+							src="#loading-texture"
+							width="2"
+							height="2"
+							position="0 1 -2.9"
+							animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"
+						></a-image>
+					</a-entity>
+
+					<!-- Ambient audio -->
+					<a-entity
+						sound="src: #ambient-audio; autoplay: true; loop: true; volume: 0.3"
+					></a-entity>
+
+					<!-- Sky with gradient for better atmosphere -->
+					<a-sky color="#121212"></a-sky>
+
+					<!-- Enhanced Environment -->
+					<a-entity id="museum-environment">
+						<!-- Floor with improved texture -->
+						<a-plane
+							src="#floor-texture"
+							rotation="-90 0 0"
+							width="40"
+							height="40"
+							repeat="8 8"
+							material="color: #333; roughness: 1;"
+						></a-plane>
+
+						<!-- Ceiling with subtle details -->
+						<a-plane
+							src="#ceiling-texture"
+							rotation="90 0 0"
+							width="40"
+							height="40"
+							position="0 8 0"
+							repeat="8 8"
+							material="color: #222; roughness: 1;"
+						></a-plane>
+
+						<!-- Walls -->
+						<a-entity id="walls">
+							<!-- North Wall -->
+							<a-plane
+								src="#wall-texture"
+								position="0 4 -20"
+								rotation="0 0 0"
+								width="40"
+								height="8"
+								material="color: #333; roughness: 0.8;"
+							></a-plane>
+
+							<!-- South Wall -->
+							<a-plane
+								src="#wall-texture"
+								position="0 4 20"
+								rotation="0 180 0"
+								width="40"
+								height="8"
+								material="color: #333; roughness: 0.8;"
+							></a-plane>
+
+							<!-- East Wall -->
+							<a-plane
+								src="#wall-texture"
+								position="20 4 0"
+								rotation="0 -90 0"
+								width="40"
+								height="8"
+								material="color: #333; roughness: 0.8;"
+							></a-plane>
+
+							<!-- West Wall -->
+							<a-plane
+								src="#wall-texture"
+								position="-20 4 0"
+								rotation="0 90 0"
+								width="40"
+								height="8"
+								material="color: #333; roughness: 0.8;"
+							></a-plane>
+						</a-entity>
+
+						<!-- Egyptian Gallery Section with improved lighting -->
+						<a-entity id="egyptian-gallery" position="-10 0 -10">
+							<!-- Gallery Label with better visibility -->
+							<a-entity position="0 6 0">
+								<a-plane
+									color="#F5B041"
+									width="8"
+									height="1"
+									position="0 0 0"
+								></a-plane>
+								<a-text
+									value="EGYPTIAN GALLERY"
+									color="#000"
+									width="6"
+									position="0 0 0.01"
+									align="center"
+									font="kelsonsans"
+								></a-text>
+							</a-entity>
+
+							<!-- Gallery Dividers -->
+							<a-box
+								position="5 2 0"
+								width="0.2"
+								height="4"
+								depth="10"
+								color="#444"
+							></a-box>
+							<a-box
+								position="-5 2 0"
+								width="0.2"
+								height="4"
+								depth="10"
+								color="#444"
+							></a-box>
+							<a-box
+								position="0 2 5"
+								width="10"
+								height="4"
+								depth="0.2"
+								color="#444"
+							></a-box>
+							<a-box
+								position="0 2 -5"
+								width="10"
+								height="4"
+								depth="0.2"
+								color="#444"
+							></a-box>
+
+							<!-- Egyptian Statue with visual indicator for interaction -->
+							<a-entity
+								position="-2 0 -2"
+								class="exhibit"
+								id="egyptian-statue-exhibit"
+							>
+								<a-cylinder color="#555" radius="0.5" height="0.2"></a-cylinder>
+								<a-cylinder
+									color="#333"
+									radius="0.4"
+									height="1"
+									position="0 0.6 0"
+								></a-cylinder>
+								<a-box
+									position="0 1.1 0"
+									width="1"
+									height="0.1"
+									depth="1"
+									color="#222"
+								></a-box>
+
+								<a-entity position="0 1.1 0" rotation="0 0 0">
+									<a-image
+										src="#egyptian-img"
+										width="1.8"
+										height="2.7"
+										position="0 1.5 0"
+									></a-image>
+									<a-text
+										value="Egyptian Statue (2500 BCE)"
+										color="#F5B041"
+										width="2"
+										position="0 -0.1 0"
+										align="center"
+									></a-text>
+
+									<!-- Interaction hint -->
+									<a-entity
+										position="0 3.2 0"
+										animation="property: position; to: 0 3.4 0; dir: alternate; dur: 1000; loop: true"
+									>
+										<a-text
+											value="Click to learn more"
+											color="#fff"
+											width="1.5"
+											position="0 0 0"
+											align="center"
+											opacity="0.8"
+										></a-text>
+									</a-entity>
+
+									<!-- Info Panel (initially hidden) -->
+									<a-entity
+										class="info-panel"
+										visible="false"
+										position="3 1.5 0"
+										rotation="0 -90 0"
+									>
+										<a-plane
+											color="#111"
+											width="3"
+											height="2"
+											opacity="0.9"
+										></a-plane>
+										<a-text
+											value="Egyptian Statue"
+											color="#F5B041"
+											width="2.8"
+											position="0 0.8 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="A limestone statue from 2500 BCE, symbolizing divine rule. Discovered at the Giza Plateau."
+											color="#fff"
+											width="2.5"
+											position="0 0.3 0.01"
+											align="center"
+											wrap-count="30"
+										></a-text>
+										<a-text
+											value="Material: Limestone\nDimensions: 45cm × 20cm × 15cm"
+											color="#ccc"
+											width="2.5"
+											position="0 -0.3 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="Click here to close"
+											color="#F5B041"
+											width="2"
+											position="0 -0.8 0.01"
+											align="center"
+										></a-text>
+									</a-entity>
+								</a-entity>
+
+								<!-- Clickable area with visual feedback -->
+								<a-entity
+									class="clickable"
+									geometry="primitive: sphere; radius: 1.5"
+									position="0 2 0"
+									material="opacity: 0"
+									animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+									onclick="toggleInfoPanel('egyptian-statue-exhibit'); playSound('click-sound')"
+								></a-entity>
+							</a-entity>
+
+							<!-- Egyptian Scarab Seal -->
+							<a-entity
+								position="2 0 2"
+								class="exhibit"
+								id="scarab-seal-exhibit"
+							>
+								<a-cylinder color="#555" radius="0.5" height="0.2"></a-cylinder>
+								<a-cylinder
+									color="#333"
+									radius="0.4"
+									height="1"
+									position="0 0.6 0"
+								></a-cylinder>
+								<a-box
+									position="0 1.1 0"
+									width="1"
+									height="0.1"
+									depth="1"
+									color="#222"
+								></a-box>
+
+								<a-entity position="0 1.1 0" rotation="0 0 0">
+									<a-image
+										src="#scarab-seal-img"
+										width="2"
+										height="2"
+										position="0 1.5 0"
+									></a-image>
+									<a-text
+										value="Scarab Seal (1450 BCE)"
+										color="#F5B041"
+										width="2"
+										position="0 -0.1 0"
+										align="center"
+									></a-text>
+
+									<!-- Interaction hint -->
+									<a-entity
+										position="0 3.0 0"
+										animation="property: position; to: 0 3.2 0; dir: alternate; dur: 1000; loop: true"
+									>
+										<a-text
+											value="Click to learn more"
+											color="#fff"
+											width="1.5"
+											position="0 0 0"
+											align="center"
+											opacity="0.8"
+										></a-text>
+									</a-entity>
+
+									<!-- Info Panel (initially hidden) -->
+									<a-entity
+										class="info-panel"
+										visible="false"
+										position="3 1.5 0"
+										rotation="0 -90 0"
+									>
+										<a-plane
+											color="#111"
+											width="3"
+											height="2"
+											opacity="0.9"
+										></a-plane>
+										<a-text
+											value="Egyptian Scarab Seal"
+											color="#F5B041"
+											width="2.8"
+											position="0 0.8 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="A finely carved scarab seal from Egypt's New Kingdom era (c. 1450 BCE). Features hieroglyphic inscriptions."
+											color="#fff"
+											width="2.5"
+											position="0 0.3 0.01"
+											align="center"
+											wrap-count="30"
+										></a-text>
+										<a-text
+											value="Material: Steatite\nDimensions: 2.8cm × 1.9cm × 1.2cm"
+											color="#ccc"
+											width="2.5"
+											position="0 -0.3 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="Click here to close"
+											color="#F5B041"
+											width="2"
+											position="0 -0.8 0.01"
+											align="center"
+										></a-text>
+									</a-entity>
+								</a-entity>
+
+								<!-- Clickable area with visual feedback -->
+								<a-entity
+									class="clickable"
+									geometry="primitive: sphere; radius: 1.5"
+									position="0 2 0"
+									material="opacity: 0"
+									animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+									onclick="toggleInfoPanel('scarab-seal-exhibit'); playSound('click-sound')"
+								></a-entity>
+							</a-entity>
+						</a-entity>
+
+						<!-- Roman Gallery Section -->
+						<a-entity id="roman-gallery" position="10 0 -10">
+							<!-- Gallery Label -->
+							<a-entity position="0 6 0">
+								<a-plane
+									color="#F5B041"
+									width="8"
+									height="1"
+									position="0 0 0"
+								></a-plane>
+								<a-text
+									value="ROMAN GALLERY"
+									color="#000"
+									width="6"
+									position="0 0 0.01"
+									align="center"
+									font="kelsonsans"
+								></a-text>
+							</a-entity>
+
+							<!-- Gallery Dividers -->
+							<a-box
+								position="5 2 0"
+								width="0.2"
+								height="4"
+								depth="10"
+								color="#444"
+							></a-box>
+							<a-box
+								position="-5 2 0"
+								width="0.2"
+								height="4"
+								depth="10"
+								color="#444"
+							></a-box>
+							<a-box
+								position="0 2 5"
+								width="10"
+								height="4"
+								depth="0.2"
+								color="#444"
+							></a-box>
+							<a-box
+								position="0 2 -5"
+								width="10"
+								height="4"
+								depth="0.2"
+								color="#444"
+							></a-box>
+
+							<!-- Roman Coin -->
+							<a-entity
+								position="-2 0 -2"
+								class="exhibit"
+								id="roman-coin-exhibit"
+							>
+								<a-cylinder color="#555" radius="0.5" height="0.2"></a-cylinder>
+								<a-cylinder
+									color="#333"
+									radius="0.4"
+									height="1"
+									position="0 0.6 0"
+								></a-cylinder>
+								<a-box
+									position="0 1.1 0"
+									width="1"
+									height="0.1"
+									depth="1"
+									color="#222"
+								></a-box>
+
+								<a-entity position="0 1.1 0" rotation="0 0 0">
+									<a-image
+										src="#roman-img"
+										width="2"
+										height="2"
+										position="0 1.5 0"
+									></a-image>
+									<a-text
+										value="Roman Coin (100 CE)"
+										color="#F5B041"
+										width="2"
+										position="0 -0.1 0"
+										align="center"
+									></a-text>
+
+									<!-- Interaction hint -->
+									<a-entity
+										position="0 3.0 0"
+										animation="property: position; to: 0 3.2 0; dir: alternate; dur: 1000; loop: true"
+									>
+										<a-text
+											value="Click to learn more"
+											color="#fff"
+											width="1.5"
+											position="0 0 0"
+											align="center"
+											opacity="0.8"
+										></a-text>
+									</a-entity>
+
+									<!-- Info Panel (initially hidden) -->
+									<a-entity
+										class="info-panel"
+										visible="false"
+										position="3 1.5 0"
+										rotation="0 -90 0"
+									>
+										<a-plane
+											color="#111"
+											width="3"
+											height="2"
+											opacity="0.9"
+										></a-plane>
+										<a-text
+											value="Roman Coin"
+											color="#F5B041"
+											width="2.8"
+											position="0 0.8 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="A gold coin from 100 CE, depicting Emperor Trajan. Used in trade across the Roman Empire."
+											color="#fff"
+											width="2.5"
+											position="0 0.3 0.01"
+											align="center"
+											wrap-count="30"
+										></a-text>
+										<a-text
+											value="Material: Gold\nDimensions: 2.5cm diameter"
+											color="#ccc"
+											width="2.5"
+											position="0 -0.3 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="Click here to close"
+											color="#F5B041"
+											width="2"
+											position="0 -0.8 0.01"
+											align="center"
+										></a-text>
+									</a-entity>
+								</a-entity>
+
+								<!-- Clickable area with visual feedback -->
+								<a-entity
+									class="clickable"
+									geometry="primitive: sphere; radius: 1.5"
+									position="0 2 0"
+									material="opacity: 0"
+									animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+									onclick="toggleInfoPanel('roman-coin-exhibit'); playSound('click-sound')"
+								></a-entity>
+							</a-entity>
+
+							<!-- Roman Glass Vessel -->
+							<a-entity
+								position="2 0 2"
+								class="exhibit"
+								id="glass-vessel-exhibit"
+							>
+								<a-cylinder color="#555" radius="0.5" height="0.2"></a-cylinder>
+								<a-cylinder
+									color="#333"
+									radius="0.4"
+									height="1"
+									position="0 0.6 0"
+								></a-cylinder>
+								<a-box
+									position="0 1.1 0"
+									width="1"
+									height="0.1"
+									depth="1"
+									color="#222"
+								></a-box>
+
+								<a-entity position="0 1.1 0" rotation="0 0 0">
+									<a-image
+										src="#glass-vessel-img"
+										width="2"
+										height="2.5"
+										position="0 1.5 0"
+									></a-image>
+									<a-text
+										value="Glass Vessel (250 CE)"
+										color="#F5B041"
+										width="2"
+										position="0 -0.1 0"
+										align="center"
+									></a-text>
+
+									<!-- Interaction hint -->
+									<a-entity
+										position="0 3.2 0"
+										animation="property: position; to: 0 3.4 0; dir: alternate; dur: 1000; loop: true"
+									>
+										<a-text
+											value="Click to learn more"
+											color="#fff"
+											width="1.5"
+											position="0 0 0"
+											align="center"
+											opacity="0.8"
+										></a-text>
+									</a-entity>
+
+									<!-- Info Panel (initially hidden) -->
+									<a-entity
+										class="info-panel"
+										visible="false"
+										position="3 1.5 0"
+										rotation="0 -90 0"
+									>
+										<a-plane
+											color="#111"
+											width="3"
+											height="2"
+											opacity="0.9"
+										></a-plane>
+										<a-text
+											value="Roman Glass Vessel"
+											color="#F5B041"
+											width="2.8"
+											position="0 0.8 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="An elegant blown glass vessel from the Roman Empire (c. 250 CE). Shows sophisticated glass manufacturing techniques."
+											color="#fff"
+											width="2.5"
+											position="0 0.3 0.01"
+											align="center"
+											wrap-count="30"
+										></a-text>
+										<a-text
+											value="Material: Glass\nDimensions: 15cm × 8cm × 8cm"
+											color="#ccc"
+											width="2.5"
+											position="0 -0.3 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="Click here to close"
+											color="#F5B041"
+											width="2"
+											position="0 -0.8 0.01"
+											align="center"
+										></a-text>
+									</a-entity>
+								</a-entity>
+
+								<!-- Clickable area with visual feedback -->
+								<a-entity
+									class="clickable"
+									geometry="primitive: sphere; radius: 1.5"
+									position="0 2 0"
+									material="opacity: 0"
+									animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+									onclick="toggleInfoPanel('glass-vessel-exhibit'); playSound('click-sound')"
+								></a-entity>
+							</a-entity>
+						</a-entity>
+
+						<!-- Medieval Gallery Section -->
+						<a-entity id="medieval-gallery" position="0 0 10">
+							<!-- Gallery Label -->
+							<a-entity position="0 6 0">
+								<a-plane
+									color="#F5B041"
+									width="8"
+									height="1"
+									position="0 0 0"
+								></a-plane>
+								<a-text
+									value="MEDIEVAL GALLERY"
+									color="#000"
+									width="6"
+									position="0 0 0.01"
+									align="center"
+									font="kelsonsans"
+								></a-text>
+							</a-entity>
+
+							<!-- Gallery Dividers -->
+							<a-box
+								position="5 2 0"
+								width="0.2"
+								height="4"
+								depth="10"
+								color="#444"
+							></a-box>
+							<a-box
+								position="-5 2 0"
+								width="0.2"
+								height="4"
+								depth="10"
+								color="#444"
+							></a-box>
+							<a-box
+								position="0 2 5"
+								width="10"
+								height="4"
+								depth="0.2"
+								color="#444"
+							></a-box>
+							<a-box
+								position="0 2 -5"
+								width="10"
+								height="4"
+								depth="0.2"
+								color="#444"
+							></a-box>
+
+							<!-- Medieval Sword -->
+							<a-entity
+								position="0 0 0"
+								class="exhibit"
+								id="medieval-sword-exhibit"
+							>
+								<a-cylinder color="#555" radius="0.5" height="0.2"></a-cylinder>
+								<a-cylinder
+									color="#333"
+									radius="0.4"
+									height="1"
+									position="0 0.6 0"
+								></a-cylinder>
+								<a-box
+									position="0 1.1 0"
+									width="1"
+									height="0.1"
+									depth="1"
+									color="#222"
+								></a-box>
+
+								<a-entity position="0 1.1 0" rotation="0 0 0">
+									<a-image
+										src="#medieval-sword-img"
+										width="1.5"
+										height="3"
+										position="0 1.5 0"
+									></a-image>
+									<a-text
+										value="Medieval Sword (1200 CE)"
+										color="#F5B041"
+										width="2"
+										position="0 -0.1 0"
+										align="center"
+									></a-text>
+
+									<!-- Interaction hint -->
+									<a-entity
+										position="0 3.5 0"
+										animation="property: position; to: 0 3.7 0; dir: alternate; dur: 1000; loop: true"
+									>
+										<a-text
+											value="Click to learn more"
+											color="#fff"
+											width="1.5"
+											position="0 0 0"
+											align="center"
+											opacity="0.8"
+										></a-text>
+									</a-entity>
+
+									<!-- Info Panel (initially hidden) -->
+									<a-entity
+										class="info-panel"
+										visible="false"
+										position="3 1.5 0"
+										rotation="0 -90 0"
+									>
+										<a-plane
+											color="#111"
+											width="3"
+											height="2"
+											opacity="0.9"
+										></a-plane>
+										<a-text
+											value="Medieval Sword"
+											color="#F5B041"
+											width="2.8"
+											position="0 0.8 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="A sword from 1200 CE, wielded by knights in the Middle Ages. Features gold inlay and religious engravings."
+											color="#fff"
+											width="2.5"
+											position="0 0.3 0.01"
+											align="center"
+											wrap-count="30"
+										></a-text>
+										<a-text
+											value="Material: Steel, Gold\nDimensions: 94cm × 12cm × 3cm"
+											color="#ccc"
+											width="2.5"
+											position="0 -0.3 0.01"
+											align="center"
+										></a-text>
+										<a-text
+											value="Click here to close"
+											color="#F5B041"
+											width="2"
+											position="0 -0.8 0.01"
+											align="center"
+										></a-text>
+									</a-entity>
+								</a-entity>
+
+								<!-- Clickable area with visual feedback -->
+								<a-entity
+									class="clickable"
+									geometry="primitive: sphere; radius: 1.5"
+									position="0 2 0"
+									material="opacity: 0"
+									animation__mouseenter="property: scale; to: 1.05 1.05 1.05; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: scale; to: 1 1 1; startEvents: mouseleave; dur: 200"
+									onclick="toggleInfoPanel('medieval-sword-exhibit'); playSound('click-sound')"
+								></a-entity>
+							</a-entity>
+						</a-entity>
+
+						<!-- Enhanced navigation points with clearer visibility -->
+						<a-entity id="navigation-points">
+							<!-- Central area -->
+							<a-entity position="0 0.1 0" class="nav-point" id="central-nav">
+								<a-cylinder
+									color="#F5B041"
+									radius="0.4"
+									height="0.05"
+								></a-cylinder>
+								<a-text
+									value="Central Hall"
+									color="#fff"
+									align="center"
+									position="0 0.5 0"
+									scale="1 1 1"
+									rotation="0 45 0"
+								></a-text>
+							</a-entity>
+
+							<!-- Egyptian Gallery navigation -->
+							<a-entity
+								position="-8 0.1 -8"
+								class="nav-point clickable"
+								id="egyptian-nav"
+								onclick="teleportTo('-10', '0', '-10'); playSound('click-sound')"
+							>
+								<a-cylinder
+									color="#F5B041"
+									radius="0.4"
+									height="0.05"
+									animation__mouseenter="property: color; to: #FFC870; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: color; to: #F5B041; startEvents: mouseleave; dur: 200"
+								></a-cylinder>
+								<a-text
+									value="Egyptian Gallery"
+									color="#fff"
+									align="center"
+									position="0 0.5 0"
+									scale="1 1 1"
+									rotation="0 45 0"
+								></a-text>
+							</a-entity>
+
+							<!-- Roman Gallery navigation -->
+							<a-entity
+								position="8 0.1 -8"
+								class="nav-point clickable"
+								id="roman-nav"
+								onclick="teleportTo('10', '0', '-10'); playSound('click-sound')"
+							>
+								<a-cylinder
+									color="#F5B041"
+									radius="0.4"
+									height="0.05"
+									animation__mouseenter="property: color; to: #FFC870; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: color; to: #F5B041; startEvents: mouseleave; dur: 200"
+								></a-cylinder>
+								<a-text
+									value="Roman Gallery"
+									color="#fff"
+									align="center"
+									position="0 0.5 0"
+									scale="1 1 1"
+									rotation="0 -45 0"
+								></a-text>
+							</a-entity>
+
+							<!-- Medieval Gallery navigation -->
+							<a-entity
+								position="0 0.1 8"
+								class="nav-point clickable"
+								id="medieval-nav"
+								onclick="teleportTo('0', '0', '10'); playSound('click-sound')"
+							>
+								<a-cylinder
+									color="#F5B041"
+									radius="0.4"
+									height="0.05"
+									animation__mouseenter="property: color; to: #FFC870; startEvents: mouseenter; dur: 200"
+									animation__mouseleave="property: color; to: #F5B041; startEvents: mouseleave; dur: 200"
+								></a-cylinder>
+								<a-text
+									value="Medieval Gallery"
+									color="#fff"
+									align="center"
+									position="0 0.5 0"
+									scale="1 1 1"
+									rotation="0 180 0"
+								></a-text>
+							</a-entity>
+						</a-entity>
+
+						<!-- Enhanced lighting for better atmosphere -->
+						<a-entity
+							light="type: ambient; color: #BBB; intensity: 0.5"
+						></a-entity>
+						<a-entity
+							light="type: directional; color: #FFF; intensity: 0.6; castShadow: true"
+							position="-1 1 1"
+						></a-entity>
+
+						<!-- Spotlights for exhibits with improved targeting -->
+						<a-entity
+							light="type: spot; color: #FFF; intensity: 1; angle: 45; penumbra: 0.3; castShadow: true"
+							position="-12 6 -12"
+							target="#egyptian-statue-exhibit"
+						></a-entity>
+						<a-entity
+							light="type: spot; color: #FFF; intensity: 1; angle: 45; penumbra: 0.3; castShadow: true"
+							position="-8 6 -8"
+							target="#scarab-seal-exhibit"
+						></a-entity>
+						<a-entity
+							light="type: spot; color: #FFF; intensity: 1; angle: 45; penumbra: 0.3; castShadow: true"
+							position="8 6 -12"
+							target="#roman-coin-exhibit"
+						></a-entity>
+						<a-entity
+							light="type: spot; color: #FFF; intensity: 1; angle: 45; penumbra: 0.3; castShadow: true"
+							position="12 6 -8"
+							target="#glass-vessel-exhibit"
+						></a-entity>
+						<a-entity
+							light="type: spot; color: #FFF; intensity: 1; angle: 45; penumbra: 0.3; castShadow: true"
+							position="0 6 10"
+							target="#medieval-sword-exhibit"
+						></a-entity>
+					</a-entity>
+
+					<!-- Camera with improved controls and guidance -->
+					<a-entity>
+						<a-camera
+							position="0 1.6 0"
+							look-controls="reverseMouseDrag: false"
+							wasd-controls="acceleration: 20"
+						>
+							<a-cursor
+								id="cursor"
+								color="#F5B041"
+								raycaster="objects: .clickable"
+								animation__click="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; easing: easeInCubic; dur: 150; startEvents: click"
+								animation__mouseenter="property: color; from: #F5B041; to: #FFC870; dur: 150; startEvents: mouseenter"
+								animation__mouseleave="property: color; from: #FFC870; to: #F5B041; dur: 150; startEvents: mouseleave"
+							></a-cursor>
+
+							<!-- Improved instructions that fade away after user starts interacting -->
+							<a-entity
+								id="instructions-panel"
+								position="0 0 -1.5"
+								geometry="primitive: plane; width: 2; height: 1"
+								material="color: #000; opacity: 0.7"
+							>
+								<a-text
+									value="Move: WASD / Arrow Keys\nLook: Click + Drag\nClick on artifacts for details\nClick on floor markers to teleport"
+									color="#F5B041"
+									width="1.8"
+									position="0 0 0.01"
+									align="center"
+									wrap-count="40"
+								></a-text>
+								<a-animation
+									attribute="opacity"
+									from="1"
+									to="0"
+									dur="8000"
+									delay="10000"
+								></a-animation>
+							</a-entity>
+
+							<!-- Minimap for easier navigation -->
+							<a-entity
+								position="0 -0.6 -1"
+								rotation="-45 0 0"
+								scale="0.15 0.15 0.15"
+								visible="false"
+								id="minimap"
+							>
+								<a-box
+									width="40"
+									height="0.1"
+									depth="40"
+									color="#222"
+									opacity="0.7"
+								></a-box>
+								<a-box
+									position="-10 0.1 -10"
+									width="10"
+									height="0.1"
+									depth="10"
+									color="#F5B041"
+									opacity="0.5"
+								></a-box>
+								<a-box
+									position="10 0.1 -10"
+									width="10"
+									height="0.1"
+									depth="10"
+									color="#F5B041"
+									opacity="0.5"
+								></a-box>
+								<a-box
+									position="0 0.1 10"
+									width="10"
+									height="0.1"
+									depth="10"
+									color="#F5B041"
+									opacity="0.5"
+								></a-box>
+								<a-text
+									value="M"
+									position="0 0.6 -16"
+									color="#F5B041"
+									scale="5 5 5"
+									align="center"
+								></a-text>
+							</a-entity>
+						</a-camera>
+					</a-entity>
+				</a-scene>
+
+				<!-- Improved VR Tour Controls with clearer visual hierarchy -->
+				<div
+					class="vr-controls fixed bottom-4 left-1/2 transform -translate-x-1/2 z-20 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4"
+				>
+					<button
+						onclick="teleportTo('0', '1.6', '0')"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						<span class="mr-2">🏛️</span> Central Hall
+					</button>
+					<button
+						onclick="teleportTo('-10', '1.6', '-10')"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						<span class="mr-2">🏺</span> Egyptian Gallery
+					</button>
+					<button
+						onclick="teleportTo('10', '1.6', '-10')"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						<span class="mr-2">🏛️</span> Roman Gallery
+					</button>
+					<button
+						onclick="teleportTo('0', '1.6', '10')"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						<span class="mr-2">⚔️</span> Medieval Gallery
+					</button>
+					<button
+						onclick="toggleMinimap()"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						<span class="mr-2">🗺️</span> Toggle Map
+					</button>
+					<button
+						onclick="toggleAudio()"
+						class="bg-dark-500/80 hover:bg-dark-400 text-white font-medium py-2 px-4 rounded-md transition-colors backdrop-blur-sm shadow-lg"
+					>
+						<span class="mr-2">🔊</span> Toggle Audio
+					</button>
+				</div>
+
+				<!-- Additional JavaScript for enhanced functionality -->
+				<script>
+					// Hide loading screen when scene is loaded
+					document
+						.querySelector("a-scene")
+						.addEventListener("loaded", function () {
+							document
+								.querySelector("#loading-screen")
+								.setAttribute("visible", "false");
+						});
+
+					// Toggle info panel visibility
+					function toggleInfoPanel(exhibitId) {
+						const exhibit = document.querySelector(`#${exhibitId}`);
+						const infoPanel = exhibit.querySelector(".info-panel");
+						const isVisible = infoPanel.getAttribute("visible") === "true";
+						infoPanel.setAttribute("visible", !isVisible);
+						playSound("click-sound");
+					}
+
+					// Teleport to location
+					function teleportTo(x, y, z) {
+						const camera = document.querySelector("a-camera");
+						camera.setAttribute("position", { x: x, y: y, z: z });
+						playSound("click-sound");
+					}
+
+					// Play sound effect
+					function playSound(soundId) {
+						const sound = document.querySelector(`#${soundId}`);
+						sound.components.sound.playSound();
+					}
+
+					// Toggle minimap visibility
+					function toggleMinimap() {
+						const minimap = document.querySelector("#minimap");
+						const isVisible = minimap.getAttribute("visible") === "true";
+						minimap.setAttribute("visible", !isVisible);
+						playSound("click-sound");
+					}
+
+					// Toggle audio
+					function toggleAudio() {
+						const ambientAudio = document.querySelector("[sound]");
+						const volume = ambientAudio.components.sound.data.volume;
+						ambientAudio.components.sound.data.volume = volume > 0 ? 0 : 0.3;
+						playSound("click-sound");
+					}
+				</script>
+			</section>
+
+			<!-- Donate Section -->
+			<section id="donate" class="section hidden min-h-screen py-8">
+				<div class="max-w-4xl mx-auto px-4 sm:px-6">
+					<h2 class="text-4xl font-display font-bold mb-6 text-center">
+						<span class="text-primary">Support</span> Our Museum
+					</h2>
+					<p class="text-gray-300 text-center max-w-2xl mx-auto mb-12">
+						Your contribution helps us preserve history and make it accessible
+						to everyone. Support our mission to educate and inspire through
+						virtual exhibitions.
+					</p>
+
+					<div
+						class="bg-dark-400/50 rounded-lg shadow-lg overflow-hidden mb-12"
+					>
+						<div class="grid grid-cols-1 md:grid-cols-3">
+							<div
+								class="p-8 border-b md:border-b-0 md:border-r border-gray-700"
+							>
+								<h3 class="text-2xl font-display font-bold text-white mb-2">
+									Education
+								</h3>
+								<p class="text-gray-300 mb-4">
+									Fund educational programs for schools and universities across
+									the globe.
+								</p>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-12 w-12 text-primary mb-2"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path d="M12 14l9-5-9-5-9 5 9 5z" />
+									<path
+										d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
+									/>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"
+									/>
+								</svg>
+							</div>
+							<div
+								class="p-8 border-b md:border-b-0 md:border-r border-gray-700"
+							>
+								<h3 class="text-2xl font-display font-bold text-white mb-2">
+									Technology
+								</h3>
+								<p class="text-gray-300 mb-4">
+									Help us enhance the virtual experience with cutting-edge
+									innovations.
+								</p>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-12 w-12 text-primary mb-2"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+									/>
+								</svg>
+							</div>
+							<div class="p-8">
+								<h3 class="text-2xl font-display font-bold text-white mb-2">
+									Acquisition
+								</h3>
+								<p class="text-gray-300 mb-4">
+									Support the acquisition and digital preservation of new
+									artifacts.
+								</p>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-12 w-12 text-primary mb-2"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+									/>
+								</svg>
+							</div>
+						</div>
+					</div>
+
+					<div class="bg-dark-400/50 rounded-lg shadow-lg p-8">
+						<h3 class="text-2xl font-display font-bold mb-6 text-center">
+							Make a Donation
+						</h3>
+
+						<div class="mb-8">
+							<h4 class="text-lg font-semibold text-primary mb-4">
+								Choose an Amount
+							</h4>
+							<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+								<button
+									class="bg-dark-300 hover:bg-primary hover:text-dark text-white font-medium py-3 rounded-md transition-colors"
+								>
+									$10
+								</button>
+								<button
+									class="bg-dark-300 hover:bg-primary hover:text-dark text-white font-medium py-3 rounded-md transition-colors"
+								>
+									$25
+								</button>
+								<button
+									class="bg-dark-300 hover:bg-primary hover:text-dark text-white font-medium py-3 rounded-md transition-colors"
+								>
+									$50
+								</button>
+								<button
+									class="bg-dark-300 hover:bg-primary hover:text-dark text-white font-medium py-3 rounded-md transition-colors"
+								>
+									$100
+								</button>
+							</div>
+						</div>
+
+						<div class="mb-8">
+							<h4 class="text-lg font-semibold text-primary mb-4">
+								Or Enter a Custom Amount
+							</h4>
+							<div class="flex items-center">
+								<span class="text-xl mr-2">$</span>
+								<input
+									type="number"
+									placeholder="Enter amount"
+									min="1"
+									class="flex-1 px-4 py-3 rounded-md bg-dark-300 border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+								/>
+							</div>
+						</div>
+
+						<div class="mb-8">
+							<h4 class="text-lg font-semibold text-primary mb-4">
+								Donation Frequency
+							</h4>
+							<div class="flex space-x-4">
+								<label class="flex items-center">
+									<input
+										type="radio"
+										name="frequency"
+										value="one-time"
+										checked
+										class="h-4 w-4 text-primary"
+									/>
+									<span class="ml-2 text-white">One-time</span>
+								</label>
+								<label class="flex items-center">
+									<input
+										type="radio"
+										name="frequency"
+										value="monthly"
+										class="h-4 w-4 text-primary"
+									/>
+									<span class="ml-2 text-white">Monthly</span>
+								</label>
+								<label class="flex items-center">
+									<input
+										type="radio"
+										name="frequency"
+										value="annually"
+										class="h-4 w-4 text-primary"
+									/>
+									<span class="ml-2 text-white">Annually</span>
+								</label>
+							</div>
+						</div>
+
+						<button
+							class="w-full bg-primary hover:bg-primary-600 text-dark font-bold py-4 px-4 rounded-md transition-colors text-lg"
+						>
+							Donate Now
+						</button>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Modal for Artifact Details -->
+		<div id="modal" class="fixed inset-0 z-50 hidden">
+			<div
+				class="modal-backdrop absolute inset-0 bg-black/90"
+				onclick="closeModal()"
+			></div>
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div
+					class="modal-content bg-dark-400 w-full max-w-4xl rounded-lg shadow-2xl overflow-hidden relative"
+				>
+					<button
+						onclick="closeModal()"
+						class="absolute top-4 right-4 text-gray-400 hover:text-white z-10"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+
+					<div class="md:flex">
+						<div class="md:w-1/2">
+							<div class="relative h-64 md:h-full">
+								<img
+									id="modal-img"
+									src=""
+									alt="Artifact"
+									class="w-full h-full object-cover"
+								/>
+								<div
+									class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-dark-500 to-transparent h-24 md:hidden"
+								></div>
+							</div>
+						</div>
+
+						<div class="md:w-1/2 p-6 md:overflow-y-auto max-h-[80vh]">
+							<div
+								id="modal-badge"
+								class="inline-block bg-primary text-dark text-xs font-bold px-2 py-1 rounded-full mb-2"
+							></div>
+							<h2
+								id="modal-title"
+								class="text-2xl font-display font-bold text-white mb-2"
+							></h2>
+
+							<div
+								id="modal-details"
+								class="grid grid-cols-2 gap-2 text-sm mb-4"
+							>
+								<div class="text-gray-400">Time Period:</div>
+								<div id="modal-period" class="text-white"></div>
+								<div class="text-gray-400">Origin:</div>
+								<div id="modal-origin" class="text-white"></div>
+								<div class="text-gray-400">Material:</div>
+								<div id="modal-material" class="text-white"></div>
+								<div class="text-gray-400">Dimensions:</div>
+								<div id="modal-dimensions" class="text-white"></div>
+							</div>
+
+							<h3 class="text-lg font-semibold text-primary mb-2">
+								About this Artifact
+							</h3>
+							<p id="modal-desc" class="text-gray-300 mb-6"></p>
+
+							<h3 class="text-lg font-semibold text-primary mb-2">
+								Audio Description
+							</h3>
+							<div class="custom-audio-player">
+								<div id="audio-progress" class="audio-progress">
+									<div id="audio-progress-bar" class="audio-progress-bar"></div>
+								</div>
+								<div class="audio-controls">
+									<button
+										id="audio-play-btn"
+										class="audio-button"
+										onclick="toggleAudio()"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-6 w-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+											/>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+									</button>
+									<div class="audio-time">
+										<span id="audio-current-time">0:00</span> /
+										<span id="audio-duration">0:00</span>
+									</div>
+									<button
+										id="audio-mute-btn"
+										class="audio-button"
+										onclick="toggleMute()"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-6 w-6"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"
+											/>
+										</svg>
+									</button>
+								</div>
+							</div>
+
+							<div id="tour-navigation" class="mt-6 hidden">
+								<!-- Tour navigation will be dynamically added here when in tour mode -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<!-- Footer -->
+		<footer class="bg-dark-500 border-t border-gray-800 py-8">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+					<!-- Quick Links -->
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-4">Quick Links</h3>
+						<nav class="flex flex-col space-y-2">
+							<a
+								href="#"
+								onclick="showSection('browse')"
+								class="text-gray-300 hover:text-primary transition-colors"
+								>Browse Collection</a
+							>
+							<a
+								href="#"
+								onclick="showSection('tours')"
+								class="text-gray-300 hover:text-primary transition-colors"
+								>Virtual Tours</a
+							>
+							<a
+								href="#"
+								onclick="showSection('exhibitions')"
+								class="text-gray-300 hover:text-primary transition-colors"
+								>Exhibitions</a
+							>
+							<a
+								href="#"
+								onclick="showSection('about')"
+								class="text-gray-300 hover:text-primary transition-colors"
+								>About Us</a
+							>
+							<a
+								href="#"
+								onclick="showSection('donate')"
+								class="text-gray-300 hover:text-primary transition-colors"
+								>Support Our Museum</a
+							>
+						</nav>
+					</div>
+
+					<!-- Contact Information -->
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-4">Contact Us</h3>
+						<address class="not-italic text-gray-300 space-y-2">
+							<p>123 Museum Lane</p>
+							<p>History City, HC 00000</p>
+							<p>
+								<a
+									href="mailto:info@virtualmuseum.com"
+									class="text-primary hover:underline"
+									>info@virtualmuseum.com</a
+								>
+							</p>
+							<p>+1-555-123-4567</p>
+						</address>
+					</div>
+
+					<!-- Social Media & Newsletter -->
+					<div>
+						<h3 class="text-lg font-semibold text-primary mb-4">
+							Connect With Us
+						</h3>
+						<div class="flex space-x-4 mb-6">
+							<a
+								href="#"
+								class="text-gray-400 hover:text-primary transition-colors"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="text-gray-400 hover:text-primary transition-colors"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="text-gray-400 hover:text-primary transition-colors"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="text-gray-400 hover:text-primary transition-colors"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</a>
+						</div>
+
+						<!-- Mini Newsletter Form -->
+						<form
+							onsubmit="event.preventDefault(); subscribeNewsletter();"
+							class="flex"
+						>
+							<input
+								type="email"
+								placeholder="Sign up for updates"
+								required
+								class="flex-1 px-3 py-2 rounded-l-md bg-dark-300 border border-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-transparent text-sm"
+							/>
+							<button
+								type="submit"
+								class="bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-3 rounded-r-md transition-colors text-sm"
+							>
+								Sign Up
+							</button>
+						</form>
+					</div>
+				</div>
+
+				<!-- Copyright and Legal Links -->
+				<div
+					class="border-t border-gray-800 pt-6 text-center md:flex md:justify-between md:text-left"
+				>
+					<p class="text-gray-500 text-sm mb-2 md:mb-0">
+						© 2023 Virtual Museum. All rights reserved.
+					</p>
+					<div class="flex justify-center md:justify-end space-x-4 text-sm">
+						<a
+							href="#"
+							class="text-gray-500 hover:text-primary transition-colors"
+							>Privacy Policy</a
+						>
+						<a
+							href="#"
+							class="text-gray-500 hover:text-primary transition-colors"
+							>Terms of Service</a
+						>
+						<a
+							href="#"
+							class="text-gray-500 hover:text-primary transition-colors"
+							>Accessibility</a
+						>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- JavaScript -->
+		<script>
+			// Artifact Data
+			const artifacts = [
+				{
+					id: 0,
+					title: "Egyptian Statue",
+					img: "https://images.unsplash.com/photo-1566117086859-5770f46928ab?auto=format&fit=crop&w=1200&q=80",
+					badge: "Egypt",
+					period: "2500 BCE",
+					origin: "Giza Plateau, Egypt",
+					material: "Limestone",
+					dimensions: "45cm × 20cm × 15cm",
+					desc: "A statue from 2500 BCE representing an Egyptian Pharaoh, symbolizing divine rule. This limestone artifact was discovered during excavations at the Giza Plateau and exemplifies the artistic conventions of the Old Kingdom period. The rigid pose with arms at the sides and forward-facing stance reflects the formality of Egyptian royal portraiture, intended to project eternal power and stability.",
+				},
+				{
+					id: 1,
+					title: "Roman Coin",
+					img: "https://images.unsplash.com/photo-1727169703988-ad083dbd048d?auto=format&fit=crop&w=1200&q=80",
+					badge: "Rome",
+					period: "100 CE",
+					origin: "Rome, Italy",
+					material: "Gold",
+					dimensions: "2.5cm diameter",
+					desc: "A gold coin from 100 CE, used in trade across the Roman Empire. The obverse depicts Emperor Trajan, while the reverse shows symbols of Roman prosperity including agricultural motifs. This coin exemplifies how currency functioned as both a medium of exchange and propaganda tool, spreading the emperor's image and achievements throughout the vast Roman territories.",
+				},
+				{
+					id: 2,
+					title: "Medieval Sword",
+					img: "https://images.unsplash.com/photo-1440711085503-89d8ec455791?auto=format&fit=crop&w=1200&q=80",
+					badge: "Europe",
+					period: "1200 CE",
+					origin: "Northern France",
+					material: "Steel, Gold",
+					dimensions: "94cm × 12cm × 3cm",
+					desc: "A sword from 1200 CE, wielded by knights in the Middle Ages. This steel blade with gold inlay was likely owned by a nobleman from Northern France and represents advanced metallurgy techniques of the period. The hilt features intricate engravings depicting religious symbols, reflecting the deep connection between warfare and faith during the Crusades era.",
+				},
+				{
+					id: 3,
+					title: "Egyptian Scarab Seal",
+					img: "https://images.unsplash.com/photo-1706727130951-817e44eb26c2?auto=format&fit=crop&w=1200&q=80",
+					badge: "Egypt",
+					period: "1450 BCE",
+					origin: "Thebes, Egypt",
+					material: "Steatite",
+					dimensions: "2.8cm × 1.9cm × 1.2cm",
+					desc: "A finely carved scarab seal from Egypt's New Kingdom era (c. 1450 BCE). This small steatite artifact features hieroglyphic inscriptions on its base and was used for administrative purposes and as a personal amulet. The scarab beetle symbolized rebirth and renewal in ancient Egyptian religion, associated with the daily regeneration of the sun.",
+				},
+				{
+					id: 4,
+					title: "Roman Glass Vessel",
+					img: "https://images.unsplash.com/photo-1743079595772-011a6f2b3d3d?auto=format&fit=crop&w=1200&q=80",
+					badge: "Rome",
+					period: "250 CE",
+					origin: "Syria, Roman Empire",
+					material: "Glass",
+					dimensions: "15cm × 8cm × 8cm",
+					desc: "An elegant blown glass vessel from the Roman Empire (c. 250 CE). This translucent blue-green container showcases the sophisticated glass manufacturing techniques employed throughout the Roman territories. The vessel's delicate form and distinctive coloration were achieved through innovative glassblowing methods developed in Syria, which was a major center of glass production in the ancient world.",
+				},
+				{
+					id: 5,
+					title: "Greek Vase",
+					img: "https://cdn.shopify.com/s/files/1/0130/8502/products/panathamp15cm_2_2000x.jpg?v=1569077015&auto=format&fit=crop&w=800&q=80",
+					badge: "Greece",
+					period: "450 BCE",
+					origin: "Athens, Greece",
+					material: "Terracotta",
+					dimensions: "32cm × 22cm",
+					desc: "A terracotta amphora from 450 BCE, decorated with scenes of daily life in Ancient Greece. This vase was used for storage and storytelling through its detailed painted imagery. The black-figure technique employed depicts athletes competing in the Panathenaic Games, offering modern viewers a glimpse into Greek athletic traditions and artistic sensibilities of the Classical period.",
+				},
+				{
+					id: 6,
+					title: "Indus Seal",
+					img: "https://smarthistory.org/wp-content/uploads/2020/04/Shiva_Pashupati.jpg?auto=format&fit=crop&w=800&q=80",
+					badge: "Indus",
+					period: "2000 BCE",
+					origin: "Mohenjo-daro, Indus Valley",
+					material: "Steatite",
+					dimensions: "4cm × 4cm",
+					desc: "This seal from 2000 BCE, originating in Mohenjo-daro, is a symbol of the Indus Valley's sophisticated script system and trade practices. Carved from steatite, it features animal motifs and script yet to be deciphered. The figure depicted may represent an early form of a deity seated in what appears to be a yogic posture, suggesting the ancient origins of spiritual practices still present in South Asian cultures today.",
+				},
+				{
+					id: 7,
+					title: "Chinese Bronze Mirror",
+					img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSl_6DEzvHsw6SEsUHzVfnrJDJ6iYJsQ37BZw&s?auto=format&fit=crop&w=800&q=80",
+					badge: "China",
+					period: "100 BCE",
+					origin: "Han Dynasty, China",
+					material: "Bronze",
+					dimensions: "15cm diameter",
+					desc: "A reflective bronze mirror from the Han Dynasty (100 BCE), elaborately decorated on the back with symbolic patterns. Used in rituals and daily life, it illustrates early Chinese craftsmanship. The geometric designs and mythological creatures adorning the reverse side were believed to have protective qualities, while the highly polished reflective surface represents technological mastery of metallurgy in ancient China.",
+				},
+			];
+
+			// Tour data
+			const tours = {
+				general: [0, 1, 2, 3, 4],
+				roman: [1, 4, 5],
+				egypt: [0, 3, 6],
+			};
+
+			// Current state variables
+			let currentSection = "browse";
+			let currentHeroIndex = 0;
+			let currentTour = null;
+			let currentTourIndex = 0;
+			let currentAudio = null;
+			let isMuted = false;
+
+			// DOM ready function
+			document.addEventListener("DOMContentLoaded", function () {
+				// Initialize the loader
+				setTimeout(function () {
+					document.getElementById("loader").classList.add("hidden");
+				}, 1500);
+
+				// Initialize the mobile menu toggle
+				document
+					.getElementById("mobile-menu-button")
+					.addEventListener("click", function () {
+						const mobileMenu = document.getElementById("mobile-menu");
+						mobileMenu.classList.toggle("hidden");
+					});
+
+				// Initialize the navigation indicator
+				updateNavIndicator();
+				window.addEventListener("resize", updateNavIndicator);
+
+				// Generate the artifact cards
+				generateArtifactCards();
+
+				// Initialize the hero section
+				updateHero();
+				setInterval(updateHero, 6000);
+
+				// Initialize the charts
+				initializeCharts();
+
+				// Show the initial section
+				showSection("browse");
+			});
+
+			// Navigation indicator update
+			function updateNavIndicator() {
+				const navLinks = document.querySelectorAll(".nav-link");
+				const indicator = document.getElementById("nav-indicator");
+
+				if (!indicator || navLinks.length === 0) return;
+
+				const activeLink = document.querySelector(
+					`.nav-link[data-target="${currentSection}"]`
+				);
+
+				if (activeLink) {
+					const rect = activeLink.getBoundingClientRect();
+					indicator.style.width = `${rect.width}px`;
+					indicator.style.left = `${rect.left}px`;
+				}
+			}
+
+			// Show different sections
+			function showSection(sectionId) {
+				// Hide all sections
+				document.querySelectorAll(".section").forEach((section) => {
+					section.classList.add("hidden");
+				});
+
+				// Show the selected section
+				const section = document.getElementById(sectionId);
+				if (section) {
+					section.classList.remove("hidden");
+					currentSection = sectionId;
+
+					// Update the navigation indicator
+					updateNavIndicator();
+
+					// Close mobile menu if open
+					document.getElementById("mobile-menu").classList.add("hidden");
+
+					// Reset the tour progress bar
+					document.getElementById("tour-progress").style.width = "0%";
+
+					// Scroll to top
+					window.scrollTo(0, 0);
+				}
+			}
+			// VR Tour Functions
+			function toggleInfoPanel(exhibitId) {
+				// Play click sound
+				const clickSound = document.querySelector("#click-sound");
+				if (clickSound) {
+					clickSound.play();
+				}
+
+				// Toggle visibility of the info panel
+				const exhibit = document.querySelector(`#${exhibitId}`);
+				if (exhibit) {
+					const infoPanel = exhibit.querySelector(".info-panel");
+					if (infoPanel) {
+						infoPanel.setAttribute(
+							"visible",
+							infoPanel.getAttribute("visible") === "true" ? "false" : "true"
+						);
+					}
+				}
+			}
+
+			function teleportTo(x, y, z) {
+				// Play click sound
+				const clickSound = document.querySelector("#click-sound");
+				if (clickSound) {
+					clickSound.play();
+				}
+
+				// Get the camera
+				const camera = document.querySelector("a-camera");
+				if (camera) {
+					// Animate the camera position change for a smoother transition
+					camera.setAttribute("animation__position", {
+						property: "position",
+						to: `${x} ${y} ${z}`,
+						dur: 1000,
+						easing: "easeInOutQuad",
+					});
+				}
+			}
+			// Show tour details
+			function showTourDetails(tourType) {
+				showSection(`tour-${tourType}`);
+			}
+
+			// Generate artifact cards for the browse section
+			function generateArtifactCards() {
+				// Featured artifacts
+				const featuredContainer = document.querySelector(
+					"#browse .grid:nth-of-type(1)"
+				);
+
+				// Clear existing content
+				featuredContainer.innerHTML = "";
+
+				// Add featured artifacts (first 3)
+				for (let i = 0; i < 3; i++) {
+					featuredContainer.appendChild(createArtifactCard(artifacts[i]));
+				}
+
+				// Recent acquisitions
+				const recentContainer = document.querySelector(
+					"#browse .grid:nth-of-type(2)"
+				);
+
+				// Clear existing content
+				recentContainer.innerHTML = "";
+
+				// Add recent acquisitions (last 3)
+				for (let i = artifacts.length - 3; i < artifacts.length; i++) {
+					recentContainer.appendChild(createArtifactCard(artifacts[i]));
+				}
+			}
+
+			// Create artifact card
+			// Update the createArtifactCard function to enhance the category badges
+			function createArtifactCard(artifact) {
+				const card = document.createElement("div");
+				card.className =
+					"artifact-card bg-dark-400/50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300";
+				card.onclick = () => showArtifact(artifact.id);
+
+				// Create a color map for different regions/categories
+				const categoryColors = {
+					Egypt: { bg: "from-yellow-600 to-yellow-800", text: "text-white" },
+					Rome: { bg: "from-red-600 to-red-800", text: "text-white" },
+					Greece: { bg: "from-blue-600 to-blue-800", text: "text-white" },
+					Europe: { bg: "from-purple-600 to-purple-800", text: "text-white" },
+					China: { bg: "from-green-600 to-green-800", text: "text-white" },
+					Indus: { bg: "from-orange-600 to-orange-800", text: "text-white" },
+					default: { bg: "from-gray-600 to-gray-800", text: "text-white" },
+				};
+
+				// Get colors for this category or use default
+				const colorSet =
+					categoryColors[artifact.badge] || categoryColors.default;
+
+				card.innerHTML = `
+    <div class="relative h-52 overflow-hidden">
+      <img src="${artifact.img}" alt="${artifact.title}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+      <div class="absolute top-3 right-3 z-10">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${colorSet.bg} ${colorSet.text} shadow-md">
+          ${artifact.badge}
+        </span>
+      </div>
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+      <div class="absolute bottom-0 left-0 p-3">
+        <h3 class="text-lg font-semibold text-white">${artifact.title}</h3>
+        <p class="text-xs text-gray-300">${artifact.period} • ${artifact.origin}</p>
+      </div>
+    </div>
+    <div class="p-4">
+      <dl class="text-sm space-y-1">
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Material:</dt>
+          <dd class="text-gray-300">${artifact.material}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Dimensions:</dt>
+          <dd class="text-gray-300">${artifact.dimensions}</dd>
+        </div>
+      </dl>
+      <div class="mt-4 flex justify-end">
+        <button class="bg-dark-300 hover:bg-primary hover:text-dark text-white text-sm font-medium py-1 px-3 rounded transition-colors">
+          View Details
+        </button>
+      </div>
+    </div>
+  `;
+
+				return card;
+			}
+			// Update hero section
+			// Update the updateHero function to enhance the badge in the hero section
+			// Update the updateHero function with a more compact, better-sized badge
+			function updateHero() {
+				const artifact = artifacts[currentHeroIndex];
+				const hero = document.getElementById("hero");
+
+				// Create a new image element to preload the next image
+				const nextImage = new Image();
+				nextImage.src = artifact.img;
+
+				// Create a color map for different regions/categories
+				const categoryColors = {
+					Egypt: { bg: "from-yellow-600 to-yellow-800", text: "text-white" },
+					Rome: { bg: "from-red-600 to-red-800", text: "text-white" },
+					Greece: { bg: "from-blue-600 to-blue-800", text: "text-white" },
+					Europe: { bg: "from-purple-600 to-purple-800", text: "text-white" },
+					China: { bg: "from-green-600 to-green-800", text: "text-white" },
+					Indus: { bg: "from-orange-600 to-orange-800", text: "text-white" },
+					default: { bg: "from-gray-600 to-gray-800", text: "text-white" },
+				};
+
+				// Get colors for this category or use default
+				const colorSet =
+					categoryColors[artifact.badge] || categoryColors.default;
+
+				// Once the image is loaded, update the hero
+				nextImage.onload = function () {
+					// Apply a subtle fade effect
+					anime({
+						targets: "#hero",
+						opacity: [1, 0.7, 1],
+						duration: 1000,
+						easing: "easeInOutQuad",
+						complete: function () {
+							hero.innerHTML = `
+          <div class="absolute inset-0 z-0">
+            <img src="${artifact.img}" alt="${
+								artifact.title
+							}" class="w-full h-full object-cover">
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-r from-dark-500/90 to-dark-500/70 z-10"></div>
+          <div class="relative z-20 h-full flex flex-col justify-center p-8 sm:p-16">
+            <div class="inline-block mb-4">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r ${
+								colorSet.bg
+							} ${colorSet.text} shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                ${artifact.badge}
+              </span>
+            </div>
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-display font-bold text-white mb-4 leading-tight">${
+							artifact.title
+						}</h2>
+            <p class="text-xl text-gray-300 max-w-2xl mb-8">${
+							artifact.period
+						} • ${artifact.origin}</p>
+            <p class="text-lg text-gray-200 max-w-xl mb-8">${
+							artifact.desc.split(". ")[0]
+						}${
+								artifact.desc.split(". ")[1]
+									? ". " + artifact.desc.split(". ")[1]
+									: "."
+							}</p>
+            <button onclick="showArtifact(${
+							artifact.id
+						})" class="bg-primary hover:bg-primary-600 text-dark font-bold py-3 px-8 rounded-md transition-colors inline-flex items-center group max-w-xs">
+              <span>Explore Artifact</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        `;
+						},
+					});
+				};
+
+				// Update index for next rotation
+				currentHeroIndex = (currentHeroIndex + 1) % artifacts.length;
+			}
+
+			// Show artifact modal
+			function showArtifact(id, fromTour = false) {
+				const artifact = artifacts[id];
+
+				// Update modal content
+				document.getElementById("modal-img").src = artifact.img;
+				document.getElementById("modal-title").textContent = artifact.title;
+				document.getElementById("modal-badge").textContent =
+					"#" + artifact.badge;
+				document.getElementById("modal-period").textContent = artifact.period;
+				document.getElementById("modal-origin").textContent = artifact.origin;
+				document.getElementById("modal-material").textContent =
+					artifact.material;
+				document.getElementById("modal-dimensions").textContent =
+					artifact.dimensions;
+				document.getElementById("modal-desc").textContent = artifact.desc;
+
+				// Reset audio player
+				resetAudioPlayer();
+
+				// Show or hide tour navigation
+				const tourNavigation = document.getElementById("tour-navigation");
+				tourNavigation.innerHTML = "";
+
+				if (fromTour) {
+					tourNavigation.classList.remove("hidden");
+					currentTourIndex = tours[currentTour].indexOf(id);
+
+					// Create tour navigation
+					const prevBtn = document.createElement("button");
+					prevBtn.className =
+						"bg-dark-300 hover:bg-dark-200 text-white font-medium py-2 px-4 rounded-md transition-colors";
+					prevBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Previous
+        `;
+					prevBtn.disabled = currentTourIndex <= 0;
+					prevBtn.style.opacity = currentTourIndex <= 0 ? "0.5" : "1";
+					prevBtn.onclick = () => showTourArtifact(currentTourIndex - 1);
+
+					const progress = document.createElement("div");
+					progress.className = "text-white";
+					progress.textContent = `${currentTourIndex + 1} of ${
+						tours[currentTour].length
+					}`;
+
+					const nextBtn = document.createElement("button");
+					nextBtn.className =
+						"bg-primary hover:bg-primary-600 text-dark font-medium py-2 px-4 rounded-md transition-colors";
+					nextBtn.innerHTML =
+						currentTourIndex < tours[currentTour].length - 1
+							? `
+          Next
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 inline" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        `
+							: "Finish Tour";
+					nextBtn.onclick = () => {
+						if (currentTourIndex < tours[currentTour].length - 1) {
+							showTourArtifact(currentTourIndex + 1);
+						} else {
+							closeModal();
+							showSection("tours");
+							document.getElementById("tour-progress").style.width = "0%";
+							currentTour = null;
+						}
+					};
+
+					const navContainer = document.createElement("div");
+					navContainer.className = "flex justify-between items-center";
+					navContainer.appendChild(prevBtn);
+					navContainer.appendChild(progress);
+					navContainer.appendChild(nextBtn);
+
+					tourNavigation.appendChild(navContainer);
+				} else {
+					tourNavigation.classList.add("hidden");
+				}
+
+				// Show the modal with animation
+				const modal = document.getElementById("modal");
+				modal.classList.remove("hidden");
+				modal.classList.add("modal-entering");
+
+				// Start speech synthesis for audio narration
+				speakDescription(artifact.desc);
+
+				// Trigger animation after a slight delay
+				setTimeout(() => {
+					modal.classList.remove("modal-entering");
+					modal.classList.add("modal-visible");
+				}, 50);
+			}
+
+			// Reset audio player
+			function resetAudioPlayer() {
+				document.getElementById("audio-progress-bar").style.width = "0%";
+				document.getElementById("audio-current-time").textContent = "0:00";
+				document.getElementById("audio-duration").textContent = "0:00";
+
+				// Update play button icon
+				const playBtn = document.getElementById("audio-play-btn");
+				playBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      `;
+			}
+
+			// Close modal
+			function closeModal() {
+				// Stop narration
+				if (currentAudio) {
+					window.speechSynthesis.cancel();
+					currentAudio = null;
+				}
+
+				// Animate modal closing
+				const modal = document.getElementById("modal");
+				modal.classList.remove("modal-visible");
+				modal.classList.add("modal-entering");
+
+				// Hide modal after animation completes
+				setTimeout(() => {
+					modal.classList.add("hidden");
+					modal.classList.remove("modal-entering");
+				}, 300);
+			}
+
+			// Start a tour
+			function startTour(tourType) {
+				currentTour = tourType;
+				currentTourIndex = 0;
+				showTourArtifact(0);
+			}
+
+			// Show tour artifact
+			function showTourArtifact(index) {
+				if (index >= 0 && index < tours[currentTour].length) {
+					const artifactId = tours[currentTour][index];
+					showArtifact(artifactId, true);
+
+					// Update tour progress bar
+					const progressPercent =
+						((index + 1) / tours[currentTour].length) * 100;
+					document.getElementById(
+						"tour-progress"
+					).style.width = `${progressPercent}%`;
+				}
+			}
+
+			// Initialize charts
+			function initializeCharts() {
+				// Chart data
+				const regionData = {
+					labels: ["Africa", "Asia", "Europe", "Americas", "Oceania"],
+					datasets: [
+						{
+							label: "Artifacts by Region",
+							data: [750, 622, 1085, 320, 105],
+							backgroundColor: [
+								"rgba(245, 176, 65, 0.8)",
+								"rgba(241, 196, 15, 0.8)",
+								"rgba(230, 126, 34, 0.8)",
+								"rgba(211, 84, 0, 0.8)",
+								"rgba(243, 156, 18, 0.8)",
+							],
+							borderColor: [
+								"rgba(245, 176, 65, 1)",
+								"rgba(241, 196, 15, 1)",
+								"rgba(230, 126, 34, 1)",
+								"rgba(211, 84, 0, 1)",
+								"rgba(243, 156, 18, 1)",
+							],
+							borderWidth: 1,
+						},
+					],
+				};
+
+				const periodData = {
+					labels: [
+						"-5000",
+						"-3000",
+						"-1000",
+						"0",
+						"500",
+						"1000",
+						"1500",
+						"2000",
+					],
+					datasets: [
+						{
+							label: "Artifacts by Time Period",
+							data: [120, 350, 580, 780, 430, 390, 620, 220],
+							tension: 0.4,
+							backgroundColor: "rgba(245, 176, 65, 0.2)",
+							borderColor: "rgba(245, 176, 65, 1)",
+							pointBackgroundColor: "rgba(245, 176, 65, 1)",
+							pointBorderColor: "#fff",
+							pointRadius: 5,
+							pointHoverRadius: 7,
+							fill: true,
+						},
+					],
+				};
+
+				// Chart options
+				const chartOptions = {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: {
+							display: false,
+						},
+						tooltip: {
+							backgroundColor: "rgba(26, 26, 26, 0.9)",
+							titleColor: "#F5B041",
+							bodyColor: "#fff",
+							borderColor: "#F5B041",
+							borderWidth: 1,
+							padding: 10,
+							titleFont: {
+								family: "Inter",
+								size: 14,
+								weight: "bold",
+							},
+							bodyFont: {
+								family: "Inter",
+								size: 13,
+							},
+							cornerRadius: 6,
+						},
+					},
+					scales: {
+						x: {
+							grid: {
+								color: "rgba(255, 255, 255, 0.1)",
+							},
+							ticks: {
+								color: "rgba(255, 255, 255, 0.7)",
+							},
+						},
+						y: {
+							grid: {
+								color: "rgba(255, 255, 255, 0.1)",
+							},
+							ticks: {
+								color: "rgba(255, 255, 255, 0.7)",
+							},
+						},
+					},
+				};
+
+				// Create area chart
+				const areaCtx = document.getElementById("areaChart").getContext("2d");
+				window.areaChart = new Chart(areaCtx, {
+					type: "bar",
+					data: regionData,
+					options: chartOptions,
+				});
+
+				// Create period chart
+				const periodCtx = document
+					.getElementById("periodChart")
+					.getContext("2d");
+				window.periodChart = new Chart(periodCtx, {
+					type: "line",
+					data: periodData,
+					options: chartOptions,
+				});
+			}
+
+			// Update charts based on filters
+			function updateCharts() {
+				const region = document.getElementById("regionFilter").value;
+				const time = parseInt(document.getElementById("timeFilter").value);
+
+				// Apply region filter
+				const regionMultiplier = region === "All" ? 1 : 0.6;
+				const newRegionData = [750, 622, 1085, 320, 105].map((val) => {
+					return region === "All"
+						? val
+						: Math.floor(val * regionMultiplier * (Math.random() * 0.5 + 0.5));
+				});
+
+				window.areaChart.data.datasets[0].data = newRegionData;
+				window.areaChart.update();
+
+				// Apply time filter
+				const periodLabels = [
+					"-5000",
+					"-3000",
+					"-1000",
+					"0",
+					"500",
+					"1000",
+					"1500",
+					"2000",
+				];
+				const periodValues = [120, 350, 580, 780, 430, 390, 620, 220];
+				const newPeriodData = periodValues.map((val, idx) => {
+					const year = parseInt(periodLabels[idx]);
+					return year <= time ? val : Math.floor(val * 0.3);
+				});
+
+				window.periodChart.data.datasets[0].data = newPeriodData;
+				window.periodChart.update();
+			}
+
+			// Speech synthesis for artifact descriptions
+			function speakDescription(text) {
+				// Stop any current speech
+				window.speechSynthesis.cancel();
+
+				// Create a new utterance
+				currentAudio = new SpeechSynthesisUtterance(text);
+				currentAudio.lang = "en-US";
+				currentAudio.rate = 0.9;
+				currentAudio.pitch = 1;
+
+				// Set up events for the audio player
+				currentAudio.onstart = () => {
+					// Update play button to show pause icon
+					document.getElementById("audio-play-btn").innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        `;
+
+					// Update duration
+					const duration = Math.ceil(text.length / 15); // Rough estimate of duration based on text length
+					document.getElementById("audio-duration").textContent =
+						formatTime(duration);
+
+					// Start progress update interval
+					startProgressUpdate(duration);
+				};
+
+				currentAudio.onend = () => {
+					// Reset play button
+					document.getElementById("audio-play-btn").innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        `;
+
+					// Reset progress bar
+					document.getElementById("audio-progress-bar").style.width = "100%";
+
+					currentAudio = null;
+				};
+
+				// Start speaking if not muted
+				if (!isMuted) {
+					window.speechSynthesis.speak(currentAudio);
+				}
+			}
+
+			// Toggle audio playback
+			function toggleAudio() {
+				if (!currentAudio) {
+					// If there's no active audio, restart narration of the current artifact
+					const artifactId = currentTour
+						? tours[currentTour][currentTourIndex]
+						: 0;
+					speakDescription(artifacts[artifactId].desc);
+					return;
+				}
+
+				if (window.speechSynthesis.paused) {
+					window.speechSynthesis.resume();
+					document.getElementById("audio-play-btn").innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        `;
+				} else {
+					window.speechSynthesis.pause();
+					document.getElementById("audio-play-btn").innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        `;
+				}
+			}
+
+			// Toggle mute
+			function toggleMute() {
+				isMuted = !isMuted;
+
+				if (isMuted) {
+					window.speechSynthesis.cancel();
+					document.getElementById("audio-mute-btn").innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        `;
+				} else {
+					document.getElementById("audio-mute-btn").innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+          </svg>
+        `;
+				}
+			}
+
+			// Start progress update for audio player
+			let progressInterval;
+			function startProgressUpdate(duration) {
+				// Clear any existing interval
+				clearInterval(progressInterval);
+
+				// Set the start time
+				const startTime = Date.now();
+
+				// Update progress every 100ms
+				progressInterval = setInterval(() => {
+					// Calculate elapsed time
+					const elapsed = (Date.now() - startTime) / 1000;
+
+					// Update progress bar
+					const progress = Math.min((elapsed / duration) * 100, 100);
+					document.getElementById(
+						"audio-progress-bar"
+					).style.width = `${progress}%`;
+
+					// Update current time display
+					document.getElementById("audio-current-time").textContent =
+						formatTime(Math.min(Math.floor(elapsed), duration));
+
+					// Stop the interval if we've reached the end
+					if (elapsed >= duration) {
+						clearInterval(progressInterval);
+					}
+				}, 100);
+			}
+
+			// Format time for audio player (converts seconds to MM:SS format)
+			function formatTime(seconds) {
+				const minutes = Math.floor(seconds / 60);
+				const remainingSeconds = Math.floor(seconds % 60);
+				return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+			}
+
+			// Newsletter subscription
+			function subscribeNewsletter() {
+				// Show a success message
+				alert("Thank you for subscribing to our newsletter!");
+
+				// Reset the form
+				document.querySelector("form").reset();
+			}
+
+			// Add event listener to close modal when clicking on backdrop
+			document
+				.querySelector(".modal-backdrop")
+				.addEventListener("click", function (event) {
+					if (event.target === this) {
+						closeModal();
+					}
+				});
+
+			// Add event listener for audio progress bar click
+			document
+				.getElementById("audio-progress")
+				.addEventListener("click", function (event) {
+					// Calculate the click position as a percentage
+					const rect = this.getBoundingClientRect();
+					const clickPosition = (event.clientX - rect.left) / rect.width;
+
+					// Update the progress bar
+					document.getElementById("audio-progress-bar").style.width = `${
+						clickPosition * 100
+					}%`;
+
+					// If we have an active narration, try to seek (Note: seeking is not well supported in Web Speech API)
+					if (currentAudio) {
+						// For now, we'll just restart narration and pause/resume based on where user clicked
+						window.speechSynthesis.cancel();
+
+						// Get the current artifact description
+						const artifactId = currentTour
+							? tours[currentTour][currentTourIndex]
+							: 0;
+						const fullText = artifacts[artifactId].desc;
+
+						// Create a truncated version based on click position
+						const startPosition = Math.floor(fullText.length * clickPosition);
+						const truncatedText = fullText.substring(startPosition);
+
+						// Start speaking the truncated text
+						currentAudio = new SpeechSynthesisUtterance(truncatedText);
+						currentAudio.lang = "en-US";
+						currentAudio.rate = 0.9;
+
+						if (!isMuted) {
+							window.speechSynthesis.speak(currentAudio);
+						}
+					}
+				});
+
+			// Function to animate elements when they enter the viewport
+			function animateOnScroll() {
+				const elements = document.querySelectorAll(".animate-on-scroll");
+
+				elements.forEach((element) => {
+					const elementTop = element.getBoundingClientRect().top;
+					const elementVisible = 150;
+
+					if (elementTop < window.innerHeight - elementVisible) {
+						element.classList.add("animate-fadeIn");
+					}
+				});
+			}
+
+			// Add scroll event listener for animations
+			window.addEventListener("scroll", animateOnScroll);
+
+			// Make sure we initialize properly
+			window.onload = function () {
+				// Show initial section
+				showSection("browse");
+
+				// Initialize animations
+				animateOnScroll();
+			};
+		</script>
+	</body>
+</html>
