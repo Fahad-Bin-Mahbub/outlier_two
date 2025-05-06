@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script
+			src="https://kit.fontawesome.com/9f305591ee.js"
+			crossorigin="anonymous"
+		></script>
+		<script src="https://cdn.lordicon.com/lordicon.js"></script>
+		<title>DocCompare Pro</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			:root {
+				--bg-primary: #0a0a0f;
+				--bg-secondary: #1a1a2e;
+				--bg-tertiary: #2a2d47;
+				--bg-glass: rgba(255, 255, 255, 0.08);
+				--accent-primary: #667eea;
+				--accent-secondary: #764ba2;
+				--text-primary: #ffffff;
+				--text-secondary: #e2e8f0;
+				--text-muted: #94a3b8;
+				--border: rgba(255, 255, 255, 0.1);
+				--border-hover: rgba(255, 255, 255, 0.2);
+				--success: #22c55e;
+				--warning: #f59e0b;
+				--error: #ef4444;
+				--shadow: rgba(0, 0, 0, 0.3);
+				--shadow-lg: rgba(0, 0, 0, 0.5);
+				--gradient-primary: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				--gradient-bg: linear-gradient(
+					135deg,
+					var(--bg-primary) 0%,
+					var(--bg-secondary) 100%
+				);
+			}
+
+			body {
+				font-family: "Poppins", sans-serif;
+				background: linear-gradient(
+					135deg,
+					var(--bg-primary) 0%,
+					var(--bg-secondary) 100%
+				);
+				color: var(--text-primary);
+				min-height: 100vh;
+				overflow-x: hidden;
+			}
+
+			/* Landing Page Styles */
+			.landing-page {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.landing-bg {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: radial-gradient(
+						circle at 20% 80%,
+						rgba(120, 119, 198, 0.3) 0%,
+						transparent 50%
+					),
+					radial-gradient(
+						circle at 80% 20%,
+						rgba(93, 46, 203, 0.2) 0%,
+						transparent 50%
+					),
+					radial-gradient(
+						circle at 40% 40%,
+						rgba(0, 0, 0, 0.2) 0%,
+						transparent 50%
+					);
+				animation: float 10s ease-in-out infinite;
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0px) rotate(0deg);
+				}
+
+				50% {
+					transform: translateY(-20px) rotate(1deg);
+				}
+			}
+
+			.landing-header-row {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 2rem;
+				padding: 4rem 4rem 0rem 4rem;
+				position: relative;
+				z-index: 1;
+			}
+
+			.landing-header {
+				padding: 2rem;
+				text-align: center;
+				position: relative;
+				z-index: 2;
+			}
+
+			.landing-logo {
+				font-size: 4rem;
+				font-weight: 800;
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 1rem;
+				animation: glow 2s ease-in-out infinite alternate;
+			}
+
+			.landing-logo-pro {
+				font-weight: 400;
+			}
+
+			@keyframes glow {
+				from {
+					filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+				}
+
+				to {
+					filter: drop-shadow(0 0 30px rgba(99, 102, 241, 0.6));
+				}
+			}
+
+			.landing-subtitle {
+				/* font-size: 1.25rem; */
+				color: var(--text-secondary);
+				/* margin-bottom: 3rem; */
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+				line-height: 1.6;
+			}
+
+			.feature-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 2rem;
+				padding: 2rem;
+				max-width: 1200px;
+				margin: 0 auto;
+				position: relative;
+				z-index: 2;
+			}
+
+			.feature-card {
+				background: rgba(255, 255, 255, 0.05);
+				backdrop-filter: blur(2px);
+				border: 1px solid var(--border);
+				border-radius: 16px;
+				padding: 2rem;
+				transition: all 0.3s ease;
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+			}
+
+			.feature-card:hover {
+				transform: translateY(-5px);
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(12px);
+				border-color: var(--accent-primary);
+				box-shadow: 0 20px 40px var(--shadow);
+				cursor: default;
+			}
+
+			.feature-icon {
+				width: 60px;
+				height: 60px;
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				box-shadow: 0 4px 12px rgba(28, 28, 32, 0.2);
+				border-radius: 12px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-bottom: 1rem;
+				font-size: 1.5rem;
+			}
+
+			.feature-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+				margin-bottom: 0.7rem;
+				color: var(--text-primary);
+			}
+
+			.feature-description {
+				color: var(--text-secondary);
+				line-height: 1.6;
+				font-size: 1rem;
+				font-weight: 300;
+			}
+
+			.cta-section {
+				text-align: center;
+				/* padding: 4rem 2rem; */
+				position: relative;
+				z-index: 2;
+				margin-top: auto;
+				margin-bottom: 2rem;
+			}
+
+			.cta-button {
+				display: inline-flex;
+				font-family: "Poppins", sans-serif;
+				align-items: center;
+				gap: 0.75rem;
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				color: white;
+				font-size: 1.125rem;
+				font-weight: 600;
+				padding: 1rem 2rem;
+				border: none;
+				border-radius: 12px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				text-decoration: none;
+				min-height: 48px;
+				min-width: 48px;
+			}
+
+			.cta-button:hover {
+				transform: translateY(-2px);
+				scale: 1.05;
+				backdrop-filter: blur(2px);
+				/* box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4); */
+			}
+
+			/* Tool Styles */
+			.tool-container {
+				display: none;
+				height: 100vh;
+				flex-direction: column;
+				background: var(--bg-primary);
+			}
+
+			.tool-header {
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				padding: 1rem 2rem;
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+				flex-shrink: 0;
+				box-shadow: 0 4px 12px var(--shadow);
+			}
+
+			.tool-title {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 1.25rem;
+				font-weight: 600;
+				color: var(--text-primary);
+			}
+
+			.back-button {
+				font-family: "Poppins", sans-serif;
+				background: var(--bg-tertiary);
+				color: var(--text-primary);
+				border: 1px solid var(--border);
+				padding: 0.5rem 1rem;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				min-height: 44px;
+				min-width: 44px;
+			}
+
+			.back-button:hover {
+				background: var(--bg-secondary);
+				border-color: var(--accent-primary);
+				scale: 1.05;
+			}
+
+			.document-container {
+				flex: 1;
+				display: flex;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.document-panel {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				border-right: 1px solid var(--border);
+				position: relative;
+			}
+
+			.document-panel:last-child {
+				border-right: none;
+			}
+
+			.panel-header {
+				background: var(--bg-tertiary);
+				padding: 1rem;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.panel-title {
+				font-weight: 600;
+				color: var(--text-primary);
+				flex: 1;
+			}
+
+			.file-input {
+				display: none;
+			}
+
+			.file-button {
+				font-family: "Poppins", sans-serif;
+				/* font-weight: 600; */
+				display: flex;
+				flex-direction: row;
+				gap: 0.5rem;
+				align-items: center;
+				background: var(--accent-primary);
+				color: white;
+				border: none;
+				padding: 0.5rem 1rem;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 0.875rem;
+				transition: all 0.3s ease;
+				min-height: 36px;
+				width: fit-content;
+			}
+
+			.file-button:hover {
+				background: var(--accent-secondary);
+				scale: 1.02;
+			}
+
+			.document-viewer {
+				flex: 1;
+				overflow: auto;
+				padding: 1rem;
+				position: relative;
+				background: linear-gradient(
+					133deg,
+					var(--bg-primary),
+					var(--bg-tertiary)
+				);
+				touch-action: manipulation;
+			}
+
+			.document-content {
+				line-height: 1.8;
+				color: var(--text-primary);
+				font-family: "Courier New", monospace;
+				white-space: pre-wrap;
+				word-wrap: break-word;
+				position: relative;
+				transform-origin: top left;
+				transition: transform 0.1s ease-out;
+			}
+
+			.diff-added-plan-a {
+				background: rgba(16, 185, 129, 0.2);
+				border-left: 3px solid var(--success);
+				padding-left: 0.5rem;
+				margin: 0.25rem 0;
+			}
+
+			.diff-added-plan-b {
+				background: rgba(16, 185, 129, 0.2);
+				border-left: 3px solid var(--success);
+				padding-left: 0.5rem;
+				margin: 0.25rem 0;
+			}
+
+			.diff-removed-plan-a {
+				background: rgba(236, 30, 30, 0.2);
+				border-left: 3px solid var(--error);
+				padding-left: 0.5rem;
+				margin: 0.25rem 0;
+				text-decoration: line-through;
+			}
+
+			.diff-removed-plan-b {
+				background: rgba(125, 5, 5, 0.2);
+				border-left: 3px solid var(--error);
+				padding-left: 0.5rem;
+				margin: 0.25rem 0;
+				text-decoration: line-through;
+			}
+
+			.diff-modified-plan-a {
+				background: rgba(250, 159, 3, 0.2);
+				border-left: 3px solid var(--warning);
+				padding-left: 0.5rem;
+				margin: 0.25rem 0;
+			}
+
+			.diff-modified-plan-b {
+				background: rgba(126, 81, 3, 0.2);
+				border-left: 3px solid var(--warning);
+				padding-left: 0.5rem;
+				margin: 0.25rem 0;
+			}
+
+			.annotation {
+				position: absolute;
+				cursor: pointer;
+				z-index: 10;
+			}
+
+			.stamp-annotation {
+				padding: 0.25rem 0.5rem;
+				border-radius: 6px;
+				font-size: 0.75rem;
+				font-weight: 600;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				border: 2px solid;
+				background: rgba(0, 0, 0, 0.8);
+				min-height: 32px;
+				min-width: 32px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.stamp-approved {
+				color: var(--success);
+				border-color: var(--success);
+			}
+
+			.stamp-revised {
+				color: var(--warning);
+				border-color: var(--warning);
+			}
+
+			.stamp-question {
+				color: var(--accent-primary);
+				border-color: var(--accent-primary);
+			}
+
+			.text-annotation {
+				background: var(--accent-primary);
+				color: white;
+				padding: 0.5rem;
+				border-radius: 8px;
+				max-width: 200px;
+				font-size: 0.875rem;
+				box-shadow: 0 4px 12px var(--shadow);
+				border: 1px solid var(--border);
+			}
+
+			.text-annotation::after {
+				content: "";
+				position: absolute;
+				bottom: -8px;
+				left: 20px;
+				width: 0;
+				height: 0;
+				border-left: 8px solid transparent;
+				border-right: 8px solid transparent;
+				border-top: 8px solid var(--accent-primary);
+			}
+
+			.toolbar {
+				background: linear-gradient(
+					133deg,
+					var(--bg-primary),
+					var(--bg-tertiary)
+				);
+				padding: 2rem;
+				display: flex;
+				gap: 1rem;
+				align-items: center;
+				justify-content: center;
+				flex-wrap: wrap;
+				position: sticky;
+				bottom: 0;
+				z-index: 100;
+			}
+
+			.toolbar-group {
+				display: flex;
+				gap: 0.5rem;
+				justify-content: center;
+				flex-wrap: wrap;
+			}
+
+			.toolbar-button {
+				background: var(--bg-tertiary);
+				color: var(--text-primary);
+				border: none;
+				box-shadow: 0 2px 2px var(--bg-tertiary);
+				/* border: 1px solid var(--border); */
+				padding: 0.75rem;
+				border-radius: 8px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				font-size: 0.875rem;
+				min-height: 44px;
+				min-width: 44px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+			}
+
+			.toolbar-button span {
+				font-family: "Poppins", sans-serif;
+			}
+
+			.toolbar-button:hover {
+				background: var(--accent-primary);
+				border-color: var(--accent-primary);
+			}
+
+			.toolbar-button.active {
+				background: var(--accent-primary);
+				border-color: var(--accent-primary);
+			}
+
+			.zoom-controls {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.zoom-display {
+				color: var(--text-secondary);
+				font-size: 0.875rem;
+				min-width: 60px;
+				text-align: center;
+			}
+
+			.annotation-input {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: var(--bg-secondary);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 2rem;
+				box-shadow: 0 20px 40px var(--shadow);
+				z-index: 1000;
+				min-width: 300px;
+				max-width: 90vw;
+			}
+
+			.annotation-input h3 {
+				margin-bottom: 1rem;
+				color: var(--text-primary);
+			}
+
+			.annotation-input textarea {
+				width: 100%;
+				height: 100px;
+				background: var(--bg-primary);
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				padding: 0.75rem;
+				color: var(--text-primary);
+				font-family: inherit;
+				resize: vertical;
+				margin-bottom: 1rem;
+			}
+
+			.annotation-input-buttons {
+				display: flex;
+				gap: 0.5rem;
+				justify-content: flex-end;
+			}
+
+			.modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.7);
+				z-index: 999;
+				display: none;
+			}
+
+			/* Mobile Responsive */
+			@media (max-width: 768px) {
+				.landing-logo {
+					font-size: 2rem;
+				}
+
+				.landing-subtitle {
+					font-size: 1rem;
+					padding: 0 1rem;
+				}
+
+				.feature-grid {
+					grid-template-columns: 1fr;
+					padding: 1rem;
+				}
+
+				.document-container {
+					flex-direction: column;
+				}
+
+				.document-panel {
+					border-right: none;
+					border-bottom: 1px solid var(--border);
+					min-height: 50%;
+				}
+
+				.document-panel:last-child {
+					border-bottom: none;
+				}
+
+				.toolbar {
+					padding: 0.75rem;
+					gap: 0.5rem;
+				}
+
+				.toolbar-button {
+					font-family: "Poppins", sans-serif;
+					padding: 0.5rem;
+					font-size: 0.75rem;
+					font-weight: 600;
+					min-height: 40px;
+					min-width: 40px;
+				}
+
+				.annotation-input {
+					margin: 1rem;
+					min-width: unset;
+					width: calc(100% - 2rem);
+				}
+			}
+
+			.hidden {
+				display: none !important;
+			}
+			/* Footer Styles */
+			.app-footer {
+				background: linear-gradient(
+					135deg,
+					var(--bg-secondary) 0%,
+					var(--bg-primary) 100%
+				);
+				border-top: 1px solid var(--border);
+				margin-top: auto;
+				position: relative;
+				z-index: 1;
+			}
+
+			.footer-content {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 3rem 2rem 2rem;
+				display: grid;
+				grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+				gap: 2rem;
+			}
+
+			.footer-section {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.footer-brand {
+				max-width: 280px;
+			}
+
+			.footer-logo {
+				font-size: 1.5rem;
+				font-weight: 800;
+				background: linear-gradient(
+					135deg,
+					var(--accent-primary),
+					var(--accent-secondary)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 0.75rem;
+			}
+
+			.footer-logo-pro {
+				font-weight: 400;
+			}
+
+			.footer-description {
+				color: var(--text-secondary);
+				line-height: 1.6;
+				font-size: 0.9rem;
+			}
+
+			.footer-heading {
+				color: var(--text-primary);
+				font-size: 1rem;
+				font-weight: 600;
+				margin-bottom: 1rem;
+			}
+
+			.footer-links {
+				list-style: none;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			.footer-links a {
+				color: var(--text-muted);
+				text-decoration: none;
+				font-size: 0.875rem;
+				transition: color 0.3s ease;
+			}
+
+			.footer-links a:hover {
+				color: var(--accent-primary);
+			}
+
+			.footer-social {
+				display: flex;
+				gap: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.social-link {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 40px;
+				height: 40px;
+				background: var(--bg-tertiary);
+				color: var(--text-secondary);
+				border-radius: 8px;
+				text-decoration: none;
+				transition: all 0.3s ease;
+				border: 1px solid var(--border);
+			}
+
+			.social-link:hover {
+				background: var(--accent-primary);
+				color: white;
+				transform: translateY(-2px);
+				border-color: var(--accent-primary);
+			}
+
+			.footer-bottom {
+				border-top: 1px solid var(--border);
+				background: var(--bg-primary);
+			}
+
+			.footer-bottom-content {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 1.5rem 2rem;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 1rem;
+			}
+
+			.footer-copyright {
+				color: var(--text-muted);
+				font-size: 0.875rem;
+			}
+
+			.footer-badges {
+				display: flex;
+				gap: 1rem;
+				flex-wrap: wrap;
+			}
+
+			.footer-badge {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.25rem 0.75rem;
+				background: var(--bg-tertiary);
+				border: 1px solid var(--border);
+				border-radius: 20px;
+				font-size: 0.75rem;
+				color: var(--text-secondary);
+				font-weight: 500;
+			}
+
+			.footer-badge i {
+				color: var(--accent-primary);
+			}
+
+			/* Mobile Responsive */
+			@media (max-width: 768px) {
+				.footer-content {
+					grid-template-columns: 1fr;
+					gap: 2rem;
+					padding: 2rem 1rem 1.5rem;
+				}
+
+				.footer-brand {
+					max-width: 100%;
+					text-align: center;
+				}
+
+				.footer-section {
+					text-align: center;
+				}
+
+				.footer-social {
+					justify-content: center;
+				}
+
+				.footer-bottom-content {
+					flex-direction: column;
+					text-align: center;
+					padding: 1rem;
+				}
+
+				.footer-badges {
+					justify-content: center;
+				}
+			}
+
+			@media (max-width: 1024px) and (min-width: 769px) {
+				.footer-content {
+					grid-template-columns: 2fr 1fr 1fr 1fr;
+					gap: 1.5rem;
+				}
+
+				.footer-section:last-child {
+					grid-column: 2 / -1;
+					text-align: center;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Landing Page -->
+		<div id="landingPage" class="landing-page">
+			<div class="landing-bg"></div>
+
+			<div class="landing-header-row">
+				<lord-icon
+					src="https://cdn.lordicon.com/fjvfsqea.json"
+					trigger="hover"
+					stroke="bold"
+					colors="primary:#cbd5e1,secondary:#4a4df7"
+					style="width: 120px; height: 120px; rotate: -12deg"
+				>
+				</lord-icon>
+				<div class="landing-header">
+					<h1 class="landing-logo">
+						DocCompare <b class="landing-logo-pro">Pro</b>
+					</h1>
+					<p class="landing-subtitle">
+						Advanced document comparison tool designed <b>for mobile teams</b>.
+						<b>Compare documents side-by-side</b> with intelligent diff
+						highlighting, synchronized scrolling, and collaborative annotations.
+					</p>
+				</div>
+				<lord-icon
+					src="https://cdn.lordicon.com/fjvfsqea.json"
+					trigger="hover"
+					stroke="bold"
+					colors="primary:#cbd5e1,secondary:#4a4df7"
+					style="width: 120px; height: 120px; rotate: 12deg"
+				>
+				</lord-icon>
+			</div>
+
+			<div class="cta-section">
+				<button class="cta-button" onclick="openTool()">
+					Launch DocCompare Pro
+				</button>
+			</div>
+
+			<div class="feature-grid">
+				<div class="feature-card">
+					<div class="feature-icon">
+						<i class="fa-regular fa-file fa-lg"></i>
+					</div>
+					<h3 class="feature-title">Side-by-Side Comparison</h3>
+					<p class="feature-description">
+						View documents side-by-side with synchronized scrolling. Perfect for
+						mobile screens with responsive design that adapts to any device.
+					</p>
+				</div>
+
+				<div class="feature-card">
+					<div class="feature-icon">
+						<i class="fa-solid fa-magnifying-glass fa-lg"></i>
+					</div>
+					<h3 class="feature-title">Smart Diff Highlighting</h3>
+					<p class="feature-description">
+						Intelligent difference detection with color-coded highlighting.
+						Easily spot additions, deletions, and modifications at a glance.
+					</p>
+				</div>
+
+				<div class="feature-card">
+					<div class="feature-icon">
+						<i class="fa-regular fa-clipboard fa-lg"></i>
+					</div>
+					<h3 class="feature-title">Touch-Friendly Annotations</h3>
+					<p class="feature-description">
+						Add stamp markers (Approved/Revised/Question) and text callouts with
+						WCAG-compliant touch targets. Perfect for mobile collaboration.
+					</p>
+				</div>
+
+				<div class="feature-card">
+					<div class="feature-icon">
+						<i class="fa-solid fa-magnifying-glass-plus fa-lg"></i>
+					</div>
+					<h3 class="feature-title">Pinch-to-Zoom</h3>
+					<p class="feature-description">
+						Native pinch-to-zoom support with smooth scaling. Examine documents
+						in detail with precise touch controls.
+					</p>
+				</div>
+
+				<div class="feature-card">
+					<div class="feature-icon">
+						<i class="fa-regular fa-floppy-disk fa-lg"></i>
+					</div>
+					<h3 class="feature-title">Persistent Storage</h3>
+					<p class="feature-description">
+						Annotations are automatically saved to local storage. Never lose
+						your work, even when switching between sessions.
+					</p>
+				</div>
+
+				<div class="feature-card">
+					<div class="feature-icon">
+						<i class="fa-regular fa-moon fa-lg"></i>
+					</div>
+					<h3 class="feature-title">Dark Mode Design</h3>
+					<p class="feature-description">
+						Beautiful dark theme optimized for extended use. Reduces eye strain
+						while maintaining excellent readability.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tool Container -->
+		<div id="toolContainer" class="tool-container">
+			<div class="tool-header">
+				<button class="back-button" onclick="backToLanding()">
+					<i class="fa-solid fa-arrow-left"></i>
+				</button>
+				<h1 class="tool-title">
+					<i class="fa-regular fa-file fa-lg"></i>DocCompare <b>Pro</b>
+				</h1>
+			</div>
+
+			<div class="document-container">
+				<div class="document-panel">
+					<div class="panel-header">
+						<span class="panel-title">Document A</span>
+						<input
+							type="file"
+							id="fileA"
+							class="file-input"
+							accept=".txt,.md"
+							onchange="loadFile('A', this)"
+						/>
+						<button
+							class="file-button"
+							onclick="document.getElementById('fileA').click()"
+						>
+							<i class="fa-solid fa-arrow-up-from-bracket"></i>
+							Upload File
+						</button>
+					</div>
+					<div id="viewerA" class="document-viewer">
+						<div id="contentA" class="document-content">
+							Click "Load File" to upload your first document for comparison.
+							Supported formats: .txt, .md You can also paste content directly
+							by clicking here and using Ctrl+V (Cmd+V on Mac).
+						</div>
+					</div>
+				</div>
+
+				<div class="document-panel">
+					<div class="panel-header">
+						<span class="panel-title">Document B</span>
+						<input
+							type="file"
+							id="fileB"
+							class="file-input"
+							accept=".txt,.md"
+							onchange="loadFile('B', this)"
+						/>
+						<button
+							class="file-button"
+							onclick="document.getElementById('fileB').click()"
+						>
+							<i class="fa-solid fa-arrow-up-from-bracket"></i>Load File
+						</button>
+					</div>
+					<div id="viewerB" class="document-viewer">
+						<div id="contentB" class="document-content">
+							Click "Load File" to upload your second document for comparison.
+							Supported formats: .txt, .md You can also paste content directly
+							by clicking here and using Ctrl+V (Cmd+V on Mac).
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="toolbar">
+				<div class="toolbar-group zoom-controls">
+					<button class="toolbar-button" onclick="compareDocuments()">
+						<span><i class="fa-solid fa-code-compare"></i></span>
+						<span class="hidden md:text-lg">Compare</span>
+					</button>
+					<button class="toolbar-button" onclick="zoomOut()">
+						<span><i class="fa-solid fa-magnifying-glass"></i>-</span>
+					</button>
+					<span id="zoomDisplay" class="zoom-display">100%</span>
+					<button class="toolbar-button" onclick="zoomIn()">
+						<span><i class="fa-solid fa-magnifying-glass"></i>+</span>
+					</button>
+					<button class="toolbar-button" onclick="resetZoom()">
+						<span><i class="fa-solid fa-ban"></i></span>
+					</button>
+				</div>
+				<div class="toolbar-group">
+					<button class="toolbar-button" onclick="clearAnnotations()">
+						<span
+							><i class="fa-solid fa-trash" style="color: #bd1212"></i
+						></span>
+						<span>Clear</span>
+					</button>
+
+					<button
+						id="approvedBtn"
+						class="toolbar-button"
+						onclick="setAnnotationMode('approved')"
+					>
+						<span
+							><i class="fa-solid fa-thumbs-up" style="color: #63e6be"></i
+						></span>
+						<span>Approved</span>
+					</button>
+					<button
+						id="revisedBtn"
+						class="toolbar-button"
+						onclick="setAnnotationMode('revised')"
+					>
+						<span
+							><i
+								class="fa-solid fa-triangle-exclamation"
+								style="color: #ffd43b"
+							></i
+						></span>
+						<span>Revised</span>
+					</button>
+					<button
+						id="questionBtn"
+						class="toolbar-button"
+						onclick="setAnnotationMode('question')"
+					>
+						<span><i class="fa-solid fa-question"></i></span>
+						<span>Question</span>
+					</button>
+					<button
+						id="textBtn"
+						class="toolbar-button"
+						onclick="setAnnotationMode('text')"
+					>
+						<span><i class="fa-solid fa-comment-dots"></i></span>
+						<span>Comment</span>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal for text annotations -->
+		<div
+			id="modalOverlay"
+			class="modal-overlay"
+			onclick="closeAnnotationInput()"
+		></div>
+		<div id="annotationInput" class="annotation-input hidden">
+			<h3>Add Comment</h3>
+			<textarea
+				id="annotationText"
+				placeholder="Enter your comment..."
+			></textarea>
+			<div class="annotation-input-buttons">
+				<button class="toolbar-button" onclick="closeAnnotationInput()">
+					Cancel
+				</button>
+				<button class="toolbar-button" onclick="saveTextAnnotation()">
+					Save
+				</button>
+			</div>
+		</div>
+		<!-- Footer -->
+		<footer class="app-footer">
+			<div class="footer-content">
+				<div class="footer-section">
+					<div class="footer-brand">
+						<h3 class="footer-logo">
+							DocCompare <span class="footer-logo-pro">Pro</span>
+						</h3>
+						<p class="footer-description">
+							Advanced document comparison for mobile teams. Compare, annotate,
+							and collaborate efficiently.
+						</p>
+					</div>
+				</div>
+
+				<div class="footer-section">
+					<h4 class="footer-heading">Product</h4>
+					<ul class="footer-links">
+						<li><a href="#features">Features</a></li>
+						<li><a href="#pricing">Pricing</a></li>
+						<li><a href="#updates">Updates</a></li>
+						<li><a href="#api">API Docs</a></li>
+					</ul>
+				</div>
+
+				<div class="footer-section">
+					<h4 class="footer-heading">Support</h4>
+					<ul class="footer-links">
+						<li><a href="#help">Help Center</a></li>
+						<li><a href="#contact">Contact Us</a></li>
+						<li><a href="#tutorials">Tutorials</a></li>
+						<li><a href="#status">System Status</a></li>
+					</ul>
+				</div>
+
+				<div class="footer-section">
+					<h4 class="footer-heading">Legal</h4>
+					<ul class="footer-links">
+						<li><a href="#privacy">Privacy Policy</a></li>
+						<li><a href="#terms">Terms of Service</a></li>
+						<li><a href="#security">Security</a></li>
+						<li><a href="#cookies">Cookie Policy</a></li>
+					</ul>
+				</div>
+
+				<div class="footer-section">
+					<h4 class="footer-heading">Connect</h4>
+					<div class="footer-social">
+						<a href="#" class="social-link" aria-label="Twitter">
+							<i class="fa-brands fa-twitter"></i>
+						</a>
+						<a href="#" class="social-link" aria-label="LinkedIn">
+							<i class="fa-brands fa-linkedin"></i>
+						</a>
+						<a href="#" class="social-link" aria-label="GitHub">
+							<i class="fa-brands fa-github"></i>
+						</a>
+						<a href="#" class="social-link" aria-label="Email">
+							<i class="fa-solid fa-envelope"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+
+			<div class="footer-bottom">
+				<div class="footer-bottom-content">
+					<p class="footer-copyright">2025 DocCompare Pro.</p>
+					<div class="footer-badges">
+						<span class="footer-badge">
+							<i class="fa-solid fa-shield-halved"></i>
+							SOC 2 Compliant
+						</span>
+						<span class="footer-badge">
+							<i class="fa-solid fa-lock"></i>
+							Enterprise Ready
+						</span>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<script>
+			// Global variables
+			let currentAnnotationMode = null;
+			let zoomLevel = 1;
+			let annotations = { A: [], B: [] };
+			let pendingAnnotation = null;
+			let documents = { A: "", B: "" };
+
+			// Navigation functions
+			function openTool() {
+				document.getElementById("landingPage").style.display = "none";
+				document.getElementById("toolContainer").style.display = "flex";
+				loadAnnotations();
+			}
+
+			function backToLanding() {
+				document.getElementById("landingPage").style.display = "block";
+				document.getElementById("toolContainer").style.display = "none";
+			}
+
+			// File loading
+			function loadFile(panel, input) {
+				const file = input.files[0];
+				if (!file) return;
+
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					const content = e.target.result;
+					documents[panel] = content;
+					document.getElementById(`content${panel}`).textContent = content;
+					document.getElementById(`content${panel}`).contentEditable = true;
+				};
+				reader.readAsText(file);
+			}
+
+			// Document comparison using simple diff algorithm
+			function compareDocuments() {
+				const docA =
+					documents.A || document.getElementById("contentA").textContent;
+				const docB =
+					documents.B || document.getElementById("contentB").textContent;
+
+				if (!docA.trim() || !docB.trim()) {
+					alert("Please load both documents before comparing.");
+					return;
+				}
+
+				const linesA = docA.split("\n");
+				const linesB = docB.split("\n");
+
+				const diffA = computeDiff(linesA, linesB, "A");
+				const diffB = computeDiff(linesB, linesA, "B");
+
+				document.getElementById("contentA").innerHTML = diffA;
+				document.getElementById("contentB").innerHTML = diffB;
+
+				renderAnnotations("A");
+				renderAnnotations("B");
+			}
+
+			function computeDiff(lines1, lines2, panel) {
+				let result = "";
+				const maxLen = Math.max(lines1.length, lines2.length);
+
+				for (let i = 0; i < maxLen; i++) {
+					const line1 = lines1[i] || "";
+					const line2 = lines2[i] || "";
+
+					if (i >= lines1.length) {
+						// Line only exists in document 2
+						if (panel === "B") {
+							result += `<div class="diff-added-${
+								panel === "A" ? "plan-a" : "plan-b"
+							}">${escapeHtml(line2)}</div>`;
+						} else {
+							result += `<div style="opacity: 0.3;">${escapeHtml(line2)}</div>`;
+						}
+					} else if (i >= lines2.length) {
+						// Line only exists in document 1
+						if (panel === "A") {
+							result += `<div class="diff-removed-${
+								panel === "A" ? "plan-a" : "plan-b"
+							}">${escapeHtml(line1)}</div>`;
+						} else {
+							result += `<div style="opacity: 0.3;">${escapeHtml(line1)}</div>`;
+						}
+					} else if (line1 !== line2) {
+						// Lines are different
+						result += `<div class="diff-modified-${
+							panel === "A" ? "plan-a" : "plan-b"
+						}">${escapeHtml(panel === "A" ? line1 : line2)}</div>`;
+					} else {
+						// Lines are the same
+						result += `<div>${escapeHtml(line1)}</div>`;
+					}
+				}
+
+				return result;
+			}
+
+			function escapeHtml(text) {
+				const div = document.createElement("div");
+				div.textContent = text;
+				return div.innerHTML;
+			}
+
+			// Synchronized scrolling
+			let isScrolling = false;
+
+			document
+				.getElementById("viewerA")
+				.addEventListener("scroll", function () {
+					if (isScrolling) return;
+					isScrolling = true;
+
+					const viewerB = document.getElementById("viewerB");
+					const scrollPercentage =
+						this.scrollTop / (this.scrollHeight - this.clientHeight);
+					viewerB.scrollTop =
+						scrollPercentage * (viewerB.scrollHeight - viewerB.clientHeight);
+
+					setTimeout(() => (isScrolling = false), 50);
+				});
+
+			document
+				.getElementById("viewerB")
+				.addEventListener("scroll", function () {
+					if (isScrolling) return;
+					isScrolling = true;
+
+					const viewerA = document.getElementById("viewerA");
+					const scrollPercentage =
+						this.scrollTop / (this.scrollHeight - this.clientHeight);
+					viewerA.scrollTop =
+						scrollPercentage * (viewerA.scrollHeight - viewerA.clientHeight);
+
+					setTimeout(() => (isScrolling = false), 50);
+				});
+
+			// Zoom functionality
+			function zoomIn() {
+				zoomLevel = Math.min(zoomLevel * 1.2, 3);
+				updateZoom();
+			}
+
+			function zoomOut() {
+				zoomLevel = Math.max(zoomLevel / 1.2, 0.5);
+				updateZoom();
+			}
+
+			function resetZoom() {
+				zoomLevel = 1;
+				updateZoom();
+			}
+
+			function updateZoom() {
+				document.getElementById(
+					"contentA"
+				).style.transform = `scale(${zoomLevel})`;
+				document.getElementById(
+					"contentB"
+				).style.transform = `scale(${zoomLevel})`;
+				document.getElementById("zoomDisplay").textContent =
+					Math.round(zoomLevel * 100) + "%";
+
+				// Re-render annotations to update counter-scale
+				renderAnnotations("A");
+				renderAnnotations("B");
+			}
+
+			// Pinch-to-zoom support
+			let initialDistance = 0;
+			let initialZoom = 1;
+
+			function getDistance(touches) {
+				const dx = touches[0].clientX - touches[1].clientX;
+				const dy = touches[0].clientY - touches[1].clientY;
+				return Math.sqrt(dx * dx + dy * dy);
+			}
+
+			["viewerA", "viewerB"].forEach((viewerId) => {
+				const viewer = document.getElementById(viewerId);
+
+				viewer.addEventListener("touchstart", function (e) {
+					if (e.touches.length === 2) {
+						e.preventDefault();
+						initialDistance = getDistance(e.touches);
+						initialZoom = zoomLevel;
+					}
+				});
+
+				viewer.addEventListener("touchmove", function (e) {
+					if (e.touches.length === 2) {
+						e.preventDefault();
+						const currentDistance = getDistance(e.touches);
+						const scale = currentDistance / initialDistance;
+						zoomLevel = Math.max(0.5, Math.min(3, initialZoom * scale));
+						updateZoom();
+					}
+				});
+			});
+
+			// Annotation system
+			function setAnnotationMode(mode) {
+				// Clear previous mode
+				document
+					.querySelectorAll(".toolbar-button")
+					.forEach((btn) => btn.classList.remove("active"));
+
+				if (currentAnnotationMode === mode) {
+					currentAnnotationMode = null;
+					return;
+				}
+
+				currentAnnotationMode = mode;
+
+				// Show instruction
+				if (mode) {
+					showToast(`Click on a document to add ${mode} annotation`);
+				}
+			}
+
+			// Add click listeners to document viewers
+			["viewerA", "viewerB"].forEach((viewerId) => {
+				const viewer = document.getElementById(viewerId);
+
+				viewer.addEventListener("click", function (e) {
+					if (!currentAnnotationMode) return;
+
+					e.preventDefault();
+					const rect = viewer.getBoundingClientRect();
+					const x = (e.clientX - rect.left) / zoomLevel;
+					const y = (e.clientY - rect.top) / zoomLevel;
+
+					const panel = viewerId.includes("A") ? "A" : "B";
+
+					if (currentAnnotationMode === "text") {
+						pendingAnnotation = { panel, x, y, type: "text" };
+						showAnnotationInput();
+					} else {
+						addAnnotation(
+							panel,
+							x,
+							y,
+							currentAnnotationMode,
+							currentAnnotationMode.toUpperCase()
+						);
+					}
+				});
+			});
+
+			function addAnnotation(panel, x, y, type, content) {
+				const annotation = {
+					id: Date.now(),
+					panel,
+					x,
+					y,
+					type,
+					content,
+					timestamp: new Date().toISOString(),
+				};
+
+				annotations[panel].push(annotation);
+				saveAnnotations();
+				renderAnnotations(panel);
+				setAnnotationMode(null);
+			}
+
+			function renderAnnotations(panel) {
+				const content = document.getElementById(`content${panel}`);
+
+				// Remove existing annotations
+				content.querySelectorAll(".annotation").forEach((el) => el.remove());
+
+				annotations[panel].forEach((annotation) => {
+					const element = document.createElement("div");
+					element.className = `annotation ${
+						annotation.type === "text" ? "text-annotation" : "stamp-annotation"
+					}`;
+
+					// Position relative to unscaled coordinates
+					element.style.position = "absolute";
+					element.style.left = annotation.x + "px";
+					element.style.top = annotation.y + "px";
+
+					// Counter-scale the annotation so size stays consistent
+					element.style.transform = `scale(${1 / zoomLevel})`;
+					element.style.transformOrigin = "top left";
+
+					if (annotation.type === "text") {
+						element.textContent = annotation.content;
+					} else {
+						element.textContent = annotation.content;
+						element.classList.add(`stamp-${annotation.type}`);
+					}
+
+					// Same delete & long-press handlers
+					element.addEventListener("contextmenu", (e) => {
+						e.preventDefault();
+						if (confirm("Delete this annotation?")) {
+							deleteAnnotation(annotation.id, panel);
+						}
+					});
+
+					let pressTimer;
+					element.addEventListener("touchstart", (e) => {
+						pressTimer = setTimeout(() => {
+							if (confirm("Delete this annotation?")) {
+								deleteAnnotation(annotation.id, panel);
+							}
+						}, 800);
+					});
+					element.addEventListener("touchend", (e) => clearTimeout(pressTimer));
+
+					content.appendChild(element);
+				});
+			}
+
+			function deleteAnnotation(id, panel) {
+				annotations[panel] = annotations[panel].filter((a) => a.id !== id);
+				saveAnnotations();
+				renderAnnotations(panel);
+			}
+
+			function clearAnnotations() {
+				if (confirm("Clear all annotations?")) {
+					annotations = { A: [], B: [] };
+					saveAnnotations();
+					renderAnnotations("A");
+					renderAnnotations("B");
+				}
+			}
+
+			function showAnnotationInput() {
+				document.getElementById("modalOverlay").style.display = "block";
+				document.getElementById("annotationInput").classList.remove("hidden");
+				document.getElementById("annotationText").focus();
+			}
+
+			function closeAnnotationInput() {
+				document.getElementById("modalOverlay").style.display = "none";
+				document.getElementById("annotationInput").classList.add("hidden");
+				document.getElementById("annotationText").value = "";
+				pendingAnnotation = null;
+			}
+
+			function saveTextAnnotation() {
+				const text = document.getElementById("annotationText").value.trim();
+				if (!text) return;
+
+				if (pendingAnnotation) {
+					addAnnotation(
+						pendingAnnotation.panel,
+						pendingAnnotation.x,
+						pendingAnnotation.y,
+						"text",
+						text
+					);
+				}
+
+				closeAnnotationInput();
+			}
+
+			// Storage functions (using memory instead of IndexedDB for render environment)
+			function saveAnnotations() {
+				// In a real environment, this would save to IndexedDB
+				// For this demo, we're using local storage
+				localStorage.setItem("annotations", JSON.stringify(annotations));
+			}
+
+			function loadAnnotations() {
+				// In a real environment, this would load from IndexedDB
+				// For this demo, we're using local storage
+				annotations =
+					JSON.parse(localStorage.getItem("annotations")) || annotations;
+				renderAnnotations("A");
+				renderAnnotations("B");
+			}
+
+			// Toast notification system
+			function showToast(message) {
+				// Create toast element
+				const toast = document.createElement("div");
+				toast.style.cssText = `
+                position: fixed;
+                top: 28px;
+                right: 20px;
+                background: var(--bg-secondary);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px var(--shadow);
+                z-index: 1001;
+                font-size: 0.875rem;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+				toast.textContent = message;
+
+				document.body.appendChild(toast);
+
+				setTimeout(() => (toast.style.opacity = "1"), 100);
+				setTimeout(() => {
+					toast.style.opacity = "0";
+					setTimeout(() => document.body.removeChild(toast), 300);
+				}, 4000);
+			}
+
+			// Content editing support
+			["contentA", "contentB"].forEach((contentId) => {
+				const content = document.getElementById(contentId);
+
+				content.addEventListener("paste", function (e) {
+					e.preventDefault();
+					const text = (e.clipboardData || window.clipboardData).getData(
+						"text"
+					);
+					const panel = contentId.includes("A") ? "A" : "B";
+					documents[panel] = text;
+					this.textContent = text;
+					showToast("Content pasted successfully");
+				});
+
+				content.addEventListener("input", function () {
+					const panel = contentId.includes("A") ? "A" : "B";
+					documents[panel] = this.textContent;
+				});
+			});
+
+			// Keyboard shortcuts
+			document.addEventListener("keydown", function (e) {
+				if (e.ctrlKey || e.metaKey) {
+					switch (e.key) {
+						case "=":
+						case "+":
+							e.preventDefault();
+							zoomIn();
+							break;
+						case "-":
+							e.preventDefault();
+							zoomOut();
+							break;
+						case "0":
+							e.preventDefault();
+							resetZoom();
+							break;
+						case "r":
+							e.preventDefault();
+							compareDocuments();
+							break;
+					}
+				}
+
+				// ESC to clear annotation mode
+				if (e.key === "Escape") {
+					setAnnotationMode(null);
+					closeAnnotationInput();
+				}
+			});
+
+			document.addEventListener("DOMContentLoaded", function () {
+				document.getElementById("contentA").contentEditable = true;
+				document.getElementById("contentB").contentEditable = true;
+
+				// Add sample content for demo
+				setTimeout(() => {
+					const sampleA = `Welcome to DocCompare Pro!
+        This is a sample document to demonstrate the comparison features.
+
+        Here are some key features:
+        - Side-by-side document comparison
+        - Synchronized scrolling
+        - Diff highlighting
+        - Touch-friendly annotations
+        - Pinch-to-zoom support
+        - Dark mode design
+
+You can edit this content directly or load your own files.
+
+Try adding some annotations by clicking the toolbar buttons and then clicking on the document.`;
+
+					const sampleB = `Welcome to DocCompare Pro!
+
+        This is a modified sample document to show difference detection.
+
+        Here are some key features:
+        - Side-by-side document comparison
+        - Synchronized scrolling between panels
+        - Smart diff highlighting with colors
+        - Touch-friendly annotations with WCAG compliance
+        - Pinch-to-zoom support for mobile
+        - Beautiful dark mode design
+        - Persistent annotation storage
+
+You can edit content directly or load your own files.
+
+Try adding annotations by selecting a tool and clicking on the document.
+
+This line is completely new!`;
+
+					documents.A = sampleA;
+					documents.B = sampleB;
+					document.getElementById("contentA").textContent = sampleA;
+					document.getElementById("contentB").textContent = sampleB;
+				}, 1000);
+			});
+
+			document
+				.getElementById("annotationText")
+				.addEventListener("keydown", function (e) {
+					if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+						e.preventDefault();
+						saveTextAnnotation();
+					}
+				});
+
+			document.addEventListener("contextmenu", function (e) {
+				if (e.target.classList.contains("annotation")) {
+					e.preventDefault();
+				}
+			});
+		</script>
+	</body>
+</html>

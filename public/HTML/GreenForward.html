@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GreenForward - Reforesting Our Planet</title>
+		<meta
+			name="description"
+			content="Join GreenForward in reforesting our planet. Professional reforestation services fighting climate change one tree at a time."
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							inter: ["Inter", "sans-serif"],
+							space: ["Space Grotesk", "sans-serif"],
+						},
+						colors: {
+							earth: {
+								50: "#fdf8f3",
+								100: "#f7ede1",
+								200: "#eed7c1",
+								300: "#e2ba93",
+								400: "#d49862",
+								500: "#c87d3f",
+								600: "#b86833",
+								700: "#9a522c",
+								800: "#7d422a",
+								900: "#663625",
+							},
+							sage: {
+								50: "#f6f7f4",
+								100: "#e9ebe4",
+								200: "#d5d9cc",
+								300: "#b8c0ab",
+								400: "#98a488",
+								500: "#7d8a6e",
+								600: "#636f56",
+								700: "#505947",
+								800: "#42493c",
+								900: "#383e33",
+							},
+							forest: {
+								50: "#f0f9f4",
+								100: "#dcf2e4",
+								200: "#bce5cc",
+								300: "#8bd1a8",
+								400: "#52b47d",
+								500: "#2d995b",
+								600: "#1f7a47",
+								700: "#1a603a",
+								800: "#174d30",
+								900: "#134027",
+							},
+						},
+						animation: {
+							"fade-in": "fadeIn 0.8s ease-out forwards",
+							"slide-up": "slideUp 0.8s ease-out forwards",
+							"slide-left": "slideLeft 0.8s ease-out forwards",
+							"slide-right": "slideRight 0.8s ease-out forwards",
+							"scale-in": "scaleIn 0.6s ease-out forwards",
+							"bounce-gentle": "bounceGentle 2s infinite",
+							float: "float 3s ease-in-out infinite",
+							"pulse-soft": "pulseSoft 2s ease-in-out infinite",
+							"reveal-text": "revealText 1s ease-out forwards",
+							"draw-line": "drawLine 1.5s ease-out forwards",
+							"counter-up": "counterUp 2s ease-out forwards",
+						},
+						keyframes: {
+							fadeIn: {
+								"0%": { opacity: "0" },
+								"100%": { opacity: "1" },
+							},
+							slideUp: {
+								"0%": { opacity: "0", transform: "translateY(60px)" },
+								"100%": { opacity: "1", transform: "translateY(0)" },
+							},
+							slideLeft: {
+								"0%": { opacity: "0", transform: "translateX(60px)" },
+								"100%": { opacity: "1", transform: "translateX(0)" },
+							},
+							slideRight: {
+								"0%": { opacity: "0", transform: "translateX(-60px)" },
+								"100%": { opacity: "1", transform: "translateX(0)" },
+							},
+							scaleIn: {
+								"0%": { opacity: "0", transform: "scale(0.8)" },
+								"100%": { opacity: "1", transform: "scale(1)" },
+							},
+							bounceGentle: {
+								"0%, 100%": { transform: "translateY(0px)" },
+								"50%": { transform: "translateY(-10px)" },
+							},
+							float: {
+								"0%, 100%": { transform: "translateY(0px)" },
+								"50%": { transform: "translateY(-15px)" },
+							},
+							pulseSoft: {
+								"0%, 100%": { transform: "scale(1)" },
+								"50%": { transform: "scale(1.05)" },
+							},
+							revealText: {
+								"0%": { clipPath: "inset(0 100% 0 0)" },
+								"100%": { clipPath: "inset(0 0 0 0)" },
+							},
+							drawLine: {
+								"0%": { width: "0%" },
+								"100%": { width: "100%" },
+							},
+							counterUp: {
+								"0%": { opacity: "0", transform: "translateY(20px)" },
+								"100%": { opacity: "1", transform: "translateY(0)" },
+							},
+						},
+						screens: {
+							xs: "320px",
+							sm: "640px",
+							md: "768px",
+							lg: "1024px",
+							xl: "1280px",
+							"2xl": "1536px",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			::-webkit-scrollbar {
+				width: 8px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f1f1;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #2d995b;
+				border-radius: 4px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #1f7a47;
+			}
+
+			@media (prefers-reduced-motion: reduce) {
+				*,
+				*::before,
+				*::after {
+					animation-duration: 0.01ms !important;
+					animation-iteration-count: 1 !important;
+					transition-duration: 0.01ms !important;
+				}
+			}
+
+			.font-space,
+			.font-inter {
+				font-display: swap;
+			}
+
+			.animate-on-scroll {
+				opacity: 0;
+				transform: translateY(50px);
+				transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+			}
+
+			.animate-on-scroll.animated {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			.parallax-container {
+				overflow: hidden;
+				position: relative;
+			}
+
+			.parallax-bg {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 120%;
+				will-change: transform;
+			}
+
+			.loader-spin {
+				border-top-color: transparent;
+				animation: spin 1s linear infinite;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.focus-ring:focus {
+				outline: 2px solid #2d995b;
+				outline-offset: 2px;
+			}
+
+			.story-reveal {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.story-reveal::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(45, 153, 91, 0.1),
+					transparent
+				);
+				transform: translateX(-100%);
+				transition: transform 1.5s ease-out;
+			}
+
+			.story-reveal.revealed::before {
+				transform: translateX(100%);
+			}
+		</style>
+	</head>
+	<body
+		class="font-inter bg-earth-50 text-gray-900 overflow-x-hidden"
+		role="document"
+	>
+		<!-- Skip to main content for accessibility -->
+		<a
+			href="#main-content"
+			class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-forest-600 text-white px-4 py-2 rounded-lg z-50"
+		>
+			Skip to main content
+		</a>
+
+		<!-- Loading Screen - Fixed centering -->
+		<div
+			id="loading-screen"
+			class="fixed inset-0 bg-gradient-to-br from-forest-600 to-sage-600 z-50 flex items-center justify-center"
+			role="dialog"
+			aria-label="Loading"
+		>
+			<div class="text-center flex flex-col items-center justify-center">
+				<div
+					class="w-16 h-16 border-4 border-white/30 border-t-white rounded-full loader-spin mb-6"
+				></div>
+				<div class="space-y-2">
+					<p class="text-white text-lg font-medium">
+						Growing a Better Future...
+					</p>
+					<div
+						class="w-48 h-1 bg-white/20 rounded-full overflow-hidden mx-auto"
+					>
+						<div class="h-full bg-white rounded-full animate-draw-line"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Navigation -->
+		<nav
+			class="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-lg z-20 transition-all duration-300 border-b border-gray-100"
+			id="navbar"
+			role="navigation"
+			aria-label="Main navigation"
+		>
+			<div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+				<div class="flex justify-between items-center h-14 sm:h-16 lg:h-20">
+					<div class="flex items-center space-x-3">
+						<div class="relative">
+							<svg
+								width="40"
+								height="40"
+								viewBox="0 0 40 40"
+								class="drop-shadow-sm"
+							>
+								<!-- Background circle -->
+								<circle
+									cx="20"
+									cy="20"
+									r="20"
+									fill="#2d995b"
+									class="animate-pulse-soft"
+								/>
+
+								<!-- Tree trunk -->
+								<rect
+									x="18"
+									y="28"
+									width="4"
+									height="8"
+									fill="#8B4513"
+									rx="2"
+								/>
+
+								<!-- Tree canopy layers -->
+								<circle cx="20" cy="18" r="8" fill="#1f7a47" opacity="0.9" />
+								<circle cx="20" cy="16" r="6" fill="#2d995b" />
+								<circle cx="20" cy="14" r="4" fill="#52b47d" />
+
+								<!-- Growth dots -->
+								<circle
+									cx="12"
+									cy="12"
+									r="1.5"
+									fill="#7d8a6e"
+									class="animate-bounce-gentle"
+									style="animation-delay: 0s"
+								/>
+								<circle
+									cx="28"
+									cy="10"
+									r="1"
+									fill="#98a488"
+									class="animate-bounce-gentle"
+									style="animation-delay: 0.5s"
+								/>
+								<circle
+									cx="30"
+									cy="20"
+									r="1.5"
+									fill="#636f56"
+									class="animate-bounce-gentle"
+									style="animation-delay: 1s"
+								/>
+
+								<!-- Subtle highlight -->
+								<circle cx="17" cy="12" r="2" fill="#8bd1a8" opacity="0.6" />
+							</svg>
+						</div>
+						<div class="flex flex-col">
+							<span
+								class="font-space font-bold text-sm lg:text-2xl text-forest-800 leading-none"
+							>
+								GreenForward
+							</span>
+						</div>
+					</div>
+
+					<div class="hidden md:flex items-center space-x-6 lg:space-x-8">
+						<a
+							href="#home"
+							class="text-gray-700 hover:text-forest-600 transition-colors font-medium focus-ring rounded-lg px-2 py-1"
+							>Home</a
+						>
+						<a
+							href="#mission"
+							class="text-gray-700 hover:text-forest-600 transition-colors font-medium focus-ring rounded-lg px-2 py-1"
+							>Mission</a
+						>
+						<a
+							href="#impact"
+							class="text-gray-700 hover:text-forest-600 transition-colors font-medium focus-ring rounded-lg px-2 py-1"
+							>Impact</a
+						>
+						<a
+							href="#stories"
+							class="text-gray-700 hover:text-forest-600 transition-colors font-medium focus-ring rounded-lg px-2 py-1"
+							>Stories</a
+						>
+						<a
+							href="#action"
+							class="text-gray-700 hover:text-forest-600 transition-colors font-medium focus-ring rounded-lg px-2 py-1"
+							>Take Action</a
+						>
+					</div>
+
+					<div class="flex items-center space-x-2 sm:space-x-4">
+						<button
+							onclick="openDonateModal()"
+							class="bg-earth-500 text-white px-3 py-2 sm:px-4 sm:py-2 lg:px-6 lg:py-3 rounded-xl font-medium hover:bg-earth-600 focus:bg-earth-600 transition-all duration-300 transform hover:scale-105 focus:scale-105 text-xs sm:text-sm lg:text-base focus-ring"
+							aria-label="Open donation form"
+						>
+							Donate Now
+						</button>
+						<button
+							id="mobile-menu-btn"
+							class="md:hidden p-2 focus-ring rounded-lg"
+							aria-label="Toggle mobile menu"
+							aria-expanded="false"
+						>
+							<div
+								class="w-5 h-5 sm:w-6 sm:h-6 flex flex-col justify-center items-center"
+							>
+								<span
+									class="w-full h-0.5 bg-gray-700 mb-1 transition-all duration-300"
+									aria-hidden="true"
+								></span>
+								<span
+									class="w-full h-0.5 bg-gray-700 mb-1 transition-all duration-300"
+									aria-hidden="true"
+								></span>
+								<span
+									class="w-full h-0.5 bg-gray-700 transition-all duration-300"
+									aria-hidden="true"
+								></span>
+							</div>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile Menu -->
+			<div
+				id="mobile-menu"
+				class="md:hidden bg-white border-t border-gray-200 hidden"
+				role="menu"
+			>
+				<div class="px-4 py-4 space-y-3">
+					<a
+						href="#home"
+						class="block text-gray-700 hover:text-forest-600 transition-colors font-medium py-2 focus-ring rounded-lg px-2"
+						role="menuitem"
+						>Home</a
+					>
+					<a
+						href="#mission"
+						class="block text-gray-700 hover:text-forest-600 transition-colors font-medium py-2 focus-ring rounded-lg px-2"
+						role="menuitem"
+						>Mission</a
+					>
+					<a
+						href="#impact"
+						class="block text-gray-700 hover:text-forest-600 transition-colors font-medium py-2 focus-ring rounded-lg px-2"
+						role="menuitem"
+						>Impact</a
+					>
+					<a
+						href="#stories"
+						class="block text-gray-700 hover:text-forest-600 transition-colors font-medium py-2 focus-ring rounded-lg px-2"
+						role="menuitem"
+						>Stories</a
+					>
+					<a
+						href="#action"
+						class="block text-gray-700 hover:text-forest-600 transition-colors font-medium py-2 focus-ring rounded-lg px-2"
+						role="menuitem"
+						>Take Action</a
+					>
+				</div>
+			</div>
+		</nav>
+
+		<main id="main-content">
+			<!-- Hero Section -->
+			<section
+				id="home"
+				class="min-h-screen flex items-center justify-center relative overflow-hidden parallax-container"
+				role="banner"
+			>
+				<div
+					class="absolute inset-0 bg-gradient-to-br from-forest-600 via-forest-500 to-sage-600"
+				></div>
+				<div class="absolute inset-0 bg-black/30"></div>
+				<div class="absolute inset-0 parallax-bg">
+					<img
+						src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80"
+						alt="Lush forest canopy representing our reforestation mission"
+						class="w-full h-full object-cover opacity-40"
+						loading="eager"
+					/>
+				</div>
+
+				<div
+					class="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8"
+				>
+					<h1
+						class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-space font-bold text-white mb-4 sm:mb-6 animate-on-scroll story-reveal"
+					>
+						Reforesting Our
+						<span class="block text-earth-200 mt-2">Planet's Future</span>
+					</h1>
+					<p
+						class="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 mb-6 sm:mb-8 max-w-3xl mx-auto animate-on-scroll"
+						style="animation-delay: 0.3s"
+					>
+						Together, we're planting hope, restoring ecosystems, and fighting
+						climate change one tree at a time. Join our mission to create a
+						sustainable future for generations to come.
+					</p>
+					<div
+						class="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center items-center animate-on-scroll"
+						style="animation-delay: 0.6s"
+					>
+						<button
+							onclick="scrollToSection('mission')"
+							class="w-full xs:w-auto bg-white text-forest-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-100 focus:bg-gray-100 transition-all duration-300 transform hover:scale-105 focus:scale-105 text-sm sm:text-base lg:text-lg focus-ring"
+						>
+							Discover Our Mission
+						</button>
+						<button
+							onclick="openDonateModal()"
+							class="w-full xs:w-auto border-2 border-white text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-white hover:text-forest-700 focus:bg-white focus:text-forest-700 transition-all duration-300 transform hover:scale-105 focus:scale-105 text-sm sm:text-base lg:text-lg focus-ring"
+						>
+							Plant Trees Now
+						</button>
+					</div>
+				</div>
+
+				<button
+					onclick="scrollToSection('problem')"
+					class="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce-gentle text-white/80 hover:text-white focus:text-white transition-colors focus-ring rounded-full p-2"
+					aria-label="Scroll to learn about the environmental crisis"
+				>
+					<svg
+						class="w-6 h-6 sm:w-8 sm:h-8"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+						aria-hidden="true"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M19 14l-7 7m0 0l-7-7m7 7V3"
+						></path>
+					</svg>
+				</button>
+			</section>
+
+			<!-- Problem Section with enhanced storytelling -->
+			<section
+				id="problem"
+				class="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-gray-900 to-gray-800 text-white relative overflow-hidden"
+			>
+				<!-- Animated background elements -->
+
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+					<div class="grid lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+						<div class="order-2 lg:order-1 animate-on-scroll">
+							<div class="mb-6">
+								<div
+									class="w-16 h-1 bg-earth-300 rounded-full animate-draw-line mb-4"
+								></div>
+								<h2
+									class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-space font-bold mb-4 sm:mb-6"
+								>
+									The Crisis We Face
+								</h2>
+							</div>
+							<div
+								class="space-y-4 sm:space-y-6 text-base sm:text-lg text-gray-300"
+							>
+								<div
+									class="animate-on-scroll story-reveal"
+									style="animation-delay: 0.2s"
+								>
+									<p>
+										Every year, our planet loses
+										<strong class="text-earth-300 text-xl sm:text-2xl font-bold"
+											>5.5 million hectares</strong
+										>
+										of tropical forest. That's equivalent to losing a forest the
+										size of Costa Rica annually.
+									</p>
+								</div>
+								<div
+									class="animate-on-scroll story-reveal"
+									style="animation-delay: 0.4s"
+								>
+									<p>
+										Deforestation contributes to
+										<strong class="text-earth-300 text-xl sm:text-2xl font-bold"
+											>11% of global CO₂ emissions</strong
+										>, accelerating climate change and threatening the homes of
+										countless species.
+									</p>
+								</div>
+								<div
+									class="animate-on-scroll story-reveal"
+									style="animation-delay: 0.6s"
+								>
+									<p>
+										<strong class="text-earth-300 text-xl sm:text-2xl font-bold"
+											>1.6 billion people</strong
+										>
+										worldwide depend on forests for their livelihoods, yet these
+										vital ecosystems continue to disappear at an alarming rate.
+									</p>
+								</div>
+							</div>
+						</div>
+						<div
+							class="order-1 lg:order-2 animate-on-scroll"
+							style="animation-delay: 0.3s"
+						>
+							<div class="relative group">
+								<img
+									src="https://images.unsplash.com/photo-1586400792375-d6b8f82db2e6?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D0"
+									alt="Devastating deforestation showing the environmental impact"
+									class="rounded-2xl shadow-2xl w-full h-64 sm:h-80 object-cover transition-transform duration-500 group-hover:scale-105"
+									loading="lazy"
+								/>
+								<!-- <div
+									class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-2xl"
+								></div> -->
+								<div
+									class="absolute bottom-4 left-4 right-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+								>
+									<p class="text-sm">
+										The urgent reality of deforestation worldwide
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Mission Section with enhanced interactions -->
+			<section
+				id="mission"
+				class="py-12 sm:py-16 lg:py-24 bg-white relative overflow-hidden"
+			>
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center mb-12 sm:mb-16">
+						<div class="animate-on-scroll">
+							<div
+								class="w-20 h-1 bg-forest-500 rounded-full mx-auto mb-6 animate-draw-line"
+							></div>
+							<h2
+								class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-space font-bold text-gray-900 mb-4 sm:mb-6"
+							>
+								Our Mission to Heal the Earth
+							</h2>
+						</div>
+						<p
+							class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto animate-on-scroll"
+							style="animation-delay: 0.2s"
+						>
+							GreenForward is dedicated to large-scale reforestation and forest
+							restoration worldwide. We work with local communities to plant
+							native species, restore degraded landscapes, and create
+							sustainable forest ecosystems.
+						</p>
+					</div>
+
+					<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+						<div
+							class="group bg-gradient-to-br from-forest-50 to-sage-50 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-on-scroll"
+							style="animation-delay: 0.1s"
+						>
+							<div
+								class="w-14 h-14 sm:w-16 sm:h-16 bg-forest-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-forest-600 transition-colors duration-300"
+							>
+								<svg
+									class="w-7 h-7 sm:w-8 sm:h-8 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+									></path>
+								</svg>
+							</div>
+							<h3
+								class="text-xl sm:text-2xl font-space font-bold text-gray-900 mb-3 sm:mb-4"
+							>
+								Climate Action
+							</h3>
+							<p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+								Trees are nature's most effective carbon capture technology. Our
+								reforestation efforts can sequester up to 23.4 billion tons of
+								CO₂ over 30 years.
+							</p>
+						</div>
+
+						<div
+							class="group bg-gradient-to-br from-earth-50 to-orange-50 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-on-scroll"
+							style="animation-delay: 0.2s"
+						>
+							<div
+								class="w-14 h-14 sm:w-16 sm:h-16 bg-earth-500 rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-earth-600 transition-colors duration-300"
+							>
+								<svg
+									class="w-7 h-7 sm:w-8 sm:h-8 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+									></path>
+								</svg>
+							</div>
+							<h3
+								class="text-xl sm:text-2xl font-space font-bold text-gray-900 mb-3 sm:mb-4"
+							>
+								Biodiversity
+							</h3>
+							<p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+								Restoring habitat for millions of species while creating
+								corridors that connect fragmented ecosystems and protect
+								endangered wildlife.
+							</p>
+						</div>
+
+						<div
+							class="group bg-gradient-to-br from-sage-50 to-green-50 p-6 sm:p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-on-scroll sm:col-span-2 lg:col-span-1"
+							style="animation-delay: 0.3s"
+						>
+							<div
+								class="w-14 h-14 sm:w-16 sm:h-16 bg-sage-600 rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-sage-700 transition-colors duration-300"
+							>
+								<svg
+									class="w-7 h-7 sm:w-8 sm:h-8 text-white"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+									></path>
+								</svg>
+							</div>
+							<h3
+								class="text-xl sm:text-2xl font-space font-bold text-gray-900 mb-3 sm:mb-4"
+							>
+								Communities
+							</h3>
+							<p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+								Creating sustainable livelihoods for local communities through
+								eco-friendly jobs, supporting 2,000+ people annually while
+								protecting forests.
+							</p>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Impact Stats Section with counter animations -->
+			<section
+				id="impact"
+				class="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-forest-600 to-sage-700 relative overflow-hidden"
+			>
+				<!-- Animated background pattern -->
+				<div class="absolute inset-0 opacity-10">
+					<svg
+						class="w-full h-full"
+						viewBox="0 0 100 100"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<defs>
+							<pattern
+								id="trees"
+								x="0"
+								y="0"
+								width="20"
+								height="20"
+								patternUnits="userSpaceOnUse"
+							>
+								<circle
+									cx="10"
+									cy="10"
+									r="2"
+									fill="currentColor"
+									opacity="0.5"
+								/>
+							</pattern>
+						</defs>
+						<rect width="100" height="100" fill="url(#trees)" />
+					</svg>
+				</div>
+
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+					<div class="text-center mb-12 sm:mb-16">
+						<div class="animate-on-scroll">
+							<div
+								class="w-20 h-1 bg-earth-200 rounded-full mx-auto mb-6 animate-draw-line"
+							></div>
+							<h2
+								class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-space font-bold text-white mb-4 sm:mb-6"
+							>
+								Our Growing Impact
+							</h2>
+						</div>
+						<p
+							class="text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto animate-on-scroll"
+							style="animation-delay: 0.2s"
+						>
+							Every tree planted, every forest restored, every community
+							empowered - together we're creating measurable change for our
+							planet.
+						</p>
+					</div>
+
+					<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+						<div
+							class="text-center animate-on-scroll"
+							style="animation-delay: 0.1s"
+						>
+							<div
+								class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 hover:bg-white/20 transition-all duration-300 group"
+							>
+								<div
+									class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-space font-bold text-earth-200 mb-2 counter-display"
+									data-counter="2500000"
+									aria-live="polite"
+								>
+									0
+								</div>
+								<div
+									class="text-white/90 font-medium text-xs sm:text-sm lg:text-base"
+								>
+									Trees Planted
+								</div>
+								<div
+									class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+								>
+									<div
+										class="h-full bg-earth-200 rounded-full animate-draw-line group-hover:bg-earth-100 transition-colors duration-300"
+									></div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="text-center animate-on-scroll"
+							style="animation-delay: 0.2s"
+						>
+							<div
+								class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 hover:bg-white/20 transition-all duration-300 group"
+							>
+								<div
+									class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-space font-bold text-earth-200 mb-2 counter-display"
+									data-counter="150000"
+									aria-live="polite"
+								>
+									0
+								</div>
+								<div
+									class="text-white/90 font-medium text-xs sm:text-sm lg:text-base"
+								>
+									Hectares Restored
+								</div>
+								<div
+									class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+								>
+									<div
+										class="h-full bg-earth-200 rounded-full animate-draw-line group-hover:bg-earth-100 transition-colors duration-300"
+										style="animation-delay: 0.2s"
+									></div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="text-center animate-on-scroll"
+							style="animation-delay: 0.3s"
+						>
+							<div
+								class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 hover:bg-white/20 transition-all duration-300 group"
+							>
+								<div
+									class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-space font-bold text-earth-200 mb-2 counter-display"
+									data-counter="45"
+									aria-live="polite"
+								>
+									0
+								</div>
+								<div
+									class="text-white/90 font-medium text-xs sm:text-sm lg:text-base"
+								>
+									Countries
+								</div>
+								<div
+									class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+								>
+									<div
+										class="h-full bg-earth-200 rounded-full animate-draw-line group-hover:bg-earth-100 transition-colors duration-300"
+										style="animation-delay: 0.4s"
+									></div>
+								</div>
+							</div>
+						</div>
+
+						<div
+							class="text-center animate-on-scroll"
+							style="animation-delay: 0.4s"
+						>
+							<div
+								class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 lg:p-8 hover:bg-white/20 transition-all duration-300 group"
+							>
+								<div
+									class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-space font-bold text-earth-200 mb-2 counter-display"
+									data-counter="50000"
+									aria-live="polite"
+								>
+									0
+								</div>
+								<div
+									class="text-white/90 font-medium text-xs sm:text-sm lg:text-base"
+								>
+									People Supported
+								</div>
+								<div
+									class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+								>
+									<div
+										class="h-full bg-earth-200 rounded-full animate-draw-line group-hover:bg-earth-100 transition-colors duration-300"
+										style="animation-delay: 0.6s"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Stories Section with enhanced storytelling -->
+			<section id="stories" class="py-12 sm:py-16 lg:py-24 bg-white">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center mb-12 sm:mb-16">
+						<div class="animate-on-scroll">
+							<div
+								class="w-20 h-1 bg-forest-500 rounded-full mx-auto mb-6 animate-draw-line"
+							></div>
+							<h2
+								class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-space font-bold text-gray-900 mb-4 sm:mb-6"
+							>
+								Stories of Transformation
+							</h2>
+						</div>
+						<p
+							class="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto animate-on-scroll"
+							style="animation-delay: 0.2s"
+						>
+							Witness the incredible transformations happening around the world
+							as communities, ecosystems, and landscapes are restored to their
+							natural glory.
+						</p>
+					</div>
+
+					<div class="grid lg:grid-cols-2 gap-8 sm:gap-12 mb-12 sm:mb-16">
+						<div class="animate-on-scroll">
+							<div
+								class="relative overflow-hidden rounded-2xl shadow-2xl group cursor-pointer"
+								onclick="openStoryModal('amazon')"
+							>
+								<img
+									src="https://plus.unsplash.com/premium_photo-1686810855843-cb595b8418bd?q=80&w=3125&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+									alt="Before and after transformation of Amazon rainforest restoration project"
+									class="w-full h-64 sm:h-80 object-cover group-hover:scale-110 transition-transform duration-500"
+									loading="lazy"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"
+								></div>
+								<div
+									class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 text-white"
+								>
+									<h3
+										class="text-lg sm:text-xl lg:text-2xl font-space font-bold mb-2"
+									>
+										Amazon Restoration Project
+									</h3>
+									<p class="text-sm sm:text-base text-gray-200 mb-3">
+										Restoring 50,000 hectares of degraded rainforest in Brazil,
+										creating corridors for wildlife and supporting indigenous
+										communities.
+									</p>
+									<div
+										class="flex items-center text-xs sm:text-sm text-earth-200"
+									>
+										<span>Click to read full story</span>
+										<svg
+											class="w-4 h-4 ml-2"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9 5l7 7-7 7"
+											></path>
+										</svg>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="animate-on-scroll" style="animation-delay: 0.2s">
+							<div
+								class="relative overflow-hidden rounded-2xl shadow-2xl group cursor-pointer"
+								onclick="openStoryModal('mangrove')"
+							>
+								<img
+									src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+									alt="Coastal mangrove restoration project protecting communities"
+									class="w-full h-64 sm:h-80 object-cover group-hover:scale-110 transition-transform duration-500"
+									loading="lazy"
+								/>
+								<div
+									class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"
+								></div>
+								<div
+									class="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 text-white"
+								>
+									<h3
+										class="text-lg sm:text-xl lg:text-2xl font-space font-bold mb-2"
+									>
+										Coastal Mangrove Initiative
+									</h3>
+									<p class="text-sm sm:text-base text-gray-200 mb-3">
+										Protecting coastlines in Kenya and Tanzania while providing
+										sustainable fishing grounds for local communities.
+									</p>
+									<div
+										class="flex items-center text-xs sm:text-sm text-earth-200"
+									>
+										<span>Click to read full story</span>
+										<svg
+											class="w-4 h-4 ml-2"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9 5l7 7-7 7"
+											></path>
+										</svg>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Enhanced Testimonial -->
+					<div
+						class="bg-gradient-to-br from-earth-50 to-sage-50 rounded-3xl p-6 sm:p-8 lg:p-12 animate-on-scroll"
+					>
+						<div class="flex flex-col md:flex-row md:items-center gap-6">
+							<div class="flex-shrink-0 text-center md:text-left">
+								<div class="relative inline-block">
+									<img
+										src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80"
+										alt="Maria Santos, Community Leader from Guatemala"
+										class="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover shadow-lg"
+										loading="lazy"
+									/>
+									<div
+										class="absolute -bottom-2 -right-2 w-8 h-8 bg-forest-500 rounded-full flex items-center justify-center"
+									>
+										<svg
+											class="w-4 h-4 text-white"
+											fill="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"
+											/>
+										</svg>
+									</div>
+								</div>
+							</div>
+							<div class="flex-1">
+								<blockquote
+									class="text-lg sm:text-xl lg:text-2xl text-gray-700 font-medium mb-4 sm:mb-6 leading-relaxed italic"
+								>
+									"GreenForward didn't just plant trees in our village - they
+									planted hope. Our children now have clean water, our families
+									have sustainable income, and our forests are coming back to
+									life."
+								</blockquote>
+								<cite class="text-earth-600 font-semibold text-sm sm:text-base">
+									Maria Santos, Community Leader, Guatemala
+								</cite>
+								<div class="flex items-center mt-4 text-forest-500">
+									<span class="text-xs sm:text-sm mr-2">Impact Rating:</span>
+									<div class="flex">
+										<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+											<path
+												d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+											/>
+										</svg>
+										<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+											<path
+												d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+											/>
+										</svg>
+										<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+											<path
+												d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+											/>
+										</svg>
+										<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+											<path
+												d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+											/>
+										</svg>
+										<svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+											<path
+												d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+											/>
+										</svg>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Call to Action Section -->
+			<section
+				id="action"
+				class="py-12 sm:py-16 lg:py-24 bg-gradient-to-r from-earth-600 via-earth-500 to-sage-600 text-white relative overflow-hidden"
+			>
+				<!-- Animated background elements -->
+				<div class="absolute inset-0 opacity-20">
+					<div class="absolute top-0 left-0 w-full h-full">
+						<div
+							class="absolute top-10 left-10 w-2 h-2 bg-white rounded-full animate-pulse"
+							style="animation-delay: 0s"
+						></div>
+						<div
+							class="absolute top-20 right-20 w-3 h-3 bg-white rounded-full animate-pulse"
+							style="animation-delay: 1s"
+						></div>
+						<div
+							class="absolute bottom-20 left-1/4 w-2 h-2 bg-white rounded-full animate-pulse"
+							style="animation-delay: 2s"
+						></div>
+						<div
+							class="absolute bottom-10 right-1/3 w-3 h-3 bg-white rounded-full animate-pulse"
+							style="animation-delay: 3s"
+						></div>
+					</div>
+				</div>
+
+				<div
+					class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10"
+				>
+					<div class="animate-on-scroll">
+						<div
+							class="w-20 h-1 bg-white/50 rounded-full mx-auto mb-6 animate-draw-line"
+						></div>
+						<h2
+							class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-space font-bold mb-4 sm:mb-6"
+						>
+							Join the Forest Revolution
+						</h2>
+					</div>
+					<p
+						class="text-lg sm:text-xl lg:text-2xl text-gray-200 mb-8 sm:mb-12 animate-on-scroll"
+						style="animation-delay: 0.2s"
+					>
+						Every action counts. Every tree matters. Every person can make a
+						difference. Start your impact today.
+					</p>
+
+					<div
+						class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12"
+					>
+						<div
+							class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 animate-on-scroll group"
+							style="animation-delay: 0.1s"
+						>
+							<div
+								class="text-2xl sm:text-3xl mb-3 sm:mb-4 group-hover:animate-bounce"
+							>
+								🌱
+							</div>
+							<h3 class="text-base sm:text-lg font-semibold mb-2">
+								Plant Trees
+							</h3>
+							<p class="text-xs sm:text-sm text-gray-200">$1 plants one tree</p>
+							<div
+								class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+							>
+								<div
+									class="h-full bg-white rounded-full animate-draw-line"
+								></div>
+							</div>
+						</div>
+						<div
+							class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 animate-on-scroll group"
+							style="animation-delay: 0.2s"
+						>
+							<div
+								class="text-2xl sm:text-3xl mb-3 sm:mb-4 group-hover:animate-bounce"
+							>
+								🌍
+							</div>
+							<h3 class="text-base sm:text-lg font-semibold mb-2">
+								Restore Forests
+							</h3>
+							<p class="text-xs sm:text-sm text-gray-200">
+								$100 restores 1 hectare
+							</p>
+							<div
+								class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+							>
+								<div
+									class="h-full bg-white rounded-full animate-draw-line"
+									style="animation-delay: 0.2s"
+								></div>
+							</div>
+						</div>
+						<div
+							class="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 hover:bg-white/20 transition-all duration-300 transform hover:scale-105 animate-on-scroll group"
+							style="animation-delay: 0.3s"
+						>
+							<div
+								class="text-2xl sm:text-3xl mb-3 sm:mb-4 group-hover:animate-bounce"
+							>
+								👥
+							</div>
+							<h3 class="text-base sm:text-lg font-semibold mb-2">
+								Support Communities
+							</h3>
+							<p class="text-xs sm:text-sm text-gray-200">
+								$500 supports one family
+							</p>
+							<div
+								class="w-full h-1 bg-white/20 rounded-full mt-3 overflow-hidden"
+							>
+								<div
+									class="h-full bg-white rounded-full animate-draw-line"
+									style="animation-delay: 0.4s"
+								></div>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="flex flex-col xs:flex-row gap-3 sm:gap-4 justify-center items-center animate-on-scroll flex-wrap"
+						style="animation-delay: 0.4s"
+					>
+						<button
+							onclick="openDonateModal()"
+							class="w-full xs:w-auto bg-white text-earth-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-100 focus:bg-gray-100 transition-all duration-300 transform hover:scale-105 focus:scale-105 text-sm sm:text-base lg:text-lg focus-ring"
+						>
+							Make a Donation
+						</button>
+						<button
+							onclick="openNewsletterModal()"
+							class="w-full xs:w-auto bg-white text-earth-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-100 focus:bg-gray-100 transition-all duration-300 transform hover:scale-105 focus:scale-105 text-sm sm:text-base lg:text-lg focus-ring"
+						>
+							Join Our Newsletter
+						</button>
+						<button
+							onclick="shareOnSocial()"
+							class="w-full xs:w-auto bg-white text-earth-700 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-gray-100 focus:bg-gray-100 transition-all duration-300 transform hover:scale-105 focus:scale-105 text-sm sm:text-base lg:text-lg focus-ring"
+						>
+							Share Our Mission
+						</button>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Enhanced Footer -->
+		<footer class="bg-gray-900 text-white py-12 sm:py-16" role="contentinfo">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div
+					class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8 sm:mb-12"
+				>
+					<div class="sm:col-span-2">
+						<div class="flex items-center space-x-2 mb-4 sm:mb-6">
+							<div
+								class="w-8 h-8 sm:w-10 sm:h-10 bg-forest-500 rounded-lg flex items-center justify-center"
+							>
+								<span
+									class="text-white font-bold text-sm sm:text-base"
+									aria-hidden="true"
+									>GF</span
+								>
+							</div>
+							<span class="font-space font-bold text-xl sm:text-2xl"
+								>GreenForward</span
+							>
+						</div>
+						<p class="text-gray-400 mb-4 sm:mb-6 max-w-md text-sm sm:text-base">
+							Leading the global reforestation movement, one tree at a time.
+							Join us in creating a sustainable future for our planet.
+						</p>
+						<div class="flex space-x-3 sm:space-x-4">
+							<a
+								href="#"
+								class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-forest-600 focus:bg-forest-600 transition-colors focus-ring"
+								aria-label="Follow us on Facebook"
+							>
+								<span class="text-sm sm:text-base" aria-hidden="true">f</span>
+							</a>
+							<a
+								href="#"
+								class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-forest-600 focus:bg-forest-600 transition-colors focus-ring"
+								aria-label="Follow us on Twitter"
+							>
+								<span class="text-sm sm:text-base" aria-hidden="true">t</span>
+							</a>
+							<a
+								href="#"
+								class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-forest-600 focus:bg-forest-600 transition-colors focus-ring"
+								aria-label="Connect with us on LinkedIn"
+							>
+								<span class="text-sm sm:text-base" aria-hidden="true">in</span>
+							</a>
+							<a
+								href="#"
+								class="w-9 h-9 sm:w-10 sm:h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-forest-600 focus:bg-forest-600 transition-colors focus-ring"
+								aria-label="Follow us on Instagram"
+							>
+								<span class="text-sm sm:text-base" aria-hidden="true">ig</span>
+							</a>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="font-semibold text-base sm:text-lg mb-3 sm:mb-4">
+							Quick Links
+						</h3>
+						<ul class="space-y-2 text-gray-400 text-sm sm:text-base">
+							<li>
+								<a
+									href="#home"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Home</a
+								>
+							</li>
+							<li>
+								<a
+									href="#mission"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Our Mission</a
+								>
+							</li>
+							<li>
+								<a
+									href="#impact"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Impact</a
+								>
+							</li>
+							<li>
+								<a
+									href="#stories"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Success Stories</a
+								>
+							</li>
+							<li>
+								<a
+									href="#action"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Take Action</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="font-semibold text-base sm:text-lg mb-3 sm:mb-4">
+							Get Involved
+						</h3>
+						<ul class="space-y-2 text-gray-400 text-sm sm:text-base">
+							<li>
+								<a
+									href="#"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Volunteer</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Partner With Us</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Corporate Programs</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Educational Resources</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+									>Events</a
+								>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div
+					class="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center"
+				>
+					<p
+						class="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-0 text-center sm:text-left"
+					>
+						© 2025 GreenForward. All rights reserved. Together for a greener
+						future.
+					</p>
+					<div
+						class="flex flex-wrap justify-center sm:justify-end space-x-4 sm:space-x-6 text-xs sm:text-sm text-gray-400"
+					>
+						<a
+							href="#"
+							class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+							>Privacy Policy</a
+						>
+						<a
+							href="#"
+							class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+							>Terms of Service</a
+						>
+						<a
+							href="#"
+							class="hover:text-white focus:text-white transition-colors focus-ring rounded px-1"
+							>Contact Us</a
+						>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Enhanced Donation Modal -->
+		<div
+			id="donate-modal"
+			class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+			role="dialog"
+			aria-labelledby="donate-title"
+			aria-modal="true"
+		>
+			<div
+				class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 relative animate-scale-in shadow-2xl"
+			>
+				<button
+					onclick="closeDonateModal()"
+					class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 focus:bg-gray-100 transition-colors focus-ring"
+					aria-label="Close donation form"
+				>
+					&times;
+				</button>
+
+				<div class="mb-6">
+					<h3
+						id="donate-title"
+						class="text-xl sm:text-2xl font-space font-bold text-gray-900 mb-2"
+					>
+						Plant Trees Today
+					</h3>
+					<p class="text-gray-600 text-sm">
+						Every donation directly funds tree planting and forest restoration
+						projects worldwide.
+					</p>
+				</div>
+
+				<div class="grid grid-cols-3 gap-3 mb-6">
+					<button
+						class="donation-amount bg-forest-50 hover:bg-forest-100 focus:bg-forest-600 focus:text-white text-forest-700 font-semibold py-3 px-4 rounded-xl transition-all duration-300 text-sm focus-ring"
+						data-amount="25"
+					>
+						$25
+						<span class="block text-xs opacity-75">25 trees</span>
+					</button>
+					<button
+						class="donation-amount bg-forest-50 hover:bg-forest-100 focus:bg-forest-600 focus:text-white text-forest-700 font-semibold py-3 px-4 rounded-xl transition-all duration-300 text-sm focus-ring"
+						data-amount="50"
+					>
+						$50
+						<span class="block text-xs opacity-75">50 trees</span>
+					</button>
+					<button
+						class="donation-amount bg-forest-50 hover:bg-forest-100 focus:bg-forest-600 focus:text-white text-forest-700 font-semibold py-3 px-4 rounded-xl transition-all duration-300 text-sm focus-ring"
+						data-amount="100"
+					>
+						$100
+						<span class="block text-xs opacity-75">100 trees</span>
+					</button>
+				</div>
+
+				<form id="donation-form" novalidate>
+					<div class="mb-6">
+						<label
+							for="custom-amount"
+							class="block text-sm font-medium text-gray-700 mb-2"
+							>Custom Amount</label
+						>
+						<div class="relative">
+							<span
+								class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+								>$</span
+							>
+							<input
+								type="number"
+								id="custom-amount"
+								min="1"
+								step="1"
+								placeholder="Enter amount"
+								class="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent outline-none transition-colors"
+								aria-describedby="amount-error"
+							/>
+						</div>
+						<div
+							id="amount-error"
+							class="text-red-500 text-xs mt-1 hidden"
+						></div>
+					</div>
+
+					<div class="mb-6">
+						<label
+							for="donor-email"
+							class="block text-sm font-medium text-gray-700 mb-2"
+							>Email Address</label
+						>
+						<input
+							type="email"
+							id="donor-email"
+							placeholder="your@email.com"
+							class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent outline-none transition-colors"
+							aria-describedby="email-error"
+							required
+						/>
+						<div
+							id="email-error"
+							class="text-red-500 text-xs mt-1 hidden"
+						></div>
+					</div>
+
+					<button
+						type="submit"
+						id="donate-btn"
+						class="w-full bg-forest-600 hover:bg-forest-700 focus:bg-forest-700 disabled:bg-gray-400 text-white font-semibold py-4 rounded-xl transition-all duration-300 focus-ring disabled:cursor-not-allowed"
+					>
+						<span class="donate-btn-text">Donate Now</span>
+						<span class="donate-btn-loader hidden">
+							<svg
+								class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
+							</svg>
+							Processing...
+						</span>
+					</button>
+				</form>
+
+				<p class="text-xs text-gray-500 mt-4 text-center">
+					🔒 Secure donation processing. Your donation helps plant trees and
+					restore forests worldwide.
+				</p>
+			</div>
+		</div>
+
+		<!-- Enhanced Newsletter Modal -->
+		<div
+			id="newsletter-modal"
+			class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+			role="dialog"
+			aria-labelledby="newsletter-title"
+			aria-modal="true"
+		>
+			<div
+				class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 relative animate-scale-in shadow-2xl"
+			>
+				<button
+					onclick="closeNewsletterModal()"
+					class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:text-gray-600 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 focus:bg-gray-100 transition-colors focus-ring"
+					aria-label="Close newsletter signup"
+				>
+					&times;
+				</button>
+
+				<div class="mb-6">
+					<h3
+						id="newsletter-title"
+						class="text-xl sm:text-2xl font-space font-bold text-gray-900 mb-2"
+					>
+						Stay Connected
+					</h3>
+					<p class="text-gray-600 text-sm">
+						Get updates on our reforestation projects and environmental impact.
+						Join 10,000+ earth protectors.
+					</p>
+				</div>
+
+				<form id="newsletter-form" novalidate>
+					<div class="space-y-4 mb-6">
+						<div>
+							<label
+								for="subscriber-name"
+								class="block text-sm font-medium text-gray-700 mb-2"
+								>Your Name</label
+							>
+							<input
+								type="text"
+								id="subscriber-name"
+								placeholder="Enter your name"
+								class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent outline-none transition-colors"
+								aria-describedby="name-error"
+								required
+							/>
+							<div
+								id="name-error"
+								class="text-red-500 text-xs mt-1 hidden"
+							></div>
+						</div>
+						<div>
+							<label
+								for="subscriber-email"
+								class="block text-sm font-medium text-gray-700 mb-2"
+								>Email Address</label
+							>
+							<input
+								type="email"
+								id="subscriber-email"
+								placeholder="your@email.com"
+								class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-500 focus:border-transparent outline-none transition-colors"
+								aria-describedby="newsletter-email-error"
+								required
+							/>
+							<div
+								id="newsletter-email-error"
+								class="text-red-500 text-xs mt-1 hidden"
+							></div>
+						</div>
+					</div>
+
+					<button
+						type="submit"
+						id="newsletter-btn"
+						class="w-full bg-earth-600 hover:bg-earth-700 focus:bg-earth-700 disabled:bg-gray-400 text-white font-semibold py-4 rounded-xl transition-all duration-300 focus-ring disabled:cursor-not-allowed"
+					>
+						<span class="newsletter-btn-text">Subscribe</span>
+						<span class="newsletter-btn-loader hidden">
+							<svg
+								class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+							>
+								<circle
+									class="opacity-25"
+									cx="12"
+									cy="12"
+									r="10"
+									stroke="currentColor"
+									stroke-width="4"
+								></circle>
+								<path
+									class="opacity-75"
+									fill="currentColor"
+									d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+								></path>
+							</svg>
+							Subscribing...
+						</span>
+					</button>
+				</form>
+
+				<p class="text-xs text-gray-500 mt-4 text-center">
+					📧 We respect your privacy. Unsubscribe at any time.
+				</p>
+			</div>
+		</div>
+
+		<!-- Story Detail Modal -->
+		<div
+			id="story-modal"
+			class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4"
+			role="dialog"
+			aria-labelledby="story-title"
+			aria-modal="true"
+		>
+			<div
+				class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative animate-scale-in shadow-2xl"
+			>
+				<button
+					onclick="closeStoryModal()"
+					class="absolute top-4 right-4 text-gray-600 bg-gray-100 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:scale-110 transition-colors focus-ring z-10"
+					aria-label="Close story details"
+				>
+					&times;
+				</button>
+				<div id="story-content" class="p-6 sm:p-8">
+					<!-- Story content will be inserted here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Toast Container -->
+		<div
+			id="toast-container"
+			class="fixed top-4 right-4 z-50 space-y-2"
+			aria-live="polite"
+		></div>
+
+		<!-- Progress Indicator -->
+		<div
+			class="fixed top-0 left-0 h-1 bg-gradient-to-r from-forest-600 to-earth-600 z-50 transition-all duration-300"
+			id="progress-bar"
+			style="width: 0%"
+			role="progressbar"
+			aria-label="Page scroll progress"
+		></div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				initializeApp();
+			});
+
+			function initializeApp() {
+				setTimeout(() => {
+					const loadingScreen = document.getElementById("loading-screen");
+					loadingScreen.style.opacity = "0";
+					setTimeout(() => {
+						loadingScreen.style.display = "none";
+						document.body.style.overflow = "visible";
+					}, 300);
+				}, 2000);
+
+				initializeScrollAnimations();
+				initializeCounterAnimations();
+				initializeNavigation();
+				initializeProgressBar();
+				initializeMobileMenu();
+				initializeParallax();
+				initializeForms();
+				initializeAccessibility();
+			}
+
+			function initializeScrollAnimations() {
+				const observerOptions = {
+					threshold: 0.1,
+					rootMargin: "-50px 0px",
+				};
+
+				const observer = new IntersectionObserver((entries) => {
+					entries.forEach((entry) => {
+						const element = entry.target;
+
+						if (entry.isIntersecting) {
+							const delay = element.getAttribute("data-delay") || 0;
+
+							setTimeout(() => {
+								element.classList.add("animated");
+
+								if (element.classList.contains("story-reveal")) {
+									element.classList.add("revealed");
+								}
+							}, delay * 1000);
+						} else {
+							if (entry.boundingClientRect.top > 0) {
+								element.classList.remove("animated", "revealed");
+							}
+						}
+					});
+				}, observerOptions);
+
+				document.querySelectorAll(".animate-on-scroll").forEach((el) => {
+					observer.observe(el);
+				});
+			}
+
+			function initializeCounterAnimations() {
+				const counterObserver = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) {
+								const counter = entry.target;
+								const target = parseInt(counter.getAttribute("data-counter"));
+								animateCounter(counter, target);
+								counterObserver.unobserve(counter);
+							}
+						});
+					},
+					{ threshold: 0.5 }
+				);
+
+				document.querySelectorAll(".counter-display").forEach((counter) => {
+					counterObserver.observe(counter);
+				});
+			}
+
+			function animateCounter(element, target) {
+				let current = 0;
+				const increment = target / 100;
+				const duration = 2000;
+				const stepTime = duration / 100;
+
+				const timer = setInterval(() => {
+					current += increment;
+					if (current >= target) {
+						element.textContent = target.toLocaleString();
+						clearInterval(timer);
+					} else {
+						element.textContent = Math.floor(current).toLocaleString();
+					}
+				}, stepTime);
+			}
+
+			function initializeNavigation() {
+				const navbar = document.getElementById("navbar");
+				let lastScrollY = window.scrollY;
+
+				window.addEventListener("scroll", () => {
+					const currentScrollY = window.scrollY;
+
+					if (currentScrollY > 100) {
+						navbar.classList.add("shadow-lg");
+					} else {
+						navbar.classList.remove("shadow-lg");
+					}
+
+					if (window.innerWidth < 768) {
+						if (currentScrollY > lastScrollY && currentScrollY > 200) {
+							navbar.style.transform = "translateY(-100%)";
+						} else {
+							navbar.style.transform = "translateY(0)";
+						}
+					}
+
+					lastScrollY = currentScrollY;
+				});
+
+				document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+					anchor.addEventListener("click", function (e) {
+						e.preventDefault();
+						const target = document.querySelector(this.getAttribute("href"));
+						if (target) {
+							const offsetTop = target.offsetTop - 80;
+							window.scrollTo({
+								top: offsetTop,
+								behavior: "smooth",
+							});
+
+							const mobileMenu = document.getElementById("mobile-menu");
+							mobileMenu.classList.add("hidden");
+							updateMobileMenuButton(false);
+						}
+					});
+				});
+			}
+
+			function initializeMobileMenu() {
+				const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+				const mobileMenu = document.getElementById("mobile-menu");
+
+				mobileMenuBtn.addEventListener("click", () => {
+					const isOpen = !mobileMenu.classList.contains("hidden");
+
+					if (isOpen) {
+						mobileMenu.classList.add("hidden");
+					} else {
+						mobileMenu.classList.remove("hidden");
+					}
+
+					updateMobileMenuButton(!isOpen);
+				});
+
+				document.addEventListener("click", (e) => {
+					if (
+						!mobileMenuBtn.contains(e.target) &&
+						!mobileMenu.contains(e.target)
+					) {
+						mobileMenu.classList.add("hidden");
+						updateMobileMenuButton(false);
+					}
+				});
+
+				document.addEventListener("keydown", (e) => {
+					if (e.key === "Escape" && !mobileMenu.classList.contains("hidden")) {
+						mobileMenu.classList.add("hidden");
+						updateMobileMenuButton(false);
+					}
+				});
+			}
+
+			function updateMobileMenuButton(isOpen) {
+				const button = document.getElementById("mobile-menu-btn");
+				const spans = button.querySelectorAll("span");
+
+				button.setAttribute("aria-expanded", isOpen);
+
+				if (isOpen) {
+					spans[0].style.transform = "rotate(45deg) translate(5px, 5px)";
+					spans[1].style.opacity = "0";
+					spans[2].style.transform = "rotate(-45deg) translate(5px, -5px)";
+				} else {
+					spans[0].style.transform = "";
+					spans[1].style.opacity = "";
+					spans[2].style.transform = "";
+				}
+			}
+
+			function initializeProgressBar() {
+				const progressBar = document.getElementById("progress-bar");
+
+				function updateProgress() {
+					const winScroll =
+						document.body.scrollTop || document.documentElement.scrollTop;
+					const height =
+						document.documentElement.scrollHeight -
+						document.documentElement.clientHeight;
+					const scrolled = (winScroll / height) * 100;
+					progressBar.style.width = scrolled + "%";
+				}
+
+				let ticking = false;
+				window.addEventListener("scroll", () => {
+					if (!ticking) {
+						requestAnimationFrame(updateProgress);
+						ticking = true;
+						setTimeout(() => {
+							ticking = false;
+						}, 16);
+					}
+				});
+			}
+
+			function initializeParallax() {
+				const parallaxElements = document.querySelectorAll(".parallax-bg");
+
+				function updateParallax() {
+					const scrolled = window.pageYOffset;
+					const windowHeight = window.innerHeight;
+
+					parallaxElements.forEach((element) => {
+						const elementTop = element.parentElement.offsetTop;
+						const elementHeight = element.parentElement.offsetHeight;
+
+						if (
+							scrolled + windowHeight > elementTop &&
+							scrolled < elementTop + elementHeight
+						) {
+							const rate = (scrolled - elementTop) * 0.5;
+							element.style.transform = `translateY(${rate}px)`;
+						}
+					});
+				}
+
+				let ticking = false;
+				window.addEventListener("scroll", () => {
+					if (!ticking) {
+						requestAnimationFrame(updateParallax);
+						ticking = true;
+						setTimeout(() => {
+							ticking = false;
+						}, 16);
+					}
+				});
+			}
+
+			function initializeForms() {
+				initializeDonationForm();
+				initializeNewsletterForm();
+			}
+
+			function initializeDonationForm() {
+				const form = document.getElementById("donation-form");
+				const donationButtons = document.querySelectorAll(".donation-amount");
+				const customAmount = document.getElementById("custom-amount");
+
+				donationButtons.forEach((button) => {
+					button.addEventListener("click", function () {
+						donationButtons.forEach((btn) => {
+							btn.classList.remove("bg-forest-600", "text-white");
+							btn.classList.add("bg-forest-50", "text-forest-700");
+						});
+
+						this.classList.remove("bg-forest-50", "text-forest-700");
+						this.classList.add("bg-forest-600", "text-white");
+
+						customAmount.value = this.getAttribute("data-amount");
+						clearFieldError("custom-amount");
+					});
+				});
+
+				customAmount.addEventListener("input", () => {
+					donationButtons.forEach((btn) => {
+						btn.classList.remove("bg-forest-600", "text-white");
+						btn.classList.add("bg-forest-50", "text-forest-700");
+					});
+					clearFieldError("custom-amount");
+				});
+
+				form.addEventListener("submit", async (e) => {
+					e.preventDefault();
+
+					if (validateDonationForm()) {
+						await processDonation();
+					}
+				});
+			}
+
+			function initializeNewsletterForm() {
+				const form = document.getElementById("newsletter-form");
+
+				form.addEventListener("submit", async (e) => {
+					e.preventDefault();
+
+					if (validateNewsletterForm()) {
+						await subscribeNewsletter();
+					}
+				});
+			}
+
+			function validateDonationForm() {
+				const amount = document.getElementById("custom-amount").value;
+				const email = document.getElementById("donor-email").value;
+				let isValid = true;
+
+				if (!amount || parseFloat(amount) < 1) {
+					showFieldError(
+						"custom-amount",
+						"Please enter an amount of at least $1"
+					);
+					isValid = false;
+				} else {
+					clearFieldError("custom-amount");
+				}
+
+				if (!validateEmail(email)) {
+					showFieldError("donor-email", "Please enter a valid email address");
+					isValid = false;
+				} else {
+					clearFieldError("donor-email");
+				}
+
+				return isValid;
+			}
+
+			function validateNewsletterForm() {
+				const name = document.getElementById("subscriber-name").value.trim();
+				const email = document.getElementById("subscriber-email").value.trim();
+				let isValid = true;
+
+				if (!name || name.length < 2) {
+					showFieldError(
+						"subscriber-name",
+						"Please enter your name (at least 2 characters)"
+					);
+					isValid = false;
+				} else {
+					clearFieldError("subscriber-name");
+				}
+
+				if (!validateEmail(email)) {
+					showFieldError(
+						"subscriber-email",
+						"Please enter a valid email address"
+					);
+					isValid = false;
+				} else {
+					clearFieldError("subscriber-email");
+				}
+
+				return isValid;
+			}
+
+			function validateEmail(email) {
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				return emailRegex.test(email);
+			}
+
+			function showFieldError(fieldId, message) {
+				const field = document.getElementById(fieldId);
+				const errorElement = document.getElementById(
+					fieldId.replace(fieldId.split("-")[1], "error")
+				);
+
+				field.classList.add("border-red-500");
+				field.classList.remove("border-gray-300");
+
+				if (errorElement) {
+					errorElement.textContent = message;
+					errorElement.classList.remove("hidden");
+				}
+			}
+
+			function clearFieldError(fieldId) {
+				const field = document.getElementById(fieldId);
+				const errorElement = document.getElementById(
+					fieldId.replace(fieldId.split("-")[1], "error")
+				);
+
+				field.classList.remove("border-red-500");
+				field.classList.add("border-gray-300");
+
+				if (errorElement) {
+					errorElement.classList.add("hidden");
+				}
+			}
+
+			function openDonateModal() {
+				const modal = document.getElementById("donate-modal");
+				modal.classList.remove("hidden");
+				modal.classList.add("flex");
+				document.body.style.overflow = "hidden";
+
+				setTimeout(() => {
+					document.getElementById("custom-amount").focus();
+				}, 100);
+			}
+
+			function closeDonateModal() {
+				const modal = document.getElementById("donate-modal");
+				modal.classList.add("hidden");
+				modal.classList.remove("flex");
+				document.body.style.overflow = "";
+				resetDonationForm();
+			}
+
+			function openNewsletterModal() {
+				const modal = document.getElementById("newsletter-modal");
+				modal.classList.remove("hidden");
+				modal.classList.add("flex");
+				document.body.style.overflow = "hidden";
+
+				setTimeout(() => {
+					document.getElementById("subscriber-name").focus();
+				}, 100);
+			}
+
+			function closeNewsletterModal() {
+				const modal = document.getElementById("newsletter-modal");
+				modal.classList.add("hidden");
+				modal.classList.remove("flex");
+				document.body.style.overflow = "";
+				resetNewsletterForm();
+			}
+
+			function openStoryModal(storyType) {
+				const modal = document.getElementById("story-modal");
+				const content = document.getElementById("story-content");
+
+				const stories = {
+					amazon: {
+						title: "Amazon Restoration Project",
+						image:
+							"https://plus.unsplash.com/premium_photo-1686810855843-cb595b8418bd?q=80&w=3125&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+						content: `
+                        <div class="mb-6">
+                            <img src="https://plus.unsplash.com/premium_photo-1686810855843-cb595b8418bd?q=80&w=3125&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Amazon restoration project" class="w-full h-64 object-cover rounded-xl">
+                        </div>
+                        <h2 class="text-2xl font-space font-bold text-gray-900 mb-4">Amazon Restoration Project</h2>
+                        <div class="prose prose-lg text-gray-700 space-y-4">
+                            <p>In the heart of the Brazilian Amazon, our largest restoration project is bringing life back to 50,000 hectares of degraded rainforest. This ambitious initiative represents hope for one of the world's most critical ecosystems.</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">The Challenge</h3>
+                            <p>Decades of deforestation had left vast areas of the Amazon barren, disrupting wildlife corridors and threatening indigenous communities who depend on the forest for their livelihoods.</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Our Approach</h3>
+                            <p>Working closely with local communities and indigenous leaders, we've developed a comprehensive restoration strategy that includes:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4">
+                                <li>Planting native species adapted to local conditions</li>
+                                <li>Creating wildlife corridors to reconnect fragmented habitats</li>
+                                <li>Training local residents in sustainable forestry practices</li>
+                                <li>Establishing community-based monitoring systems</li>
+                            </ul>
+                            
+                            <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Impact So Far</h3>
+                            <p>After three years of dedicated work, we've achieved remarkable results:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4">
+                                <li>1.2 million trees planted with 95% survival rate</li>
+                                <li>300+ species of birds have returned to the area</li>
+                                <li>150 families now earning sustainable income from the forest</li>
+                                <li>25% increase in local rainfall patterns</li>
+                            </ul>
+                            
+<p class="font-semibold text-forest-700 bg-forest-50 p-4 rounded-lg">This project demonstrates that with proper planning, community involvement, and scientific expertise, we can restore even the most degraded ecosystems to their former glory.</p>
+                        </div>
+                    `,
+					},
+					mangrove: {
+						title: "Coastal Mangrove Initiative",
+						image:
+							"https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80",
+						content: `
+                        <div class="mb-6">
+                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Coastal mangrove restoration" class="w-full h-64 object-cover rounded-xl">
+                        </div>
+                        <h2 class="text-2xl font-space font-bold text-gray-900 mb-4">Coastal Mangrove Initiative</h2>
+                        <div class="prose prose-lg text-gray-700 space-y-4">
+                            <p>Along the coastlines of Kenya and Tanzania, our mangrove restoration initiative is protecting communities from coastal erosion while creating sustainable livelihoods for thousands of families.</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">The Crisis</h3>
+                            <p>Climate change and human activities had destroyed 70% of the region's mangrove forests, leaving coastal communities vulnerable to storms and tsunamis while destroying crucial fishing habitats.</p>
+                            
+                            <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Our Solution</h3>
+                            <p>Our comprehensive approach combines environmental restoration with community empowerment:</p>
+                            <ul class="list-disc list-inside space-y-2 ml-4">
+                                <li>Replanting native mangrove species in strategic locations</li>
+                                <li>Training fishermen in sustainable aquaculture practices</li>
+                                <li>Establishing women's cooperatives for mangrove nurseries</li>
+                                <li>Creating eco-tourism opportunities</li>
+                            </ul>
+                            
+                            <h3 class="text-xl font-semibold text-gray-900 mt-6 mb-3">Remarkable Results</h3>
+                            <ul class="list-disc list-inside space-y-2 ml-4">
+                                <li>800,000 mangrove saplings planted across 15,000 hectares</li>
+                                <li>40% reduction in coastal erosion</li>
+                                <li>2,500 families earning income from sustainable fishing</li>
+                                <li>60% increase in fish populations</li>
+                                <li>300 women trained in mangrove nursery management</li>
+                            </ul>
+                            
+                            <p class="font-semibold text-earth-700 bg-earth-50 p-4 rounded-lg">Mangroves are among the most effective carbon sinks on Earth, sequestering up to 10 times more carbon per hectare than terrestrial forests.</p>
+                        </div>
+                    `,
+					},
+				};
+
+				content.innerHTML = stories[storyType].content;
+				modal.classList.remove("hidden");
+				modal.classList.add("flex");
+				document.body.style.overflow = "hidden";
+			}
+
+			function closeStoryModal() {
+				const modal = document.getElementById("story-modal");
+				modal.classList.add("hidden");
+				modal.classList.remove("flex");
+				document.body.style.overflow = "";
+			}
+
+			function resetDonationForm() {
+				document.getElementById("donation-form").reset();
+
+				document.querySelectorAll(".donation-amount").forEach((btn) => {
+					btn.classList.remove("bg-forest-600", "text-white");
+					btn.classList.add("bg-forest-50", "text-forest-700");
+				});
+
+				clearFieldError("custom-amount");
+				clearFieldError("donor-email");
+			}
+
+			function resetNewsletterForm() {
+				document.getElementById("newsletter-form").reset();
+				clearFieldError("subscriber-name");
+				clearFieldError("subscriber-email");
+			}
+
+			async function processDonation() {
+				const amount = document.getElementById("custom-amount").value;
+				const email = document.getElementById("donor-email").value;
+				const button = document.getElementById("donate-btn");
+				const buttonText = button.querySelector(".donate-btn-text");
+				const buttonLoader = button.querySelector(".donate-btn-loader");
+
+				button.disabled = true;
+				buttonText.classList.add("hidden");
+				buttonLoader.classList.remove("hidden");
+
+				try {
+					await new Promise((resolve) => setTimeout(resolve, 2000));
+
+					showToast(
+						`Thank you for your $${amount} donation! 🌱 You've just helped plant ${amount} trees.`,
+						"success"
+					);
+					closeDonateModal();
+
+					setTimeout(() => {
+						showToast(
+							`Your trees will absorb approximately ${Math.round(
+								amount * 48
+							)} lbs of CO₂ over their lifetime! 🌍`,
+							"info"
+						);
+					}, 3000);
+				} catch (error) {
+					showToast(
+						"There was an error processing your donation. Please try again.",
+						"error"
+					);
+				} finally {
+					button.disabled = false;
+					buttonText.classList.remove("hidden");
+					buttonLoader.classList.add("hidden");
+				}
+			}
+
+			async function subscribeNewsletter() {
+				const name = document.getElementById("subscriber-name").value;
+				const email = document.getElementById("subscriber-email").value;
+				const button = document.getElementById("newsletter-btn");
+				const buttonText = button.querySelector(".newsletter-btn-text");
+				const buttonLoader = button.querySelector(".newsletter-btn-loader");
+
+				button.disabled = true;
+				buttonText.classList.add("hidden");
+				buttonLoader.classList.remove("hidden");
+
+				try {
+					await new Promise((resolve) => setTimeout(resolve, 1500));
+
+					showToast(
+						`Welcome to the forest family, ${name}! 🌳 Check your email for our welcome guide.`,
+						"success"
+					);
+					closeNewsletterModal();
+
+					setTimeout(() => {
+						showToast(
+							"You'll receive our monthly impact report with exclusive updates! 📧",
+							"info"
+						);
+					}, 2000);
+				} catch (error) {
+					showToast(
+						"There was an error subscribing you to our newsletter. Please try again.",
+						"error"
+					);
+				} finally {
+					button.disabled = false;
+					buttonText.classList.remove("hidden");
+					buttonLoader.classList.add("hidden");
+				}
+			}
+
+			function shareOnSocial() {
+				const url = encodeURIComponent(window.location.href);
+				const text = encodeURIComponent(
+					"Join GreenForward in reforesting our planet! 🌱 Every tree counts in fighting climate change. #Reforestation #ClimateAction #SustainableFuture"
+				);
+
+				if (
+					navigator.share &&
+					/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+						navigator.userAgent
+					)
+				) {
+					navigator
+						.share({
+							title: "GreenForward - Reforesting Our Planet",
+							text: "Join us in reforesting our planet! Every tree counts in fighting climate change.",
+							url: window.location.href,
+						})
+						.then(() => {
+							showToast("Thanks for sharing our mission! 🌱", "success");
+						})
+						.catch(() => {
+							showSocialOptions(url, text);
+						});
+				} else {
+					showSocialOptions(url, text);
+				}
+			}
+
+			function showSocialOptions(url, text) {
+				const socialModal = document.createElement("div");
+				socialModal.className =
+					"fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4";
+				socialModal.innerHTML = `
+                <div class="bg-white rounded-2xl max-w-sm w-full p-6 relative animate-scale-in">
+                    <button onclick="this.closest('.fixed').remove()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                    <h3 class="text-xl font-space font-bold text-gray-900 mb-4">Share Our Mission</h3>
+                    <div class="space-y-3">
+                        <button onclick="window.open('https://twitter.com/intent/tweet?text=${text}&url=${url}', '_blank'); this.closest('.fixed').remove()" class="w-full bg-blue-500 text-white py-3 px-4 rounded-xl hover:bg-blue-600 transition-colors flex items-center justify-center space-x-2">
+                            <span>🐦</span><span>Share on Twitter</span>
+                        </button>
+                        <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${url}', '_blank'); this.closest('.fixed').remove()" class="w-full bg-blue-600 text-white py-3 px-4 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2">
+                            <span>📘</span><span>Share on Facebook</span>
+                        </button>
+                        <button onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=${url}', '_blank'); this.closest('.fixed').remove()" class="w-full bg-blue-700 text-white py-3 px-4 rounded-xl hover:bg-blue-800 transition-colors flex items-center justify-center space-x-2">
+                            <span>💼</span><span>Share on LinkedIn</span>
+                        </button>
+                        <button onclick="navigator.clipboard.writeText('${decodeURIComponent(
+													url
+												)}').then(() => {showToast('Link copied to clipboard! 📋', 'success'); this.closest('.fixed').remove();})" class="w-full bg-gray-600 text-white py-3 px-4 rounded-xl hover:bg-gray-700 transition-colors flex items-center justify-center space-x-2">
+                            <span>📋</span><span>Copy Link</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+				document.body.appendChild(socialModal);
+			}
+
+			function scrollToSection(sectionId) {
+				const section = document.getElementById(sectionId);
+				if (section) {
+					const offsetTop = section.offsetTop - 80;
+					window.scrollTo({
+						top: offsetTop,
+						behavior: "smooth",
+					});
+				}
+			}
+
+			function showToast(message, type = "info", duration = 4000) {
+				const toast = document.createElement("div");
+				const colors = {
+					success: "bg-forest-600 text-white border-forest-700",
+					error: "bg-red-600 text-white border-red-700",
+					info: "bg-earth-600 text-white border-earth-700",
+					warning: "bg-yellow-600 text-white border-yellow-700",
+				};
+
+				const icons = {
+					success: "✅",
+					error: "❌",
+					info: "ℹ️",
+					warning: "⚠️",
+				};
+
+				toast.className = `${colors[type]} border px-6 py-4 rounded-xl shadow-2xl transform translate-x-full transition-all duration-300 max-w-sm flex items-start space-x-3`;
+
+				toast.innerHTML = `
+                <span class="text-lg flex-shrink-0 mt-0.5">${icons[type]}</span>
+                <div class="flex-1">
+                    <p class="font-medium">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-white/80 hover:text-white ml-2 text-lg leading-none">&times;</button>
+            `;
+
+				document.getElementById("toast-container").appendChild(toast);
+
+				setTimeout(() => {
+					toast.classList.remove("translate-x-full");
+				}, 100);
+
+				setTimeout(() => {
+					if (toast.parentElement) {
+						toast.classList.add("translate-x-full");
+						setTimeout(() => {
+							if (toast.parentElement) {
+								toast.remove();
+							}
+						}, 300);
+					}
+				}, duration);
+			}
+
+			function initializeAccessibility() {
+				document.addEventListener("keydown", (e) => {
+					if (e.key === "Escape") {
+						const modals = document.querySelectorAll(".fixed.flex");
+						modals.forEach((modal) => {
+							if (modal.id === "donate-modal") closeDonateModal();
+							else if (modal.id === "newsletter-modal") closeNewsletterModal();
+							else if (modal.id === "story-modal") closeStoryModal();
+							else modal.remove();
+						});
+					}
+				});
+
+				const focusableElements =
+					'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+				function trapFocus(element) {
+					const focusableContent = element.querySelectorAll(focusableElements);
+					const firstFocusableElement = focusableContent[0];
+					const lastFocusableElement =
+						focusableContent[focusableContent.length - 1];
+
+					element.addEventListener("keydown", (e) => {
+						if (e.key === "Tab") {
+							if (e.shiftKey) {
+								if (document.activeElement === firstFocusableElement) {
+									lastFocusableElement.focus();
+									e.preventDefault();
+								}
+							} else {
+								if (document.activeElement === lastFocusableElement) {
+									firstFocusableElement.focus();
+									e.preventDefault();
+								}
+							}
+						}
+					});
+				}
+
+				document.querySelectorAll('[role="dialog"]').forEach(trapFocus);
+
+				const announcer = document.createElement("div");
+				announcer.setAttribute("aria-live", "polite");
+				announcer.setAttribute("aria-atomic", "true");
+				announcer.className = "sr-only";
+				document.body.appendChild(announcer);
+
+				document.querySelectorAll('a[href^="#"]').forEach((link) => {
+					if (!link.getAttribute("aria-label")) {
+						const targetId = link.getAttribute("href").substring(1);
+						const target = document.getElementById(targetId);
+						if (target) {
+							const heading = target.querySelector("h1, h2, h3, h4, h5, h6");
+							if (heading) {
+								link.setAttribute(
+									"aria-label",
+									`Navigate to ${heading.textContent}`
+								);
+							}
+						}
+					}
+				});
+			}
+
+			function initializePerformanceOptimizations() {
+				if ("IntersectionObserver" in window) {
+					const imageObserver = new IntersectionObserver((entries) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) {
+								const img = entry.target;
+								if (img.dataset.src) {
+									img.src = img.dataset.src;
+									img.removeAttribute("data-src");
+								}
+								imageObserver.unobserve(img);
+							}
+						});
+					});
+
+					document.querySelectorAll("img[data-src]").forEach((img) => {
+						imageObserver.observe(img);
+					});
+				}
+
+				const criticalResources = [
+					"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap",
+				];
+
+				criticalResources.forEach((resource) => {
+					const link = document.createElement("link");
+					link.rel = "preload";
+					link.as = "style";
+					link.href = resource;
+					document.head.appendChild(link);
+				});
+			}
+
+			window.addEventListener("error", (e) => {
+				console.error("Global error:", e.error);
+				showToast("Something went wrong. Please refresh the page.", "error");
+			});
+
+			window.addEventListener("unhandledrejection", (e) => {
+				console.error("Unhandled promise rejection:", e.reason);
+				showToast(
+					"A network error occurred. Please check your connection.",
+					"error"
+				);
+			});
+
+			let konamiCode = [];
+			const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+
+			document.addEventListener("keydown", function (e) {
+				konamiCode.push(e.keyCode);
+				if (konamiCode.length > konami.length) {
+					konamiCode.shift();
+				}
+
+				if (
+					konamiCode.length === konami.length &&
+					konamiCode.every((code, index) => code === konami[index])
+				) {
+					showToast(
+						"🌳 Secret Forest Mode Activated! You found the hidden grove! 🦋",
+						"success"
+					);
+
+					document.documentElement.style.filter =
+						"hue-rotate(120deg) saturate(1.2)";
+
+					for (let i = 0; i < 10; i++) {
+						const leaf = document.createElement("div");
+						leaf.innerHTML = "🍃";
+						leaf.style.cssText = `
+                        position: fixed;
+                        top: -50px;
+                        left: ${Math.random() * 100}vw;
+                        font-size: 2rem;
+                        pointer-events: none;
+                        z-index: 1000;
+                        animation: fall 3s linear forwards;
+                    `;
+						document.body.appendChild(leaf);
+
+						setTimeout(() => leaf.remove(), 3000);
+					}
+
+					setTimeout(() => {
+						document.documentElement.style.filter = "";
+						showToast(
+							"🌿 The forest spirits have blessed your visit! 🌿",
+							"info"
+						);
+					}, 10000);
+				}
+			});
+
+			const fallAnimation = document.createElement("style");
+			fallAnimation.textContent = `
+            @keyframes fall {
+                to {
+                    transform: translateY(100vh) rotate(360deg);
+                    opacity: 0;
+                }
+            }
+        `;
+			document.head.appendChild(fallAnimation);
+
+			window.addEventListener("load", () => {
+				initializePerformanceOptimizations();
+
+				if (!localStorage.getItem("greenforward-visited")) {
+					setTimeout(() => {
+						showToast(
+							"Welcome to GreenForward! 🌱 Scroll down to discover our impact.",
+							"info",
+							6000
+						);
+						localStorage.setItem("greenforward-visited", "true");
+					}, 3000);
+				}
+			});
+
+			if ("serviceWorker" in navigator) {
+				window.addEventListener("load", () => {
+					navigator.serviceWorker
+						.register("/sw.js")
+						.then((registration) => {
+							console.log("SW registered: ", registration);
+						})
+						.catch((registrationError) => {
+							console.log("SW registration failed: ", registrationError);
+						});
+				});
+			}
+		</script>
+	</body>
+</html>
