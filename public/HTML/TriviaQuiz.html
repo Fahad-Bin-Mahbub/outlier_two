@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Zesty Quiz - Interactive Trivia Game</title>
+
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
+
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--primary: #f9d342;
+				--primary-light: #fff3b0;
+				--primary-dark: #e6ba0a;
+				--secondary: #292826;
+				--accent: #ffd600;
+			}
+
+			body {
+				font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+				background-color: #f9f9f9;
+				background-image: linear-gradient(135deg, #f9f9f9 0%, #e9ecef 100%);
+				background-attachment: fixed;
+				overflow-x: hidden;
+			}
+
+			.glass {
+				background-color: rgba(255, 255, 255, 0.25);
+				-webkit-backdrop-filter: blur(10px);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.18);
+				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+			}
+
+			.glass-dark {
+				background-color: rgba(41, 40, 38, 0.8);
+				-webkit-backdrop-filter: blur(10px);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+			}
+
+			.glass-yellow {
+				background-color: rgba(249, 211, 66, 0.15);
+				-webkit-backdrop-filter: blur(10px);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(249, 211, 66, 0.3);
+				box-shadow: 0 8px 32px 0 rgba(249, 211, 66, 0.1);
+			}
+
+			.btn-primary {
+				background-color: var(--primary);
+				color: var(--secondary);
+				transition: all 0.3s ease;
+				cursor: pointer;
+			}
+
+			.btn-primary:hover {
+				background-color: var(--primary-dark);
+				transform: translateY(-3px);
+				box-shadow: 0 6px 16px rgba(249, 211, 66, 0.4);
+			}
+
+			.btn-secondary {
+				background-color: var(--secondary);
+				color: var(--primary);
+				transition: all 0.3s ease;
+				cursor: pointer;
+			}
+
+			.btn-secondary:hover {
+				background-color: #3a3935;
+				transform: translateY(-3px);
+				box-shadow: 0 6px 16px rgba(41, 40, 38, 0.4);
+			}
+
+			.option-btn {
+				transition: all 0.3s ease;
+				cursor: pointer;
+			}
+
+			.option-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			}
+
+			.correct-answer {
+				background-color: #4bb543 !important;
+				color: white !important;
+				animation: pulse-green 1s ease-in-out;
+			}
+
+			.wrong-answer {
+				background-color: #ff3333 !important;
+				color: white !important;
+				animation: shake 0.6s ease-in-out;
+			}
+
+			@keyframes pulse-green {
+				0% {
+					box-shadow: 0 0 0 0 rgba(75, 181, 67, 0.7);
+				}
+				70% {
+					box-shadow: 0 0 0 10px rgba(75, 181, 67, 0);
+				}
+				100% {
+					box-shadow: 0 0 0 0 rgba(75, 181, 67, 0);
+				}
+			}
+
+			@keyframes shake {
+				0%,
+				100% {
+					transform: translateX(0);
+				}
+				10%,
+				30%,
+				50%,
+				70%,
+				90% {
+					transform: translateX(-5px);
+				}
+				20%,
+				40%,
+				60%,
+				80% {
+					transform: translateX(5px);
+				}
+			}
+
+			.progress-bar {
+				height: 8px;
+				transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+			}
+
+			.timer-circle {
+				width: 60px;
+				height: 60px;
+				transition: stroke-dashoffset 1s linear;
+			}
+
+			.bg-pattern {
+				background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23F9D342' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+			}
+
+			.confetti {
+				position: absolute;
+				width: 10px;
+				height: 10px;
+				background-color: var(--primary);
+				opacity: 0;
+				animation: confetti-fall 4s ease-in-out infinite;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes confetti-fall {
+				0% {
+					opacity: 1;
+					transform: translateY(-100vh) rotate(0deg);
+				}
+				100% {
+					opacity: 0;
+					transform: translateY(100vh) rotate(720deg);
+				}
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			@keyframes bounceIn {
+				0% {
+					opacity: 0;
+					transform: scale(0.3);
+				}
+				50% {
+					opacity: 1;
+					transform: scale(1.05);
+				}
+				70% {
+					transform: scale(0.9);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			@keyframes floatIn {
+				0% {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				100% {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes slideInRight {
+				0% {
+					opacity: 0;
+					transform: translateX(50px);
+				}
+				100% {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			.float-in {
+				animation: floatIn 0.6s ease-out forwards;
+			}
+
+			.bounce-in {
+				animation: bounceIn 0.6s ease-out forwards;
+			}
+
+			.slide-in-right {
+				animation: slideInRight 0.6s ease-out forwards;
+			}
+
+			.toast {
+				position: fixed;
+				right: 20px;
+				bottom: 20px;
+				padding: 16px;
+				background: var(--secondary);
+				color: white;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				z-index: 1000;
+				transform: translateY(100px);
+				opacity: 0;
+				transition: all 0.3s ease;
+			}
+
+			.toast.show {
+				transform: translateY(0);
+				opacity: 1;
+			}
+
+			.animate-in {
+				animation: fadeIn 0.6s ease-out forwards;
+			}
+
+			.animate-in-delay-1 {
+				animation: fadeIn 0.6s ease-out 0.1s forwards;
+				opacity: 0;
+			}
+
+			.animate-in-delay-2 {
+				animation: fadeIn 0.6s ease-out 0.2s forwards;
+				opacity: 0;
+			}
+
+			.animate-in-delay-3 {
+				animation: fadeIn 0.6s ease-out 0.3s forwards;
+				opacity: 0;
+			}
+
+			.pulse {
+				animation: pulse 1.5s ease-in-out infinite;
+			}
+
+			.loader {
+				width: 48px;
+				height: 48px;
+				border: 5px solid var(--primary-light);
+				border-bottom-color: var(--primary);
+				border-radius: 50%;
+				display: inline-block;
+				box-sizing: border-box;
+				animation: rotation 1s linear infinite;
+			}
+
+			.bar-animation {
+				transition: height 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+			}
+
+			.hover-lift {
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.hover-lift:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 10px 20px rgba(249, 211, 66, 0.2);
+			}
+
+			.tooltip {
+				position: absolute;
+				bottom: 100%;
+				left: 50%;
+				transform: translateX(-50%);
+				margin-bottom: 8px;
+				background-color: var(--secondary);
+				color: white;
+				padding: 6px 10px;
+				border-radius: 4px;
+				font-size: 12px;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.2s ease;
+				white-space: nowrap;
+				z-index: 10;
+			}
+
+			.tooltip::after {
+				content: "";
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				margin-left: -5px;
+				border-width: 5px;
+				border-style: solid;
+				border-color: var(--secondary) transparent transparent transparent;
+			}
+
+			.has-tooltip:hover .tooltip {
+				opacity: 1;
+			}
+
+			@keyframes rotation {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.transform {
+				transform: translate(var(--tw-translate-x), var(--tw-translate-y))
+					rotate(var(--tw-rotate)) skewX(var(--tw-skew-x))
+					skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x))
+					scaleY(var(--tw-scale-y));
+			}
+
+			.translate-x-full {
+				--tw-translate-x: 100%;
+			}
+
+			.transition {
+				transition-property: color, background-color, border-color,
+					text-decoration-color, fill, stroke, opacity, box-shadow, transform,
+					filter, backdrop-filter;
+				transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+				transition-duration: 150ms;
+			}
+
+			.transition-transform {
+				transition-property: transform;
+				transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+				transition-duration: 150ms;
+			}
+
+			.duration-300 {
+				transition-duration: 300ms;
+			}
+
+			.ease-in-out {
+				transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+			}
+
+			.hover\:text-yellow-300:hover {
+				color: #fcd34d;
+			}
+
+			.hover\:shadow-lg:hover {
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+			}
+
+			.container {
+				width: 100%;
+				margin-right: auto;
+				margin-left: auto;
+				padding-right: 1rem;
+				padding-left: 1rem;
+			}
+
+			.object-cover {
+				object-fit: cover;
+			}
+
+			.flex-shrink-0 {
+				flex-shrink: 0;
+			}
+
+			.pointer-events-none {
+				pointer-events: none;
+			}
+
+			@media (min-width: 640px) {
+				.sm\:grid-cols-2 {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+
+			@media (min-width: 768px) {
+				.md\:flex {
+					display: flex;
+				}
+
+				.md\:hidden {
+					display: none;
+				}
+
+				.md\:flex-row {
+					flex-direction: row;
+				}
+
+				.md\:space-y-0 {
+					--tw-space-y-reverse: 0;
+					margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
+					margin-bottom: calc(0px * var(--tw-space-y-reverse));
+				}
+
+				.md\:space-x-4 > * + * {
+					margin-left: 1rem;
+				}
+
+				.md\:text-5xl {
+					font-size: 3rem;
+					line-height: 1;
+				}
+
+				.md\:text-left {
+					text-align: left;
+				}
+
+				.md\:text-right {
+					text-align: right;
+				}
+
+				.md\:justify-start {
+					justify-content: flex-start;
+				}
+
+				.md\:justify-end {
+					justify-content: flex-end;
+				}
+
+				.md\:p-12 {
+					padding: 3rem;
+				}
+
+				.md\:grid-cols-2 {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+
+				.md\:mb-0 {
+					margin-bottom: 0;
+				}
+			}
+
+			@media (min-width: 1024px) {
+				.lg\:block {
+					display: block;
+				}
+
+				.lg\:grid-cols-3 {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+			}
+
+			@media (max-width: 640px) {
+				.font-size-sm {
+					font-size: 0.875rem;
+				}
+
+				h1 {
+					font-size: 1.75rem !important;
+				}
+
+				h2 {
+					font-size: 1.5rem !important;
+				}
+
+				.btn-primary,
+				.btn-secondary {
+					padding: 0.5rem 1rem !important;
+					font-size: 0.875rem !important;
+				}
+
+				.option-btn {
+					padding: 0.75rem !important;
+				}
+
+				.timer-circle {
+					width: 40px;
+					height: 40px;
+				}
+			}
+
+			.text-contrast-yellow {
+				color: #8a6600;
+			}
+
+			.share-menu {
+				position: absolute;
+				bottom: 100%;
+				right: 0;
+				background: white;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				padding: 8px;
+				margin-bottom: 8px;
+				z-index: 10;
+				opacity: 0;
+				transform: translateY(10px);
+				pointer-events: none;
+				transition: all 0.3s ease;
+			}
+
+			.share-menu.active {
+				opacity: 1;
+				transform: translateY(0);
+				pointer-events: auto;
+			}
+
+			.share-option {
+				display: flex;
+				align-items: center;
+				padding: 8px 12px;
+				cursor: pointer;
+				border-radius: 4px;
+				transition: background-color 0.2s ease;
+			}
+
+			.share-option:hover {
+				background-color: #f3f4f6;
+			}
+
+			.share-option i {
+				width: 20px;
+				margin-right: 8px;
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body class="bg-pattern min-h-screen">
+		<header class="fixed top-0 left-0 right-0 z-50 px-4 py-3 glass-dark">
+			<div class="container mx-auto flex justify-between items-center">
+				<a href="#" class="flex items-center space-x-2">
+					<svg
+						class="w-8 h-8"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+							stroke="#F9D342"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M12 8V16"
+							stroke="#F9D342"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M8 12H16"
+							stroke="#F9D342"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					<span class="text-2xl font-bold text-white"
+						>Zesty<span class="text-yellow-300">Quiz</span></span
+					>
+				</a>
+				<nav class="hidden md:flex space-x-6">
+					<a
+						href="#"
+						class="text-white hover:text-yellow-300 transition duration-300"
+						>Home</a
+					>
+					<a
+						href="#"
+						class="text-white hover:text-yellow-300 transition duration-300"
+						>Categories</a
+					>
+					<a
+						href="#"
+						class="text-white hover:text-yellow-300 transition duration-300"
+						>Leaderboard</a
+					>
+					<a
+						href="#"
+						class="text-white hover:text-yellow-300 transition duration-300"
+						>About</a
+					>
+				</nav>
+				<div class="flex items-center space-x-4">
+					<button
+						id="themeToggle"
+						class="text-white hover:text-yellow-300 transition duration-300 cursor-pointer relative"
+					>
+						<i class="fas fa-moon"></i>
+						<span class="tooltip">Toggle theme</span>
+					</button>
+					<button
+						id="mobileMenuBtn"
+						class="md:hidden text-white hover:text-yellow-300 transition duration-300 cursor-pointer"
+					>
+						<i class="fas fa-bars"></i>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<div
+			id="mobileMenu"
+			class="fixed inset-0 bg-gray-900 bg-opacity-95 z-40 transform translate-x-full transition-transform duration-300 ease-in-out"
+		>
+			<div class="flex justify-end p-4">
+				<button
+					id="closeMenu"
+					class="text-white hover:text-yellow-300 transition duration-300 cursor-pointer"
+				>
+					<i class="fas fa-times text-2xl"></i>
+				</button>
+			</div>
+			<div class="flex flex-col items-center justify-center h-full space-y-8">
+				<a
+					href="#"
+					class="text-white text-2xl hover:text-yellow-300 transition duration-300"
+					>Home</a
+				>
+				<a
+					href="#"
+					class="text-white text-2xl hover:text-yellow-300 transition duration-300"
+					>Categories</a
+				>
+				<a
+					href="#"
+					class="text-white text-2xl hover:text-yellow-300 transition duration-300"
+					>Leaderboard</a
+				>
+				<a
+					href="#"
+					class="text-white text-2xl hover:text-yellow-300 transition duration-300"
+					>About</a
+				>
+			</div>
+		</div>
+
+		<main class="container mx-auto px-4 pt-32 pb-16">
+			<section
+				id="welcome-screen"
+				class="flex flex-col items-center justify-center min-h-screen"
+			>
+				<div class="glass rounded-2xl p-8 md:p-12 max-w-4xl w-full animate-in">
+					<div class="text-center">
+						<h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
+							Welcome to <span class="text-yellow-500">Zesty</span>Quiz!
+						</h1>
+						<p class="text-xl text-gray-600 mb-8">
+							Test your knowledge with our fun and challenging trivia questions.
+							Are you ready to begin?
+						</p>
+
+						<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+							<div class="glass-yellow rounded-xl p-6 text-center hover-lift">
+								<i class="fas fa-brain text-3xl text-yellow-500 mb-4"></i>
+								<h3 class="text-xl font-bold text-gray-800 mb-2">
+									Challenge Yourself
+								</h3>
+								<p class="text-gray-600">
+									Test your knowledge across various exciting topics
+								</p>
+							</div>
+							<div class="glass-yellow rounded-xl p-6 text-center hover-lift">
+								<i class="fas fa-trophy text-3xl text-yellow-500 mb-4"></i>
+								<h3 class="text-xl font-bold text-gray-800 mb-2">
+									Compete & Share
+								</h3>
+								<p class="text-gray-600">
+									Share your scores with friends and challenge them
+								</p>
+							</div>
+							<div class="glass-yellow rounded-xl p-6 text-center hover-lift">
+								<i class="fas fa-clock text-3xl text-yellow-500 mb-4"></i>
+								<h3 class="text-xl font-bold text-gray-800 mb-2">
+									Beat the Clock
+								</h3>
+								<p class="text-gray-600">
+									Answer quickly to earn bonus points and rewards
+								</p>
+							</div>
+						</div>
+
+						<div
+							class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4"
+						>
+							<button
+								id="start-quiz"
+								class="btn-primary px-8 py-3 rounded-full text-lg font-bold cursor-pointer flex items-center justify-center"
+							>
+								<i class="fas fa-play mr-2"></i> Start Quiz
+							</button>
+							<button
+								id="select-category"
+								class="btn-secondary px-8 py-3 rounded-full text-lg font-bold cursor-pointer flex items-center justify-center"
+							>
+								<i class="fas fa-list mr-2"></i> Select Category
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div
+					class="mt-12 glass rounded-xl p-6 max-w-4xl w-full animate-in-delay-2"
+				>
+					<h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">
+						Top Scores
+					</h2>
+					<div class="overflow-x-auto">
+						<table class="min-w-full" id="top-scores-table">
+							<thead>
+								<tr>
+									<th class="py-3 px-4 text-left text-gray-700">Rank</th>
+									<th class="py-3 px-4 text-left text-gray-700">Name</th>
+									<th class="py-3 px-4 text-left text-gray-700">Score</th>
+									<th class="py-3 px-4 text-left text-gray-700">Category</th>
+									<th class="py-3 px-4 text-left text-gray-700">Date</th>
+								</tr>
+							</thead>
+							<tbody>
+								<!-- Rows will be inserted here dynamically -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="absolute bottom-20 right-20 hidden lg:block">
+					<img
+						src="https://plus.unsplash.com/premium_photo-1681426604528-ae470ae9314d?q=80&w=2960&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+						alt="Zesty Quiz Mascot"
+						class="pulse h-24 rounded-full"
+					/>
+				</div>
+			</section>
+
+			<section
+				id="category-screen"
+				class="min-h-screen flex flex-col items-center justify-center hidden"
+			>
+				<div class="glass rounded-2xl p-8 md:p-12 max-w-4xl w-full">
+					<h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+						Select a Category
+					</h2>
+
+					<div
+						class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+					>
+						<div
+							class="category-card glass-yellow rounded-xl p-6 text-center cursor-pointer hover-lift transition duration-300"
+							data-category="general"
+						>
+							<img
+								src="https://plus.unsplash.com/premium_photo-1677567996070-68fa4181775a?q=80&w=2944&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								alt="General Knowledge"
+								class="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
+							/>
+							<h3 class="text-xl font-bold text-gray-800 mb-2">
+								General Knowledge
+							</h3>
+							<p class="text-gray-600 mb-4">
+								Test your knowledge on a variety of topics
+							</p>
+							<span
+								class="inline-block bg-yellow-400 text-contrast-yellow px-3 py-1 rounded-full text-sm font-semibold"
+								>10 Questions</span
+							>
+						</div>
+
+						<div
+							class="category-card glass-yellow rounded-xl p-6 text-center cursor-pointer hover-lift transition duration-300"
+							data-category="science"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1507413245164-6160d8298b31?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								alt="Science"
+								class="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
+							/>
+							<h3 class="text-xl font-bold text-gray-800 mb-2">Science</h3>
+							<p class="text-gray-600 mb-4">
+								Physics, Chemistry, Biology and more
+							</p>
+							<span
+								class="inline-block bg-yellow-400 text-contrast-yellow px-3 py-1 rounded-full text-sm font-semibold"
+								>10 Questions</span
+							>
+						</div>
+
+						<div
+							class="category-card glass-yellow rounded-xl p-6 text-center cursor-pointer hover-lift transition duration-300"
+							data-category="history"
+						>
+							<img
+								src="https://plus.unsplash.com/premium_photo-1682125784386-d6571f1ac86a?q=80&w=3008&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								alt="History"
+								class="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
+							/>
+							<h3 class="text-xl font-bold text-gray-800 mb-2">History</h3>
+							<p class="text-gray-600 mb-4">
+								From ancient civilizations to modern times
+							</p>
+							<span
+								class="inline-block bg-yellow-400 text-contrast-yellow px-3 py-1 rounded-full text-sm font-semibold"
+								>10 Questions</span
+							>
+						</div>
+
+						<div
+							class="category-card glass-yellow rounded-xl p-6 text-center cursor-pointer hover-lift transition duration-300"
+							data-category="geography"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1521295121783-8a321d551ad2?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								alt="Geography"
+								class="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
+							/>
+							<h3 class="text-xl font-bold text-gray-800 mb-2">Geography</h3>
+							<p class="text-gray-600 mb-4">
+								Countries, capitals, landmarks and more
+							</p>
+							<span
+								class="inline-block bg-yellow-400 text-contrast-yellow px-3 py-1 rounded-full text-sm font-semibold"
+								>10 Questions</span
+							>
+						</div>
+
+						<div
+							class="category-card glass-yellow rounded-xl p-6 text-center cursor-pointer hover-lift transition duration-300"
+							data-category="entertainment"
+						>
+							<img
+								src="https://plus.unsplash.com/premium_photo-1710409625244-e9ed7e98f67b?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								alt="Entertainment"
+								class="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
+							/>
+							<h3 class="text-xl font-bold text-gray-800 mb-2">
+								Entertainment
+							</h3>
+							<p class="text-gray-600 mb-4">
+								Movies, TV shows, music and celebrities
+							</p>
+							<span
+								class="inline-block bg-yellow-400 text-contrast-yellow px-3 py-1 rounded-full text-sm font-semibold"
+								>10 Questions</span
+							>
+						</div>
+
+						<div
+							class="category-card glass-yellow rounded-xl p-6 text-center cursor-pointer hover-lift transition duration-300"
+							data-category="sports"
+						>
+							<img
+								src="https://plus.unsplash.com/premium_photo-1685303469251-4ee0ea014bb3?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								alt="Sports"
+								class="w-16 h-16 mx-auto mb-4 rounded-full object-cover"
+							/>
+							<h3 class="text-xl font-bold text-gray-800 mb-2">Sports</h3>
+							<p class="text-gray-600 mb-4">
+								Teams, players, rules and championships
+							</p>
+							<span
+								class="inline-block bg-yellow-400 text-contrast-yellow px-3 py-1 rounded-full text-sm font-semibold"
+								>10 Questions</span
+							>
+						</div>
+					</div>
+
+					<div class="text-center">
+						<button
+							id="back-to-welcome"
+							class="btn-secondary px-6 py-2 rounded-full text-lg font-bold cursor-pointer"
+						>
+							<i class="fas fa-arrow-left mr-2"></i> Back
+						</button>
+					</div>
+				</div>
+			</section>
+
+			<section
+				id="quiz-screen"
+				class="min-h-screen flex flex-col gap-4 items-center justify-center hidden"
+			>
+				<div class="glass rounded-2xl p-8 md:p-12 max-w-4xl w-full">
+					<div class="flex justify-between items-center mb-6">
+						<div class="flex items-center">
+							<span
+								id="category-label"
+								class="px-4 py-1 bg-yellow-400 text-contrast-yellow rounded-full text-sm font-semibold"
+								>General Knowledge</span
+							>
+						</div>
+						<div class="flex items-center">
+							<span class="text-gray-700 mr-2">Question</span>
+							<span id="current-question" class="font-bold text-yellow-600"
+								>1</span
+							>
+							<span class="text-gray-700 mx-1">/</span>
+							<span id="total-questions" class="text-gray-700">10</span>
+						</div>
+					</div>
+
+					<div class="mb-6">
+						<div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+							<div
+								id="progress-bar"
+								class="progress-bar bg-yellow-400 h-full w-0"
+							></div>
+						</div>
+					</div>
+
+					<div class="flex justify-between items-center mb-8">
+						<div class="flex items-center">
+							<span class="text-gray-700 mr-2">Score:</span>
+							<span id="current-score" class="font-bold text-yellow-600"
+								>0</span
+							>
+						</div>
+						<div class="flex items-center">
+							<div class="relative mr-2">
+								<svg class="timer-circle" viewBox="0 0 36 36">
+									<path
+										class="timer-bg"
+										d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+										fill="none"
+										stroke="#E2E8F0"
+										stroke-width="3"
+										stroke-dasharray="100, 100"
+									/>
+									<path
+										id="timer-path"
+										d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+										fill="none"
+										stroke="#F9D342"
+										stroke-width="3"
+										stroke-dasharray="100, 100"
+										stroke-dashoffset="0"
+									/>
+								</svg>
+								<span
+									id="timer-text"
+									class="absolute inset-0 flex items-center justify-center font-bold text-lg"
+									>20</span
+								>
+							</div>
+							<span class="text-gray-700">seconds</span>
+						</div>
+					</div>
+
+					<div id="question-container" class="mb-8">
+						<h2
+							id="question-text"
+							class="text-2xl font-bold text-gray-800 mb-6 bounce-in"
+						>
+							What is the capital of France?
+						</h2>
+
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<button
+								class="option-btn glass-yellow rounded-xl p-4 text-left text-gray-800 font-medium cursor-pointer hover:bg-yellow-100 transition duration-300 flex items-center float-in"
+								data-index="0"
+								style="animation-delay: 0.1s"
+							>
+								<span
+									class="w-8 h-8 rounded-full bg-white text-yellow-600 font-bold flex items-center justify-center mr-3 flex-shrink-0"
+									>A</span
+								>
+								<span class="option-text">London</span>
+							</button>
+
+							<button
+								class="option-btn glass-yellow rounded-xl p-4 text-left text-gray-800 font-medium cursor-pointer hover:bg-yellow-100 transition duration-300 flex items-center float-in"
+								data-index="1"
+								style="animation-delay: 0.2s"
+							>
+								<span
+									class="w-8 h-8 rounded-full bg-white text-yellow-600 font-bold flex items-center justify-center mr-3 flex-shrink-0"
+									>B</span
+								>
+								<span class="option-text">Berlin</span>
+							</button>
+
+							<button
+								class="option-btn glass-yellow rounded-xl p-4 text-left text-gray-800 font-medium cursor-pointer hover:bg-yellow-100 transition duration-300 flex items-center float-in"
+								data-index="2"
+								style="animation-delay: 0.3s"
+							>
+								<span
+									class="w-8 h-8 rounded-full bg-white text-yellow-600 font-bold flex items-center justify-center mr-3 flex-shrink-0"
+									>C</span
+								>
+								<span class="option-text">Paris</span>
+							</button>
+
+							<button
+								class="option-btn glass-yellow rounded-xl p-4 text-left text-gray-800 font-medium cursor-pointer hover:bg-yellow-100 transition duration-300 flex items-center float-in"
+								data-index="3"
+								style="animation-delay: 0.4s"
+							>
+								<span
+									class="w-8 h-8 rounded-full bg-white text-yellow-600 font-bold flex items-center justify-center mr-3 flex-shrink-0"
+									>D</span
+								>
+								<span class="option-text">Madrid</span>
+							</button>
+						</div>
+					</div>
+
+					<div id="feedback-container" class="mb-8 hidden">
+						<div
+							id="feedback-content"
+							class="glass-yellow rounded-xl p-6 text-center bounce-in"
+						>
+							<h3
+								id="feedback-text"
+								class="text-xl font-bold text-gray-800 mb-4"
+							>
+								Correct! Well done!
+							</h3>
+							<p id="feedback-explanation" class="text-gray-600 mb-4">
+								Paris is indeed the capital of France.
+							</p>
+							<button
+								id="next-question"
+								class="btn-primary px-6 py-2 rounded-full text-lg font-bold cursor-pointer"
+							>
+								Next Question <i class="fas fa-arrow-right ml-2"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+				<button
+					id="quit-quiz"
+					class="btn-primary px-6 py-3 rounded-full text-lg font-bold cursor-pointer flex items-center justify-center float-in"
+					style="animation-delay: 0.7s"
+				>
+					Quit
+				</button>
+			</section>
+
+			<section
+				id="results-screen"
+				class="min-h-screen flex items-center justify-center hidden"
+			>
+				<div class="glass rounded-2xl p-8 md:p-12 max-w-4xl w-full">
+					<div class="text-center mb-8">
+						<h2 class="text-3xl font-bold text-gray-800 mb-4 bounce-in">
+							Quiz Complete!
+						</h2>
+						<p class="text-xl text-gray-600 float-in">Here's how you did:</p>
+					</div>
+
+					<div
+						class="glass-yellow rounded-xl p-8 text-center mb-8 float-in"
+						style="animation-delay: 0.2s"
+					>
+						<div class="flex justify-center mb-6">
+							<div class="relative">
+								<svg class="w-40 h-40" viewBox="0 0 36 36">
+									<path
+										class="timer-bg"
+										d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+										fill="none"
+										stroke="#E2E8F0"
+										stroke-width="3"
+										stroke-dasharray="100, 100"
+									/>
+									<path
+										id="score-path"
+										d="M18 2.0845
+                  a 15.9155 15.9155 0 0 1 0 31.831
+                  a 15.9155 15.9155 0 0 1 0 -31.831"
+										fill="none"
+										stroke="#F9D342"
+										stroke-width="3"
+										stroke-dasharray="100, 100"
+										stroke-dashoffset="25"
+									/>
+								</svg>
+								<div
+									class="absolute inset-0 flex items-center justify-center flex-col"
+								>
+									<span
+										id="final-score"
+										class="font-bold text-4xl text-yellow-600"
+										>750</span
+									>
+									<span class="text-gray-700">points</span>
+								</div>
+							</div>
+						</div>
+
+						<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+							<div
+								class="bg-white bg-opacity-50 rounded-lg p-4 slide-in-right"
+								style="animation-delay: 0.4s"
+							>
+								<h3 class="font-bold text-gray-800 mb-2">Correct Answers</h3>
+								<div class="flex items-center justify-center">
+									<span
+										id="correct-answers"
+										class="text-2xl font-bold text-green-600"
+										>7</span
+									>
+									<span class="text-gray-600 ml-1">/ 10</span>
+								</div>
+							</div>
+
+							<div
+								class="bg-white bg-opacity-50 rounded-lg p-4 slide-in-right"
+								style="animation-delay: 0.5s"
+							>
+								<h3 class="font-bold text-gray-800 mb-2">Time Bonus</h3>
+								<span id="time-bonus" class="text-2xl font-bold text-yellow-600"
+									>+150</span
+								>
+							</div>
+
+							<div
+								class="bg-white bg-opacity-50 rounded-lg p-4 slide-in-right"
+								style="animation-delay: 0.6s"
+							>
+								<h3 class="font-bold text-gray-800 mb-2">Streak Bonus</h3>
+								<span
+									id="streak-bonus"
+									class="text-2xl font-bold text-yellow-600"
+									>+100</span
+								>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4"
+					>
+						<button
+							id="play-again"
+							class="btn-primary px-6 py-3 rounded-full text-lg font-bold cursor-pointer flex items-center justify-center float-in"
+							style="animation-delay: 0.7s"
+						>
+							<i class="fas fa-redo mr-2"></i> Play Again
+						</button>
+
+						<div class="relative">
+							<button
+								id="share-results"
+								class="btn-secondary px-6 py-3 rounded-full text-lg font-bold cursor-pointer flex items-center justify-center float-in"
+								style="animation-delay: 0.8s"
+							>
+								<i class="fas fa-share-alt mr-2"></i> Share Results
+							</button>
+
+							<div id="share-menu" class="share-menu">
+								<div class="share-option" id="share-fb">
+									<i class="fab fa-facebook-f text-blue-600"></i>
+									<span>Facebook</span>
+								</div>
+								<div class="share-option" id="share-twitter">
+									<i class="fab fa-twitter text-blue-400"></i>
+									<span>Twitter</span>
+								</div>
+								<div class="share-option" id="share-whatsapp">
+									<i class="fab fa-whatsapp text-green-500"></i>
+									<span>WhatsApp</span>
+								</div>
+								<div class="share-option" id="share-clipboard">
+									<i class="fas fa-clipboard text-gray-600"></i>
+									<span>Copy to clipboard</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div id="add-to-leaderboard" class="mt-8">
+						<h3 class="text-xl font-bold text-gray-800 mb-4 text-center">
+							Add to Leaderboard
+						</h3>
+						<form
+							id="leaderboard-form"
+							class="flex flex-col items-center space-y-4"
+						>
+							<input
+								type="text"
+								id="player-name"
+								placeholder="Enter your name"
+								class="px-4 py-2 rounded-md w-full max-w-xs"
+								required
+							/>
+							<button
+								type="submit"
+								class="btn-primary px-6 py-2 rounded-full text-lg font-bold cursor-pointer"
+							>
+								Submit Score
+							</button>
+						</form>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<footer class="glass-dark text-white py-6 px-4">
+			<div class="container mx-auto">
+				<div class="flex flex-col md:flex-row justify-between items-center">
+					<div class="mb-4 md:mb-0">
+						<div
+							class="flex items-center justify-center md:justify-start space-x-2"
+						>
+							<svg
+								class="w-6 h-6"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+									stroke="#F9D342"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M12 8V16"
+									stroke="#F9D342"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M8 12H16"
+									stroke="#F9D342"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+							<span class="text-xl font-bold"
+								>Zesty<span class="text-yellow-300">Quiz</span></span
+							>
+						</div>
+						<p class="text-sm text-gray-400 mt-2 text-center md:text-left">
+							Test your knowledge, challenge your friends!
+						</p>
+					</div>
+
+					<div class="flex space-x-6 mb-4 md:mb-0">
+						<a
+							href="#"
+							class="text-white hover:text-yellow-300 transition duration-300 cursor-pointer"
+						>
+							<i class="fab fa-facebook-f"></i>
+						</a>
+						<a
+							href="#"
+							class="text-white hover:text-yellow-300 transition duration-300 cursor-pointer"
+						>
+							<i class="fab fa-twitter"></i>
+						</a>
+						<a
+							href="#"
+							class="text-white hover:text-yellow-300 transition duration-300 cursor-pointer"
+						>
+							<i class="fab fa-instagram"></i>
+						</a>
+						<a
+							href="#"
+							class="text-white hover:text-yellow-300 transition duration-300 cursor-pointer"
+						>
+							<i class="fab fa-linkedin-in"></i>
+						</a>
+					</div>
+
+					<div class="text-sm text-gray-400 text-center md:text-right">
+						<div class="flex space-x-4 justify-center md:justify-end mb-2">
+							<a
+								href="#"
+								class="hover:text-yellow-300 transition duration-300 cursor-pointer"
+								>Privacy Policy</a
+							>
+							<a
+								href="#"
+								class="hover:text-yellow-300 transition duration-300 cursor-pointer"
+								>Terms of Service</a
+							>
+							<a
+								href="#"
+								class="hover:text-yellow-300 transition duration-300 cursor-pointer"
+								>Contact Us</a
+							>
+						</div>
+						<p>© 2025 ZestyQuiz. All rights reserved.</p>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<div id="toast" class="toast">
+			<div class="flex items-center">
+				<i class="fas fa-info-circle mr-2"></i>
+				<span id="toast-message">This is a toast message!</span>
+			</div>
+		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const welcomeScreen = document.getElementById("welcome-screen");
+				const categoryScreen = document.getElementById("category-screen");
+				const quizScreen = document.getElementById("quiz-screen");
+				const resultsScreen = document.getElementById("results-screen");
+
+				const startQuizBtn = document.getElementById("start-quiz");
+				const selectCategoryBtn = document.getElementById("select-category");
+				const backToWelcomeBtn = document.getElementById("back-to-welcome");
+				const categoryCards = document.querySelectorAll(".category-card");
+				const playAgainBtn = document.getElementById("play-again");
+				const quitBtn = document.getElementById("quit-quiz");
+				const shareResultsBtn = document.getElementById("share-results");
+				const shareMenu = document.getElementById("share-menu");
+				const shareFb = document.getElementById("share-fb");
+				const shareTwitter = document.getElementById("share-twitter");
+				const shareWhatsapp = document.getElementById("share-whatsapp");
+				const shareClipboard = document.getElementById("share-clipboard");
+
+				const questionContainer = document.getElementById("question-container");
+				const questionText = document.getElementById("question-text");
+				const optionBtns = document.querySelectorAll(".option-btn");
+				const currentQuestionEl = document.getElementById("current-question");
+				const totalQuestionsEl = document.getElementById("total-questions");
+				const categoryLabelEl = document.getElementById("category-label");
+				const progressBar = document.getElementById("progress-bar");
+
+				const feedbackContainer = document.getElementById("feedback-container");
+				const feedbackText = document.getElementById("feedback-text");
+				const feedbackExplanation = document.getElementById(
+					"feedback-explanation"
+				);
+				const nextQuestionBtn = document.getElementById("next-question");
+
+				const currentScoreEl = document.getElementById("current-score");
+				const finalScoreEl = document.getElementById("final-score");
+				const correctAnswersEl = document.getElementById("correct-answers");
+				const timeBonusEl = document.getElementById("time-bonus");
+				const streakBonusEl = document.getElementById("streak-bonus");
+				const scorePath = document.getElementById("score-path");
+
+				const timerText = document.getElementById("timer-text");
+				const timerPath = document.getElementById("timer-path");
+
+				const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+				const closeMenuBtn = document.getElementById("closeMenu");
+				const mobileMenu = document.getElementById("mobileMenu");
+
+				const themeToggle = document.getElementById("themeToggle");
+				const toast = document.getElementById("toast");
+				const toastMessage = document.getElementById("toast-message");
+
+				const quizData = {
+					general: [
+						{
+							question: "Which planet is known as the Red Planet?",
+							options: ["Venus", "Mars", "Jupiter", "Saturn"],
+							correctIndex: 1,
+							explanation:
+								"Mars is called the Red Planet because of the reddish appearance given to its surface by iron oxide (rust).",
+						},
+						{
+							question: "What is the largest organ in the human body?",
+							options: ["Heart", "Liver", "Brain", "Skin"],
+							correctIndex: 3,
+							explanation:
+								"The skin is the largest organ in the human body, covering an area of about 2 square meters in adults.",
+						},
+						{
+							question: "Who painted the Mona Lisa?",
+							options: [
+								"Vincent van Gogh",
+								"Pablo Picasso",
+								"Leonardo da Vinci",
+								"Michelangelo",
+							],
+							correctIndex: 2,
+							explanation:
+								"The Mona Lisa was painted by Leonardo da Vinci between 1503 and 1506.",
+						},
+						{
+							question: "What is the capital of Australia?",
+							options: ["Sydney", "Melbourne", "Canberra", "Perth"],
+							correctIndex: 2,
+							explanation:
+								"Canberra is the capital city of Australia, not Sydney or Melbourne as many people think.",
+						},
+						{
+							question: "Which element has the chemical symbol 'O'?",
+							options: ["Gold", "Oxygen", "Osmium", "Oganesson"],
+							correctIndex: 1,
+							explanation:
+								"Oxygen has the chemical symbol 'O' on the periodic table of elements.",
+						},
+						{
+							question: "Which of these is NOT a programming language?",
+							options: ["Java", "Python", "Cougar", "Ruby"],
+							correctIndex: 2,
+							explanation:
+								"Cougar is not a programming language. Java, Python, and Ruby are all popular programming languages.",
+						},
+						{
+							question: "Who wrote 'Romeo and Juliet'?",
+							options: [
+								"Charles Dickens",
+								"Jane Austen",
+								"William Shakespeare",
+								"F. Scott Fitzgerald",
+							],
+							correctIndex: 2,
+							explanation:
+								"Romeo and Juliet is a tragedy written by William Shakespeare early in his career.",
+						},
+						{
+							question: "What is the capital of Japan?",
+							options: ["Seoul", "Beijing", "Tokyo", "Bangkok"],
+							correctIndex: 2,
+							explanation:
+								"Tokyo is the capital city of Japan and is the world's most populous metropolitan area.",
+						},
+						{
+							question: "Which is the smallest prime number?",
+							options: ["0", "1", "2", "3"],
+							correctIndex: 2,
+							explanation:
+								"2 is the smallest prime number. A prime number is a natural number greater than 1 that cannot be formed by multiplying two smaller natural numbers.",
+						},
+						{
+							question:
+								"Which of these is NOT one of the Seven Wonders of the Ancient World?",
+							options: [
+								"Great Pyramid of Giza",
+								"Colosseum of Rome",
+								"Hanging Gardens of Babylon",
+								"Lighthouse of Alexandria",
+							],
+							correctIndex: 1,
+							explanation:
+								"The Colosseum of Rome is not one of the Seven Wonders of the Ancient World. It is sometimes considered one of the New Seven Wonders of the World.",
+						},
+					],
+					science: [
+						{
+							question: "What is the hardest natural substance on Earth?",
+							options: ["Platinum", "Diamond", "Quartz", "Titanium"],
+							correctIndex: 1,
+							explanation:
+								"Diamond is the hardest naturally occurring substance on Earth, scoring 10 on the Mohs scale of mineral hardness.",
+						},
+						{
+							question: "What part of the atom has no electric charge?",
+							options: ["Proton", "Electron", "Neutron", "Nucleus"],
+							correctIndex: 2,
+							explanation:
+								"Neutrons have no electric charge. Protons have a positive charge, and electrons have a negative charge.",
+						},
+						{
+							question: "Which is NOT a state of matter?",
+							options: ["Solid", "Liquid", "Gas", "Crystal"],
+							correctIndex: 3,
+							explanation:
+								"Crystal is not a state of matter. The main states of matter are solid, liquid, gas, and plasma. Crystals are a type of solid.",
+						},
+						{
+							question:
+								"What is the scientific name for the process by which plants make their own food?",
+							options: [
+								"Respiration",
+								"Transpiration",
+								"Photosynthesis",
+								"Fermentation",
+							],
+							correctIndex: 2,
+							explanation:
+								"Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with carbon dioxide and water.",
+						},
+						{
+							question: "What is the nearest planet to the Sun?",
+							options: ["Venus", "Earth", "Mercury", "Mars"],
+							correctIndex: 2,
+							explanation:
+								"Mercury is the closest planet to the Sun, at an average distance of about 36 million miles (58 million kilometers).",
+						},
+						{
+							question: "What is the largest species of shark?",
+							options: [
+								"Great White Shark",
+								"Whale Shark",
+								"Hammerhead Shark",
+								"Tiger Shark",
+							],
+							correctIndex: 1,
+							explanation:
+								"The Whale Shark (Rhincodon typus) is the largest known extant fish species, reaching lengths of up to 40 feet (12 meters).",
+						},
+						{
+							question: "What is the powerhouse of the cell?",
+							options: [
+								"Nucleus",
+								"Mitochondria",
+								"Endoplasmic Reticulum",
+								"Golgi Apparatus",
+							],
+							correctIndex: 1,
+							explanation:
+								"Mitochondria are often referred to as the powerhouse of the cell because they generate most of the cell's supply of adenosine triphosphate (ATP), which is used as a source of chemical energy.",
+						},
+						{
+							question: "Which of these is NOT a noble gas?",
+							options: ["Helium", "Neon", "Chlorine", "Argon"],
+							correctIndex: 2,
+							explanation:
+								"Chlorine is not a noble gas; it's a halogen. The noble gases are helium, neon, argon, krypton, xenon, and radon.",
+						},
+						{
+							question: "What is the study of fungi called?",
+							options: ["Mycology", "Phycology", "Entomology", "Botany"],
+							correctIndex: 0,
+							explanation:
+								"Mycology is the branch of biology concerned with the study of fungi, including their genetic and biochemical properties, their taxonomy, and their use to humans.",
+						},
+						{
+							question: "Which blood type is known as the universal donor?",
+							options: ["A+", "AB-", "O-", "B+"],
+							correctIndex: 2,
+							explanation:
+								"O negative (O-) blood is considered the universal donor type because it can be given to people with any blood type in emergency situations when there's no time to determine the blood type of the recipient.",
+						},
+					],
+				};
+
+				quizData.history = [...quizData.general];
+				quizData.geography = [...quizData.science];
+				quizData.entertainment = [...quizData.general];
+				quizData.sports = [...quizData.science];
+
+				let currentQuiz = {
+					category: "general",
+					questions: [],
+					currentQuestionIndex: 0,
+					score: 0,
+					correctAnswers: 0,
+					timeBonus: 0,
+					streakBonus: 0,
+					currentStreak: 0,
+					maxStreak: 0,
+					timerInterval: null,
+					timePerQuestion: 20,
+					timeRemaining: 20,
+					answered: false,
+					questionResults: [],
+				};
+
+				let topScores = JSON.parse(localStorage.getItem("topScores")) || [
+					{
+						name: "Emily Johnson",
+						score: 950,
+						category: "Science",
+						date: "5/8/2025",
+					},
+					{
+						name: "Michael Chen",
+						score: 920,
+						category: "History",
+						date: "5/7/2025",
+					},
+					{
+						name: "Sarah Rodriguez",
+						score: 880,
+						category: "General Knowledge",
+						date: "5/6/2025",
+					},
+				];
+
+				function displayTopScores() {
+					const tableBody = document.querySelector("#top-scores-table tbody");
+					tableBody.innerHTML = "";
+
+					topScores.forEach((entry, index) => {
+						const row = document.createElement("tr");
+						row.className = "glass-yellow rounded-md hover-lift";
+						row.innerHTML = `
+            <td class="py-3 px-4 rounded-l-md">
+                <span class="flex items-center font-bold text-yellow-600">${
+									index + 1
+								} <i class="fas fa-crown text-yellow-500 ml-2"></i></span>
+            </td>
+            <td class="py-3 px-4">${entry.name}</td>
+            <td class="py-3 px-4">${entry.score}</td>
+            <td class="py-3 px-4">${entry.category}</td>
+            <td class="py-3 px-4 rounded-r-md">${entry.date}</td>
+        `;
+						tableBody.appendChild(row);
+					});
+				}
+
+				displayTopScores();
+
+				function initQuiz(category = "general") {
+					currentQuiz.category = category;
+					currentQuiz.questions = [...quizData[category]];
+					currentQuiz.currentQuestionIndex = 0;
+					currentQuiz.score = 0;
+					currentQuiz.correctAnswers = 0;
+					currentQuiz.timeBonus = 0;
+					currentQuiz.streakBonus = 0;
+					currentQuiz.currentStreak = 0;
+					currentQuiz.maxStreak = 0;
+					currentQuiz.questionResults = [];
+
+					currentQuiz.questions = shuffleArray(currentQuiz.questions);
+
+					totalQuestionsEl.textContent = currentQuiz.questions.length;
+
+					categoryLabelEl.textContent =
+						category.charAt(0).toUpperCase() + category.slice(1);
+
+					showQuestion();
+
+					showScreen(quizScreen);
+				}
+
+				function showQuestion() {
+					currentQuiz.answered = false;
+					currentQuiz.timeRemaining = currentQuiz.timePerQuestion;
+
+					currentQuestionEl.textContent = currentQuiz.currentQuestionIndex + 1;
+					progressBar.style.width = `${
+						(currentQuiz.currentQuestionIndex / currentQuiz.questions.length) *
+						100
+					}%`;
+
+					const question =
+						currentQuiz.questions[currentQuiz.currentQuestionIndex];
+
+					questionText.textContent = question.question;
+
+					questionText.classList.remove("bounce-in");
+					void questionText.offsetWidth;
+					questionText.classList.add("bounce-in");
+
+					for (let i = 0; i < optionBtns.length; i++) {
+						optionBtns[i].classList.remove("correct-answer", "wrong-answer");
+						optionBtns[i].querySelector(".option-text").textContent =
+							question.options[i];
+
+						optionBtns[i].classList.remove("float-in");
+						void optionBtns[i].offsetWidth;
+						optionBtns[i].classList.add("float-in");
+						optionBtns[i].style.animationDelay = `${0.1 + i * 0.1}s`;
+					}
+
+					questionContainer.classList.remove("hidden");
+					feedbackContainer.classList.add("hidden");
+
+					startTimer();
+				}
+
+				function selectOption(index) {
+					if (currentQuiz.answered) return;
+
+					stopTimer();
+
+					currentQuiz.answered = true;
+
+					const question =
+						currentQuiz.questions[currentQuiz.currentQuestionIndex];
+
+					const isCorrect = index === question.correctIndex;
+
+					optionBtns[index].classList.add(
+						isCorrect ? "correct-answer" : "wrong-answer"
+					);
+
+					if (!isCorrect) {
+						optionBtns[question.correctIndex].classList.add("correct-answer");
+					}
+
+					if (isCorrect) {
+						const basePoints = 100;
+
+						const timeBonus = Math.round(currentQuiz.timeRemaining * 5);
+						currentQuiz.timeBonus += timeBonus;
+
+						currentQuiz.currentStreak++;
+						currentQuiz.maxStreak = Math.max(
+							currentQuiz.maxStreak,
+							currentQuiz.currentStreak
+						);
+
+						const streakBonus =
+							currentQuiz.currentStreak >= 3
+								? currentQuiz.currentStreak * 10
+								: 0;
+						currentQuiz.streakBonus += streakBonus;
+
+						const pointsEarned = basePoints + timeBonus + streakBonus;
+
+						currentQuiz.score += pointsEarned;
+						currentQuiz.correctAnswers++;
+
+						currentScoreEl.textContent = currentQuiz.score;
+
+						currentQuiz.questionResults.push({
+							question: question.question,
+							correct: true,
+							timeRemaining: currentQuiz.timeRemaining,
+							points: pointsEarned,
+						});
+
+						feedbackText.textContent = "Correct! Well done!";
+						feedbackText.className = "text-xl font-bold text-green-600 mb-4";
+						feedbackExplanation.textContent = question.explanation;
+
+						createConfetti();
+					} else {
+						currentQuiz.currentStreak = 0;
+
+						currentQuiz.questionResults.push({
+							question: question.question,
+							correct: false,
+							timeRemaining: currentQuiz.timeRemaining,
+							points: 0,
+						});
+
+						feedbackText.textContent = "Incorrect!";
+						feedbackText.className = "text-xl font-bold text-red-600 mb-4";
+						feedbackExplanation.textContent = question.explanation;
+					}
+
+					setTimeout(() => {
+						questionContainer.classList.add("hidden");
+						feedbackContainer.classList.remove("hidden");
+
+						const feedbackContent = document.getElementById("feedback-content");
+						feedbackContent.classList.remove("bounce-in");
+						void feedbackContent.offsetWidth;
+						feedbackContent.classList.add("bounce-in");
+					}, 800);
+				}
+
+				function nextQuestion() {
+					currentQuiz.currentQuestionIndex++;
+
+					if (currentQuiz.currentQuestionIndex < currentQuiz.questions.length) {
+						showQuestion();
+					} else {
+						endQuiz();
+					}
+				}
+
+				function endQuiz() {
+					finalScoreEl.textContent = currentQuiz.score;
+					correctAnswersEl.textContent = currentQuiz.correctAnswers;
+					timeBonusEl.textContent = `+${currentQuiz.timeBonus}`;
+					streakBonusEl.textContent = `+${currentQuiz.streakBonus}`;
+
+					const percentage =
+						(currentQuiz.correctAnswers / currentQuiz.questions.length) * 100;
+					const offset = 100 - percentage;
+					scorePath.setAttribute("stroke-dashoffset", offset);
+
+					showScreen(resultsScreen);
+				}
+
+				function startTimer() {
+					updateTimerDisplay();
+
+					if (currentQuiz.timerInterval) {
+						clearInterval(currentQuiz.timerInterval);
+					}
+
+					currentQuiz.timerInterval = setInterval(() => {
+						currentQuiz.timeRemaining--;
+
+						updateTimerDisplay();
+
+						if (currentQuiz.timeRemaining <= 0) {
+							stopTimer();
+							timeUp();
+						}
+					}, 1000);
+				}
+
+				function stopTimer() {
+					if (currentQuiz.timerInterval) {
+						clearInterval(currentQuiz.timerInterval);
+						currentQuiz.timerInterval = null;
+					}
+				}
+
+				function updateTimerDisplay() {
+					timerText.textContent = currentQuiz.timeRemaining;
+
+					const percentage =
+						(currentQuiz.timeRemaining / currentQuiz.timePerQuestion) * 100;
+					const offset = 100 - percentage;
+					timerPath.setAttribute("stroke-dashoffset", offset);
+
+					if (currentQuiz.timeRemaining <= 5) {
+						timerPath.setAttribute("stroke", "#FF3333");
+						timerText.classList.add("text-red-600");
+					} else if (currentQuiz.timeRemaining <= 10) {
+						timerPath.setAttribute("stroke", "#FFC107");
+						timerText.classList.remove("text-red-600");
+					} else {
+						timerPath.setAttribute("stroke", "#F9D342");
+						timerText.classList.remove("text-red-600");
+					}
+				}
+
+				function timeUp() {
+					if (currentQuiz.answered) return;
+
+					currentQuiz.answered = true;
+
+					currentQuiz.currentStreak = 0;
+
+					const question =
+						currentQuiz.questions[currentQuiz.currentQuestionIndex];
+
+					optionBtns[question.correctIndex].classList.add("correct-answer");
+
+					currentQuiz.questionResults.push({
+						question: question.question,
+						correct: false,
+						timeRemaining: 0,
+						points: 0,
+					});
+
+					feedbackText.textContent = "Time's Up!";
+					feedbackText.className = "text-xl font-bold text-red-600 mb-4";
+					feedbackExplanation.textContent = question.explanation;
+
+					questionContainer.classList.add("hidden");
+					feedbackContainer.classList.remove("hidden");
+
+					const feedbackContent = document.getElementById("feedback-content");
+					feedbackContent.classList.remove("bounce-in");
+					void feedbackContent.offsetWidth;
+					feedbackContent.classList.add("bounce-in");
+				}
+
+				function createConfetti() {
+					const confettiCount = 100;
+					const colors = [
+						"#F9D342",
+						"#FFE066",
+						"#FFED8A",
+						"#FFF3B0",
+						"#292826",
+					];
+
+					for (let i = 0; i < confettiCount; i++) {
+						const confetti = document.createElement("div");
+						confetti.className = "confetti";
+
+						const size = Math.random() * 10 + 5;
+						confetti.style.width = `${size}px`;
+						confetti.style.height = `${size}px`;
+
+						confetti.style.backgroundColor =
+							colors[Math.floor(Math.random() * colors.length)];
+						confetti.style.left = `${Math.random() * 100}%`;
+
+						confetti.style.animationDelay = `${Math.random() * 2}s`;
+						confetti.style.animationDuration = `${Math.random() * 3 + 2}s`;
+
+						document.body.appendChild(confetti);
+
+						setTimeout(() => {
+							confetti.remove();
+						}, 5000);
+					}
+				}
+
+				function showScreen(screen) {
+					welcomeScreen.classList.add("hidden");
+					categoryScreen.classList.add("hidden");
+					quizScreen.classList.add("hidden");
+					resultsScreen.classList.add("hidden");
+
+					screen.classList.remove("hidden");
+				}
+
+				function showToast(message, duration = 3000) {
+					toastMessage.textContent = message;
+					toast.classList.add("show");
+
+					setTimeout(() => {
+						toast.classList.remove("show");
+					}, duration);
+				}
+
+				function shuffleArray(array) {
+					const newArray = [...array];
+					for (let i = newArray.length - 1; i > 0; i--) {
+						const j = Math.floor(Math.random() * (i + 1));
+						[newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+					}
+					return newArray;
+				}
+
+				function toggleShareMenu() {
+					shareMenu.classList.toggle("active");
+				}
+
+				function shareToFacebook() {
+					const url = encodeURIComponent(window.location.href);
+					const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+					window.open(facebookUrl, "_blank");
+					showToast(
+						"Share your score on Facebook! You can mention your score in the post."
+					);
+					shareMenu.classList.remove("active");
+				}
+
+				function shareToTwitter() {
+					const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+						`I scored ${currentQuiz.score} points in ${currentQuiz.category} on ZestyQuiz! Can you beat me?`
+					)}&url=${encodeURIComponent(window.location.href)}`;
+					window.open(twitterUrl, "_blank");
+					shareMenu.classList.remove("active");
+				}
+
+				function shareToWhatsapp() {
+					const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(
+						`I scored ${currentQuiz.score} points in ${currentQuiz.category} on ZestyQuiz! Can you beat me? ${window.location.href}`
+					)}`;
+					window.open(whatsappUrl, "_blank");
+					shareMenu.classList.remove("active");
+				}
+
+				function copyToClipboard() {
+					const textToCopy = `I scored ${currentQuiz.score} points in ${currentQuiz.category} on ZestyQuiz! Can you beat me? ${window.location.href}`;
+					navigator.clipboard
+						.writeText(textToCopy)
+						.then(() => {
+							showToast("Result copied to clipboard!");
+						})
+						.catch((err) => {
+							showToast("Failed to copy text: " + err);
+						});
+					shareMenu.classList.remove("active");
+				}
+
+				function updateTopScores(newScore, category, name) {
+					const date = new Date().toLocaleDateString();
+					const newEntry = { name, score: newScore, category, date };
+
+					topScores.push(newEntry);
+
+					topScores.sort((a, b) => b.score - a.score);
+
+					if (topScores.length > 5) {
+						topScores = topScores.slice(0, 5);
+					}
+
+					localStorage.setItem("topScores", JSON.stringify(topScores));
+
+					displayTopScores();
+				}
+
+				startQuizBtn.addEventListener("click", () => initQuiz("general"));
+
+				selectCategoryBtn.addEventListener("click", () => {
+					showScreen(categoryScreen);
+				});
+
+				backToWelcomeBtn.addEventListener("click", () => {
+					showScreen(welcomeScreen);
+				});
+
+				categoryCards.forEach((card) => {
+					card.addEventListener("click", () => {
+						const category = card.getAttribute("data-category");
+						initQuiz(category);
+					});
+				});
+
+				optionBtns.forEach((btn, index) => {
+					btn.addEventListener("click", () => {
+						selectOption(index);
+					});
+				});
+
+				nextQuestionBtn.addEventListener("click", nextQuestion);
+
+				playAgainBtn.addEventListener("click", () => {
+					showScreen(welcomeScreen);
+				});
+
+				quitBtn.addEventListener("click", () => {
+					showScreen(welcomeScreen);
+				});
+
+				shareResultsBtn.addEventListener("click", () => {
+					toggleShareMenu();
+				});
+
+				shareFb.addEventListener("click", shareToFacebook);
+				shareTwitter.addEventListener("click", shareToTwitter);
+				shareWhatsapp.addEventListener("click", shareToWhatsapp);
+				shareClipboard.addEventListener("click", copyToClipboard);
+
+				document.addEventListener("click", (e) => {
+					if (
+						!shareResultsBtn.contains(e.target) &&
+						!shareMenu.contains(e.target)
+					) {
+						shareMenu.classList.remove("active");
+					}
+				});
+
+				mobileMenuBtn.addEventListener("click", () => {
+					mobileMenu.classList.remove("translate-x-full");
+				});
+
+				closeMenuBtn.addEventListener("click", () => {
+					mobileMenu.classList.add("translate-x-full");
+				});
+
+				themeToggle.addEventListener("click", () => {
+					showToast("Theme toggle functionality would be implemented here!");
+				});
+
+				document.querySelectorAll("a, button").forEach((element) => {
+					if (
+						!element.id &&
+						!element.classList.contains("option-btn") &&
+						!element.classList.contains("category-card")
+					) {
+						element.addEventListener("click", (e) => {
+							if (element.getAttribute("href") === "#") {
+								e.preventDefault();
+								showToast("This feature is not implemented");
+							}
+						});
+					}
+				});
+
+				document
+					.getElementById("leaderboard-form")
+					.addEventListener("submit", (e) => {
+						e.preventDefault();
+						const name = document.getElementById("player-name").value.trim();
+						if (name) {
+							updateTopScores(currentQuiz.score, currentQuiz.category, name);
+							showToast("Score added to leaderboard!");
+						}
+					});
+
+				showScreen(welcomeScreen);
+			});
+		</script>
+	</body>
+</html>
