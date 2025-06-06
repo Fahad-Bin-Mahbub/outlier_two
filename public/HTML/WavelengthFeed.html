@@ -1,0 +1,3405 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Wavelength | Social Feed</title>
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+			rel="stylesheet"
+		/>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			:root {
+				--primary: #6366f1;
+				--primary-light: #818cf8;
+				--secondary: #f472b6;
+				--accent: #ec4899;
+				--bg-light: #f9fafb;
+				--text-dark: #1f2937;
+				--text-light: #6b7280;
+				--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+				--shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+			}
+
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+					Helvetica, Arial, sans-serif;
+				background-color: var(--bg-light);
+				color: var(--text-dark);
+				min-height: 100vh;
+				position: relative;
+			}
+
+			.neumorphic {
+				border-radius: 16px;
+				background: #f0f4f8;
+				box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff;
+				transition: all 0.3s ease;
+			}
+
+			.neumorphic-inset {
+				border-radius: 16px;
+				background: #f0f4f8;
+				box-shadow: inset 5px 5px 10px #d1d9e6, inset -5px -5px 10px #ffffff;
+			}
+
+			.neumorphic:active {
+				box-shadow: inset 5px 5px 10px #d1d9e6, inset -5px -5px 10px #ffffff;
+			}
+
+			.glass {
+				background: rgba(255, 255, 255, 0.25);
+				backdrop-filter: blur(4px);
+				-webkit-backdrop-filter: blur(4px);
+				border: 1px solid rgba(255, 255, 255, 0.18);
+			}
+
+			.gradient-primary {
+				background: linear-gradient(
+					135deg,
+					var(--primary),
+					var(--primary-light)
+				);
+			}
+
+			.gradient-secondary {
+				background: linear-gradient(135deg, var(--secondary), var(--accent));
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			@keyframes slideUp {
+				from {
+					transform: translateY(20px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes rotate {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.refresh-indicator {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 60px;
+				margin-top: -60px;
+				transition: margin-top 0.3s ease;
+			}
+
+			.refresh-indicator.active {
+				margin-top: 0;
+			}
+
+			.refresh-spinner {
+				width: 24px;
+				height: 24px;
+				border: 3px solid #e2e8f0;
+				border-top: 3px solid var(--primary);
+				border-radius: 50%;
+				animation: rotate 1s linear infinite;
+			}
+
+			.story-circle {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				padding: 3px;
+				background: linear-gradient(45deg, #f472b6, #ec4899, #6366f1, #818cf8);
+			}
+
+			.story-circle-inner {
+				width: 100%;
+				height: 100%;
+				border-radius: 50%;
+				background-color: white;
+				overflow: hidden;
+			}
+
+			.heart-animation {
+				animation: pulse 0.5s ease;
+			}
+
+			.post-item {
+				animation: fadeIn 0.5s ease, slideUp 0.5s ease;
+			}
+
+			::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e1;
+				border-radius: 3px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #94a3b8;
+			}
+
+			.toast {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				padding: 10px 20px;
+				border-radius: 8px;
+				color: white;
+				font-weight: 500;
+				opacity: 0;
+				transition: opacity 0.3s ease;
+				z-index: 1000;
+			}
+
+			.toast.show {
+				opacity: 1;
+			}
+
+			.loading-spinner {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 20px 0;
+			}
+
+			.loading-spinner .spinner {
+				width: 30px;
+				height: 30px;
+				border: 3px solid #e2e8f0;
+				border-top: 3px solid var(--primary);
+				border-radius: 50%;
+				animation: rotate 1s linear infinite;
+			}
+
+			.modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 1000;
+				opacity: 0;
+				visibility: hidden;
+				transition: opacity 0.3s ease, visibility 0.3s ease;
+			}
+
+			.modal.show {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-content {
+				background-color: white;
+				border-radius: 12px;
+				width: 90%;
+				max-width: 400px;
+				max-height: 80vh;
+				overflow-y: auto;
+				transform: scale(0.9);
+				transition: transform 0.3s ease;
+			}
+
+			.modal.show .modal-content {
+				transform: scale(1);
+			}
+
+			.comments-section {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.3s ease;
+			}
+
+			.comments-section.show {
+				max-height: 500px;
+			}
+
+			.tab-content {
+				display: none;
+			}
+
+			.tab-content.active {
+				display: block;
+				animation: fadeIn 0.5s ease;
+			}
+
+			.share-option {
+				transition: all 0.2s ease;
+			}
+
+			.share-option:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			}
+
+			.nav-item {
+				transition: all 0.2s ease;
+				position: relative;
+			}
+
+			.nav-item:not(.active) i {
+				color: #4b5563 !important;
+			}
+
+			.nav-item:not(.active) span {
+				color: #4b5563 !important;
+			}
+
+			.story-progress {
+				height: 3px;
+				background: rgba(255, 255, 255, 0.3);
+				border-radius: 3px;
+				overflow: hidden;
+			}
+
+			.story-progress-bar {
+				height: 100%;
+				background: white;
+				border-radius: 3px;
+				width: 0;
+				transition: width linear;
+			}
+
+			.profile-stats {
+				display: flex;
+				justify-content: space-around;
+				text-align: center;
+				padding: 10px 0;
+			}
+
+			.tab-indicator {
+				position: absolute;
+				bottom: 0;
+				height: 2px;
+				background: var(--primary);
+				transition: all 0.3s ease;
+			}
+
+			@media (max-width: 380px) {
+				.nav-item span {
+					font-size: 0.65rem;
+				}
+
+				.nav-item i {
+					font-size: 1rem;
+				}
+
+				.story-circle {
+					width: 50px;
+					height: 50px;
+				}
+
+				.post-actions button {
+					padding: 6px;
+				}
+
+				#new-post-btn {
+					padding: 10px;
+				}
+
+				#new-post-btn i {
+					font-size: 1rem;
+				}
+			}
+
+			.post-image {
+				position: relative;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+				user-select: none;
+			}
+
+			.tap-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 5;
+			}
+
+			.message-bubble {
+				border-radius: 18px;
+				padding: 8px 12px;
+				max-width: 80%;
+				margin-bottom: 8px;
+				word-wrap: break-word;
+			}
+
+			.message-sent {
+				background: linear-gradient(
+					135deg,
+					var(--primary),
+					var(--primary-light)
+				);
+				color: white;
+				align-self: flex-end;
+				border-bottom-right-radius: 5px;
+			}
+
+			.message-received {
+				background: #e5e7eb;
+				color: var(--text-dark);
+				align-self: flex-start;
+				border-bottom-left-radius: 5px;
+			}
+
+			.camera-container {
+				background-color: black;
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 2000;
+				display: none;
+			}
+
+			.camera-container.active {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.camera-preview {
+				flex: 1;
+				position: relative;
+				overflow: hidden;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.camera-controls {
+				display: flex;
+				padding: 20px;
+				justify-content: space-around;
+				align-items: center;
+				background: rgba(0, 0, 0, 0.5);
+			}
+
+			.camera-button {
+				width: 60px;
+				height: 60px;
+				border-radius: 50%;
+				background: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+			}
+
+			.camera-option {
+				color: white;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(255, 255, 255, 0.2);
+			}
+
+			.profile-edit-field {
+				margin-bottom: 12px;
+				border-bottom: 1px solid #e5e7eb;
+				padding-bottom: 12px;
+			}
+
+			.hide-scrollbar {
+				-ms-overflow-style: none;
+				scrollbar-width: none;
+			}
+
+			.hide-scrollbar::-webkit-scrollbar {
+				display: none;
+			}
+
+			main {
+				padding-bottom: 80px;
+			}
+
+			.chat-container {
+				height: calc(100vh - 150px);
+				display: flex;
+				flex-direction: column;
+			}
+
+			.chat-messages {
+				flex: 1;
+				overflow-y: auto;
+				padding: 15px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.notification-dot {
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 8px;
+				height: 8px;
+				background-color: #ef4444;
+				border-radius: 50%;
+				border: 1px solid white;
+			}
+		</style>
+	</head>
+	<body class="pb-16">
+		<!-- Toast notifications -->
+		<div id="toast" class="toast"></div>
+
+		<!-- Header -->
+		<header class="fixed top-0 left-0 w-full z-10 glass px-4 py-3">
+			<div class="flex justify-between items-center">
+				<div class="flex items-center">
+					<div
+						class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-pink-500"
+					>
+						Wavelength
+					</div>
+				</div>
+
+				<div class="flex items-center space-x-3">
+					<button
+						id="search-btn"
+						class="p-2 rounded-full hover:bg-gray-100 transition-all"
+					>
+						<i class="fas fa-search text-gray-600"></i>
+					</button>
+					<button
+						id="notifications-btn"
+						class="p-2 rounded-full hover:bg-gray-100 transition-all relative"
+					>
+						<i class="fas fa-bell text-gray-600"></i>
+						<span class="notification-dot"></span>
+					</button>
+					<button
+						id="messages-btn"
+						class="p-2 rounded-full hover:bg-gray-100 transition-all relative"
+					>
+						<i class="fas fa-envelope text-gray-600"></i>
+						<span class="notification-dot"></span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<!-- Pull to refresh indicator -->
+		<div class="refresh-indicator">
+			<div class="refresh-spinner"></div>
+		</div>
+
+		<!-- Main content -->
+		<main class="container mx-auto px-4 pt-20 pb-4">
+			<!-- HOME TAB CONTENT -->
+			<div id="home-tab" class="tab-content active">
+				<!-- Stories -->
+				<div class="mb-6 mt-2">
+					<div class="flex space-x-4 overflow-x-auto py-2 hide-scrollbar">
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div
+								id="add-story-btn"
+								class="story-circle bg-blue-600 md:w-16 md:h-16 rounded-full gradient-primary flex items-center justify-center cursor-pointer"
+							>
+								<i class="fas fa-plus text-white text-xl"></i>
+							</div>
+							<span class="text-xs mt-1 text-gray-700">Add Story</span>
+						</div>
+
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="story-circle cursor-pointer" data-story-index="0">
+								<div class="story-circle-inner">
+									<img
+										src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+							</div>
+							<span class="text-xs mt-1 text-gray-700">Emma</span>
+						</div>
+
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="story-circle cursor-pointer" data-story-index="1">
+								<div class="story-circle-inner">
+									<img
+										src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+							</div>
+							<span class="text-xs mt-1 text-gray-700">Alex</span>
+						</div>
+
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="story-circle cursor-pointer" data-story-index="2">
+								<div class="story-circle-inner">
+									<img
+										src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+							</div>
+							<span class="text-xs mt-1 text-gray-700">Sophie</span>
+						</div>
+
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="story-circle cursor-pointer" data-story-index="3">
+								<div class="story-circle-inner">
+									<img
+										src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+							</div>
+							<span class="text-xs mt-1 text-gray-700">David</span>
+						</div>
+
+						<div class="flex flex-col items-center flex-shrink-0">
+							<div class="story-circle cursor-pointer" data-story-index="4">
+								<div class="story-circle-inner">
+									<img
+										src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+							</div>
+							<span class="text-xs mt-1 text-gray-700">Mia</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Feed -->
+				<div id="feed-container">
+					<!-- Posts will be loaded here -->
+				</div>
+
+				<!-- Loading spinner for infinite scroll -->
+				<div class="loading-spinner">
+					<div class="spinner"></div>
+				</div>
+			</div>
+
+			<!-- EXPLORE TAB CONTENT -->
+			<div id="explore-tab" class="tab-content">
+				<div class="my-4">
+					<div class="relative mb-4">
+						<input
+							type="text"
+							class="w-full py-2 px-4 pl-10 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+							placeholder="Search topics, people, or tags"
+						/>
+						<i
+							class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+						></i>
+					</div>
+
+					<div class="mb-4">
+						<h3 class="font-medium text-gray-800 mb-3">Popular Categories</h3>
+						<div class="flex flex-wrap gap-2">
+							<span
+								class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm"
+								>#photography</span
+							>
+							<span
+								class="px-3 py-1 bg-pink-100 text-pink-800 rounded-full text-sm"
+								>#fashion</span
+							>
+							<span
+								class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+								>#travel</span
+							>
+							<span
+								class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm"
+								>#food</span
+							>
+							<span
+								class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm"
+								>#music</span
+							>
+							<span
+								class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+								>#tech</span
+							>
+							<span
+								class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm"
+								>#fitness</span
+							>
+							<span
+								class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm"
+								>#art</span
+							>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-3 gap-1">
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1551632811-561732d1e306"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1504674900247-0877df9cc836"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1593642634367-d91a135587b5"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1469474968028-56623f02e42e"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1502759683299-cdcd6974244f"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1523049673857-eb18f1d7b578"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="aspect-square overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1501854140801-50d01698950b"
+								alt="Explore"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- ACTIVITY TAB CONTENT -->
+			<div id="activity-tab" class="tab-content">
+				<div class="pt-2">
+					<div class="flex items-center justify-between mb-4">
+						<h2 class="text-xl font-bold">Activity</h2>
+						<button class="text-indigo-500">Mark all as read</button>
+					</div>
+
+					<div class="mb-4">
+						<h3 class="font-medium text-gray-800 mb-2">Today</h3>
+						<div class="space-y-4">
+							<div class="flex items-start p-3 bg-white rounded-lg shadow-sm">
+								<div
+									class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<div>
+									<p class="text-gray-800">
+										<span class="font-medium">Sophie</span> liked your photo.
+										<span class="text-gray-500 text-sm">2m</span>
+									</p>
+									<div class="mt-2 h-12 w-12 overflow-hidden rounded">
+										<img
+											src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+											alt="Post"
+											class="w-full h-full object-cover"
+										/>
+									</div>
+								</div>
+							</div>
+
+							<div class="flex items-start p-3 bg-white rounded-lg shadow-sm">
+								<div
+									class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<div>
+									<p class="text-gray-800">
+										<span class="font-medium">David</span> commented on your
+										post.
+										<span class="text-gray-500 text-sm">15m</span>
+									</p>
+									<p
+										class="text-gray-600 text-sm mt-1 p-2 bg-gray-50 rounded-lg"
+									>
+										Great shot! Where was this taken?
+									</p>
+								</div>
+							</div>
+
+							<div class="flex items-start p-3 bg-white rounded-lg shadow-sm">
+								<div
+									class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<div>
+									<p class="text-gray-800">
+										<span class="font-medium">Alex</span> started following you.
+										<span class="text-gray-500 text-sm">1h</span>
+									</p>
+									<button
+										class="mt-2 py-1 px-4 rounded-full text-sm text-white gradient-primary follow-back-btn"
+									>
+										Follow Back
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="font-medium text-gray-800 mb-2">Yesterday</h3>
+						<div class="space-y-4">
+							<div class="flex items-start p-3 bg-white rounded-lg shadow-sm">
+								<div
+									class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0"
+								>
+									<i class="fas fa-bell text-indigo-500"></i>
+								</div>
+								<div>
+									<p class="text-gray-800">
+										Your post reached 1,000 views!
+										<span class="text-gray-500 text-sm">5h</span>
+									</p>
+									<div class="mt-2 h-12 w-12 overflow-hidden rounded">
+										<img
+											src="https://images.unsplash.com/photo-1551632811-561732d1e306"
+											alt="Post"
+											class="w-full h-full object-cover"
+										/>
+									</div>
+								</div>
+							</div>
+
+							<div class="flex items-start p-3 bg-white rounded-lg shadow-sm">
+								<div
+									class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+								>
+									<img
+										src="https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+										alt="User"
+										class="w-full h-full object-cover"
+									/>
+								</div>
+								<div>
+									<p class="text-gray-800">
+										<span class="font-medium">Mia</span> mentioned you in a
+										comment.
+										<span class="text-gray-500 text-sm">1d</span>
+									</p>
+									<p
+										class="text-gray-600 text-sm mt-1 p-2 bg-gray-50 rounded-lg"
+									>
+										I think @you would love this place too!
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- PROFILE TAB CONTENT -->
+			<div id="profile-tab" class="tab-content">
+				<div class="pt-2">
+					<div class="flex items-center">
+						<div class="w-20 h-20 rounded-full overflow-hidden mr-4">
+							<img
+								src="https://images.unsplash.com/photo-1599566150163-29194dcaad36"
+								alt="Your Profile"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div>
+							<h2 class="text-xl font-bold">Fahad</h2>
+							<p class="text-gray-600">@fahad</p>
+							<button
+								id="edit-profile-btn"
+								class="mt-2 py-1 px-4 rounded-full text-sm border border-gray-300 font-medium"
+							>
+								Edit Profile
+							</button>
+						</div>
+					</div>
+
+					<div class="mt-4">
+						<p class="text-gray-800">
+							Hey there! I'm passionate about photography, technology and music.
+						</p>
+						<p class="text-indigo-500 mt-1">www.yourwebsite.com</p>
+					</div>
+
+					<div class="profile-stats border-t border-b border-gray-200 my-4">
+						<div>
+							<div class="font-bold">125</div>
+							<div class="text-xs text-gray-500">Posts</div>
+						</div>
+						<div>
+							<div class="font-bold">1,240</div>
+							<div class="text-xs text-gray-500">Followers</div>
+						</div>
+						<div>
+							<div class="font-bold">348</div>
+							<div class="text-xs text-gray-500">Following</div>
+						</div>
+					</div>
+
+					<!-- Profile tabs -->
+					<div class="relative mb-4">
+						<div class="flex justify-around border-b border-gray-200">
+							<button
+								class="profile-tab-btn py-3 px-4 text-indigo-500 border-b-2 border-indigo-500"
+								data-tab="posts"
+							>
+								<i class="fas fa-th"></i>
+								<span class="text-sm ml-1">Posts</span>
+							</button>
+							<button
+								class="profile-tab-btn py-3 px-4 text-gray-500"
+								data-tab="saved"
+							>
+								<i class="fas fa-bookmark"></i>
+								<span class="text-sm ml-1">Saved</span>
+							</button>
+							<button
+								class="profile-tab-btn py-3 px-4 text-gray-500"
+								data-tab="tagged"
+							>
+								<i class="fas fa-user-tag"></i>
+								<span class="text-sm ml-1">Tagged</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Profile tabs content -->
+					<div id="profile-posts-tab" class="profile-content active">
+						<div class="grid grid-cols-3 gap-1">
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e"
+									alt="Your post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1542291026-7eec264c27ff"
+									alt="Your post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1494548162494-384bba4ab999?q=80&w=2960&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+									alt="Your post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1525373698358-041e3a460346"
+									alt="Your post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1527489377706-5bf97e608852"
+									alt="Your post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1499028344343-cd173ffc68a9"
+									alt="Your post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div id="profile-saved-tab" class="profile-content hidden">
+						<div id="saved-posts-container" class="grid grid-cols-3 gap-1">
+							<!-- Saved posts will appear here -->
+						</div>
+					</div>
+
+					<div id="profile-tagged-tab" class="profile-content hidden">
+						<div class="grid grid-cols-3 gap-1">
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963"
+									alt="Tagged post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="aspect-square overflow-hidden">
+								<img
+									src="https://images.unsplash.com/photo-1523049673857-eb18f1d7b578"
+									alt="Tagged post"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- Navigation bar -->
+		<nav
+			class="fixed bottom-0 left-0 w-full bg-white px-2 py-3 border-t border-gray-200"
+		>
+			<div class="flex justify-around items-center">
+				<button
+					id="home-btn"
+					class="nav-item active p-2 rounded-lg flex flex-col items-center"
+				>
+					<i class="fas fa-home text-indigo-500 text-xl"></i>
+					<span class="text-xs mt-1 text-indigo-500 font-medium">Home</span>
+				</button>
+
+				<button
+					id="explore-btn"
+					class="nav-item p-2 rounded-lg flex flex-col items-center"
+				>
+					<i class="fas fa-compass text-gray-500 text-xl"></i>
+					<span class="text-xs mt-1 text-gray-500">Explore</span>
+				</button>
+
+				<button
+					id="new-post-btn"
+					class="p-3 rounded-full gradient-primary text-white shadow-lg transform transition-transform hover:scale-105"
+				>
+					<i class="fas fa-plus text-xl"></i>
+				</button>
+
+				<button
+					id="activity-btn"
+					class="nav-item p-2 rounded-lg flex flex-col items-center"
+				>
+					<i class="fas fa-heart text-gray-500 text-xl"></i>
+					<span class="text-xs mt-1 text-gray-500">Activity</span>
+				</button>
+
+				<button
+					id="profile-btn"
+					class="nav-item p-2 rounded-lg flex flex-col items-center"
+				>
+					<i class="fas fa-user text-gray-500 text-xl"></i>
+					<span class="text-xs mt-1 text-gray-500">Profile</span>
+				</button>
+			</div>
+		</nav>
+
+		<!-- New Post Modal -->
+		<div id="new-post-modal" class="modal">
+			<div class="modal-content p-4">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-lg font-bold">Create New Post</h3>
+					<button id="close-modal" class="text-gray-500 hover:text-gray-700">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<div class="neumorphic-inset p-4 mb-4">
+					<textarea
+						id="post-content"
+						class="w-full bg-transparent border-none outline-none resize-none"
+						rows="4"
+						placeholder="What's on your mind?"
+					></textarea>
+				</div>
+
+				<div
+					id="image-preview-container"
+					class="mb-4 hidden rounded-lg overflow-hidden"
+				>
+					<img
+						id="image-preview"
+						src=""
+						alt="Preview"
+						class="w-full object-cover"
+						style="max-height: 200px"
+					/>
+				</div>
+
+				<div class="flex items-center mb-4">
+					<button
+						id="add-photo"
+						class="flex items-center mr-4 text-gray-600 hover:text-indigo-500 transition-colors"
+					>
+						<i class="fas fa-image mr-2"></i>
+						<span>Add Photo</span>
+					</button>
+					<input
+						type="file"
+						id="photo-upload"
+						accept="image/*"
+						class="hidden"
+					/>
+
+					<button
+						id="tag-people"
+						class="flex items-center text-gray-600 hover:text-indigo-500 transition-colors"
+					>
+						<i class="fas fa-user-tag mr-2"></i>
+						<span>Tag People</span>
+					</button>
+				</div>
+
+				<button
+					id="publish-post"
+					class="w-full py-3 rounded-lg font-medium text-white gradient-primary hover:opacity-90 transition-opacity"
+				>
+					Publish
+				</button>
+			</div>
+		</div>
+
+		<!-- Story View Modal -->
+		<div id="story-modal" class="modal">
+			<div class="modal-content p-0 bg-transparent max-w-md w-full">
+				<div class="relative rounded-xl overflow-hidden">
+					<div class="absolute top-0 left-0 right-0 p-2 z-10">
+						<div class="flex space-x-1">
+							<div class="story-progress flex-1">
+								<div class="story-progress-bar"></div>
+							</div>
+						</div>
+					</div>
+
+					<img
+						id="story-image"
+						src=""
+						alt="Story"
+						class="w-full object-cover"
+						style="max-height: 80vh"
+					/>
+
+					<div class="absolute top-0 left-0 right-0 p-4">
+						<div class="flex items-center">
+							<div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+								<img
+									id="story-user-image"
+									src=""
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+
+							<div>
+								<div id="story-username" class="text-white font-medium">
+									Username
+								</div>
+								<div class="text-white text-xs opacity-80">Just now</div>
+							</div>
+
+							<button id="close-story" class="ml-auto text-white">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+					</div>
+
+					<!-- Story Navigation -->
+					<div class="absolute top-0 bottom-0 left-0 right-0 flex">
+						<div id="prev-story" class="w-1/2 h-full cursor-pointer"></div>
+						<div id="next-story" class="w-1/2 h-full cursor-pointer"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Search overlay -->
+		<div
+			id="search-overlay"
+			class="fixed inset-0 bg-white z-20 transform translate-y-full transition-transform duration-300"
+		>
+			<div class="p-4">
+				<div class="flex items-center mb-4">
+					<button id="close-search" class="mr-3 text-gray-500">
+						<i class="fas fa-arrow-left"></i>
+					</button>
+
+					<div class="relative flex-1">
+						<input
+							type="text"
+							id="search-input"
+							class="w-full py-2 px-4 pr-10 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+							placeholder="Search"
+						/>
+						<button
+							class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+						>
+							<i class="fas fa-search"></i>
+						</button>
+					</div>
+				</div>
+
+				<div class="mb-4">
+					<h4 class="font-medium text-gray-800 mb-2">Recent Searches</h4>
+					<div class="space-y-3">
+						<div class="flex items-center justify-between">
+							<div class="flex items-center">
+								<div
+									class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3"
+								>
+									<i class="fas fa-user text-gray-500"></i>
+								</div>
+								<span>emma_wilson</span>
+							</div>
+							<button class="text-gray-400">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center">
+								<div
+									class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3"
+								>
+									<i class="fas fa-hashtag text-gray-500"></i>
+								</div>
+								<span>photography</span>
+							</div>
+							<button class="text-gray-400">
+								<i class="fas fa-times"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<h4 class="font-medium text-gray-800 mb-2">Trending</h4>
+					<div class="space-y-3">
+						<div class="flex items-center">
+							<div
+								class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3"
+							>
+								<i class="fas fa-fire text-gray-500"></i>
+							</div>
+							<div>
+								<span>#summervibes</span>
+								<p class="text-xs text-gray-500">1.2M posts</p>
+							</div>
+						</div>
+						<div class="flex items-center">
+							<div
+								class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3"
+							>
+								<i class="fas fa-fire text-gray-500"></i>
+							</div>
+							<div>
+								<span>#techinnovation</span>
+								<p class="text-xs text-gray-500">856K posts</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Notifications panel -->
+		<div
+			id="notifications-panel"
+			class="fixed inset-0 bg-white z-20 transform translate-y-full transition-transform duration-300"
+		>
+			<div class="p-4">
+				<div class="flex items-center justify-between mb-6">
+					<h3 class="text-xl font-bold">Notifications</h3>
+					<button id="close-notifications" class="text-gray-500">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<div class="space-y-4">
+					<div class="flex items-start">
+						<div
+							class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+								alt="User"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+
+						<div>
+							<p class="text-gray-800">
+								<span class="font-medium">Sophie</span> liked your photo.
+								<span class="text-gray-500 text-sm">2m</span>
+							</p>
+						</div>
+					</div>
+
+					<div class="flex items-start">
+						<div
+							class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+								alt="User"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+
+						<div>
+							<p class="text-gray-800">
+								<span class="font-medium">David</span> commented on your post.
+								<span class="text-gray-500 text-sm">15m</span>
+							</p>
+							<p class="text-gray-600 text-sm mt-1">
+								Great shot! Where was this taken?
+							</p>
+						</div>
+					</div>
+
+					<div class="flex items-start">
+						<div
+							class="w-12 h-12 rounded-full overflow-hidden mr-3 flex-shrink-0"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+								alt="User"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+
+						<div>
+							<p class="text-gray-800">
+								<span class="font-medium">Alex</span> started following you.
+								<span class="text-gray-500 text-sm">1h</span>
+							</p>
+							<button
+								class="mt-2 py-1 px-4 rounded-full text-sm text-white gradient-primary follow-back-btn"
+							>
+								Follow Back
+							</button>
+						</div>
+					</div>
+
+					<div class="flex items-start">
+						<div
+							class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center mr-3 flex-shrink-0"
+						>
+							<i class="fas fa-bell text-indigo-500"></i>
+						</div>
+
+						<div>
+							<p class="text-gray-800">
+								Your post reached 1,000 views!
+								<span class="text-gray-500 text-sm">5h</span>
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Messages panel -->
+		<div
+			id="messages-panel"
+			class="fixed inset-0 bg-white z-20 transform translate-y-full transition-transform duration-300"
+		>
+			<div class="p-4">
+				<div class="flex items-center justify-between mb-6">
+					<h3 class="text-xl font-bold">Messages</h3>
+					<button id="close-messages" class="text-gray-500">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<div class="relative mb-4">
+					<input
+						type="text"
+						class="w-full py-2 px-4 pl-10 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+						placeholder="Search messages"
+					/>
+					<i
+						class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+					></i>
+				</div>
+
+				<div class="space-y-2">
+					<div
+						class="message-preview flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer active-message"
+						data-conversation="emma"
+					>
+						<div class="relative">
+							<div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div
+								class="absolute bottom-0 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
+							></div>
+						</div>
+
+						<div class="flex-1">
+							<div class="flex justify-between items-center">
+								<h4 class="font-medium">Emma</h4>
+								<span class="text-xs text-gray-500">2m</span>
+							</div>
+							<p class="text-gray-600 text-sm truncate">
+								Hey! Are you free this weekend?
+							</p>
+						</div>
+					</div>
+
+					<div
+						class="message-preview flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+						data-conversation="alex"
+					>
+						<div class="relative">
+							<div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+						</div>
+
+						<div class="flex-1">
+							<div class="flex justify-between items-center">
+								<h4 class="font-medium">Alex</h4>
+								<span class="text-xs text-gray-500">1h</span>
+							</div>
+							<p class="text-gray-600 text-sm truncate">
+								Thanks for the recommendations!
+							</p>
+						</div>
+					</div>
+
+					<div
+						class="message-preview flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+						data-conversation="sophie"
+					>
+						<div class="relative">
+							<div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div
+								class="absolute bottom-0 right-2 w-3 h-3 bg-green-500 rounded-full border-2 border-white"
+							></div>
+						</div>
+
+						<div class="flex-1">
+							<div class="flex justify-between items-center">
+								<h4 class="font-medium">Sophie</h4>
+								<span class="text-xs text-gray-500">3h</span>
+							</div>
+							<p class="text-gray-600 text-sm truncate">
+								I just sent you the files you asked for
+							</p>
+						</div>
+					</div>
+
+					<div
+						class="message-preview flex items-center p-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+						data-conversation="david"
+					>
+						<div class="relative">
+							<div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+						</div>
+
+						<div class="flex-1">
+							<div class="flex justify-between items-center">
+								<h4 class="font-medium">David</h4>
+								<span class="text-xs text-gray-500">Yesterday</span>
+							</div>
+							<p class="text-gray-600 text-sm truncate">
+								Let's meet up sometime this week
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Active Conversation -->
+			<div
+				id="conversation-container"
+				class="fixed inset-0 bg-white z-30 transform translate-y-full transition-transform duration-300"
+			>
+				<div class="h-full flex flex-col">
+					<div class="p-4 border-b flex items-center">
+						<button id="back-to-messages" class="mr-3 text-gray-500">
+							<i class="fas fa-arrow-left"></i>
+						</button>
+
+						<div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+							<img
+								id="conversation-avatar"
+								src=""
+								alt="User"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+
+						<div>
+							<h4 id="conversation-name" class="font-medium"></h4>
+							<p class="text-xs text-green-500">Online</p>
+						</div>
+
+						<div class="ml-auto flex space-x-4">
+							<button class="text-gray-500">
+								<i class="fas fa-phone"></i>
+							</button>
+							<button class="text-gray-500">
+								<i class="fas fa-video"></i>
+							</button>
+							<button class="text-gray-500">
+								<i class="fas fa-info-circle"></i>
+							</button>
+						</div>
+					</div>
+
+					<div
+						class="chat-messages p-4 flex-1 overflow-y-auto"
+						id="messages-container"
+					>
+						<!-- Messages will be dynamically inserted here -->
+					</div>
+
+					<div class="p-3 border-t flex items-center">
+						<button class="p-2 text-gray-500">
+							<i class="far fa-smile"></i>
+						</button>
+						<div class="relative flex-1 mx-2">
+							<input
+								type="text"
+								id="message-input"
+								class="w-full py-2 px-4 rounded-full bg-gray-100 focus:outline-none"
+								placeholder="Message..."
+							/>
+						</div>
+						<button id="send-message" class="p-2 text-indigo-500">
+							<i class="fas fa-paper-plane"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Share Modal -->
+		<div id="share-modal" class="modal">
+			<div class="modal-content p-4">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-lg font-bold">Share Post</h3>
+					<button
+						id="close-share-modal"
+						class="text-gray-500 hover:text-gray-700"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<div class="mb-4">
+					<h4 class="font-medium text-gray-700 mb-3">Share to</h4>
+					<div class="grid grid-cols-4 gap-4">
+						<div class="share-option flex flex-col items-center">
+							<div
+								class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mb-1 text-white"
+							>
+								<i class="fab fa-facebook-f"></i>
+							</div>
+							<span class="text-xs">Facebook</span>
+						</div>
+						<div class="share-option flex flex-col items-center">
+							<div
+								class="w-12 h-12 rounded-full bg-blue-400 flex items-center justify-center mb-1 text-white"
+							>
+								<i class="fab fa-twitter"></i>
+							</div>
+							<span class="text-xs">Twitter</span>
+						</div>
+						<div class="share-option flex flex-col items-center">
+							<div
+								class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-1 text-white"
+							>
+								<i class="fab fa-instagram"></i>
+							</div>
+							<span class="text-xs">Instagram</span>
+						</div>
+						<div class="share-option flex flex-col items-center">
+							<div
+								class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-1 text-white"
+							>
+								<i class="fab fa-whatsapp"></i>
+							</div>
+							<span class="text-xs">WhatsApp</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-4">
+					<h4 class="font-medium text-gray-700 mb-2">Send to</h4>
+					<div class="space-y-2">
+						<div class="flex items-center p-2 rounded-lg hover:bg-gray-50">
+							<div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="flex-1">
+								<h5 class="font-medium">Emma</h5>
+							</div>
+							<button class="py-1 px-3 rounded-full bg-gray-200 text-sm">
+								Send
+							</button>
+						</div>
+						<div class="flex items-center p-2 rounded-lg hover:bg-gray-50">
+							<div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="flex-1">
+								<h5 class="font-medium">Alex</h5>
+							</div>
+							<button class="py-1 px-3 rounded-full bg-gray-200 text-sm">
+								Send
+							</button>
+						</div>
+						<div class="flex items-center p-2 rounded-lg hover:bg-gray-50">
+							<div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+								<img
+									src="https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+									alt="User"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+							<div class="flex-1">
+								<h5 class="font-medium">Sophie</h5>
+							</div>
+							<button class="py-1 px-3 rounded-full bg-gray-200 text-sm">
+								Send
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<h4 class="font-medium text-gray-700 mb-2">Copy Link</h4>
+					<div class="flex">
+						<input
+							type="text"
+							id="post-link"
+							value="https://wavelength.com/p/123456"
+							class="flex-1 py-2 px-3 rounded-l-lg bg-gray-100 border-0 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+							readonly
+						/>
+						<button
+							id="copy-link"
+							class="py-2 px-3 rounded-r-lg bg-indigo-500 text-white"
+						>
+							<i class="far fa-copy"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Edit Profile Modal -->
+		<div id="edit-profile-modal" class="modal">
+			<div class="modal-content p-4">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-lg font-bold">Edit Profile</h3>
+					<button
+						id="close-edit-profile"
+						class="text-gray-500 hover:text-gray-700"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+
+				<div class="flex justify-center mb-4">
+					<div class="relative">
+						<div class="w-20 h-20 rounded-full overflow-hidden">
+							<img
+								src="https://images.unsplash.com/photo-1599566150163-29194dcaad36"
+								alt="Your Profile"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<button
+							class="absolute bottom-0 right-0 bg-indigo-500 text-white rounded-full p-1 shadow-md"
+						>
+							<i class="fas fa-camera"></i>
+						</button>
+					</div>
+				</div>
+
+				<div class="space-y-3">
+					<div class="profile-edit-field">
+						<label class="text-sm text-gray-500">Name</label>
+						<input
+							type="text"
+							value="Your Username"
+							class="w-full py-1 border-0 focus:outline-none focus:ring-0 font-medium"
+						/>
+					</div>
+
+					<div class="profile-edit-field">
+						<label class="text-sm text-gray-500">Username</label>
+						<input
+							type="text"
+							value="your_username"
+							class="w-full py-1 border-0 focus:outline-none focus:ring-0 font-medium"
+						/>
+					</div>
+
+					<div class="profile-edit-field">
+						<label class="text-sm text-gray-500">Bio</label>
+						<textarea
+							class="w-full py-1 border-0 focus:outline-none focus:ring-0"
+							rows="3"
+						>
+Hey there! I'm passionate about photography, technology and music.</textarea
+						>
+					</div>
+
+					<div class="profile-edit-field">
+						<label class="text-sm text-gray-500">Website</label>
+						<input
+							type="text"
+							value="www.yourwebsite.com"
+							class="w-full py-1 border-0 focus:outline-none focus:ring-0 font-medium"
+						/>
+					</div>
+				</div>
+
+				<button
+					id="save-profile"
+					class="w-full py-3 rounded-lg font-medium text-white gradient-primary hover:opacity-90 transition-opacity mt-4"
+				>
+					Save
+				</button>
+			</div>
+		</div>
+
+		<!-- Story Creator -->
+		<div id="story-creator" class="camera-container">
+			<div class="camera-preview">
+				<img
+					id="story-placeholder"
+					src="https://images.unsplash.com/photo-1682686580849-3e7f67df4015"
+					alt="Story Preview"
+					class="w-full h-full object-cover"
+				/>
+				<div class="absolute top-4 right-4">
+					<button id="close-story-creator" class="text-white text-xl">
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+			</div>
+
+			<div class="camera-controls">
+				<button class="camera-option">
+					<i class="fas fa-images"></i>
+				</button>
+				<button class="camera-button">
+					<i class="fas fa-camera text-2xl"></i>
+				</button>
+				<button class="camera-option">
+					<i class="fas fa-magic"></i>
+				</button>
+			</div>
+		</div>
+
+		<script>
+			const posts = [
+				{
+					id: 1,
+					user: {
+						name: "Emma Wilson",
+						username: "emma_wilson",
+						avatar:
+							"https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+					},
+					content:
+						"Enjoying the perfect sunset at the beach today! 🌅 #nature #sunset #beachlife",
+					image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+					likes: 243,
+					comments: [
+						{
+							user: {
+								name: "Sophie",
+								avatar:
+									"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+							},
+							content: "Absolutely beautiful! Which beach is this?",
+							likes: 5,
+							time: "2h ago",
+						},
+						{
+							user: {
+								name: "Emma Wilson",
+								avatar:
+									"https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+							},
+							content: "Thanks Sophie! It's Clearwater Beach in Florida.",
+							likes: 1,
+							time: "1h ago",
+						},
+					],
+					time: "3 hours ago",
+					liked: false,
+					saved: false,
+				},
+				{
+					id: 2,
+					user: {
+						name: "Alex Johnson",
+						username: "alex_j",
+						avatar:
+							"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+					},
+					content:
+						"Just finished my latest project! Excited to share it with everyone soon. 💻 #coding #webdev",
+					image: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+					likes: 156,
+					comments: [
+						{
+							user: {
+								name: "David",
+								avatar:
+									"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+							},
+							content: "Can't wait to see it!",
+							likes: 2,
+							time: "30m ago",
+						},
+					],
+					time: "5 hours ago",
+					liked: true,
+					saved: true,
+				},
+				{
+					id: 3,
+					user: {
+						name: "Sophie Miller",
+						username: "sophie_m",
+						avatar:
+							"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+					},
+					content:
+						"Morning hike with the best view! 🌄 #hiking #outdoors #adventure",
+					image: "https://images.unsplash.com/photo-1551632811-561732d1e306",
+					likes: 318,
+					comments: [
+						{
+							user: {
+								name: "Emma",
+								avatar:
+									"https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+							},
+							content: "The view is breathtaking! Where is this?",
+							likes: 3,
+							time: "4h ago",
+						},
+						{
+							user: {
+								name: "Sophie Miller",
+								avatar:
+									"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+							},
+							content: "Thanks Emma! It's Mount Rainier National Park.",
+							likes: 1,
+							time: "3h ago",
+						},
+						{
+							user: {
+								name: "Alex",
+								avatar:
+									"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+							},
+							content: "Adding this to my travel bucket list!",
+							likes: 2,
+							time: "2h ago",
+						},
+					],
+					time: "8 hours ago",
+					liked: false,
+					saved: false,
+				},
+			];
+
+			const additionalPosts = [
+				{
+					id: 4,
+					user: {
+						name: "David Lee",
+						username: "david_lee",
+						avatar:
+							"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+					},
+					content:
+						"New studio setup complete! Ready to create some music. 🎵 #music #producer",
+					image: "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04",
+					likes: 210,
+					comments: [
+						{
+							user: {
+								name: "Alex",
+								avatar:
+									"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+							},
+							content: "Looks awesome! What DAW do you use?",
+							likes: 1,
+							time: "45m ago",
+						},
+					],
+					time: "12 hours ago",
+					liked: false,
+					saved: false,
+				},
+				{
+					id: 5,
+					user: {
+						name: "Mia Zhang",
+						username: "mia_zhang",
+						avatar:
+							"https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+					},
+					content:
+						"Just tried this amazing restaurant downtown! The food was incredible. 🍽️ #foodie #cuisine",
+					image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836",
+					likes: 178,
+					comments: [
+						{
+							user: {
+								name: "Sophie",
+								avatar:
+									"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+							},
+							content:
+								"That looks delicious! What's the name of the restaurant?",
+							likes: 3,
+							time: "2h ago",
+						},
+						{
+							user: {
+								name: "Mia Zhang",
+								avatar:
+									"https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+							},
+							content:
+								"It's called Bistro Central. You should definitely check it out!",
+							likes: 1,
+							time: "1h ago",
+						},
+					],
+					time: "1 day ago",
+					liked: true,
+					saved: false,
+				},
+			];
+
+			const stories = [
+				{
+					user: {
+						name: "Emma",
+						avatar:
+							"https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+					},
+					image: "https://images.unsplash.com/photo-1593642634367-d91a135587b5",
+				},
+				{
+					user: {
+						name: "Alex",
+						avatar:
+							"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+					},
+					image: "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+				},
+				{
+					user: {
+						name: "Sophie",
+						avatar:
+							"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+					},
+					image: "https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13",
+				},
+				{
+					user: {
+						name: "David",
+						avatar:
+							"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+					},
+					image: "https://images.unsplash.com/photo-1502759683299-cdcd6974244f",
+				},
+				{
+					user: {
+						name: "Mia",
+						avatar:
+							"https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+					},
+					image: "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578",
+				},
+			];
+
+			const conversations = {
+				emma: [
+					{
+						sender: "emma",
+						content: "Hey! How have you been?",
+						time: "1:30 PM",
+					},
+					{
+						sender: "user",
+						content: "I'm good! Just been busy with work. How about you?",
+						time: "1:35 PM",
+					},
+					{
+						sender: "emma",
+						content: "Same here. Working on a new project.",
+						time: "1:37 PM",
+					},
+					{
+						sender: "emma",
+						content: "Hey! Are you free this weekend?",
+						time: "1:45 PM",
+					},
+				],
+				alex: [
+					{
+						sender: "alex",
+						content: "Did you check out those photo editing tips I sent?",
+						time: "11:20 AM",
+					},
+					{
+						sender: "user",
+						content: "Yes! They were really helpful. Thanks!",
+						time: "11:45 AM",
+					},
+					{
+						sender: "alex",
+						content: "No problem! Let me know if you need anything else.",
+						time: "12:00 PM",
+					},
+					{
+						sender: "alex",
+						content: "Thanks for the recommendations!",
+						time: "12:15 PM",
+					},
+				],
+				sophie: [
+					{
+						sender: "sophie",
+						content: "Hey, I wanted to share these photos with you",
+						time: "10:00 AM",
+					},
+					{
+						sender: "user",
+						content: "Those look amazing! Where did you take them?",
+						time: "10:15 AM",
+					},
+					{
+						sender: "sophie",
+						content:
+							"At the national park last weekend. We should go together sometime!",
+						time: "10:20 AM",
+					},
+					{
+						sender: "sophie",
+						content: "I just sent you the files you asked for",
+						time: "10:30 AM",
+					},
+				],
+				david: [
+					{
+						sender: "david",
+						content: "Are we still on for the concert next month?",
+						time: "Yesterday",
+					},
+					{
+						sender: "user",
+						content: "Absolutely! I already got the tickets.",
+						time: "Yesterday",
+					},
+					{
+						sender: "david",
+						content: "Perfect! Should be a great show.",
+						time: "Yesterday",
+					},
+					{
+						sender: "david",
+						content: "Let's meet up sometime this week",
+						time: "Yesterday",
+					},
+				],
+			};
+
+			const avatars = {
+				emma: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+				alex: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+				sophie: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+				david: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+				user: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
+			};
+
+			const names = {
+				emma: "Emma",
+				alex: "Alex",
+				sophie: "Sophie",
+				david: "David",
+			};
+
+			const feedContainer = document.getElementById("feed-container");
+			const loadingSpinner = document.querySelector(".loading-spinner");
+			const refreshIndicator = document.querySelector(".refresh-indicator");
+			const toast = document.getElementById("toast");
+			const storyCirlces = document.querySelectorAll(".story-circle");
+			const storyModal = document.getElementById("story-modal");
+			const storyImage = document.getElementById("story-image");
+			const storyUserImage = document.getElementById("story-user-image");
+			const storyUsername = document.getElementById("story-username");
+			const closeStory = document.getElementById("close-story");
+			const storyProgressBar = document.querySelector(".story-progress-bar");
+			const prevStory = document.getElementById("prev-story");
+			const nextStory = document.getElementById("next-story");
+			const newPostBtn = document.getElementById("new-post-btn");
+			const newPostModal = document.getElementById("new-post-modal");
+			const closeModal = document.getElementById("close-modal");
+			const publishPost = document.getElementById("publish-post");
+			const postContent = document.getElementById("post-content");
+			const searchBtn = document.getElementById("search-btn");
+			const searchOverlay = document.getElementById("search-overlay");
+			const closeSearch = document.getElementById("close-search");
+			const searchInput = document.getElementById("search-input");
+			const notificationsBtn = document.getElementById("notifications-btn");
+			const notificationsPanel = document.getElementById("notifications-panel");
+			const closeNotifications = document.getElementById("close-notifications");
+			const messagesBtn = document.getElementById("messages-btn");
+			const messagesPanel = document.getElementById("messages-panel");
+			const closeMessages = document.getElementById("close-messages");
+			const navItems = document.querySelectorAll(".nav-item");
+			const tabBtns = document.querySelectorAll(".nav-item");
+			const tabContents = document.querySelectorAll(".tab-content");
+			const addPhoto = document.getElementById("add-photo");
+			const photoUpload = document.getElementById("photo-upload");
+			const imagePreviewContainer = document.getElementById(
+				"image-preview-container"
+			);
+			const imagePreview = document.getElementById("image-preview");
+			const shareModal = document.getElementById("share-modal");
+			const closeShareModal = document.getElementById("close-share-modal");
+			const messagePreviews = document.querySelectorAll(".message-preview");
+			const conversationContainer = document.getElementById(
+				"conversation-container"
+			);
+			const backToMessages = document.getElementById("back-to-messages");
+			const conversationAvatar = document.getElementById("conversation-avatar");
+			const conversationName = document.getElementById("conversation-name");
+			const messagesContainer = document.getElementById("messages-container");
+			const messageInput = document.getElementById("message-input");
+			const sendMessage = document.getElementById("send-message");
+			const copyLink = document.getElementById("copy-link");
+			const postLink = document.getElementById("post-link");
+			const editProfileBtn = document.getElementById("edit-profile-btn");
+			const editProfileModal = document.getElementById("edit-profile-modal");
+			const closeEditProfile = document.getElementById("close-edit-profile");
+			const saveProfile = document.getElementById("save-profile");
+			const profileTabBtns = document.querySelectorAll(".profile-tab-btn");
+			const profileContent = document.querySelectorAll(".profile-content");
+			const savedPostsContainer = document.getElementById(
+				"saved-posts-container"
+			);
+			const followBackBtns = document.querySelectorAll(".follow-back-btn");
+			const addStoryBtn = document.getElementById("add-story-btn");
+			const storyCreator = document.getElementById("story-creator");
+			const closeStoryCreator = document.getElementById("close-story-creator");
+
+			let currentPage = 1;
+			let isLoading = false;
+			let allPosts = [...posts];
+			let currentStoryIndex = 0;
+			let storyTimeout;
+			let currentConversation = "";
+
+			function renderPosts(postsToRender) {
+				postsToRender.forEach((post) => {
+					const postElement = document.createElement("article");
+					postElement.classList.add(
+						"post-item",
+						"neumorphic",
+						"mb-6",
+						"overflow-hidden"
+					);
+					postElement.setAttribute("data-post-id", post.id);
+
+					const postHeader = `
+                    <div class="p-4 flex items-center">
+                        <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                            <img src="${post.user.avatar}" alt="${post.user.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <div class="font-medium">${post.user.name}</div>
+                            <div class="text-xs text-gray-500">@${post.user.username}</div>
+                        </div>
+                        <button class="ml-auto text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                    </div>
+                `;
+
+					const postImage = `
+                    <div class="post-image">
+                        <div class="tap-overlay"></div>
+                        <img src="${post.image}" alt="Post" class="w-full object-cover" style="max-height: 400px;">
+                    </div>
+                `;
+
+					const postActions = `
+                    <div class="p-4 flex items-center justify-between post-actions">
+                        <div class="flex items-center space-x-4">
+                            <button class="like-button text-xl ${
+															post.liked ? "text-red-500" : "text-gray-600"
+														}" data-post-id="${post.id}">
+                                <i class="${
+																	post.liked ? "fas fa-heart" : "far fa-heart"
+																}"></i>
+                            </button>
+                            <button class="comment-button text-xl text-gray-600" data-post-id="${
+															post.id
+														}">
+                                <i class="far fa-comment"></i>
+                            </button>
+                            <button class="share-button text-xl text-gray-600" data-post-id="${
+															post.id
+														}">
+                                <i class="far fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <button class="save-button text-xl ${
+													post.saved ? "text-indigo-500" : "text-gray-600"
+												}" data-post-id="${post.id}">
+                            <i class="${
+															post.saved ? "fas fa-bookmark" : "far fa-bookmark"
+														}"></i>
+                        </button>
+                    </div>
+                `;
+
+					const postDetails = `
+                    <div class="px-4 pb-2">
+                        <div class="mb-2 font-medium likes-count">${post.likes} likes</div>
+                        <div class="mb-1">
+                            <span class="font-medium">${post.user.name}</span> 
+                            <span>${post.content}</span>
+                        </div>
+                        <div class="text-gray-500 text-sm mb-2 view-comments-link" data-post-id="${post.id}">
+                            View all ${post.comments.length} comments
+                        </div>
+                        <div class="text-gray-400 text-xs">${post.time}</div>
+                    </div>
+                `;
+
+					let commentsHtml = "";
+					post.comments.forEach((comment) => {
+						commentsHtml += `
+                        <div class="px-4 py-2 flex">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0">
+                                <img src="${comment.user.avatar}" alt="${comment.user.name}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-1">
+                                <div class="text-sm">
+                                    <span class="font-medium">${comment.user.name}</span>
+                                    <span>${comment.content}</span>
+                                </div>
+                                <div class="flex items-center text-xs text-gray-500 mt-1">
+                                    <span>${comment.time}</span>
+                                    <span class="mx-2">&middot;</span>
+                                    <span>${comment.likes} likes</span>
+                                    <button class="ml-2 font-medium">Reply</button>
+                                </div>
+                            </div>
+                            <button class="text-xs text-gray-500 flex-shrink-0 comment-like-button">
+                                <i class="far fa-heart"></i>
+                            </button>
+                        </div>
+                    `;
+					});
+
+					const commentsSection = `
+                    <div class="comments-section bg-gray-50 border-t" data-post-id="${post.id}">
+                        ${commentsHtml}
+                        <div class="p-4 border-t">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                                    <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36" alt="Your Profile" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1 relative">
+                                    <input type="text" class="comment-input w-full py-2 px-3 pr-10 rounded-full bg-gray-100 focus:outline-none text-sm" placeholder="Add a comment...">
+                                    <button class="post-comment-button absolute right-3 top-1/2 transform -translate-y-1/2 text-indigo-500 font-medium text-sm">Post
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+					postElement.innerHTML = `
+                    ${postHeader}
+                    ${postImage}
+                    ${postActions}
+                    ${postDetails}
+                    ${commentsSection}
+                `;
+
+					feedContainer.appendChild(postElement);
+
+					addPostEventListeners(postElement, post);
+				});
+			}
+
+			function addPostEventListeners(postElement, post) {
+				const likeBtn = postElement.querySelector(".like-button");
+				likeBtn.addEventListener("click", () => {
+					toggleLike(likeBtn, post);
+				});
+
+				const tapOverlay = postElement.querySelector(".tap-overlay");
+
+				let tapCount = 0;
+				let tapTimer = null;
+
+				tapOverlay.addEventListener("click", () => {
+					tapCount++;
+
+					if (tapCount === 1) {
+						tapTimer = setTimeout(() => {
+							tapCount = 0;
+						}, 300);
+					} else if (tapCount === 2) {
+						clearTimeout(tapTimer);
+						tapCount = 0;
+
+						if (!post.liked) {
+							const heart = document.createElement("div");
+							heart.innerHTML =
+								'<i class="fas fa-heart text-white text-6xl"></i>';
+							heart.style.position = "absolute";
+							heart.style.top = "50%";
+							heart.style.left = "50%";
+							heart.style.transform = "translate(-50%, -50%)";
+							heart.style.opacity = "0";
+							heart.style.animation = "pulse 1s ease forwards";
+							heart.style.zIndex = "10";
+							heart.style.textShadow = "0 0 10px rgba(0,0,0,0.5)";
+
+							const postImage = postElement.querySelector(".post-image");
+							postImage.style.position = "relative";
+							postImage.appendChild(heart);
+
+							setTimeout(() => {
+								postImage.removeChild(heart);
+							}, 1000);
+
+							toggleLike(likeBtn, post);
+						}
+					}
+				});
+
+				const saveBtn = postElement.querySelector(".save-button");
+				saveBtn.addEventListener("click", () => {
+					post.saved = !post.saved;
+
+					if (post.saved) {
+						saveBtn.classList.add("text-indigo-500");
+						saveBtn.classList.remove("text-gray-600");
+						saveBtn.innerHTML = '<i class="fas fa-bookmark"></i>';
+						showToast("Post saved!", "bg-indigo-500");
+
+						updateSavedPosts();
+					} else {
+						saveBtn.classList.remove("text-indigo-500");
+						saveBtn.classList.add("text-gray-600");
+						saveBtn.innerHTML = '<i class="far fa-bookmark"></i>';
+
+						updateSavedPosts();
+					}
+				});
+
+				const shareBtn = postElement.querySelector(".share-button");
+				shareBtn.addEventListener("click", () => {
+					shareModal.classList.add("show");
+
+					postLink.value = `https://wavelength.com/p/${post.id}`;
+
+					showToast("Share options opened!", "bg-indigo-500");
+				});
+
+				const viewCommentsLink = postElement.querySelector(
+					".view-comments-link"
+				);
+				const commentsSection = postElement.querySelector(".comments-section");
+
+				viewCommentsLink.addEventListener("click", () => {
+					commentsSection.classList.toggle("show");
+				});
+
+				const commentBtn = postElement.querySelector(".comment-button");
+				commentBtn.addEventListener("click", () => {
+					commentsSection.classList.add("show");
+
+					const commentInput = commentsSection.querySelector("input");
+					commentInput.focus();
+				});
+
+				const postCommentButton = postElement.querySelector(
+					".post-comment-button"
+				);
+				const commentInput = postElement.querySelector(".comment-input");
+
+				postCommentButton.addEventListener("click", () => {
+					addComment(post, commentInput, postElement);
+				});
+
+				commentInput.addEventListener("keypress", (e) => {
+					if (e.key === "Enter") {
+						addComment(post, commentInput, postElement);
+					}
+				});
+
+				const commentLikeButtons = postElement.querySelectorAll(
+					".comment-like-button"
+				);
+				commentLikeButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const icon = button.querySelector("i");
+						if (icon.classList.contains("far")) {
+							icon.classList.remove("far");
+							icon.classList.add("fas");
+							button.classList.add("text-red-500");
+						} else {
+							icon.classList.remove("fas");
+							icon.classList.add("far");
+							button.classList.remove("text-red-500");
+						}
+					});
+				});
+			}
+
+			function toggleLike(likeBtn, post) {
+				const postElement = likeBtn.closest(".post-item");
+				post.liked = !post.liked;
+
+				if (post.liked) {
+					post.likes++;
+					likeBtn.classList.add("text-red-500");
+					likeBtn.classList.remove("text-gray-600");
+					likeBtn.querySelector("i").classList.remove("far");
+					likeBtn.querySelector("i").classList.add("fas");
+					likeBtn.classList.add("heart-animation");
+
+					setTimeout(() => {
+						likeBtn.classList.remove("heart-animation");
+					}, 500);
+
+					showToast("Post liked!", "bg-red-500");
+				} else {
+					post.likes--;
+					likeBtn.classList.remove("text-red-500");
+					likeBtn.classList.add("text-gray-600");
+					likeBtn.querySelector("i").classList.remove("fas");
+					likeBtn.querySelector("i").classList.add("far");
+				}
+
+				const likesCount = postElement.querySelector(".likes-count");
+				likesCount.textContent = `${post.likes} likes`;
+			}
+
+			function addComment(post, commentInput, postElement) {
+				const commentText = commentInput.value.trim();
+				if (commentText) {
+					const newComment = {
+						user: {
+							name: userProfile.name,
+							avatar:
+								"https://images.unsplash.com/photo-1599566150163-29194dcaad36",
+						},
+						content: commentText,
+						likes: 0,
+						time: "Just now",
+					};
+
+					post.comments.push(newComment);
+
+					const commentElement = document.createElement("div");
+					commentElement.classList.add("px-4", "py-2", "flex");
+					commentElement.innerHTML = `
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2 flex-shrink-0">
+                            <img src="${newComment.user.avatar}" alt="${newComment.user.name}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="text-sm">
+                                <span class="font-medium">${newComment.user.name}</span>
+                                <span>${newComment.content}</span>
+                            </div>
+                            <div class="flex items-center text-xs text-gray-500 mt-1">
+                                <span>${newComment.time}</span>
+                                <span class="mx-2">&middot;</span>
+                                <span>${newComment.likes} likes</span>
+                                <button class="ml-2 font-medium">Reply</button>
+                            </div>
+                        </div>
+                        <button class="text-xs text-gray-500 flex-shrink-0 comment-like-button">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    `;
+
+					const likeButton = commentElement.querySelector(
+						".comment-like-button"
+					);
+					likeButton.addEventListener("click", () => {
+						const icon = likeButton.querySelector("i");
+						if (icon.classList.contains("far")) {
+							icon.classList.remove("far");
+							icon.classList.add("fas");
+							likeButton.classList.add("text-red-500");
+						} else {
+							icon.classList.remove("fas");
+							icon.classList.add("far");
+							likeButton.classList.remove("text-red-500");
+						}
+					});
+
+					const inputSection = postElement.querySelector(
+						".comments-section > div:last-child"
+					);
+					inputSection.parentNode.insertBefore(commentElement, inputSection);
+
+					const viewCommentsLink = postElement.querySelector(
+						".view-comments-link"
+					);
+					viewCommentsLink.textContent = `View all ${post.comments.length} comments`;
+
+					commentInput.value = "";
+
+					showToast("Comment posted!", "bg-green-500");
+				}
+			}
+
+			function updateSavedPosts() {
+				savedPostsContainer.innerHTML = "";
+
+				const savedPosts = allPosts.filter((post) => post.saved);
+
+				if (savedPosts.length === 0) {
+					savedPostsContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10">
+                        <div class="text-5xl text-gray-300 mb-4">
+                            <i class="far fa-bookmark"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-700 mb-2">No Saved Posts</h3>
+                        <p class="text-gray-500 text-center">Items you save will appear here.</p>
+                    </div>
+                    `;
+				} else {
+					savedPosts.forEach((post) => {
+						const postElement = document.createElement("div");
+						postElement.classList.add("aspect-square", "overflow-hidden");
+						postElement.innerHTML = `
+                        <img src="${post.image}" alt="Saved post" class="w-full h-full object-cover">
+                        `;
+						savedPostsContainer.appendChild(postElement);
+					});
+				}
+			}
+
+			function showToast(message, bgColor) {
+				toast.textContent = message;
+				toast.className = `toast ${bgColor}`;
+				toast.classList.add("show");
+
+				setTimeout(() => {
+					toast.classList.remove("show");
+				}, 3000);
+			}
+
+			function loadMorePosts() {
+				if (isLoading) return;
+
+				isLoading = true;
+				loadingSpinner.style.display = "flex";
+
+				setTimeout(() => {
+					if (currentPage === 1) {
+						renderPosts(additionalPosts);
+						allPosts = [...allPosts, ...additionalPosts];
+						currentPage++;
+					} else {
+						const randomPosts = generateRandomPosts(3);
+						renderPosts(randomPosts);
+						allPosts = [...allPosts, ...randomPosts];
+						currentPage++;
+					}
+
+					isLoading = false;
+					loadingSpinner.style.display = "none";
+				}, 1500);
+			}
+
+			function generateRandomPosts(count) {
+				const randomPosts = [];
+
+				for (let i = 0; i < count; i++) {
+					const id = allPosts.length + i + 1;
+					const randomUserIndex = Math.floor(Math.random() * 5);
+					const users = [
+						{
+							name: "Emma Wilson",
+							username: "emma_wilson",
+							avatar:
+								"https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+						},
+						{
+							name: "Alex Johnson",
+							username: "alex_j",
+							avatar:
+								"https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+						},
+						{
+							name: "Sophie Miller",
+							username: "sophie_m",
+							avatar:
+								"https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+						},
+						{
+							name: "David Lee",
+							username: "david_lee",
+							avatar:
+								"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+						},
+						{
+							name: "Mia Zhang",
+							username: "mia_zhang",
+							avatar:
+								"https://images.unsplash.com/photo-1534528741775-53994a69daeb",
+						},
+					];
+
+					const images = [
+						"https://images.unsplash.com/photo-1542291026-7eec264c27ff",
+						"https://images.unsplash.com/photo-1501854140801-50d01698950b",
+						"https://images.unsplash.com/photo-1501426690582-c1683d81083a",
+						"https://images.unsplash.com/photo-1525373698358-041e3a460346",
+						"https://images.unsplash.com/photo-1527489377706-5bf97e608852",
+						"https://images.unsplash.com/photo-1499028344343-cd173ffc68a9",
+						"https://images.unsplash.com/photo-1518331647614-7a1f04cd34cf",
+						"https://images.unsplash.com/photo-1516483638261-f4dbaf036963",
+					];
+
+					const contents = [
+						"Just finished this amazing book! Highly recommend it. 📚 #reading #books",
+						"Perfect day for coffee and creativity ☕️ #coffee #monday",
+						"New workout routine is really paying off! 💪 #fitness #motivation",
+						"Can't believe how beautiful this place is! 😍 #travel #adventure",
+						"Made this dish from scratch today! #cooking #homemade",
+						"Sometimes all you need is a little inspiration. #quote #mindfulness",
+						"My new office setup is complete! #workspace #productivity",
+						"Exploring the city today. Found some hidden gems! #urban #exploration",
+					];
+
+					const randomPost = {
+						id: id,
+						user: users[randomUserIndex],
+						content: contents[Math.floor(Math.random() * contents.length)],
+						image: images[Math.floor(Math.random() * images.length)],
+						likes: Math.floor(Math.random() * 500) + 50,
+						comments: [],
+						time: Math.floor(Math.random() * 24) + 1 + " hours ago",
+						liked: false,
+						saved: false,
+					};
+
+					const commentCount = Math.floor(Math.random() * 3) + 1;
+					for (let j = 0; j < commentCount; j++) {
+						const randomUser = users[Math.floor(Math.random() * users.length)];
+						const commentContents = [
+							"This is amazing!",
+							"Love this!",
+							"Great photo!",
+							"Thanks for sharing!",
+							"Wow, incredible!",
+							"Looks awesome!",
+						];
+
+						randomPost.comments.push({
+							user: {
+								name: randomUser.name,
+								avatar: randomUser.avatar,
+							},
+							content:
+								commentContents[
+									Math.floor(Math.random() * commentContents.length)
+								],
+							likes: Math.floor(Math.random() * 10),
+							time: Math.floor(Math.random() * 60) + "m ago",
+						});
+					}
+
+					randomPosts.push(randomPost);
+				}
+
+				return randomPosts;
+			}
+
+			function openStory(index) {
+				currentStoryIndex = index;
+				const story = stories[index];
+
+				storyImage.src = story.image;
+				storyUserImage.src = story.user.avatar;
+				storyUsername.textContent = story.user.name;
+
+				storyModal.classList.add("show");
+
+				startStoryProgress();
+			}
+
+			function startStoryProgress() {
+				storyProgressBar.style.width = "0";
+
+				if (storyTimeout) {
+					clearTimeout(storyTimeout);
+				}
+
+				storyProgressBar.style.transition = "width 5s linear";
+				storyProgressBar.style.width = "100%";
+
+				storyTimeout = setTimeout(() => {
+					nextStoryAutomatic();
+				}, 5000);
+			}
+
+			function nextStoryAutomatic() {
+				if (currentStoryIndex < stories.length - 1) {
+					currentStoryIndex++;
+					openStory(currentStoryIndex);
+				} else {
+					storyModal.classList.remove("show");
+				}
+			}
+
+			function showPreviousStory() {
+				if (currentStoryIndex > 0) {
+					currentStoryIndex--;
+					openStory(currentStoryIndex);
+				}
+			}
+
+			function showNextStory() {
+				if (currentStoryIndex < stories.length - 1) {
+					currentStoryIndex++;
+					openStory(currentStoryIndex);
+				} else {
+					storyModal.classList.remove("show");
+				}
+			}
+
+			function openConversation(person) {
+				currentConversation = person;
+
+				conversationAvatar.src = avatars[person];
+				conversationName.textContent = names[person];
+
+				messagesContainer.innerHTML = "";
+
+				const messages = conversations[person];
+				messages.forEach((message) => {
+					const messageElement = document.createElement("div");
+					messageElement.classList.add(
+						"message-bubble",
+						message.sender === "user" ? "message-sent" : "message-received"
+					);
+					messageElement.textContent = message.content;
+
+					const timeElement = document.createElement("div");
+					timeElement.classList.add(
+						"text-xs",
+						"text-gray-500",
+						"mt-1",
+						message.sender === "user" ? "text-right" : "text-left"
+					);
+					timeElement.textContent = message.time;
+
+					const messageContainer = document.createElement("div");
+					messageContainer.classList.add(
+						"flex",
+						"flex-col",
+						message.sender === "user" ? "items-end" : "items-start"
+					);
+					messageContainer.appendChild(messageElement);
+					messageContainer.appendChild(timeElement);
+
+					messagesContainer.appendChild(messageContainer);
+				});
+
+				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+				conversationContainer.style.transform = "translateY(0)";
+			}
+
+			function sendNewMessage() {
+				const messageText = messageInput.value.trim();
+				if (messageText && currentConversation) {
+					const newMessage = {
+						sender: "user",
+						content: messageText,
+						time: "Just now",
+					};
+
+					conversations[currentConversation].push(newMessage);
+
+					const messageElement = document.createElement("div");
+					messageElement.classList.add("message-bubble", "message-sent");
+					messageElement.textContent = messageText;
+
+					const timeElement = document.createElement("div");
+					timeElement.classList.add(
+						"text-xs",
+						"text-gray-500",
+						"mt-1",
+						"text-right"
+					);
+					timeElement.textContent = "Just now";
+
+					const messageContainer = document.createElement("div");
+					messageContainer.classList.add("flex", "flex-col", "items-end");
+					messageContainer.appendChild(messageElement);
+					messageContainer.appendChild(timeElement);
+
+					messagesContainer.appendChild(messageContainer);
+
+					messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+					messageInput.value = "";
+
+					setTimeout(() => {
+						const replyText =
+							"Thanks for your message! I'll get back to you soon.";
+
+						const replyMessage = {
+							sender: currentConversation,
+							content: replyText,
+							time: "Just now",
+						};
+
+						conversations[currentConversation].push(replyMessage);
+
+						const replyElement = document.createElement("div");
+						replyElement.classList.add("message-bubble", "message-received");
+						replyElement.textContent = replyText;
+
+						const replyTimeElement = document.createElement("div");
+						replyTimeElement.classList.add(
+							"text-xs",
+							"text-gray-500",
+							"mt-1",
+							"text-left"
+						);
+						replyTimeElement.textContent = "Just now";
+
+						const replyContainer = document.createElement("div");
+						replyContainer.classList.add("flex", "flex-col", "items-start");
+						replyContainer.appendChild(replyElement);
+						replyContainer.appendChild(replyTimeElement);
+
+						messagesContainer.appendChild(replyContainer);
+
+						messagesContainer.scrollTop = messagesContainer.scrollHeight;
+					}, 1500);
+				}
+			}
+
+			renderPosts(posts);
+			updateSavedPosts();
+
+			let startY = 0;
+			let endY = 0;
+
+			document.addEventListener("touchstart", (e) => {
+				startY = e.touches[0].clientY;
+			});
+
+			document.addEventListener("touchmove", (e) => {
+				const currentY = e.touches[0].clientY;
+				const scrollPosition = window.scrollY;
+
+				if (scrollPosition <= 0 && currentY > startY) {
+					if (currentY - startY > 70) {
+						refreshIndicator.classList.add("active");
+					} else {
+						refreshIndicator.classList.remove("active");
+					}
+
+					e.preventDefault();
+				}
+			});
+
+			document.addEventListener("touchend", (e) => {
+				endY = e.changedTouches[0].clientY;
+
+				if (endY - startY > 70 && window.scrollY <= 0) {
+					refreshIndicator.classList.add("active");
+
+					setTimeout(() => {
+						feedContainer.innerHTML = "";
+						allPosts = [...posts];
+						currentPage = 1;
+
+						renderPosts(posts);
+
+						refreshIndicator.classList.remove("active");
+						showToast("Feed updated!", "bg-green-500");
+					}, 1500);
+				} else {
+					refreshIndicator.classList.remove("active");
+				}
+			});
+
+			window.addEventListener("scroll", () => {
+				if (
+					window.innerHeight + window.scrollY >=
+						document.body.offsetHeight - 500 &&
+					!isLoading
+				) {
+					loadMorePosts();
+				}
+			});
+
+			storyCirlces.forEach((storyCircle) => {
+				const index = storyCircle.getAttribute("data-story-index");
+				if (index) {
+					storyCircle.addEventListener("click", () => {
+						openStory(parseInt(index));
+					});
+				}
+			});
+
+			closeStory.addEventListener("click", () => {
+				storyModal.classList.remove("show");
+				clearTimeout(storyTimeout);
+			});
+
+			prevStory.addEventListener("click", () => {
+				clearTimeout(storyTimeout);
+				showPreviousStory();
+			});
+
+			nextStory.addEventListener("click", () => {
+				clearTimeout(storyTimeout);
+				showNextStory();
+			});
+
+			newPostBtn.addEventListener("click", () => {
+				newPostModal.classList.add("show");
+			});
+
+			closeModal.addEventListener("click", () => {
+				newPostModal.classList.remove("show");
+
+				postContent.value = "";
+				imagePreviewContainer.classList.add("hidden");
+				imagePreview.src = "";
+			});
+
+			publishPost.addEventListener("click", () => {
+				const content = postContent.value.trim();
+
+				if (imagePreview.src.includes("html")) {
+					imagePreview.src =
+						"https://plus.unsplash.com/premium_photo-1683977922495-3ab3ce7ba4e6?q=80&w=3200&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+				}
+				const imageSrc = imagePreview.src;
+
+				if (content) {
+					const newPost = {
+						id: allPosts.length + 1,
+						user: {
+							name: userProfile.name,
+							username: userProfile.username,
+							avatar:
+								"https://images.unsplash.com/photo-1599566150163-29194dcaad36",
+						},
+						content: content,
+						image: imageSrc,
+						likes: 0,
+						comments: [],
+						time: "Just now",
+						liked: false,
+						saved: false,
+					};
+
+					allPosts.unshift(newPost);
+
+					feedContainer.innerHTML = "";
+					renderPosts(allPosts);
+
+					postContent.value = "";
+					imagePreviewContainer.classList.add("hidden");
+					imagePreview.src = "";
+					newPostModal.classList.remove("show");
+
+					showToast("Post published successfully!", "bg-green-500");
+
+					window.scrollTo({
+						top: 0,
+						behavior: "smooth",
+					});
+				} else {
+					showToast("Please add some content to your post.", "bg-red-500");
+				}
+			});
+
+			addPhoto.addEventListener("click", () => {
+				photoUpload.click();
+			});
+
+			photoUpload.addEventListener("change", (e) => {
+				if (e.target.files && e.target.files[0]) {
+					const reader = new FileReader();
+
+					reader.onload = function (event) {
+						imagePreview.src = event.target.result;
+						imagePreviewContainer.classList.remove("hidden");
+					};
+
+					reader.readAsDataURL(e.target.files[0]);
+				}
+			});
+
+			searchBtn.addEventListener("click", () => {
+				searchOverlay.style.transform = "translateY(0)";
+				setTimeout(() => {
+					searchInput.focus();
+				}, 300);
+			});
+
+			closeSearch.addEventListener("click", () => {
+				searchOverlay.style.transform = "translateY(100%)";
+			});
+
+			searchInput.addEventListener("keypress", (e) => {
+				if (e.key === "Enter") {
+					const searchQuery = searchInput.value.trim();
+
+					if (searchQuery) {
+						showToast(`Searching for "${searchQuery}"...`, "bg-indigo-500");
+
+						setTimeout(() => {
+							searchInput.value = "";
+							searchOverlay.style.transform = "translateY(100%)";
+						}, 1500);
+					}
+				}
+			});
+
+			notificationsBtn.addEventListener("click", () => {
+				notificationsPanel.style.transform = "translateY(0)";
+
+				notificationsBtn.querySelector(".notification-dot").style.display =
+					"none";
+			});
+
+			closeNotifications.addEventListener("click", () => {
+				notificationsPanel.style.transform = "translateY(100%)";
+			});
+
+			messagesBtn.addEventListener("click", () => {
+				messagesPanel.style.transform = "translateY(0)";
+
+				messagesBtn.querySelector(".notification-dot").style.display = "none";
+			});
+
+			closeMessages.addEventListener("click", () => {
+				messagesPanel.style.transform = "translateY(100%)";
+			});
+
+			messagePreviews.forEach((preview) => {
+				preview.addEventListener("click", () => {
+					const person = preview.getAttribute("data-conversation");
+					if (person) {
+						openConversation(person);
+					}
+				});
+			});
+
+			backToMessages.addEventListener("click", () => {
+				conversationContainer.style.transform = "translateY(100%)";
+			});
+
+			sendMessage.addEventListener("click", () => {
+				sendNewMessage();
+			});
+
+			messageInput.addEventListener("keypress", (e) => {
+				if (e.key === "Enter") {
+					sendNewMessage();
+				}
+			});
+
+			tabBtns.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					const tabId = btn.id.replace("-btn", "-tab");
+
+					tabContents.forEach((tab) => {
+						tab.classList.remove("active");
+					});
+
+					document.getElementById(tabId).classList.add("active");
+
+					tabBtns.forEach((tabBtn) => {
+						tabBtn.classList.remove("active");
+						const icon = tabBtn.querySelector("i");
+						const text = tabBtn.querySelector("span");
+
+						if (icon && text) {
+							icon.classList.remove("text-indigo-500");
+							icon.classList.add("text-gray-500");
+							text.classList.remove("text-indigo-500", "font-medium");
+							text.classList.add("text-gray-500");
+						}
+					});
+
+					btn.classList.add("active");
+					const icon = btn.querySelector("i");
+					const text = btn.querySelector("span");
+
+					if (icon && text) {
+						icon.classList.remove("text-gray-500");
+						icon.classList.add("text-indigo-500");
+						text.classList.remove("text-gray-500");
+						text.classList.add("text-indigo-500", "font-medium");
+					}
+				});
+			});
+
+			closeShareModal.addEventListener("click", () => {
+				shareModal.classList.remove("show");
+			});
+
+			copyLink.addEventListener("click", () => {
+				postLink.select();
+				postLink.setSelectionRange(0, 99999);
+
+				document.execCommand("copy");
+
+				showToast("Link copied to clipboard!", "bg-green-500");
+			});
+
+			document.querySelectorAll(".share-option").forEach((option) => {
+				option.addEventListener("click", () => {
+					const platform = option.querySelector("span").textContent;
+					showToast(`Sharing to ${platform}...`, "bg-indigo-500");
+
+					setTimeout(() => {
+						shareModal.classList.remove("show");
+					}, 1500);
+				});
+			});
+
+			profileTabBtns.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					const tabId = btn.getAttribute("data-tab");
+
+					profileTabBtns.forEach((tabBtn) => {
+						tabBtn.classList.remove(
+							"text-indigo-500",
+							"border-b-2",
+							"border-indigo-500"
+						);
+						tabBtn.classList.add("text-gray-500");
+					});
+
+					btn.classList.remove("text-gray-500");
+					btn.classList.add(
+						"text-indigo-500",
+						"border-b-2",
+						"border-indigo-500"
+					);
+
+					profileContent.forEach((content) => {
+						content.classList.add("hidden");
+					});
+
+					document
+						.getElementById(`profile-${tabId}-tab`)
+						.classList.remove("hidden");
+				});
+			});
+
+			editProfileBtn.addEventListener("click", () => {
+				editProfileModal.classList.add("show");
+			});
+
+			closeEditProfile.addEventListener("click", () => {
+				editProfileModal.classList.remove("show");
+			});
+
+			saveProfile.addEventListener("click", () => {
+				editProfileModal.classList.remove("show");
+				showToast("Profile updated successfully!", "bg-green-500");
+			});
+
+			followBackBtns.forEach((btn) => {
+				btn.addEventListener("click", () => {
+					btn.textContent = "Following";
+					btn.classList.remove("gradient-primary", "text-white");
+					btn.classList.add("bg-gray-200", "text-gray-800");
+
+					showToast("Started following!", "bg-green-500");
+				});
+			});
+
+			addStoryBtn.addEventListener("click", () => {
+				storyCreator.classList.add("active");
+			});
+
+			closeStoryCreator.addEventListener("click", () => {
+				storyCreator.classList.remove("active");
+			});
+
+			document.querySelector(".camera-button").addEventListener("click", () => {
+				showToast("Photo captured!", "bg-green-500");
+
+				setTimeout(() => {
+					storyCreator.classList.remove("active");
+					showToast("Story posted successfully!", "bg-green-500");
+				}, 1500);
+			});
+
+			document
+				.querySelector(".camera-option:first-child")
+				.addEventListener("click", () => {
+					showToast("Gallery opened!", "bg-indigo-500");
+				});
+		</script>
+		<script>
+			const userProfile = {
+				name: "Fahad",
+				username: "fahad",
+				bio: "Hey there! I'm passionate about photography, technology and music.",
+				website: "www.yourwebsite.com",
+				avatar: "https://images.unsplash.com/photo-1599566150163-29194dcaad36",
+			};
+
+			document.addEventListener("DOMContentLoaded", function () {
+				const editProfileBtn = document.getElementById("edit-profile-btn");
+				const editProfileModal = document.getElementById("edit-profile-modal");
+				const closeEditProfile = document.getElementById("close-edit-profile");
+				const saveProfileBtn = document.getElementById("save-profile");
+
+				const nameInput = document.querySelector(
+					'#edit-profile-modal input[value="Your Username"]'
+				);
+				const usernameInput = document.querySelector(
+					'#edit-profile-modal input[value="your_username"]'
+				);
+				const bioTextarea = document.querySelector(
+					"#edit-profile-modal textarea"
+				);
+				const websiteInput = document.querySelector(
+					'#edit-profile-modal input[value*="www"]'
+				);
+
+				if (editProfileBtn) {
+					editProfileBtn.addEventListener("click", function () {
+						if (editProfileModal) {
+							editProfileModal.classList.add("show");
+
+							if (nameInput) nameInput.value = userProfile.name;
+							if (usernameInput) usernameInput.value = userProfile.username;
+							if (bioTextarea) bioTextarea.value = userProfile.bio;
+							if (websiteInput) websiteInput.value = userProfile.website;
+						}
+					});
+				}
+
+				if (closeEditProfile) {
+					closeEditProfile.addEventListener("click", function () {
+						if (editProfileModal) {
+							editProfileModal.classList.remove("show");
+						}
+					});
+				}
+
+				if (saveProfileBtn) {
+					saveProfileBtn.addEventListener("click", function () {
+						if (nameInput) userProfile.name = nameInput.value.trim();
+						if (usernameInput)
+							userProfile.username = usernameInput.value.trim();
+						if (bioTextarea) userProfile.bio = bioTextarea.value.trim();
+						if (websiteInput) userProfile.website = websiteInput.value.trim();
+
+						const profileName = document.querySelector("#profile-tab h2");
+						const profileUsername = document.querySelector(
+							"#profile-tab p.text-gray-600"
+						);
+						const profileBio = document.querySelector(
+							"#profile-tab p.text-gray-800"
+						);
+						const profileWebsite = document.querySelector(
+							"#profile-tab p.text-indigo-500"
+						);
+
+						if (profileName) profileName.textContent = userProfile.name;
+						if (profileUsername)
+							profileUsername.textContent = "@" + userProfile.username;
+						if (profileBio) profileBio.textContent = userProfile.bio;
+						if (profileWebsite)
+							profileWebsite.textContent = userProfile.website;
+
+						const userPosts = allPosts.filter(
+							(post) =>
+								post.user.username === "your_username" ||
+								post.user.name === "You" ||
+								post.user.name === userProfile.name
+						);
+
+						userPosts.forEach((post) => {
+							post.user.name = userProfile.name;
+							post.user.username = userProfile.username;
+						});
+
+						const homeTab = document.getElementById("home-tab");
+						if (homeTab && homeTab.classList.contains("active")) {
+							const feedContainer = document.getElementById("feed-container");
+							if (feedContainer) {
+								feedContainer.innerHTML = "";
+								renderPosts(allPosts);
+							}
+						}
+
+						if (editProfileModal) editProfileModal.classList.remove("show");
+
+						showToast("Profile updated successfully!", "bg-green-500");
+					});
+				}
+			});
+		</script>
+	</body>
+</html>

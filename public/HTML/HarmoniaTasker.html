@@ -1,0 +1,2401 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Harmonia - Premium Music Streaming</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--primary-color: #8a2be2;
+				--primary-light: #b983ff;
+				--primary-dark: #6a0dad;
+				--accent-color: #1ed760;
+				--text-color: #e6e6e6;
+				--text-secondary: #a7a7a7;
+				--background: #121212;
+				--card-background: rgba(30, 30, 30, 0.7);
+				--nav-background: rgba(18, 18, 18, 0.95);
+				--glass-background: rgba(30, 30, 30, 0.4);
+				--glass-border: rgba(255, 255, 255, 0.08);
+				--glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+				--cover-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+				--player-height: 90px;
+				--nav-height: 60px;
+				--bottom-nav-height: 65px;
+				--footer-height: 200px;
+				--transition-speed: 0.3s;
+				--border-radius: 12px;
+				--border-radius-sm: 8px;
+				--content-max-width: 1500px;
+				--content-padding: 0 clamp(20px, 5vw, 80px);
+				--margin-m: 20px;
+			}
+
+			.light-theme {
+				--primary-color: #7627c8;
+				--primary-light: #9d4dea;
+				--primary-dark: #5a1d99;
+				--text-color: #121212;
+				--text-secondary: #505050;
+				--background: #f5f5f7;
+				--card-background: rgba(255, 255, 255, 0.7);
+				--nav-background: rgba(245, 245, 247, 0.95);
+				--glass-background: rgba(255, 255, 255, 0.4);
+				--glass-border: rgba(255, 255, 255, 0.3);
+				--glass-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+				--cover-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+					Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+					sans-serif;
+			}
+
+			body {
+				background-color: var(--background);
+				color: var(--text-color);
+				transition: all var(--transition-speed) ease;
+				min-height: 100vh;
+				width: 100vw;
+				overflow-x: hidden;
+				position: relative;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding-bottom: calc(var(--bottom-nav-height) + 20px);
+				/* Add some breathing room */
+				-webkit-overflow-scrolling: touch;
+				overscroll-behavior: none;
+			}
+
+			.container {
+				height: 100%;
+				width: 100%;
+				max-width: var(--content-max-width);
+				margin: 0 auto;
+				display: grid;
+				grid-template-rows: var(--nav-height) 1fr auto var(--bottom-nav-height);
+				box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+				position: relative;
+				overflow-y: none;
+				margin-top: 0px;
+				margin-bottom: -5%;
+			}
+
+			#root {
+				height: 100%;
+				width: 100%;
+				position: relative;
+				overflow: hidden;
+			}
+
+			/* === GLASSMORPHISM === */
+			.glass {
+				background: var(--glass-background);
+				backdrop-filter: blur(16px);
+				-webkit-backdrop-filter: blur(16px);
+				border: 1px solid var(--glass-border);
+				box-shadow: var(--glass-shadow);
+				border-radius: var(--border-radius);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.glass:hover {
+				box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+				transform: translateY(-3px);
+			}
+
+			.glass-nav {
+				background: var(--nav-background);
+				backdrop-filter: blur(16px);
+				-webkit-backdrop-filter: blur(16px);
+				z-index: 100;
+			}
+
+			.backdrop-blur {
+				backdrop-filter: blur(8px);
+				-webkit-backdrop-filter: blur(8px);
+			}
+
+			/* === NAVBAR === */
+			.navbar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0 var(--margin-m);
+				position: sticky;
+				top: 0;
+				width: 100%;
+				z-index: 10;
+				height: var(--nav-height);
+				background-color: var(--dar);
+			}
+			:root {
+				--nav-background: rgba(5, 5, 5, 0.98); /* Darker nav background */
+				/* All other variables remain the same */
+			}
+
+			/* For the light theme, you might want to update this too */
+			.light-theme {
+				--nav-background: rgba(
+					230,
+					230,
+					235,
+					0.98
+				); /* Darker version of the light theme nav */
+				/* All other light theme variables remain the same */
+			}
+
+			.app-logo {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-weight: 700;
+				font-size: 24px;
+				color: var(--primary-color);
+			}
+
+			.app-logo i {
+				color: var(--primary-color);
+			}
+
+			.theme-toggle {
+				background: transparent;
+				color: var(--text-color);
+				border: none;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				font-size: 20px;
+				transition: all 0.2s ease;
+			}
+
+			.theme-toggle:hover {
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			/* === MAIN CONTENT === */
+			.main-content {
+				overflow-y: none;
+				padding: 0;
+				position: relative;
+				scrollbar-width: thin;
+				scrollbar-color: var(--primary-color) transparent;
+				height: 100%;
+			}
+
+			.main-content::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.main-content::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			.main-content::-webkit-scrollbar-thumb {
+				background-color: var(--primary-color);
+				border-radius: 20px;
+			}
+
+			/* === HOME PAGE === */
+			.page {
+				padding: 20px;
+				width: 100%;
+				margin-bottom: 15%;
+			}
+
+			.section-title {
+				font-size: 24px;
+				font-weight: 700;
+				margin-bottom: 20px;
+				margin-top: 20px;
+			}
+
+			.section-subtitle {
+				font-size: 14px;
+				color: var(--text-secondary);
+				margin-bottom: 20px;
+			}
+
+			/* === CARDS GRID === */
+			.cards-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+				gap: 20px;
+				padding-bottom: 20px;
+			}
+
+			.card {
+				border-radius: var(--border-radius);
+				overflow: hidden;
+				cursor: pointer;
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+				height: 100%;
+				position: relative;
+				padding: 15px;
+			}
+
+			.card:hover {
+				transform: translateY(-8px);
+				box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+			}
+
+			.card-image {
+				width: 100%;
+				aspect-ratio: 1/1;
+				object-fit: cover;
+				border-radius: var(--border-radius-sm);
+				margin-bottom: 15px;
+				box-shadow: var(--cover-shadow);
+			}
+
+			.card-title {
+				font-weight: 600;
+				margin-bottom: 5px;
+				font-size: 16px;
+			}
+
+			.card-subtitle {
+				font-size: 14px;
+				color: var(--text-secondary);
+			}
+
+			/* === SONGS LIST === */
+			.songs-list {
+				margin-top: 20px;
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.song-item {
+				display: grid;
+				grid-template-columns: auto 1fr auto auto;
+				align-items: center;
+				gap: 15px;
+				padding: 10px 15px;
+				border-radius: var(--border-radius-sm);
+				cursor: pointer;
+				transition: background-color 0.2s ease;
+			}
+
+			.song-item:hover {
+				background-color: rgba(255, 255, 255, 0.05);
+			}
+
+			.song-item.active {
+				background-color: rgba(138, 43, 226, 0.2);
+			}
+
+			.song-cover {
+				width: 48px;
+				height: 48px;
+				border-radius: 8px;
+				object-fit: cover;
+			}
+
+			.song-info {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.song-title {
+				font-weight: 500;
+				margin-bottom: 4px;
+			}
+
+			.song-artist {
+				font-size: 14px;
+				color: var(--text-secondary);
+			}
+
+			.song-duration {
+				color: var(--text-secondary);
+				font-size: 14px;
+			}
+
+			.song-actions {
+				display: flex;
+				gap: 15px;
+			}
+
+			.song-action-btn {
+				background: transparent;
+				border: none;
+				color: var(--text-secondary);
+				cursor: pointer;
+				font-size: 18px;
+				transition: color 0.2s ease, background-color 0.2s ease,
+					transform 0.2s ease;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+			}
+
+			.song-action-btn:hover {
+				color: var(--text-color);
+				background-color: rgba(255, 255, 255, 0.1);
+				transform: scale(1.1);
+			}
+
+			.song-action-btn.favorite.active {
+				color: #ff3860;
+			}
+
+			.song-action-btn.remove:hover {
+				color: #ff3860;
+			}
+
+			/* === FOOTER === */
+			.footer {
+				padding: 30px var(--margin-m);
+				border-top: 1px solid var(--glass-border);
+				width: 100%;
+				background: var(--card-background);
+				z-index: 5;
+				margin-top: 15%;
+			}
+
+			.footer-container {
+				max-width: var(--content-max-width);
+				margin: 0 auto;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: 30px;
+			}
+
+			.footer-column {
+				display: flex;
+				flex-direction: column;
+				gap: 12px;
+			}
+
+			.footer-title {
+				font-weight: 700;
+				font-size: 16px;
+				margin-bottom: 5px;
+			}
+
+			.footer-link {
+				color: var(--text-secondary);
+				text-decoration: none;
+				font-size: 14px;
+				transition: color 0.2s ease;
+			}
+
+			.footer-link:hover {
+				color: var(--primary-color);
+			}
+
+			.social-links {
+				display: flex;
+				gap: 15px;
+				margin-top: 5px;
+			}
+
+			.social-link {
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.1);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--text-color);
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+
+			.social-link:hover {
+				background: var(--primary-color);
+				transform: translateY(-3px);
+			}
+
+			.footer-logo {
+				font-size: 22px;
+				font-weight: 700;
+				margin-bottom: 10px;
+				color: var(--primary-color);
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.footer-bottom {
+				margin-top: 25px;
+				padding-top: 15px;
+				border-top: 1px solid var(--glass-border);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: 10px;
+				font-size: 12px;
+				color: var(--text-secondary);
+			}
+
+			.footer-bottom-links {
+				display: flex;
+				gap: 15px;
+			}
+
+			.app-badge {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				background: rgba(255, 255, 255, 0.1);
+				padding: 8px 12px;
+				border-radius: 8px;
+				margin-bottom: 10px;
+				transition: all 0.2s ease;
+			}
+
+			.app-badge:hover {
+				background: rgba(255, 255, 255, 0.2);
+			}
+
+			.app-badge i {
+				font-size: 24px;
+			}
+
+			.app-badge-info {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.app-badge-title {
+				font-size: 10px;
+				opacity: 0.7;
+			}
+
+			.app-badge-store {
+				font-weight: 600;
+				font-size: 14px;
+			}
+
+			/* === BOTTOM NAVIGATION === */
+			.bottom-nav {
+				height: var(--bottom-nav-height);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				z-index: 10;
+				border-top: 1px solid var(--glass-border);
+				width: 100%;
+				max-width: var(--content-max-width);
+				padding: 0 var(--margin-m);
+				position: fixed;
+				bottom: 0;
+				margin: 0 auto;
+				left: 50%;
+				transform: translateX(-50%);
+				box-sizing: border-box;
+			}
+
+			.nav-item {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 4px;
+				color: var(--text-secondary);
+				font-size: 12px;
+				cursor: pointer;
+				transition: color 0.2s ease;
+				width: 60px;
+				height: 56px;
+				border-radius: 16px;
+				text-decoration: none;
+				flex-shrink: 0;
+			}
+
+			.nav-item i {
+				font-size: 20px;
+			}
+
+			.nav-item.active {
+				color: var(--primary-color);
+				font-weight: 500;
+			}
+
+			.nav-item:hover {
+				color: var(--text-color);
+			}
+
+			.nav-player-btn {
+				width: 68px;
+				height: 68px;
+				background: var(--primary-color);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+				margin-top: -20px;
+				font-size: 24px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+				transition: transform 0.2s ease, background-color 0.2s ease;
+				flex-shrink: 0;
+			}
+
+			.nav-player-btn:hover {
+				transform: scale(1.05);
+				background: var(--primary-light);
+			}
+
+			.nav-player-btn.playing {
+				transform: scale(1.05);
+				background: var(--accent-color);
+			}
+
+			/* === PLAYER PAGE === */
+			.player-page {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				padding: 0;
+				position: relative;
+				overflow: hidden;
+			}
+
+			@media (min-width: 768px) {
+				.player-page {
+					flex-direction: row;
+				}
+			}
+
+			.player-section {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				justify-content: space-between;
+				padding: 30px;
+				min-height: 100%;
+				position: relative;
+			}
+
+			.lyrics-section {
+				flex: 1;
+				padding: 30px;
+				overflow-y: auto;
+				position: relative;
+				display: none;
+				/* Initially hidden on mobile */
+			}
+
+			@media (min-width: 768px) {
+				.lyrics-section {
+					display: block;
+					max-height: 100%;
+					overflow-y: auto;
+				}
+			}
+
+			.player-top {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 20px;
+			}
+
+			.player-controls {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 20px;
+				width: 100%;
+			}
+
+			.player-album-art {
+				width: 70%;
+				max-width: 300px;
+				aspect-ratio: 1/1;
+				margin: 0 auto;
+				border-radius: var(--border-radius);
+				box-shadow: var(--cover-shadow);
+				transition: transform 0.3s ease;
+				animation: pulse 4s infinite alternate;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+					box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+				}
+
+				100% {
+					transform: scale(1.03);
+					box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
+				}
+			}
+
+			.player-info {
+				text-align: center;
+				margin: 25px 0;
+			}
+
+			.player-title {
+				font-size: 24px;
+				font-weight: 700;
+				margin-bottom: 8px;
+			}
+
+			.player-artist {
+				font-size: 16px;
+				color: var(--text-secondary);
+			}
+
+			.player-timeline {
+				width: 100%;
+				max-width: 400px;
+				margin: 0 auto;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.progress-bar {
+				width: 100%;
+				height: 5px;
+				background-color: rgba(255, 255, 255, 0.1);
+				border-radius: 10px;
+				position: relative;
+				cursor: pointer;
+				overflow: hidden;
+			}
+
+			.progress-current {
+				height: 100%;
+				background-color: var(--primary-color);
+				width: 30%;
+				border-radius: 10px;
+				position: relative;
+				transition: width 0.1s linear;
+			}
+
+			.progress-handle {
+				width: 15px;
+				height: 15px;
+				background-color: var(--primary-color);
+				border: 3px solid white;
+				border-radius: 50%;
+				position: absolute;
+				top: 50%;
+				right: 0;
+				transform: translate(50%, -50%);
+				box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+			}
+
+			.time-stamps {
+				display: flex;
+				justify-content: space-between;
+				font-size: 12px;
+				color: var(--text-secondary);
+			}
+
+			.player-buttons {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 15px;
+				margin-top: 25px;
+			}
+
+			.ctrl-btn {
+				background: transparent;
+				border: none;
+				color: var(--text-color);
+				cursor: pointer;
+				font-size: 18px;
+				transition: transform 0.2s ease, color 0.2s ease;
+				width: 45px;
+				height: 45px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.ctrl-btn:hover {
+				color: var(--primary-color);
+				transform: scale(1.1);
+			}
+
+			.ctrl-btn.large {
+				font-size: 22px;
+				width: 55px;
+				height: 55px;
+				background-color: var(--primary-color);
+				color: white;
+			}
+
+			.ctrl-btn.large:hover {
+				background-color: var(--primary-light);
+				transform: scale(1.05);
+			}
+
+			.ctrl-btn.favorite.active {
+				color: #ff3860;
+			}
+
+			.lyrics-title {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 20px;
+				font-weight: 700;
+				font-size: 20px;
+			}
+
+			.lyrics-toggle {
+				background: transparent;
+				border: none;
+				color: var(--text-secondary);
+				cursor: pointer;
+				font-size: 16px;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				padding: 8px 12px;
+				border-radius: var(--border-radius-sm);
+				transition: all 0.2s ease;
+			}
+
+			.lyrics-toggle:hover {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: var(--text-color);
+			}
+
+			.lyrics-content {
+				font-size: 16px;
+				line-height: 1.8;
+				white-space: pre-line;
+			}
+
+			.lyrics-line {
+				margin-bottom: 15px;
+				transition: all 0.3s ease;
+				opacity: 0.6;
+			}
+
+			.lyrics-line.current {
+				font-weight: 600;
+				color: var(--primary-color);
+				opacity: 1;
+				transform: scale(1.02);
+			}
+
+			/* Update the display property for Up Next section */
+			.upnext-content {
+				display: block;
+			}
+
+			/* Mobile switches */
+			.mobile-switches {
+				display: flex;
+				justify-content: center;
+				gap: 20px;
+				margin-top: 20px;
+			}
+
+			@media (min-width: 768px) {
+				.mobile-switches {
+					display: none;
+				}
+			}
+
+			.switch-btn {
+				background: transparent;
+				border: 1px solid var(--glass-border);
+				color: var(--text-secondary);
+				border-radius: var(--border-radius-sm);
+				padding: 8px 15px;
+				font-size: 14px;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.switch-btn.active {
+				background-color: var(--primary-color);
+				color: white;
+				border-color: var(--primary-color);
+			}
+
+			/* === RESPONSIVE STYLES === */
+			@media (max-width: 1600px) {
+				.container {
+					max-width: 95%;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.container {
+					height: 100%;
+					width: 100%;
+					max-width: var(--content-max-width);
+					margin: 0 auto;
+					display: grid;
+					grid-template-rows: var(--nav-height) minmax(0, 1fr) auto var(
+							--bottom-nav-height
+						);
+					/* Use minmax for flexibility */
+					box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
+					position: relative;
+					overflow-y: hidden;
+					/* Prevent container overflow, let main-content handle it */
+					margin-top: 0px;
+				}
+				.footer {
+					margin: 0px 0px;
+				}
+				.footer-desktop-only {
+					display: none;
+				}
+
+				.cards-grid {
+					grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+					gap: 15px;
+				}
+
+				.player-album-art {
+					width: 80%;
+				}
+
+				.player-title {
+					font-size: 20px;
+				}
+
+				.section-title {
+					font-size: 20px;
+				}
+
+				.footer-container {
+					grid-template-columns: 1fr 1fr;
+				}
+
+				.footer-bottom {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+			}
+
+			@media (max-width: 576px) {
+				.footer-container {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (min-width: 1024px) {
+				.player-page {
+					padding: 0;
+				}
+			}
+
+			/* === ANIMATIONS === */
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.fade-in {
+				animation: fadeIn 0.4s ease forwards;
+			}
+
+			/* === PLAYLISTS PAGE === */
+			.playlist-header {
+				display: flex;
+				align-items: center;
+				gap: 20px;
+				margin-bottom: 30px;
+			}
+
+			.playlist-image {
+				width: 150px;
+				height: 150px;
+				border-radius: var(--border-radius);
+				object-fit: cover;
+				box-shadow: var(--cover-shadow);
+			}
+
+			.playlist-details {
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+			}
+
+			.playlist-title {
+				font-size: 28px;
+				font-weight: 700;
+			}
+
+			.playlist-info {
+				font-size: 14px;
+				color: var(--text-secondary);
+			}
+
+			.playlist-actions {
+				display: flex;
+				gap: 15px;
+				margin-top: 15px;
+			}
+
+			.playlist-btn {
+				background: var(--primary-color);
+				color: white;
+				border: none;
+				border-radius: 30px;
+				padding: 12px 25px;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+
+			.playlist-btn:hover {
+				background: var(--primary-light);
+				transform: translateY(-2px);
+			}
+
+			.playlist-btn.outline {
+				background: transparent;
+				color: var(--text-color);
+				border: 1px solid var(--glass-border);
+			}
+
+			.playlist-btn.outline:hover {
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			/* Modal Styles */
+			.modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.7);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				padding: 20px;
+			}
+
+			.modal-content {
+				width: 100%;
+				max-width: 400px;
+				padding: 25px;
+				border-radius: var(--border-radius);
+				position: relative;
+				animation: fadeIn 0.3s ease;
+			}
+
+			.modal-header {
+				text-align: center;
+				margin-bottom: 25px;
+			}
+
+			.modal-icon {
+				width: 60px;
+				height: 60px;
+				background: var(--primary-color);
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin: 0 auto 15px;
+				font-size: 24px;
+				color: white;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+			}
+
+			.modal-title {
+				font-size: 22px;
+				font-weight: 600;
+				margin-bottom: 8px;
+			}
+
+			.modal-subtitle {
+				font-size: 14px;
+				color: var(--text-secondary);
+			}
+
+			.modal-body {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+			}
+
+			.form-group {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.form-label {
+				font-size: 14px;
+				font-weight: 500;
+			}
+
+			.form-input {
+				padding: 12px;
+				border-radius: var(--border-radius-sm);
+				border: 1px solid var(--glass-border);
+				background: rgba(255, 255, 255, 0.05);
+				color: var(--text-color);
+				font-size: 14px;
+				transition: all 0.2s ease;
+			}
+
+			.form-input:focus {
+				outline: none;
+				border-color: var(--primary-color);
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			.modal-footer {
+				display: flex;
+				gap: 15px;
+				justify-content: flex-end;
+				margin-top: 25px;
+			}
+
+			.modal-btn {
+				padding: 10px 20px;
+				border-radius: 20px;
+				border: none;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.modal-btn.primary {
+				background: var(--primary-color);
+				color: white;
+			}
+
+			.modal-btn.primary:hover {
+				background: var(--primary-light);
+				transform: translateY(-2px);
+			}
+
+			.modal-btn.secondary {
+				background: transparent;
+				color: var(--text-secondary);
+				border: 1px solid var(--glass-border);
+			}
+
+			.modal-btn.secondary:hover {
+				background: rgba(255, 255, 255, 0.1);
+				color: var(--text-color);
+			}
+
+			.modal-btn:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			.add-to-playlist-btn {
+				background: transparent;
+				border: none;
+				color: var(--text-secondary);
+				cursor: pointer;
+				font-size: 18px;
+				transition: color 0.2s ease, background-color 0.2s ease,
+					transform 0.2s ease;
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.add-to-playlist-btn:hover {
+				color: var(--text-color);
+				background-color: rgba(255, 255, 255, 0.1);
+				transform: scale(1.1);
+			}
+
+			.playlist-select-modal {
+				max-height: 80vh;
+				overflow-y: auto;
+			}
+
+			@media (max-width: 576px) {
+				.playlist-header {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+
+				.playlist-image {
+					width: 120px;
+					height: 120px;
+				}
+
+				.playlist-title {
+					font-size: 24px;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="root"></div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.21.4/babel.min.js"></script>
+
+		<script type="text/babel">
+			const { useState, useEffect, useRef } = React;
+
+			// Shared Lyrics for All Songs
+			const sharedLyrics = `Lost in the rhythm of the night
+Echoes of sound paint pictures in my mind
+Each beat resonates with my soul
+Creating memories that never grow old
+
+Music flows through my veins
+Like rainfall washing away all pains
+Melodies that touch the heart
+Where passion and emotion start
+
+The symphony of life plays on
+From dusk until the break of dawn
+Harmonies blend and intertwine
+In this perfect moment frozen in time
+
+Dancing to the rhythm and beat
+The sound carries me off my feet
+Music, the universal tongue
+Where all souls can feel they belong`;
+
+			// Sample data with more songs
+			const songsData = [
+				{
+					id: 1,
+					title: "Astral Journey",
+					artist: "Cosmic Waves",
+					album: "Galaxy Invaders",
+					cover: "https://picsum.photos/400/400?random=1",
+					duration: "3:45",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 2,
+					title: "Digital Dreams",
+					artist: "Neural Network",
+					album: "Modular Minds",
+					cover: "https://picsum.photos/400/400?random=2",
+					duration: "4:21",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/pang/paza-moduless.mp3",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 3,
+					title: "Velocity",
+					artist: "Quantum Drive",
+					album: "Race to Infinity",
+					cover: "https://picsum.photos/400/400?random=3",
+					duration: "2:57",
+					src: "https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/race2.ogg",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 4,
+					title: "Nebula Nights",
+					artist: "Cosmic Waves",
+					album: "Galaxy Invaders",
+					cover: "https://picsum.photos/400/400?random=4",
+					duration: "3:15",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 5,
+					title: "Synapse",
+					artist: "Neural Network",
+					album: "Modular Minds",
+					cover: "https://picsum.photos/400/400?random=5",
+					duration: "3:52",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/pang/paza-moduless.mp3",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 6,
+					title: "Hyperdrive",
+					artist: "Quantum Drive",
+					album: "Race to Infinity",
+					cover: "https://picsum.photos/400/400?random=6",
+					duration: "4:05",
+					src: "https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/race2.ogg",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 7,
+					title: "Midnight Flow",
+					artist: "Echo Pulse",
+					album: "Twilight Sessions",
+					cover: "https://picsum.photos/400/400?random=7",
+					duration: "3:33",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3",
+					category: "Ambient",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 8,
+					title: "Solar Flare",
+					artist: "Star Collective",
+					album: "Cosmic Rhythms",
+					cover: "https://picsum.photos/400/400?random=8",
+					duration: "4:12",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/pang/paza-moduless.mp3",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 9,
+					title: "Quantum Leap",
+					artist: "Particle Wave",
+					album: "Dimensional Shift",
+					cover: "https://picsum.photos/400/400?random=9",
+					duration: "3:28",
+					src: "https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/race2.ogg",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 10,
+					title: "Neon Dreams",
+					artist: "Cyber Syntax",
+					album: "Digital Revolution",
+					cover: "https://picsum.photos/400/400?random=10",
+					duration: "3:50",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/GalaxyInvaders/theme_01.mp3",
+					category: "Synthwave",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 11,
+					title: "Aurora",
+					artist: "Polar Lights",
+					album: "Northern Skies",
+					cover: "https://picsum.photos/400/400?random=11",
+					duration: "4:15",
+					src: "https://codeskulptor-demos.commondatastorage.googleapis.com/pang/paza-moduless.mp3",
+					category: "Ambient",
+					lyrics: sharedLyrics,
+				},
+				{
+					id: 12,
+					title: "Circuit Breaker",
+					artist: "Binary Code",
+					album: "System Override",
+					cover: "https://picsum.photos/400/400?random=12",
+					duration: "3:22",
+					src: "https://commondatastorage.googleapis.com/codeskulptor-demos/riceracer_assets/music/race2.ogg",
+					category: "Electronic",
+					lyrics: sharedLyrics,
+				},
+			];
+
+			const playlistsData = [
+				{
+					id: 1,
+					title: "Cosmic Vibes",
+					description: "Electronic music for space exploration",
+					cover: "https://picsum.photos/400/400?random=101",
+					songIds: [1, 4, 6, 8],
+				},
+				{
+					id: 2,
+					title: "Digital Focus",
+					description: "Help your mind concentrate with electronic beats",
+					cover: "https://picsum.photos/400/400?random=102",
+					songIds: [2, 5, 3, 12],
+				},
+				{
+					id: 3,
+					title: "Quantum Beats",
+					description: "Fast-paced electronic music for workouts",
+					cover: "https://picsum.photos/400/400?random=103",
+					songIds: [3, 6, 2, 9],
+				},
+				{
+					id: 4,
+					title: "Ambient Dreams",
+					description: "Relaxing ambient sounds for meditation",
+					cover: "https://picsum.photos/400/400?random=104",
+					songIds: [7, 11, 4, 10],
+				},
+				{
+					id: 5,
+					title: "Synthwave Mix",
+					description: "Retro-futuristic electronic vibes",
+					cover: "https://picsum.photos/400/400?random=105",
+					songIds: [10, 8, 5, 1],
+				},
+			];
+
+			function App() {
+				const [isDarkTheme, setIsDarkTheme] = useState(true);
+				const [currentPage, setCurrentPage] = useState("home");
+				const [favorites, setFavorites] = useState([1, 4]);
+				const [currentSong, setCurrentSong] = useState(null);
+				const [isPlaying, setIsPlaying] = useState(false);
+				const [progress, setProgress] = useState(0);
+				const [currentTime, setCurrentTime] = useState("0:00");
+				const [showLyrics, setShowLyrics] = useState(true);
+				const [audioElement, setAudioElement] = useState(null);
+				const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+				const [showCreatePlaylistModal, setShowCreatePlaylistModal] =
+					useState(false);
+				const [newPlaylistName, setNewPlaylistName] = useState("");
+				const [newPlaylistDescription, setNewPlaylistDescription] =
+					useState("");
+				const [showAddToPlaylistModal, setShowAddToPlaylistModal] =
+					useState(false);
+				const [songToAdd, setSongToAdd] = useState(null);
+
+				useEffect(() => {
+					document.body.classList.toggle("light-theme", isDarkTheme);
+				}, []);
+
+				const audioRef = useRef(null);
+				const progressIntervalRef = useRef(null);
+
+				useEffect(() => {
+					const audio = new Audio();
+					audio.addEventListener("ended", handleSongEnd);
+					audioRef.current = audio;
+					setAudioElement(audio);
+
+					return () => {
+						clearInterval(progressIntervalRef.current);
+						audio.pause();
+						audio.removeEventListener("ended", handleSongEnd);
+					};
+				}, []);
+
+				const toggleTheme = () => {
+					const newTheme = !isDarkTheme;
+					setIsDarkTheme(newTheme);
+					document.body.classList.toggle("light-theme", newTheme);
+				};
+
+				const formatTime = (seconds) => {
+					const minutes = Math.floor(seconds / 60);
+					const remainingSeconds = Math.floor(seconds % 60);
+					return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+				};
+
+				const playSong = (song) => {
+					if (currentSong && currentSong.id === song.id) {
+						if (isPlaying) {
+							audioRef.current.pause();
+							setIsPlaying(false);
+							clearInterval(progressIntervalRef.current);
+						} else {
+							audioRef.current.play();
+							setIsPlaying(true);
+							startProgressUpdate();
+						}
+					} else {
+						if (audioRef.current) {
+							audioRef.current.pause();
+							clearInterval(progressIntervalRef.current);
+						}
+
+						audioRef.current.src = song.src;
+						audioRef.current.load();
+						audioRef.current
+							.play()
+							.then(() => {
+								setCurrentSong(song);
+								setIsPlaying(true);
+								startProgressUpdate();
+								setCurrentPage("player");
+							})
+							.catch((err) => console.error("Error playing audio:", err));
+					}
+				};
+
+				const startProgressUpdate = () => {
+					clearInterval(progressIntervalRef.current);
+					progressIntervalRef.current = setInterval(() => {
+						if (audioRef.current) {
+							const currentProgress =
+								(audioRef.current.currentTime / audioRef.current.duration) *
+								100;
+							setProgress(currentProgress || 0);
+							setCurrentTime(formatTime(audioRef.current.currentTime));
+						}
+					}, 1000);
+				};
+
+				const handleSongEnd = () => {
+					clearInterval(progressIntervalRef.current);
+					setIsPlaying(false);
+					setProgress(0);
+					setCurrentTime("0:00");
+					const currentIndex = songsData.findIndex(
+						(song) => song.id === currentSong.id
+					);
+					const nextIndex = (currentIndex + 1) % songsData.length;
+					playSong(songsData[nextIndex]);
+				};
+
+				const toggleFavorite = (songId, event) => {
+					event.stopPropagation();
+					setFavorites((prevFavorites) =>
+						prevFavorites.includes(songId)
+							? prevFavorites.filter((id) => id !== songId)
+							: [...prevFavorites, songId]
+					);
+				};
+
+				const handleCreatePlaylist = () => {
+					if (newPlaylistName.trim() === "") return;
+
+					const newPlaylist = {
+						id: playlistsData.length + 1,
+						title: newPlaylistName,
+						description: newPlaylistDescription || "My custom playlist",
+						cover: `https://picsum.photos/400/400?random=${Math.floor(
+							Math.random() * 1000
+						)}`,
+						songIds: [],
+					};
+
+					playlistsData.push(newPlaylist);
+					setNewPlaylistName("");
+					setNewPlaylistDescription("");
+					setShowCreatePlaylistModal(false);
+					setSelectedPlaylist(newPlaylist);
+					setCurrentPage("playlist");
+				};
+
+				const removeSongFromPlaylist = (playlistId, songId, event) => {
+					event.stopPropagation();
+					const playlist = playlistsData.find((p) => p.id === playlistId);
+					if (playlist) {
+						playlist.songIds = playlist.songIds.filter((id) => id !== songId);
+						setSelectedPlaylist({ ...playlist });
+					}
+				};
+
+				const addSongToPlaylist = (playlistId, songId) => {
+					const playlist = playlistsData.find((p) => p.id === playlistId);
+					if (playlist && !playlist.songIds.includes(songId)) {
+						playlist.songIds.push(songId);
+						setShowAddToPlaylistModal(false);
+						setSongToAdd(null);
+					}
+				};
+
+				const openAddToPlaylistModal = (song, event) => {
+					event.stopPropagation();
+					setSongToAdd(song);
+					setShowAddToPlaylistModal(true);
+				};
+
+				const playPreviousSong = () => {
+					if (!currentSong) return;
+					const currentIndex = songsData.findIndex(
+						(song) => song.id === currentSong.id
+					);
+					const prevIndex =
+						currentIndex === 0 ? songsData.length - 1 : currentIndex - 1;
+					playSong(songsData[prevIndex]);
+				};
+
+				const playNextSong = () => {
+					if (!currentSong) return;
+					const currentIndex = songsData.findIndex(
+						(song) => song.id === currentSong.id
+					);
+					const nextIndex = (currentIndex + 1) % songsData.length;
+					playSong(songsData[nextIndex]);
+				};
+
+				const seek = (e) => {
+					const progressBar = e.currentTarget;
+					const rect = progressBar.getBoundingClientRect();
+					const offsetX = e.clientX - rect.left;
+					const newProgress = (offsetX / rect.width) * 100;
+
+					if (audioRef.current && !isNaN(audioRef.current.duration)) {
+						audioRef.current.currentTime =
+							(newProgress / 100) * audioRef.current.duration;
+						setProgress(newProgress);
+						setCurrentTime(formatTime(audioRef.current.currentTime));
+					}
+				};
+
+				const openPlaylist = (playlist) => {
+					setSelectedPlaylist(playlist);
+					setCurrentPage("playlist");
+				};
+
+				const getNextSongs = () => {
+					if (!currentSong) return [];
+					const currentIndex = songsData.findIndex(
+						(song) => song.id === currentSong.id
+					);
+					let nextSongs = [];
+					for (let i = 1; i <= 5; i++) {
+						const nextIndex = (currentIndex + i) % songsData.length;
+						nextSongs.push(songsData[nextIndex]);
+					}
+					return nextSongs;
+				};
+
+				const SongItem = ({ song, isActive, showRemove, playlistId }) => (
+					<div
+						className={`song-item glass ${isActive ? "active" : ""}`}
+						onClick={() => playSong(song)}
+					>
+						<img src={song.cover} alt={song.title} className="song-cover" />
+						<div className="song-info">
+							<div className="song-title">{song.title}</div>
+							<div className="song-artist">{song.artist}</div>
+						</div>
+						<div className="song-duration">{song.duration}</div>
+						<div className="song-actions">
+							<button
+								className={`song-action-btn favorite ${
+									favorites.includes(song.id) ? "active" : ""
+								}`}
+								onClick={(e) => toggleFavorite(song.id, e)}
+							>
+								<i
+									className={`fa-${
+										favorites.includes(song.id) ? "solid" : "regular"
+									} fa-heart`}
+								></i>
+							</button>
+							<button
+								className="song-action-btn add-to-playlist-btn"
+								onClick={(e) => openAddToPlaylistModal(song, e)}
+							>
+								<i className="fa-solid fa-plus"></i>
+							</button>
+							{showRemove && (
+								<button
+									className="song-action-btn remove"
+									onClick={(e) =>
+										removeSongFromPlaylist(playlistId, song.id, e)
+									}
+								>
+									<i className="fa-solid fa-trash-can"></i>
+								</button>
+							)}
+						</div>
+					</div>
+				);
+
+				const renderHomePage = () => (
+					<div className="page fade-in">
+						<div className="section-title">Featured Playlists</div>
+						<div className="cards-grid">
+							{playlistsData.map((playlist) => (
+								<div
+									key={playlist.id}
+									className="card glass"
+									onClick={() => openPlaylist(playlist)}
+								>
+									<img
+										src={playlist.cover}
+										alt={playlist.title}
+										className="card-image"
+									/>
+									<div className="card-title">{playlist.title}</div>
+									<div className="card-subtitle">{playlist.description}</div>
+								</div>
+							))}
+						</div>
+
+						<div className="section-title">Recently Played</div>
+						<div className="songs-list">
+							{songsData.slice(0, 4).map((song) => (
+								<SongItem
+									key={song.id}
+									song={song}
+									isActive={currentSong && currentSong.id === song.id}
+								/>
+							))}
+						</div>
+
+						<div className="section-title">Top Tracks</div>
+						<div className="cards-grid">
+							{songsData.slice(0, 6).map((song) => (
+								<div
+									key={song.id}
+									className="card glass"
+									onClick={() => playSong(song)}
+								>
+									<img
+										src={song.cover}
+										alt={song.title}
+										className="card-image"
+									/>
+									<div className="card-title">{song.title}</div>
+									<div className="card-subtitle">{song.artist}</div>
+								</div>
+							))}
+						</div>
+					</div>
+				);
+
+				const renderFavoritesPage = () => (
+					<div className="page fade-in">
+						<div className="section-title">Your Favorites</div>
+						<div className="section-subtitle">
+							{favorites.length === 0
+								? "You haven't added any favorites yet."
+								: `${favorites.length} favorite tracks`}
+						</div>
+						<div className="songs-list">
+							{favorites.length > 0 ? (
+								songsData
+									.filter((song) => favorites.includes(song.id))
+									.map((song) => (
+										<SongItem
+											key={song.id}
+											song={song}
+											isActive={currentSong && currentSong.id === song.id}
+										/>
+									))
+							) : (
+								<div
+									className="glass"
+									style={{ padding: "30px", textAlign: "center" }}
+								>
+									<i
+										className="fa-regular fa-heart"
+										style={{
+											fontSize: "48px",
+											marginBottom: "20px",
+											opacity: 0.5,
+										}}
+									></i>
+									<p>Start adding some favorites</p>
+								</div>
+							)}
+						</div>
+					</div>
+				);
+
+				const renderPlayerPage = () => {
+					if (!currentSong) {
+						return (
+							<div
+								className="page fade-in"
+								style={{
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "center",
+									justifyContent: "center",
+									height: "100%",
+								}}
+							>
+								<i
+									className="fa-solid fa-music"
+									style={{
+										fontSize: "48px",
+										marginBottom: "20px",
+										opacity: 0.5,
+									}}
+								></i>
+								<h2>No track selected</h2>
+								<p
+									style={{ marginTop: "10px", color: "var(--text-secondary)" }}
+								>
+									Choose a song to start listening
+								</p>
+							</div>
+						);
+					}
+
+					return (
+						<div className="player-page fade-in">
+							<div className="player-section">
+								<div className="player-top">
+									<button
+										className="ctrl-btn"
+										onClick={() => setCurrentPage("home")}
+									>
+										<i className="fa-solid fa-arrow-left"></i>
+									</button>
+									<button
+										className={`ctrl-btn favorite ${
+											favorites.includes(currentSong.id) ? "active" : ""
+										}`}
+										onClick={(e) => toggleFavorite(currentSong.id, e)}
+									>
+										<i
+											className={`fa-${
+												favorites.includes(currentSong.id) ? "solid" : "regular"
+											} fa-heart`}
+										></i>
+									</button>
+								</div>
+								<div className="player-controls">
+									<img
+										src={currentSong.cover}
+										alt={currentSong.title}
+										className="player-album-art"
+									/>
+									<div className="player-info">
+										<div className="player-title">{currentSong.title}</div>
+										<div className="player-artist">{currentSong.artist}</div>
+									</div>
+									<div className="player-timeline">
+										<div className="progress-bar" onClick={seek}>
+											<div
+												className="progress-current"
+												style={{ width: `${progress}%` }}
+											>
+												<div className="progress-handle"></div>
+											</div>
+										</div>
+										<div className="time-stamps">
+											<div>{currentTime}</div>
+											<div>{currentSong.duration}</div>
+										</div>
+									</div>
+									<div className="player-buttons">
+										<button className="ctrl-btn" onClick={() => {}}>
+											<i className="fa-solid fa-shuffle"></i>
+										</button>
+										<button className="ctrl-btn" onClick={playPreviousSong}>
+											<i className="fa-solid fa-backward-step"></i>
+										</button>
+										<button
+											className="ctrl-btn large"
+											onClick={() => playSong(currentSong)}
+										>
+											<i
+												className={`fa-solid fa-${
+													isPlaying ? "pause" : "play"
+												}`}
+											></i>
+										</button>
+										<button className="ctrl-btn" onClick={playNextSong}>
+											<i className="fa-solid fa-forward-step"></i>
+										</button>
+										<button className="ctrl-btn" onClick={() => {}}>
+											<i className="fa-solid fa-repeat"></i>
+										</button>
+									</div>
+								</div>
+								<div className="mobile-switches">
+									<button
+										className={`switch-btn ${showLyrics ? "active" : ""}`}
+										onClick={() => setShowLyrics(true)}
+									>
+										Lyrics
+									</button>
+									<button
+										className={`switch-btn ${!showLyrics ? "active" : ""}`}
+										onClick={() => setShowLyrics(false)}
+									>
+										Up Next
+									</button>
+								</div>
+							</div>
+							<div
+								className={`lyrics-section glass ${showLyrics ? "active" : ""}`}
+							>
+								{showLyrics ? (
+									<>
+										<div className="lyrics-title">
+											<span>Lyrics</span>
+											<button
+												className="lyrics-toggle"
+												onClick={() => setShowLyrics(false)}
+											>
+												<i className="fa-solid fa-list"></i> Up Next
+											</button>
+										</div>
+										<div className="lyrics-content">
+											{currentSong.lyrics.split("\n\n").map((stanza, index) => (
+												<div
+													key={index}
+													className={`lyrics-line ${
+														index === 1 ? "current" : ""
+													}`}
+												>
+													{stanza}
+												</div>
+											))}
+										</div>
+									</>
+								) : (
+									<>
+										<div className="lyrics-title">
+											<span>Up Next</span>
+											<button
+												className="lyrics-toggle"
+												onClick={() => setShowLyrics(true)}
+											>
+												<i className="fa-solid fa-music"></i> Lyrics
+											</button>
+										</div>
+										<div className="upnext-content">
+											<div className="songs-list">
+												{getNextSongs().map((song) => (
+													<SongItem key={song.id} song={song} />
+												))}
+											</div>
+										</div>
+									</>
+								)}
+							</div>
+						</div>
+					);
+				};
+				const renderPlaylistPage = () => {
+					if (!selectedPlaylist) return null;
+					const playlistSongs = songsData.filter((song) =>
+						selectedPlaylist.songIds.includes(song.id)
+					);
+
+					return (
+						<div className="page fade-in">
+							<div className="playlist-header">
+								<img
+									src={selectedPlaylist.cover}
+									alt={selectedPlaylist.title}
+									className="playlist-image"
+								/>
+								<div className="playlist-details">
+									<div className="playlist-title">{selectedPlaylist.title}</div>
+									<div className="playlist-info">
+										{selectedPlaylist.description}
+									</div>
+									<div className="playlist-info">
+										{playlistSongs.length} songs
+									</div>
+									<div className="playlist-actions">
+										<button className="playlist-btn">
+											<i className="fa-solid fa-play"></i> Play All
+										</button>
+										<button className="playlist-btn outline">
+											<i className="fa-regular fa-heart"></i> Add to Favorites
+										</button>
+									</div>
+								</div>
+							</div>
+							<div className="songs-list">
+								{playlistSongs.map((song) => (
+									<SongItem
+										key={song.id}
+										song={song}
+										isActive={currentSong && currentSong.id === song.id}
+										showRemove
+										playlistId={selectedPlaylist.id}
+									/>
+								))}
+							</div>
+						</div>
+					);
+				};
+
+				const renderPlaylistsPage = () => (
+					<div className="page fade-in">
+						<div className="section-title">Your Playlists</div>
+						<div className="cards-grid">
+							{playlistsData.map((playlist) => (
+								<div
+									key={playlist.id}
+									className="card glass"
+									onClick={() => openPlaylist(playlist)}
+								>
+									<img
+										src={playlist.cover}
+										alt={playlist.title}
+										className="card-image"
+									/>
+									<div className="card-title">{playlist.title}</div>
+									<div className="card-subtitle">{playlist.description}</div>
+								</div>
+							))}
+						</div>
+						<div className="section-title">Create New Playlist</div>
+						<div
+							className="card glass"
+							style={{
+								display: "flex",
+								flexDirection: "column",
+								alignItems: "center",
+								justifyContent: "center",
+								gap: "15px",
+								padding: "20px",
+								cursor: "pointer",
+							}}
+							onClick={() => setShowCreatePlaylistModal(true)}
+						>
+							<i className="fa-solid fa-plus" style={{ fontSize: "32px" }}></i>
+							<div>Create Playlist</div>
+						</div>
+					</div>
+				);
+
+				const renderProfilePage = () => (
+					<div className="page fade-in">
+						<div className="section-title">Your Profile</div>
+						<div
+							className="glass"
+							style={{ padding: "30px", borderRadius: "var(--border-radius)" }}
+						>
+							<div
+								style={{
+									display: "flex",
+									alignItems: "center",
+									gap: "20px",
+									marginBottom: "30px",
+								}}
+							>
+								<div
+									style={{
+										width: "100px",
+										height: "100px",
+										borderRadius: "50%",
+										background: "var(--primary-color)",
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										fontSize: "40px",
+										color: "white",
+										boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
+									}}
+								>
+									<img
+										src="https://avatar.iran.liara.run/public"
+										alt="User Avatar"
+										style={{
+											width: "100%",
+											height: "100%",
+											borderRadius: "50%",
+											objectFit: "cover",
+										}}
+									/>
+								</div>
+								<div>
+									<h2 style={{ marginBottom: "5px" }}>User Name</h2>
+									<p style={{ color: "var(--text-secondary)" }}>
+										Premium Member
+									</p>
+								</div>
+							</div>
+
+							<div
+								style={{
+									display: "flex",
+									flexDirection: "column",
+									gap: "20px",
+								}}
+							>
+								<div>
+									<div style={{ marginBottom: "10px", fontWeight: "600" }}>
+										Account Settings
+									</div>
+									<div className="song-item" style={{ cursor: "pointer" }}>
+										<i
+											className="fa-solid fa-gear"
+											style={{ width: "24px" }}
+										></i>
+										<span>Settings</span>
+									</div>
+									<div className="song-item" style={{ cursor: "pointer" }}>
+										<i
+											className="fa-solid fa-bell"
+											style={{ width: "24px" }}
+										></i>
+										<span>Notifications</span>
+									</div>
+								</div>
+
+								<div>
+									<div style={{ marginBottom: "10px", fontWeight: "600" }}>
+										Content Preferences
+									</div>
+									<div className="song-item" style={{ cursor: "pointer" }}>
+										<i
+											className="fa-solid fa-sliders"
+											style={{ width: "24px" }}
+										></i>
+										<span>Audio Quality</span>
+									</div>
+									<div className="song-item" style={{ cursor: "pointer" }}>
+										<i
+											className="fa-solid fa-download"
+											style={{ width: "24px" }}
+										></i>
+										<span>Downloads</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				);
+
+				//Footer Component
+				const Footer = () => (
+					<footer className="footer">
+						<div className="footer-container">
+							<div className="footer-column">
+								<div className="footer-logo">
+									<i className="fa-solid fa-compact-disc"></i>
+									<span>Harmonia</span>
+								</div>
+								<p
+									style={{
+										fontSize: "14px",
+										color: "var(--text-secondary)",
+										lineHeight: "1.6",
+									}}
+								>
+									Discover and enjoy millions of songs with premium sound
+									quality and personalized recommendations.
+								</p>
+								<div className="social-links">
+									<a href="#" className="social-link">
+										<i className="fa-brands fa-facebook-f"></i>
+									</a>
+									<a href="#" className="social-link">
+										<i className="fa-brands fa-twitter"></i>
+									</a>
+									<a href="#" className="social-link">
+										<i className="fa-brands fa-instagram"></i>
+									</a>
+									<a href="#" className="social-link">
+										<i className="fa-brands fa-spotify"></i>
+									</a>
+								</div>
+							</div>
+							<div className="footer-column">
+								<div className="footer-title footer-desktop-only">Company</div>
+								<a href="#" className="footer-link">
+									About
+								</a>
+								<a href="#" className="footer-link">
+									Careers
+								</a>
+								<a href="#" className="footer-link">
+									Press
+								</a>
+								<a href="#" className="footer-link">
+									News
+								</a>
+								<a href="#" className="footer-link">
+									Contact
+								</a>
+							</div>
+							<div className="footer-column footer-desktop-only">
+								<div className="footer-title">Support</div>
+								<a href="#" className="footer-link">
+									Help Center
+								</a>
+								<a href="#" className="footer-link">
+									Community
+								</a>
+								<a href="#" className="footer-link">
+									Safety Center
+								</a>
+								<a href="#" className="footer-link">
+									Artist Support
+								</a>
+								<a href="#" className="footer-link">
+									Developer API
+								</a>
+							</div>
+							<div className="footer-column footer-desktop-only">
+								<div className="footer-title">Get Our App</div>
+								<p
+									style={{
+										fontSize: "14px",
+										color: "var(--text-secondary)",
+										marginBottom: "10px",
+									}}
+								>
+									Listen on the go with our mobile app.
+								</p>
+								<a href="#" className="app-badge">
+									<i className="fa-brands fa-apple"></i>
+									<div className="app-badge-info">
+										<div className="app-badge-title">Download on the</div>
+										<div className="app-badge-store">App Store</div>
+									</div>
+								</a>
+								<a href="#" className="app-badge">
+									<i className="fa-brands fa-google-play"></i>
+									<div className="app-badge-info">
+										<div className="app-badge-title">GET IT ON</div>
+										<div className="app-badge-store">Google Play</div>
+									</div>
+								</a>
+							</div>
+						</div>
+						<div className="footer-bottom footer-desktop-only">
+							<div>
+								© {new Date().getFullYear()} Harmonia. All rights reserved.
+							</div>
+							<div className="footer-bottom-links">
+								<a href="#" className="footer-link">
+									Terms
+								</a>
+								<a href="#" className="footer-link">
+									Privacy
+								</a>
+								<a href="#" className="footer-link">
+									Cookies
+								</a>
+							</div>
+						</div>
+					</footer>
+				);
+
+				const renderContent = () => {
+					switch (currentPage) {
+						case "home":
+							return renderHomePage();
+						case "favorites":
+							return renderFavoritesPage();
+						case "player":
+							return renderPlayerPage();
+						case "playlists":
+							return renderPlaylistsPage();
+						case "playlist":
+							return renderPlaylistPage();
+						case "profile":
+							return renderProfilePage();
+						default:
+							return renderHomePage();
+					}
+				};
+
+				return (
+					<div className="container">
+						<header className="navbar glass-nav">
+							<div className="app-logo">
+								<i className="fa-solid fa-compact-disc"></i>
+								<span>Harmonia</span>
+							</div>
+							<button className="theme-toggle" onClick={toggleTheme}>
+								{isDarkTheme ? (
+									<i className="fa-solid fa-sun"></i>
+								) : (
+									<i className="fa-solid fa-moon"></i>
+								)}
+							</button>
+						</header>
+
+						<main className="main-content">{renderContent()}</main>
+
+						<Footer />
+
+						<nav className="bottom-nav glass-nav">
+							<div
+								className={`nav-item ${currentPage === "home" ? "active" : ""}`}
+								onClick={() => setCurrentPage("home")}
+							>
+								<i className="fa-solid fa-house"></i>
+								<span>Home</span>
+							</div>
+							<div
+								className={`nav-item ${
+									currentPage === "favorites" ? "active" : ""
+								}`}
+								onClick={() => setCurrentPage("favorites")}
+							>
+								<i className="fa-solid fa-heart"></i>
+								<span>Favorites</span>
+							</div>
+							<div
+								className={`nav-player-btn ${isPlaying ? "playing" : ""}`}
+								onClick={() =>
+									currentSong
+										? setCurrentPage("player")
+										: setCurrentPage("home")
+								}
+							>
+								<i
+									className={`fa-solid fa-${
+										currentSong && isPlaying ? "pause" : "play"
+									}`}
+								></i>
+							</div>
+							<div
+								className={`nav-item ${
+									currentPage === "playlists" ? "active" : ""
+								}`}
+								onClick={() => setCurrentPage("playlists")}
+							>
+								<i className="fa-solid fa-list"></i>
+								<span>Playlists</span>
+							</div>
+							<div
+								className={`nav-item ${
+									currentPage === "profile" ? "active" : ""
+								}`}
+								onClick={() => setCurrentPage("profile")}
+							>
+								<i className="fa-solid fa-user"></i>
+								<span>Profile</span>
+							</div>
+						</nav>
+
+						{showCreatePlaylistModal && (
+							<div className="modal-overlay">
+								<div className="modal-content glass">
+									<div className="modal-header">
+										<div className="modal-icon">
+											<i className="fa-solid fa-music"></i>
+										</div>
+										<div className="modal-title">Create New Playlist</div>
+										<div className="modal-subtitle">
+											Express yourself by curating your perfect collection
+										</div>
+									</div>
+									<div className="modal-body">
+										<div className="form-group">
+											<label className="form-label">Playlist Name</label>
+											<input
+												type="text"
+												className="form-input"
+												placeholder="Enter playlist name"
+												value={newPlaylistName}
+												onChange={(e) => setNewPlaylistName(e.target.value)}
+											/>
+										</div>
+										<div className="form-group">
+											<label className="form-label">
+												Description (optional)
+											</label>
+											<input
+												type="text"
+												className="form-input"
+												placeholder="Enter playlist description"
+												value={newPlaylistDescription}
+												onChange={(e) =>
+													setNewPlaylistDescription(e.target.value)
+												}
+											/>
+										</div>
+									</div>
+									<div className="modal-footer">
+										<button
+											className="modal-btn secondary"
+											onClick={() => setShowCreatePlaylistModal(false)}
+										>
+											Cancel
+										</button>
+										<button
+											className="modal-btn primary"
+											onClick={handleCreatePlaylist}
+											disabled={!newPlaylistName.trim()}
+										>
+											Create
+										</button>
+									</div>
+								</div>
+							</div>
+						)}
+
+						{showAddToPlaylistModal && songToAdd && (
+							<div className="modal-overlay">
+								<div className="modal-content glass playlist-select-modal">
+									<div className="modal-header">
+										<div className="modal-icon">
+											<i className="fa-solid fa-plus"></i>
+										</div>
+										<div className="modal-title">
+											Add "{songToAdd.title}" to Playlist
+										</div>
+										<div className="modal-subtitle">
+											Select a playlist to add this song
+										</div>
+									</div>
+									<div className="modal-body">
+										{playlistsData.map((playlist) => (
+											<div
+												key={playlist.id}
+												className="song-item glass"
+												onClick={() =>
+													addSongToPlaylist(playlist.id, songToAdd.id)
+												}
+												style={{ cursor: "pointer" }}
+											>
+												<img
+													src={playlist.cover}
+													alt={playlist.title}
+													className="song-cover"
+												/>
+												<div className="song-info">
+													<div className="song-title">{playlist.title}</div>
+													<div className="song-artist">
+														{playlist.description}
+													</div>
+												</div>
+											</div>
+										))}
+									</div>
+									<div className="modal-footer">
+										<button
+											className="modal-btn secondary"
+											onClick={() => setShowAddToPlaylistModal(false)}
+										>
+											Cancel
+										</button>
+									</div>
+								</div>
+							</div>
+						)}
+					</div>
+				);
+			}
+
+			ReactDOM.render(<App />, document.getElementById("root"));
+		</script>
+	</body>
+</html>
