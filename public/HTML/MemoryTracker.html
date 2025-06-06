@@ -1,0 +1,2569 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Memory Usage Visualizer | Enterprise Edition</title>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.4.0/dist/chartjs-plugin-annotation.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.2.1/dist/chartjs-plugin-zoom.min.js"></script>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			@media (min-width: 475px) {
+				.xs\:grid-cols-2 {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.xs\:flex {
+					display: flex;
+				}
+				.xs\:flex-row {
+					flex-direction: row;
+				}
+				.xs\:items-center {
+					align-items: center;
+				}
+				.xs\:justify-between {
+					justify-content: space-between;
+				}
+				.xs\:w-auto {
+					width: auto;
+				}
+				.xs\:col-span-1 {
+					grid-column: span 1 / span 1;
+				}
+				.xs\:col-span-2 {
+					grid-column: span 2 / span 2;
+				}
+			}
+
+			@media (max-width: 374px) {
+				.xxs\:text-xs {
+					font-size: 0.75rem;
+					line-height: 1rem;
+				}
+				.xxs\:text-sm {
+					font-size: 0.8125rem;
+					line-height: 1.25rem;
+				}
+				.xxs\:text-lg {
+					font-size: 1rem;
+					line-height: 1.5rem;
+				}
+				.xxs\:text-xl {
+					font-size: 1.125rem;
+					line-height: 1.75rem;
+				}
+				.xxs\:text-2xl {
+					font-size: 1.25rem;
+					line-height: 1.75rem;
+				}
+				.xxs\:py-0\.5 {
+					padding-top: 0.125rem;
+					padding-bottom: 0.125rem;
+				}
+				.xxs\:px-1 {
+					padding-left: 0.25rem;
+					padding-right: 0.25rem;
+				}
+				.xxs\:py-1 {
+					padding-top: 0.25rem;
+					padding-bottom: 0.25rem;
+				}
+				.xxs\:px-2 {
+					padding-left: 0.5rem;
+					padding-right: 0.5rem;
+				}
+				.xxs\:px-3 {
+					padding-left: 0.75rem;
+					padding-right: 0.75rem;
+				}
+				.xxs\:gap-1 {
+					gap: 0.25rem;
+				}
+				.xxs\:gap-2 {
+					gap: 0.5rem;
+				}
+				.xxs\:p-2 {
+					padding: 0.5rem;
+				}
+				.xxs\:p-3 {
+					padding: 0.75rem;
+				}
+				.xxs\:h-36 {
+					height: 9rem;
+				}
+				.xxs\:h-7 {
+					height: 1.75rem;
+				}
+				.xxs\:h-8 {
+					height: 2rem;
+				}
+				.xxs\:h-9 {
+					height: 2.25rem;
+				}
+				.xxs\:h-4 {
+					height: 1rem;
+				}
+				.xxs\:w-4 {
+					width: 1rem;
+				}
+				.xxs\:w-6 {
+					width: 1.5rem;
+				}
+				.xxs\:w-7 {
+					width: 1.75rem;
+				}
+				.xxs\:w-full {
+					width: 100%;
+				}
+				.xxs\:hidden {
+					display: none;
+				}
+				.xxs\:grid-cols-1 {
+					grid-template-columns: repeat(1, minmax(0, 1fr));
+				}
+				.xxs\:flex-col {
+					flex-direction: column;
+				}
+				.xxs\:pb-1 {
+					padding-bottom: 0.25rem;
+				}
+				.xxs\:mt-1 {
+					margin-top: 0.25rem;
+				}
+				.xxs\:mb-1 {
+					margin-bottom: 0.25rem;
+				}
+				.xxs\:pt-1 {
+					padding-top: 0.25rem;
+				}
+				.xxs\:mb-2 {
+					margin-bottom: 0.5rem;
+				}
+				.xxs\:text-center {
+					text-align: center;
+				}
+			}
+
+			:root {
+				--primary-color: #f8fafc;
+				--primary-light: #f1f5f9;
+				--primary-dark: #e2e8f0;
+				--accent-color: #0284c7;
+				--accent-light: #38bdf8;
+				--accent-dark: #0369a1;
+				--success-color: #10b981;
+				--warning-color: #f59e0b;
+				--danger-color: #ef4444;
+				--text-primary: #0f172a;
+				--text-secondary: #64748b;
+				--card-bg: #ffffff;
+				--card-border: #e2e8f0;
+				--card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				--card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+			}
+
+			body {
+				font-family: "Inter", sans-serif;
+				background-color: var(--primary-color);
+				color: var(--text-primary);
+				transition: background-color 0.3s ease;
+				min-width: 320px;
+			}
+
+			.btn {
+				padding: 0.5rem 1rem;
+				border-radius: 0.5rem;
+				font-weight: 500;
+				transition: all 0.2s ease;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+			}
+
+			@media (max-width: 374px) {
+				.btn {
+					padding: 0.375rem 0.75rem;
+					font-size: 0.75rem;
+					gap: 0.25rem;
+				}
+			}
+
+			.btn-primary {
+				background-color: var(--accent-color);
+				color: white;
+			}
+
+			.btn-primary:hover {
+				background-color: var(--accent-dark);
+				transform: translateY(-1px);
+				box-shadow: var(--card-shadow);
+			}
+
+			.btn-secondary {
+				background-color: var(--primary-light);
+				color: var(--text-primary);
+				border: 1px solid var(--card-border);
+			}
+
+			.btn-secondary:hover {
+				background-color: var(--primary-dark);
+				transform: translateY(-1px);
+			}
+
+			.btn-danger {
+				background-color: var(--danger-color);
+				color: white;
+			}
+
+			.btn-danger:hover {
+				opacity: 0.9;
+				transform: translateY(-1px);
+			}
+
+			.btn-success {
+				background-color: var(--success-color);
+				color: white;
+			}
+
+			.btn-success:hover {
+				opacity: 0.9;
+				transform: translateY(-1px);
+			}
+
+			.btn-warning {
+				background-color: var(--warning-color);
+				color: white;
+			}
+
+			.btn-warning:hover {
+				opacity: 0.9;
+				transform: translateY(-1px);
+			}
+
+			.menu-slide-in {
+				transform: translateX(0);
+				transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+				box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+			}
+
+			.menu-slide-out {
+				transform: translateX(100%);
+				transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+				box-shadow: none;
+			}
+
+			.full-height-layout {
+				min-height: calc(100vh - 140px);
+			}
+
+			.card {
+				background-color: var(--card-bg);
+				border-radius: 0.75rem;
+				border: 1px solid var(--card-border);
+				box-shadow: var(--card-shadow);
+				padding: 1.5rem;
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+
+			@media (max-width: 374px) {
+				.card {
+					padding: 0.75rem;
+					border-radius: 0.5rem;
+				}
+			}
+
+			.card:hover {
+				box-shadow: var(--card-shadow-hover);
+			}
+
+			.tooltip {
+				position: relative;
+				display: inline-block;
+			}
+
+			.tooltip .tooltip-text {
+				visibility: hidden;
+				background-color: var(--text-primary);
+				color: white;
+				text-align: center;
+				border-radius: 6px;
+				padding: 5px 10px;
+				position: absolute;
+				z-index: 1;
+				bottom: 125%;
+				left: 50%;
+				transform: translateX(-50%);
+				opacity: 0;
+				transition: opacity 0.3s;
+				white-space: nowrap;
+				font-size: 0.875rem;
+				box-shadow: var(--card-shadow);
+			}
+
+			@media (max-width: 374px) {
+				.tooltip .tooltip-text {
+					font-size: 0.75rem;
+					padding: 3px 6px;
+				}
+			}
+
+			.tooltip:hover .tooltip-text {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			.badge {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.25rem 0.5rem;
+				border-radius: 9999px;
+				font-size: 0.75rem;
+				font-weight: 500;
+			}
+
+			@media (max-width: 374px) {
+				.badge {
+					padding: 0.125rem 0.375rem;
+					font-size: 0.625rem;
+				}
+			}
+
+			.badge-primary {
+				background-color: var(--accent-color);
+				color: white;
+			}
+
+			.badge-success {
+				background-color: var(--success-color);
+				color: white;
+			}
+
+			.badge-warning {
+				background-color: var(--warning-color);
+				color: white;
+			}
+
+			.badge-danger {
+				background-color: var(--danger-color);
+				color: white;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.5;
+				}
+			}
+
+			.animate-pulse {
+				animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: var(--primary-light);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--text-secondary);
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--accent-color);
+			}
+
+			.form-input {
+				background-color: white;
+				border: 1px solid var(--card-border);
+				color: var(--text-primary);
+				border-radius: 0.5rem;
+				padding: 0.5rem 1rem;
+				transition: border-color 0.2s ease;
+			}
+
+			@media (max-width: 374px) {
+				.form-input {
+					padding: 0.375rem 0.75rem;
+					font-size: 0.875rem;
+					border-radius: 0.375rem;
+				}
+			}
+
+			.form-input:focus {
+				outline: none;
+				border-color: var(--accent-color);
+				box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+			}
+
+			.form-input::placeholder {
+				color: var(--text-secondary);
+			}
+
+			input[type="range"] {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 100%;
+				height: 6px;
+				border-radius: 5px;
+				background: var(--primary-dark);
+				outline: none;
+			}
+
+			input[type="range"]::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: var(--accent-color);
+				cursor: pointer;
+				transition: background 0.2s ease;
+			}
+
+			@media (max-width: 374px) {
+				input[type="range"] {
+					height: 4px;
+				}
+				input[type="range"]::-webkit-slider-thumb {
+					width: 14px;
+					height: 14px;
+				}
+			}
+
+			input[type="range"]::-webkit-slider-thumb:hover {
+				background: var(--accent-light);
+			}
+
+			.spinner {
+				border: 3px solid rgba(0, 0, 0, 0.1);
+				border-radius: 50%;
+				border-top: 3px solid var(--accent-color);
+				width: 24px;
+				height: 24px;
+				animation: spin 1s linear infinite;
+			}
+
+			@media (max-width: 374px) {
+				.spinner {
+					border-width: 2px;
+					border-top-width: 2px;
+					width: 18px;
+					height: 18px;
+				}
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.kbd {
+				background-color: var(--primary-light);
+				border: 1px solid var(--card-border);
+				border-radius: 0.25rem;
+				box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+				color: var(--text-primary);
+				display: inline-block;
+				font-size: 0.75rem;
+				font-weight: 600;
+				line-height: 1;
+				padding: 0.25rem 0.5rem;
+				vertical-align: middle;
+			}
+
+			@media (max-width: 374px) {
+				.kbd {
+					font-size: 0.625rem;
+					padding: 0.125rem 0.25rem;
+				}
+			}
+		</style>
+	</head>
+
+	<body class="flex flex-col min-h-screen">
+		<!-- Top status bar -->
+		<div
+			class="bg-blue-50 py-1 px-2 sm:px-4 text-xs flex justify-between items-center text-gray-600 border-b border-blue-100"
+		>
+			<div class="flex items-center gap-2 sm:gap-4">
+				<span id="connectionStatus" class="flex items-center gap-1">
+					<span class="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+					<span class="xxs:text-xs">Connected</span>
+				</span>
+				<span id="lastUpdated" class="xxs:text-xs">Last updated: Just now</span>
+			</div>
+			<div class="flex items-center gap-2 sm:gap-4">
+				<span class="flex items-center gap-1">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-3 w-3"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+						/>
+					</svg>
+					<span id="dataPoints" class="xxs:text-xs">0 points</span>
+				</span>
+			</div>
+		</div>
+
+		<header class="py-2 sm:py-4 border-b border-gray-200 bg-white shadow-sm">
+			<div class="max-w-7xl mx-auto px-2 sm:px-4">
+				<div class="flex justify-between items-center">
+					<div class="flex items-center gap-2 sm:gap-3">
+						<div class="relative">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								class="h-7 w-7 sm:h-10 sm:w-10 text-blue-600"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M21 12.79A9 9 0 1112.21 3a7 7 0 008.79 9.79z" />
+								<path
+									d="M12 2v2m0 16v2m10-10h-2M4 12H2m16.364-6.364l-1.414 1.414M7.05 17.05l-1.414 1.414m12.728 0l-1.414-1.414M7.05 6.95l-1.414-1.414"
+								/>
+								<path d="M12 6a6 6 0 100 12 6 6 0 000-12z" />
+							</svg>
+							<span class="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4">
+								<span
+									class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"
+								></span>
+								<span
+									class="relative inline-flex rounded-full h-3 w-3 sm:h-4 sm:w-4 bg-blue-500"
+								></span>
+							</span>
+						</div>
+						<div>
+							<h1
+								class="text-xl xxs:text-lg sm:text-2xl font-bold text-gray-900"
+							>
+								MemoryTracker<span
+									class="text-xs align-top bg-blue-600 text-white px-1 rounded ml-1"
+									>PRO</span
+								>
+							</h1>
+							<p class="text-xs xxs:text-xs text-gray-500 mt-0 sm:mt-1">
+								Enterprise Memory Monitoring
+							</p>
+						</div>
+					</div>
+
+					<!-- Desktop Navigation -->
+					<nav class="hidden md:flex space-x-6">
+						<button
+							class="desktop-nav-link text-gray-700 hover:text-blue-600 font-medium text-sm flex items-center gap-1 px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
+							data-section="visualizer"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+								/>
+							</svg>
+							Dashboard
+						</button>
+						<button
+							class="desktop-nav-link text-gray-700 hover:text-blue-600 font-medium text-sm flex items-center gap-1 px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
+							data-section="about"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							About
+						</button>
+						<button
+							class="desktop-nav-link text-gray-700 hover:text-blue-600 font-medium text-sm flex items-center gap-1 px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
+							data-section="contact"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+								/>
+							</svg>
+							Support
+						</button>
+					</nav>
+
+					<div class="flex items-center gap-2 sm:gap-3">
+						<!-- User profile -->
+						<div
+							class="hidden md:flex items-center gap-2 text-sm text-gray-700 border-l border-gray-200 pl-4"
+						>
+							<img
+								src="https://ui-avatars.com/api/?name=Admin+User&background=0284c7&color=fff"
+								class="w-8 h-8 rounded-full"
+								alt="User"
+							/>
+							<span>Admin</span>
+						</div>
+
+						<!-- Mobile Menu Button -->
+						<button
+							id="menuButton"
+							class="p-1 sm:p-2 rounded-lg hover:bg-gray-100 text-gray-700 md:hidden"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 sm:h-6 sm:w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 6h16M4 12h16M4 18h16"
+								/>
+							</svg>
+						</button>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<div
+			id="menuOverlay"
+			class="fixed inset-0 bg-black bg-opacity-30 hidden z-50"
+		>
+			<div
+				id="mobileMenu"
+				class="fixed right-0 top-0 h-full w-64 sm:w-72 bg-white border-l border-gray-200 shadow-lg transform menu-slide-out"
+			>
+				<div class="p-4 sm:p-6">
+					<div class="flex items-center justify-between mb-6 sm:mb-8">
+						<div class="flex items-center gap-2">
+							<img
+								src="https://ui-avatars.com/api/?name=Admin+User&background=0284c7&color=fff"
+								class="w-8 h-8 sm:w-10 sm:h-10 rounded-full"
+								alt="User"
+							/>
+							<div>
+								<div class="text-gray-800 font-medium text-sm sm:text-base">
+									Admin User
+								</div>
+								<div class="text-gray-500 text-xs">admin@company.com</div>
+							</div>
+						</div>
+						<button
+							id="closeMenu"
+							class="p-1 sm:p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-4 w-4 sm:h-5 sm:w-5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</div>
+
+					<div class="border-t border-gray-200 pt-3 pb-2 sm:pt-4 sm:pb-2">
+						<div
+							class="text-xs uppercase text-gray-500 font-semibold tracking-wider mb-2 sm:mb-3"
+						>
+							Main Navigation
+						</div>
+					</div>
+
+					<nav>
+						<ul class="space-y-1">
+							<li>
+								<button
+									class="nav-link w-full text-left px-3 py-2 sm:px-4 sm:py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+									data-section="visualizer"
+								>
+									<span class="flex items-center gap-2 sm:gap-3">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 sm:h-5 sm:w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+											/>
+										</svg>
+										Dashboard
+									</span>
+								</button>
+							</li>
+							<li>
+								<button
+									class="nav-link w-full text-left px-3 py-2 sm:px-4 sm:py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+									data-section="about"
+								>
+									<span class="flex items-center gap-2 sm:gap-3">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 sm:h-5 sm:w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+										About
+									</span>
+								</button>
+							</li>
+							<li>
+								<button
+									class="nav-link w-full text-left px-3 py-2 sm:px-4 sm:py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+									data-section="contact"
+								>
+									<span class="flex items-center gap-2 sm:gap-3">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 sm:h-5 sm:w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+											/>
+										</svg>
+										Support
+									</span>
+								</button>
+							</li>
+						</ul>
+					</nav>
+
+					<div class="border-t border-gray-200 mt-4 pt-4 sm:mt-6 sm:pt-6">
+						<div
+							class="text-xs uppercase text-gray-500 font-semibold tracking-wider mb-2 sm:mb-3"
+						>
+							System
+						</div>
+						<ul class="space-y-1">
+							<li>
+								<button
+									class="w-full text-left px-3 py-2 sm:px-4 sm:py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+								>
+									<span class="flex items-center gap-2 sm:gap-3">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 sm:h-5 sm:w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+											/>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+											/>
+										</svg>
+										Settings
+									</span>
+								</button>
+							</li>
+							<li>
+								<button
+									class="w-full text-left px-3 py-2 sm:px-4 sm:py-3 rounded-lg hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+								>
+									<span class="flex items-center gap-2 sm:gap-3">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-4 w-4 sm:h-5 sm:w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+											/>
+										</svg>
+										Logout
+									</span>
+								</button>
+							</li>
+						</ul>
+					</div>
+
+					<div class="mt-6 pt-4 border-t border-gray-200">
+						<div class="bg-blue-50 rounded-lg p-2 sm:p-3 text-xs text-gray-600">
+							<div class="flex items-center gap-2 mb-1 sm:mb-2">
+								<span
+									class="inline-block w-2 h-2 rounded-full bg-green-500"
+								></span>
+								<span class="font-medium text-gray-800"
+									>System Status: Online</span
+								>
+							</div>
+							<p>Memory usage is currently within normal parameters.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<main class="flex-1 full-height-layout">
+			<div id="visualizerSection" class="section active">
+				<div class="max-w-7xl mx-auto px-2 sm:px-4 py-3 sm:py-6">
+					<section class="text-center mb-4 sm:mb-6 card">
+						<div
+							class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-3 sm:mb-4"
+						>
+							<h2
+								class="text-xl xxs:text-lg sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-0"
+							>
+								Real-time Memory Usage
+							</h2>
+							<div class="flex items-center gap-2 self-end sm:self-auto">
+								<div class="tooltip">
+									<button
+										class="btn btn-secondary text-xs sm:text-sm xxs:px-2 xxs:py-1"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-3 w-3 sm:h-4 sm:w-4"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+											/>
+										</svg>
+										<span class="xxs:hidden">Share</span>
+									</button>
+									<span class="tooltip-text">Share dashboard</span>
+								</div>
+								<div class="tooltip">
+									<button
+										class="btn btn-secondary text-xs sm:text-sm xxs:px-2 xxs:py-1"
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-3 w-3 sm:h-4 sm:w-4"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+											/>
+										</svg>
+										<span class="xxs:hidden">More</span>
+									</button>
+									<span class="tooltip-text">More options</span>
+								</div>
+							</div>
+						</div>
+						<p
+							class="text-gray-600 text-sm xxs:text-xs mt-1 sm:mt-2 px-0 sm:px-8"
+						>
+							Monitor memory usage over time with interactive charts and
+							annotations.
+						</p>
+						<div class="flex items-center justify-center gap-2 mt-2 sm:mt-4">
+							<span class="badge badge-primary">Real-time</span>
+							<span class="badge badge-success">Interactive</span>
+							<span class="badge badge-warning">Enterprise</span>
+						</div>
+					</section>
+
+					<!-- Grid Layout for Main Content -->
+					<div
+						class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6"
+					>
+						<!-- Left Column: Chart and Controls -->
+						<div class="md:col-span-2 space-y-3 sm:space-y-6">
+							<!-- Controls Card -->
+							<div class="card">
+								<div
+									class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 sm:mb-4"
+								>
+									<h3
+										class="text-base sm:text-lg font-semibold text-gray-800 mb-1 sm:mb-0"
+									>
+										Controls
+									</h3>
+									<div
+										class="text-xs text-gray-500 flex flex-wrap items-center gap-1"
+									>
+										<span>Shortcuts:</span>
+										<span class="kbd">P</span>
+										<span>Pause</span>
+										<span class="kbd">R</span>
+										<span>Reset</span>
+									</div>
+								</div>
+								<div
+									class="controls grid grid-cols-2 xxs:grid-cols-1 gap-y-2 sm:gap-y-4 sm:flex sm:flex-row flex-wrap justify-center items-center gap-2 sm:gap-4"
+								>
+									<div
+										class="flex flex-col xs:flex-row gap-1 sm:gap-2 col-span-1"
+									>
+										<button
+											id="toggle"
+											class="btn btn-primary text-xs sm:text-sm w-full xs:w-auto xxs:py-1 xxs:h-8"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3 w-3 sm:h-4 sm:w-4"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
+												/>
+											</svg>
+											Pause
+										</button>
+										<button
+											id="reset"
+											class="btn btn-secondary text-xs sm:text-sm w-full xs:w-auto xxs:py-1 xxs:h-8"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3 w-3 sm:h-4 sm:w-4"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+												/>
+											</svg>
+											Reset
+										</button>
+									</div>
+									<div
+										class="flex flex-col xs:flex-row gap-1 sm:gap-2 col-span-1"
+									>
+										<button
+											id="lineBtn"
+											class="btn btn-secondary text-xs sm:text-sm flex items-center justify-center gap-1 w-full xs:w-auto ring-2 ring-blue-500 xxs:py-1 xxs:h-8"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 24 24"
+												class="w-3 h-3 sm:w-4 sm:h-4"
+											>
+												<path
+													d="M3 12l5-5 5 5 5-5 5 5"
+													stroke="currentColor"
+													stroke-width="2"
+													fill="none"
+												/>
+											</svg>
+											Line
+										</button>
+										<button
+											id="barBtn"
+											class="btn btn-secondary text-xs sm:text-sm flex items-center justify-center gap-1 w-full xs:w-auto xxs:py-1 xxs:h-8"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 24 24"
+												class="w-3 h-3 sm:w-4 sm:h-4"
+											>
+												<rect
+													x="3"
+													y="12"
+													width="4"
+													height="8"
+													fill="currentColor"
+												/>
+												<rect
+													x="10"
+													y="8"
+													width="4"
+													height="12"
+													fill="currentColor"
+												/>
+												<rect
+													x="17"
+													y="16"
+													width="4"
+													height="4"
+													fill="currentColor"
+												/>
+											</svg>
+											Bar
+										</button>
+									</div>
+									<div
+										class="flex flex-col items-center col-span-2 xs:col-span-1"
+									>
+										<label
+											for="interval"
+											class="font-medium text-gray-700 text-xs sm:text-sm"
+											>Update Interval</label
+										>
+										<input
+											type="range"
+											id="interval"
+											min="1"
+											max="5"
+											step="1"
+											value="1"
+											class="w-full xs:w-32"
+										/>
+										<span
+											id="intervalValue"
+											class="text-gray-600 text-xs sm:text-sm"
+											>1s</span
+										>
+									</div>
+									<div
+										class="flex gap-2 col-span-2 xs:col-span-1 justify-center xs:justify-start"
+									>
+										<button
+											id="export"
+											class="btn btn-secondary text-xs sm:text-sm xxs:py-1 xxs:h-8"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3 w-3 sm:h-4 sm:w-4"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+												/>
+											</svg>
+											Export
+										</button>
+									</div>
+								</div>
+								<div class="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-gray-200">
+									<div
+										class="flex flex-col xs:flex-row xs:justify-between xs:items-center"
+									>
+										<div class="text-xs sm:text-sm text-gray-500 mb-1 xs:mb-0">
+											Memory threshold alert:
+										</div>
+										<div class="flex items-center gap-2">
+											<input
+												type="number"
+												id="threshold"
+												min="0"
+												max="100"
+												value="80"
+												class="form-input w-16 text-xs sm:text-sm py-1"
+											/>
+											<span class="text-xs sm:text-sm text-gray-600">MB</span>
+											<button
+												id="setThreshold"
+												class="btn btn-secondary text-xs py-1"
+											>
+												Set
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Chart Card -->
+							<div class="card">
+								<div class="flex justify-between items-center mb-3 sm:mb-4">
+									<h3 class="text-base sm:text-lg font-semibold text-gray-800">
+										Memory Usage
+									</h3>
+									<div class="flex items-center gap-1 sm:gap-2">
+										<div class="tooltip">
+											<button
+												id="zoomReset"
+												class="btn btn-secondary text-xs py-1 xxs:px-2"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-3 w-3 sm:h-4 sm:w-4"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+													/>
+												</svg>
+												<span class="xxs:hidden">Reset Zoom</span>
+											</button>
+											<span class="tooltip-text">Reset chart zoom</span>
+										</div>
+										<div class="tooltip">
+											<button
+												id="toggleLegend"
+												class="btn btn-secondary text-xs py-1 xxs:px-2"
+											>
+												<svg
+													xmlns="http://www.w3.org/2000/svg"
+													class="h-3 w-3 sm:h-4 sm:w-4"
+													fill="none"
+													viewBox="0 0 24 24"
+													stroke="currentColor"
+												>
+													<path
+														stroke-linecap="round"
+														stroke-linejoin="round"
+														stroke-width="2"
+														d="M4 6h16M4 12h16M4 18h7"
+													/>
+												</svg>
+												<span class="xxs:hidden">Legend</span>
+											</button>
+											<span class="tooltip-text">Toggle legend</span>
+										</div>
+									</div>
+								</div>
+								<div
+									class="chart-container h-40 xxs:h-36 xs:h-48 sm:h-64 md:h-80 relative"
+								>
+									<div
+										id="loadingOverlay"
+										class="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center hidden"
+									>
+										<div class="flex flex-col items-center">
+											<div class="spinner mb-2"></div>
+											<div class="text-xs sm:text-sm text-gray-600">
+												Loading data...
+											</div>
+										</div>
+									</div>
+									<canvas id="chart"></canvas>
+								</div>
+								<div
+									class="stats grid grid-cols-2 xxs:grid-cols-2 xs:flex xs:flex-wrap justify-center gap-2 sm:gap-6 text-gray-600 mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-gray-200"
+								>
+									<div class="flex flex-col items-center">
+										<span class="text-xs text-gray-500">Min</span>
+										<span
+											id="minStat"
+											class="text-base xxs:text-sm sm:text-lg font-semibold text-blue-600"
+											>0 MB</span
+										>
+									</div>
+									<div class="flex flex-col items-center">
+										<span class="text-xs text-gray-500">Avg</span>
+										<span
+											id="avgStat"
+											class="text-base xxs:text-sm sm:text-lg font-semibold text-blue-600"
+											>0 MB</span
+										>
+									</div>
+									<div class="flex flex-col items-center">
+										<span class="text-xs text-gray-500">Max</span>
+										<span
+											id="maxStat"
+											class="text-base xxs:text-sm sm:text-lg font-semibold text-blue-600"
+											>0 MB</span
+										>
+									</div>
+									<div class="flex flex-col items-center">
+										<span class="text-xs text-gray-500">Current</span>
+										<span
+											id="currentStat"
+											class="text-base xxs:text-sm sm:text-lg font-semibold text-blue-600"
+											>0 MB</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<!-- Annotation Form Card -->
+							<div class="card">
+								<h3
+									class="text-base sm:text-lg font-semibold text-gray-800 mb-3 sm:mb-4"
+								>
+									Add Annotation
+								</h3>
+								<form
+									class="annotation-form grid grid-cols-1 xxs:grid-cols-1 xs:grid-cols-2 sm:flex sm:flex-row justify-center gap-2 sm:gap-3"
+									id="annotationForm"
+								>
+									<div class="flex flex-col w-full xs:col-span-1 sm:w-auto">
+										<label
+											for="annotationTime"
+											class="text-xs text-gray-500 mb-0.5 sm:mb-1"
+											>Time (s)</label
+										>
+										<input
+											type="number"
+											step="1"
+											min="0"
+											id="annotationTime"
+											placeholder="Time"
+											required
+											class="form-input text-sm sm:text-base h-8 sm:h-10"
+										/>
+									</div>
+									<div class="flex flex-col w-full xs:col-span-1 sm:flex-1">
+										<label
+											for="annotationType"
+											class="text-xs text-gray-500 mb-0.5 sm:mb-1"
+											>Type</label
+										>
+										<select
+											id="annotationType"
+											class="form-input text-sm sm:text-base h-8 sm:h-10"
+										>
+											<option value="info">Information</option>
+											<option value="warning">Warning</option>
+											<option value="error">Error</option>
+										</select>
+									</div>
+									<div class="flex flex-col w-full xs:col-span-2 sm:flex-1">
+										<label
+											for="annotationLabel"
+											class="text-xs text-gray-500 mb-0.5 sm:mb-1"
+											>Note</label
+										>
+										<input
+											type="text"
+											id="annotationLabel"
+											placeholder="Enter annotation text"
+											required
+											class="form-input text-sm sm:text-base h-8 sm:h-10"
+										/>
+									</div>
+									<div
+										class="flex flex-col w-full xs:col-span-2 sm:w-auto sm:justify-end"
+									>
+										<label
+											class="text-xs text-gray-500 mb-0.5 sm:mb-1 opacity-0 hidden xs:block"
+											>Action</label
+										>
+										<button
+											type="submit"
+											class="btn btn-primary h-8 sm:h-10 text-xs sm:text-sm"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3 w-3 sm:h-4 sm:w-4"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+												/>
+											</svg>
+											Add Note
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+
+						<!-- Right Column: Notes -->
+						<div class="md:col-span-2 lg:col-span-1">
+							<div class="card h-full">
+								<div class="flex justify-between items-center mb-3 sm:mb-4">
+									<h3 class="text-base sm:text-lg font-semibold text-gray-800">
+										Notes & Events
+									</h3>
+									<div class="flex items-center">
+										<button
+											id="clearNotes"
+											class="btn btn-secondary text-xs py-1 xxs:px-2"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-3 w-3 sm:h-4 sm:w-4"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+												/>
+											</svg>
+											<span class="xxs:hidden">Clear All</span>
+										</button>
+									</div>
+								</div>
+								<div
+									class="grid grid-cols-2 xxs:grid-cols-2 xs:flex gap-1 sm:gap-2 mb-3 sm:mb-4"
+								>
+									<button
+										class="btn btn-secondary text-xs py-1 flex-1 active"
+										id="filterAll"
+									>
+										All
+									</button>
+									<button
+										class="btn btn-secondary text-xs py-1 flex-1"
+										id="filterInfo"
+									>
+										Info
+									</button>
+									<button
+										class="btn btn-secondary text-xs py-1 flex-1"
+										id="filterWarning"
+									>
+										Warn
+									</button>
+									<button
+										class="btn btn-secondary text-xs py-1 flex-1"
+										id="filterError"
+									>
+										Errors
+									</button>
+								</div>
+								<div
+									id="noteList"
+									class="overflow-y-auto max-h-[150px] xxs:max-h-[120px] xs:max-h-[180px] sm:max-h-[250px] md:max-h-[calc(100vh-350px)] border border-gray-200 rounded-lg p-2 bg-gray-50"
+								>
+									<!-- Notes will be added here dynamically -->
+									<div
+										class="text-center text-gray-500 py-4 text-xs sm:text-sm"
+									>
+										No annotations yet. Add a note to get started.
+									</div>
+								</div>
+								<div class="mt-3 pt-3 sm:mt-4 sm:pt-4 border-t border-gray-200">
+									<div
+										class="text-xs sm:text-sm text-gray-600 mb-1 sm:mb-2 flex justify-between items-center"
+									>
+										<span>System Events</span>
+										<span class="text-xs text-gray-400">Last 5 events</span>
+									</div>
+									<div
+										id="systemEvents"
+										class="text-xs text-gray-500 space-y-1 sm:space-y-2 max-h-[90px] xxs:max-h-[70px] xs:max-h-[120px] sm:max-h-[150px] overflow-y-auto pr-1"
+									>
+										<div class="flex items-center gap-2">
+											<span
+												class="inline-block w-2 h-2 rounded-full bg-green-500"
+											></span>
+											<span
+												>Session started at
+												<span id="sessionStartTime">10:45 AM</span></span
+											>
+										</div>
+										<div class="flex items-center gap-2">
+											<span
+												class="inline-block w-2 h-2 rounded-full bg-blue-500"
+											></span>
+											<span>Data collection initialized</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="aboutSection" class="section hidden">
+				<section class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+					<h2
+						class="text-2xl xxs:text-xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6"
+					>
+						About Memory Usage Visualizer
+					</h2>
+
+					<div class="grid md:grid-cols-2 gap-4 sm:gap-8 mb-6 sm:mb-12">
+						<div class="bg-white rounded-xl shadow-md p-3 sm:p-6">
+							<h3
+								class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+							>
+								Our Mission
+							</h3>
+							<p
+								class="text-sm xxs:text-xs sm:text-base text-gray-600 mb-2 sm:mb-4"
+							>
+								We're dedicated to providing developers with powerful tools to
+								monitor and optimize memory usage in their applications.
+							</p>
+							<p class="text-sm xxs:text-xs sm:text-base text-gray-600">
+								In today's fast-paced development environment, memory management
+								is crucial for creating efficient and reliable applications.
+							</p>
+						</div>
+						<div class="bg-white rounded-xl shadow-md p-3 sm:p-6">
+							<h3
+								class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+							>
+								Key Features
+							</h3>
+							<ul
+								class="space-y-1 sm:space-y-2 text-sm xxs:text-xs sm:text-base text-gray-600"
+							>
+								<li class="flex items-center gap-2">
+									<svg
+										class="h-4 w-4 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+									Real-time memory monitoring
+								</li>
+								<li class="flex items-center gap-2">
+									<svg
+										class="h-4 w-4 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+									Interactive visualizations
+								</li>
+								<li class="flex items-center gap-2">
+									<svg
+										class="h-4 w-4 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+									Custom annotations
+								</li>
+								<li class="flex items-center gap-2">
+									<svg
+										class="h-4 w-4 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+									Data export capabilities
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="bg-white rounded-xl shadow-md p-3 sm:p-6 mb-4 sm:mb-8">
+						<h3
+							class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+						>
+							Why Memory Visualization Matters
+						</h3>
+						<p
+							class="text-sm xxs:text-xs sm:text-base text-gray-600 mb-2 sm:mb-4"
+						>
+							Memory visualization is more than just tracking numbers - it's
+							about understanding the story behind your application's
+							performance.
+						</p>
+						<ul
+							class="list-disc list-inside text-sm xxs:text-xs sm:text-base text-gray-600 space-y-1 sm:space-y-2 mb-0"
+						>
+							<li>Identify memory leaks before they become critical issues</li>
+							<li>Optimize resource allocation for better performance</li>
+							<li>
+								Understand memory usage patterns across different operations
+							</li>
+						</ul>
+					</div>
+
+					<div class="grid md:grid-cols-2 gap-4 sm:gap-8">
+						<div class="bg-white rounded-xl shadow-md p-3 sm:p-6">
+							<h3
+								class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+							>
+								Technical Excellence
+							</h3>
+							<p
+								class="text-sm xxs:text-xs sm:text-base text-gray-600 mb-2 sm:mb-4"
+							>
+								Built with modern web technologies, our visualizer offers:
+							</p>
+							<ul
+								class="list-disc list-inside text-sm xxs:text-xs sm:text-base text-gray-600 space-y-1 sm:space-y-2"
+							>
+								<li>Real-time data processing</li>
+								<li>Responsive design for all devices</li>
+								<li>Intuitive user interface</li>
+								<li>Secure data handling</li>
+							</ul>
+						</div>
+						<div class="bg-white rounded-xl shadow-md p-3 sm:p-6">
+							<h3
+								class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+							>
+								Future Development
+							</h3>
+							<p
+								class="text-sm xxs:text-xs sm:text-base text-gray-600 mb-2 sm:mb-4"
+							>
+								We're constantly working to improve our tool with:
+							</p>
+							<ul
+								class="list-disc list-inside text-sm xxs:text-xs sm:text-base text-gray-600 space-y-1 sm:space-y-2"
+							>
+								<li>Advanced analytics features</li>
+								<li>Customizable visualization options</li>
+								<li>Integration with popular development tools</li>
+								<li>Enhanced export capabilities</li>
+							</ul>
+						</div>
+					</div>
+				</section>
+			</div>
+
+			<div id="contactSection" class="section hidden">
+				<section class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
+					<h2
+						class="text-2xl xxs:text-xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-6"
+					>
+						Contact Us
+					</h2>
+					<div class="grid md:grid-cols-2 gap-4 sm:gap-8">
+						<div class="bg-white rounded-xl shadow-md p-3 sm:p-6">
+							<h3
+								class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+							>
+								Get in Touch
+							</h3>
+							<p
+								class="text-sm xxs:text-xs sm:text-base text-gray-600 mb-3 sm:mb-4"
+							>
+								Have questions or suggestions? We'd love to hear from you. Our
+								team is always ready to help.
+							</p>
+							<div class="space-y-2 sm:space-y-4">
+								<div class="flex items-center gap-2 sm:gap-3">
+									<svg
+										class="h-4 w-4 sm:h-5 sm:w-5 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+										/>
+									</svg>
+									<span class="text-sm xxs:text-xs sm:text-base text-gray-600"
+										>support@memoryvisualizer.com</span
+									>
+								</div>
+								<div class="flex items-center gap-2 sm:gap-3">
+									<svg
+										class="h-4 w-4 sm:h-5 sm:w-5 text-blue-500"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+										/>
+									</svg>
+									<span class="text-sm xxs:text-xs sm:text-base text-gray-600"
+										>@memoryvisualizer</span
+									>
+								</div>
+							</div>
+						</div>
+						<div class="bg-white rounded-xl shadow-md p-3 sm:p-6">
+							<h3
+								class="text-lg xxs:text-base sm:text-xl font-semibold text-gray-800 mb-2 sm:mb-4"
+							>
+								Join Our Community
+							</h3>
+							<p
+								class="text-sm xxs:text-xs sm:text-base text-gray-600 mb-3 sm:mb-4"
+							>
+								Connect with other developers, share your experiences, and stay
+								updated with the latest features.
+							</p>
+							<div class="flex gap-3 sm:gap-4 flex-wrap">
+								<button
+									class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-500 text-white hover:bg-blue-600 flex items-center gap-2 text-xs sm:text-sm"
+								>
+									<svg
+										class="h-4 w-4 sm:h-5 sm:w-5"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+										/>
+									</svg>
+									GitHub
+								</button>
+								<button
+									class="px-3 py-1 sm:px-4 sm:py-2 rounded-lg bg-blue-400 text-white hover:bg-blue-500 flex items-center gap-2 text-xs sm:text-sm"
+								>
+									<svg
+										class="h-4 w-4 sm:h-5 sm:w-5"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+										/>
+									</svg>
+									LinkedIn
+								</button>
+							</div>
+						</div>
+					</div>
+				</section>
+			</div>
+		</main>
+
+		<footer
+			class="bg-white text-gray-600 py-4 sm:py-6 border-t border-gray-200"
+		>
+			<div class="max-w-7xl mx-auto px-3 sm:px-4">
+				<div class="flex flex-col md:flex-row justify-between items-center">
+					<div class="mb-4 md:mb-0 text-center md:text-left">
+						<div
+							class="flex items-center justify-center md:justify-start gap-2 mb-1 sm:mb-2"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								class="h-6 w-6 sm:h-8 sm:w-8 md:h-6 md:w-6 text-blue-600"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M21 12.79A9 9 0 1112.21 3a7 7 0 008.79 9.79z" />
+								<path
+									d="M12 2v2m0 16v2m10-10h-2M4 12H2m16.364-6.364l-1.414 1.414M7.05 17.05l-1.414 1.414m12.728 0l-1.414-1.414M7.05 6.95l-1.414-1.414"
+								/>
+							</svg>
+							<span
+								class="font-bold text-gray-800 text-base sm:text-xl md:text-base"
+								>MemoryTracker</span
+							>
+						</div>
+						<p
+							class="text-xs xxs:text-xs sm:text-sm text-gray-500 mt-0 sm:mt-1 px-2 sm:px-4 md:px-0"
+						>
+							© 2025 Enterprise Memory Monitoring. All rights reserved.
+						</p>
+					</div>
+
+					<div
+						class="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-row gap-4 sm:gap-6 md:gap-12"
+					>
+						<div>
+							<h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm">
+								Product
+							</h4>
+							<ul class="text-xs space-y-1">
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>Features</a
+									>
+								</li>
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>Pricing</a
+									>
+								</li>
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600">Docs</a>
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm">
+								Company
+							</h4>
+							<ul class="text-xs space-y-1">
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>About</a
+									>
+								</li>
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600">Blog</a>
+								</li>
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>Careers</a
+									>
+								</li>
+							</ul>
+						</div>
+
+						<div class="col-span-2 sm:col-span-1">
+							<h4 class="font-semibold text-gray-800 mb-1 sm:mb-2 text-sm">
+								Support
+							</h4>
+							<ul class="text-xs space-y-1">
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>Help Center</a
+									>
+								</li>
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>Contact</a
+									>
+								</li>
+								<li>
+									<a href="#" class="text-gray-500 hover:text-blue-600"
+										>Status</a
+									>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div
+					class="mt-4 pt-4 sm:mt-6 sm:pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center"
+				>
+					<!-- Social Media Icons for Mobile (Top) -->
+					<div class="flex gap-4 sm:gap-6 mb-3 sm:mb-6 md:hidden order-first">
+						<a href="#" class="text-gray-400 hover:text-blue-600">
+							<svg
+								class="h-5 w-5 sm:h-6 sm:w-6"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+								/>
+							</svg>
+						</a>
+						<a href="#" class="text-gray-400 hover:text-blue-600">
+							<svg
+								class="h-5 w-5 sm:h-6 sm:w-6"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
+								/>
+							</svg>
+						</a>
+						<a href="#" class="text-gray-400 hover:text-blue-600">
+							<svg
+								class="h-5 w-5 sm:h-6 sm:w-6"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+								/>
+							</svg>
+						</a>
+					</div>
+
+					<!-- Legal Links -->
+					<div
+						class="text-xs text-gray-500 mb-3 sm:mb-4 md:mb-0 text-center md:text-left"
+					>
+						<div
+							class="flex flex-wrap justify-center md:justify-start gap-x-2 gap-y-1"
+						>
+							<a href="#" class="hover:text-blue-600">Privacy Policy</a>
+							<span class="hidden xs:inline">·</span>
+							<a href="#" class="hover:text-blue-600">Terms of Service</a>
+							<span class="hidden xs:inline">·</span>
+							<a href="#" class="hover:text-blue-600">Cookie Policy</a>
+						</div>
+					</div>
+
+					<!-- Social Media Icons for Desktop (Right) -->
+					<div class="hidden md:flex gap-4">
+						<a href="#" class="text-gray-400 hover:text-blue-600">
+							<svg
+								class="h-4 w-4 sm:h-5 sm:w-5"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+								/>
+							</svg>
+						</a>
+						<a href="#" class="text-gray-400 hover:text-blue-600">
+							<svg
+								class="h-4 w-4 sm:h-5 sm:w-5"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"
+								/>
+							</svg>
+						</a>
+						<a href="#" class="text-gray-400 hover:text-blue-600">
+							<svg
+								class="h-4 w-4 sm:h-5 sm:w-5"
+								fill="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"
+								/>
+							</svg>
+						</a>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const menuButton = document.getElementById("menuButton");
+				const closeMenu = document.getElementById("closeMenu");
+				const menuOverlay = document.getElementById("menuOverlay");
+				const mobileMenu = document.getElementById("mobileMenu");
+				const navLinks = document.querySelectorAll(".nav-link");
+				const desktopNavLinks = document.querySelectorAll(".desktop-nav-link");
+				const sections = document.querySelectorAll(".section");
+
+				function switchToSection(sectionName) {
+					sections.forEach((section) => {
+						section.classList.add("hidden");
+						section.classList.remove("active");
+					});
+					document
+						.getElementById(`${sectionName}Section`)
+						.classList.remove("hidden");
+					document
+						.getElementById(`${sectionName}Section`)
+						.classList.add("active");
+				}
+
+				menuButton.addEventListener("click", () => {
+					menuOverlay.style.opacity = "0";
+					menuOverlay.classList.remove("hidden");
+
+					void menuOverlay.offsetWidth;
+
+					menuOverlay.style.opacity = "1";
+					menuOverlay.style.transition = "opacity 0.3s ease";
+
+					setTimeout(() => {
+						mobileMenu.classList.remove("menu-slide-out");
+						mobileMenu.classList.add("menu-slide-in");
+					}, 50);
+				});
+
+				function closeMenuOverlay() {
+					mobileMenu.classList.remove("menu-slide-in");
+					mobileMenu.classList.add("menu-slide-out");
+
+					menuOverlay.style.opacity = "0";
+
+					setTimeout(() => {
+						menuOverlay.classList.add("hidden");
+						menuOverlay.style.transition = "";
+					}, 300);
+				}
+
+				closeMenu.addEventListener("click", closeMenuOverlay);
+
+				menuOverlay.addEventListener("click", (e) => {
+					if (e.target === menuOverlay) {
+						closeMenuOverlay();
+					}
+				});
+
+				navLinks.forEach((link) => {
+					link.addEventListener("click", () => {
+						const targetSection = link.dataset.section;
+						switchToSection(targetSection);
+						closeMenuOverlay();
+					});
+				});
+
+				desktopNavLinks.forEach((link) => {
+					link.addEventListener("click", () => {
+						const targetSection = link.dataset.section;
+						switchToSection(targetSection);
+					});
+				});
+			});
+
+			const canvas = document.getElementById("chart");
+			const ctx = canvas.getContext("2d");
+			let memoryData = [],
+				labels = [],
+				annotations = [],
+				running = true,
+				interval = 1000,
+				currentIntervalValue = 1,
+				elapsedTime = 0,
+				memoryThreshold = 80,
+				showLegend = false,
+				noteTypes = {
+					info: { color: "#0284c7", icon: "ℹ️" },
+					warning: { color: "#f59e0b", icon: "⚠️" },
+					error: { color: "#ef4444", icon: "❌" },
+				},
+				currentFilter = "all";
+			let chartType = "line";
+
+			let gradient = ctx.createLinearGradient(0, 0, 0, 300);
+			gradient.addColorStop(0, "rgba(2, 132, 199, 0.2)");
+			gradient.addColorStop(1, "rgba(56, 189, 248, 0.05)");
+
+			const now = new Date();
+			document.getElementById("sessionStartTime").textContent = `${now
+				.getHours()
+				.toString()
+				.padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")} ${
+				now.getHours() >= 12 ? "PM" : "AM"
+			}`;
+
+			const loadingOverlay = document.getElementById("loadingOverlay");
+			loadingOverlay.classList.remove("hidden");
+			setTimeout(() => {
+				loadingOverlay.classList.add("hidden");
+			}, 1500);
+
+			function createChart(type) {
+				const ctx = document.getElementById("chart").getContext("2d");
+				return new Chart(ctx, {
+					type,
+					data: {
+						labels: labels,
+						datasets: [
+							{
+								label: "Memory Usage (MB)",
+								data: memoryData,
+								borderColor: "#0284c7",
+								backgroundColor:
+									type === "line" ? gradient : "rgba(2, 132, 199, 0.7)",
+								fill: type === "line",
+								tension: 0.3,
+								borderWidth: 2,
+							},
+							{
+								label: "Threshold",
+								data: Array(labels.length).fill(memoryThreshold),
+								borderColor: "rgba(239, 68, 68, 0.7)",
+								borderWidth: 2,
+								borderDash: [5, 5],
+								fill: false,
+								pointRadius: 0,
+								type: "line",
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						animation: {
+							duration: 500,
+						},
+						plugins: {
+							annotation: { annotations: {} },
+							legend: { display: showLegend },
+							tooltip: {
+								backgroundColor: "rgba(15, 23, 42, 0.8)",
+								titleFont: {
+									size: 12,
+									weight: "bold",
+								},
+								bodyFont: {
+									size: 11,
+								},
+								padding: 8,
+								cornerRadius: 6,
+								displayColors: false,
+								callbacks: {
+									title: function (tooltipItems) {
+										return `Time: ${tooltipItems[0].label}`;
+									},
+									label: function (context) {
+										return `Memory: ${context.raw} MB`;
+									},
+								},
+							},
+							zoom: {
+								pan: {
+									enabled: true,
+									mode: "x",
+								},
+								zoom: {
+									wheel: {
+										enabled: true,
+									},
+									pinch: {
+										enabled: true,
+									},
+									mode: "x",
+								},
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								suggestedMax: 100,
+								ticks: {
+									color: "#64748b",
+									font: {
+										size: 10,
+									},
+								},
+								grid: { color: "rgba(226, 232, 240, 0.5)" },
+								title: {
+									display: true,
+									text: "Memory (MB)",
+									color: "#64748b",
+									font: {
+										size: 10,
+										weight: "normal",
+									},
+								},
+							},
+							x: {
+								ticks: {
+									color: "#64748b",
+									font: {
+										size: 10,
+									},
+								},
+								grid: { color: "rgba(226, 232, 240, 0.5)" },
+								title: {
+									display: true,
+									text: "Time (seconds)",
+									color: "#64748b",
+									font: {
+										size: 10,
+										weight: "normal",
+									},
+								},
+							},
+						},
+						onClick: (event, elements) => {
+							if (elements.length > 0) {
+								const index = elements[0].index;
+								const timeLabel = labels[index];
+								const time = parseInt(timeLabel.replace("s", ""), 10);
+								document.getElementById("annotationTime").value = time;
+							}
+						},
+					},
+				});
+			}
+
+			let chart = createChart(chartType);
+
+			function updateStats() {
+				if (!memoryData.length) return;
+				const min = Math.min(...memoryData);
+				const max = Math.max(...memoryData);
+				const avg = (
+					memoryData.reduce((a, b) => a + b, 0) / memoryData.length
+				).toFixed(1);
+				const current = memoryData[memoryData.length - 1];
+
+				document.getElementById("minStat").textContent = `${min} MB`;
+				document.getElementById("avgStat").textContent = `${avg} MB`;
+				document.getElementById("maxStat").textContent = `${max} MB`;
+				document.getElementById("currentStat").textContent = `${current} MB`;
+
+				document.getElementById(
+					"dataPoints"
+				).textContent = `${memoryData.length} points`;
+
+				const now = new Date();
+				document.getElementById(
+					"lastUpdated"
+				).textContent = `Last updated: ${now
+					.getHours()
+					.toString()
+					.padStart(2, "0")}:${now
+					.getMinutes()
+					.toString()
+					.padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
+			}
+
+			function updateChart() {
+				if (!running) return;
+
+				if (memoryData.length === 0) {
+					loadingOverlay.classList.remove("hidden");
+					setTimeout(() => {
+						loadingOverlay.classList.add("hidden");
+					}, 500);
+				}
+
+				const next = Math.floor(Math.random() * 70) + 10;
+				elapsedTime += currentIntervalValue;
+				labels.push(`${elapsedTime}s`);
+				memoryData.push(next);
+
+				chart.data.datasets[1].data = Array(labels.length).fill(
+					memoryThreshold
+				);
+
+				if (next > memoryThreshold && memoryData.length > 1) {
+					const eventDiv = document.createElement("div");
+					eventDiv.className = "flex items-center gap-2";
+					eventDiv.innerHTML = `
+            <span class="inline-block w-2 h-2 rounded-full bg-red-500"></span>
+            <span>Memory threshold exceeded at ${elapsedTime}s</span>
+          `;
+					const systemEvents = document.getElementById("systemEvents");
+					systemEvents.insertBefore(eventDiv, systemEvents.firstChild);
+
+					addAnnotation(elapsedTime, "Memory threshold exceeded", "warning");
+				}
+
+				chart.update();
+				updateStats();
+			}
+
+			let timer = setInterval(updateChart, interval);
+
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "p" || e.key === "P") {
+					document.getElementById("toggle").click();
+				} else if (e.key === "r" || e.key === "R") {
+					document.getElementById("reset").click();
+				}
+			});
+
+			document.getElementById("toggle").onclick = () => {
+				running = !running;
+				const toggleBtn = document.getElementById("toggle");
+				if (running) {
+					toggleBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Pause
+          `;
+				} else {
+					toggleBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Resume
+          `;
+				}
+			};
+
+			document.getElementById("reset").onclick = () => {
+				loadingOverlay.classList.remove("hidden");
+
+				memoryData = [];
+				labels = [];
+				annotations = [];
+				elapsedTime = 0;
+				chart.destroy();
+				chart = createChart(chartType);
+				chart.options.plugins.annotation.annotations = {};
+				updateStats();
+
+				document.getElementById("noteList").innerHTML =
+					'<div class="text-center text-gray-500 py-4 text-xs sm:text-sm">No annotations yet. Add a note to get started.</div>';
+
+				const systemEvents = document.getElementById("systemEvents");
+				const eventItems = systemEvents.querySelectorAll("div");
+				for (let i = 2; i < eventItems.length; i++) {
+					systemEvents.removeChild(eventItems[i]);
+				}
+
+				setTimeout(() => {
+					loadingOverlay.classList.add("hidden");
+				}, 500);
+			};
+
+			document.getElementById("interval").oninput = (e) => {
+				clearInterval(timer);
+				currentIntervalValue = parseInt(e.target.value);
+				interval = currentIntervalValue * 1000;
+				timer = setInterval(updateChart, interval);
+				document.getElementById(
+					"intervalValue"
+				).textContent = `${currentIntervalValue}s`;
+			};
+
+			document.getElementById("intervalValue").textContent = "1s";
+
+			document.getElementById("export").onclick = () => {
+				let csv = "Time,Memory,Threshold\n";
+				memoryData.forEach((val, i) => {
+					const timeLabel = labels[i];
+					csv += `${timeLabel},${val},${memoryThreshold}\n`;
+				});
+				const blob = new Blob([csv], { type: "text/csv" });
+				const a = document.createElement("a");
+				a.href = URL.createObjectURL(blob);
+				a.download = `memory_data_${new Date().toISOString().slice(0, 10)}.csv`;
+				a.click();
+			};
+
+			document.getElementById("setThreshold").onclick = () => {
+				const thresholdInput = document.getElementById("threshold");
+				const newThreshold = parseInt(thresholdInput.value);
+				if (!isNaN(newThreshold) && newThreshold > 0) {
+					memoryThreshold = newThreshold;
+					chart.data.datasets[1].data = Array(labels.length).fill(
+						memoryThreshold
+					);
+					chart.update();
+
+					const eventDiv = document.createElement("div");
+					eventDiv.className = "flex items-center gap-2";
+					eventDiv.innerHTML = `
+            <span class="inline-block w-2 h-2 rounded-full bg-blue-500"></span>
+            <span>Threshold changed to ${memoryThreshold} MB</span>
+          `;
+					const systemEvents = document.getElementById("systemEvents");
+					systemEvents.insertBefore(eventDiv, systemEvents.firstChild);
+				}
+			};
+
+			document.getElementById("toggleLegend").onclick = () => {
+				showLegend = !showLegend;
+				chart.options.plugins.legend.display = showLegend;
+				chart.update();
+			};
+
+			document.getElementById("zoomReset").onclick = () => {
+				chart.resetZoom();
+			};
+
+			document.getElementById("clearNotes").onclick = () => {
+				document.getElementById("noteList").innerHTML =
+					'<div class="text-center text-gray-500 py-4 text-xs sm:text-sm">No annotations yet. Add a note to get started.</div>';
+				annotations = [];
+				chart.options.plugins.annotation.annotations = {};
+				chart.update();
+			};
+
+			document.getElementById("filterAll").onclick = () => setFilter("all");
+			document.getElementById("filterInfo").onclick = () => setFilter("info");
+			document.getElementById("filterWarning").onclick = () =>
+				setFilter("warning");
+			document.getElementById("filterError").onclick = () => setFilter("error");
+
+			function setFilter(filter) {
+				currentFilter = filter;
+
+				document
+					.querySelectorAll(
+						"#filterAll, #filterInfo, #filterWarning, #filterError"
+					)
+					.forEach((btn) => {
+						btn.classList.remove("active");
+						btn.classList.remove("bg-blue-100");
+					});
+				document
+					.getElementById(
+						`filter${filter.charAt(0).toUpperCase() + filter.slice(1)}`
+					)
+					.classList.add("active");
+				document
+					.getElementById(
+						`filter${filter.charAt(0).toUpperCase() + filter.slice(1)}`
+					)
+					.classList.add("bg-blue-100");
+
+				const notes = document.querySelectorAll(".note-item");
+				if (notes.length > 0) {
+					notes.forEach((note) => {
+						if (filter === "all" || note.dataset.type === filter) {
+							note.classList.remove("hidden");
+						} else {
+							note.classList.add("hidden");
+						}
+					});
+				}
+			}
+
+			function addAnnotation(time, label, type = "info") {
+				const noteType = noteTypes[type] || noteTypes.info;
+
+				const annotationId = `annotation-${Date.now()}`;
+
+				const annotation = {
+					id: annotationId,
+					type: "line",
+					mode: "vertical",
+					scaleID: "x",
+					value: `${time}s`,
+					borderColor: noteType.color,
+					borderWidth: 2,
+					label: {
+						content: label,
+						enabled: true,
+						backgroundColor: noteType.color,
+						color: "#fff",
+						position: "top",
+						font: {
+							size: 10,
+						},
+					},
+				};
+
+				annotations.push(annotation);
+
+				chart.options.plugins.annotation.annotations = {};
+				annotations.forEach((a) => {
+					chart.options.plugins.annotation.annotations[a.id] = a;
+				});
+
+				chart.update();
+
+				const noteList = document.getElementById("noteList");
+
+				const placeholder = noteList.querySelector(".text-center");
+				if (placeholder) {
+					noteList.removeChild(placeholder);
+				}
+
+				const note = document.createElement("div");
+				note.className = `note-item py-2 border-b border-gray-200 text-gray-700 hover:bg-gray-100 flex items-start gap-2 ${
+					currentFilter !== "all" && currentFilter !== type ? "hidden" : ""
+				}`;
+				note.dataset.type = type;
+
+				const iconSpan = document.createElement("span");
+				iconSpan.className = "text-base xxs:text-sm";
+				iconSpan.textContent = noteType.icon;
+				note.appendChild(iconSpan);
+
+				const contentDiv = document.createElement("div");
+				contentDiv.className = "flex-1";
+
+				const timeStamp = document.createElement("div");
+				timeStamp.className = "font-semibold text-xs text-blue-600";
+				timeStamp.textContent = `${time}s`;
+				contentDiv.appendChild(timeStamp);
+
+				const labelText = document.createElement("div");
+				labelText.className = "text-xs";
+				labelText.textContent = label;
+				contentDiv.appendChild(labelText);
+
+				note.appendChild(contentDiv);
+
+				const deleteBtn = document.createElement("button");
+				deleteBtn.className = "text-gray-400 hover:text-red-500";
+				deleteBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 sm:h-4 sm:w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        `;
+				deleteBtn.onclick = function () {
+					noteList.removeChild(note);
+
+					const index = annotations.findIndex(
+						(a) => a.value === `${time}s` && a.label.content === label
+					);
+					if (index !== -1) {
+						const removedAnnotation = annotations.splice(index, 1)[0];
+
+						chart.options.plugins.annotation.annotations = {};
+						annotations.forEach((a) => {
+							chart.options.plugins.annotation.annotations[a.id] = a;
+						});
+
+						chart.update();
+					}
+
+					if (noteList.children.length === 0) {
+						noteList.innerHTML =
+							'<div class="text-center text-gray-500 py-4 text-xs sm:text-sm">No annotations yet. Add a note to get started.</div>';
+					}
+				};
+				note.appendChild(deleteBtn);
+
+				if (noteList.firstChild) {
+					noteList.insertBefore(note, noteList.firstChild);
+				} else {
+					noteList.appendChild(note);
+				}
+			}
+
+			document.getElementById("annotationForm").onsubmit = (e) => {
+				e.preventDefault();
+				const time = document.getElementById("annotationTime").value;
+				const label = document.getElementById("annotationLabel").value;
+				const type = document.getElementById("annotationType").value;
+
+				addAnnotation(time, label, type);
+				document.getElementById("annotationForm").reset();
+			};
+
+			document.getElementById("lineBtn").onclick = () =>
+				switchChartType("line");
+			document.getElementById("barBtn").onclick = () => switchChartType("bar");
+
+			function switchChartType(type) {
+				chartType = type;
+
+				const currentData = {
+					labels: [...labels],
+					memoryData: [...memoryData],
+					annotations: [...annotations],
+				};
+
+				chart.destroy();
+				chart = createChart(type);
+
+				document
+					.getElementById("lineBtn")
+					.classList.remove("ring-2", "ring-blue-500");
+				document
+					.getElementById("barBtn")
+					.classList.remove("ring-2", "ring-blue-500");
+
+				if (type === "line") {
+					document
+						.getElementById("lineBtn")
+						.classList.add("ring-2", "ring-blue-500");
+				} else {
+					document
+						.getElementById("barBtn")
+						.classList.add("ring-2", "ring-blue-500");
+				}
+			}
+		</script>
+	</body>
+</html>
