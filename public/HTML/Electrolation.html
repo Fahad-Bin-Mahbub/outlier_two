@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gas Behavior Simulation</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			:root {
+				--bg-color: #f8fafc;
+				--text-color: #334155;
+				--card-bg: #ffffff;
+				--primary-color: #4776e6;
+				--secondary-color: #8e54e9;
+				--accent-color: #4caf50;
+				--gradient-bg: linear-gradient(120deg, #f8fafc, #eef2f7);
+				--button-bg: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--secondary-color)
+				);
+				--button-hover-bg: linear-gradient(
+					135deg,
+					var(--secondary-color),
+					var(--primary-color)
+				);
+				--button-text-color: #ffffff;
+				--shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+				--card-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+				--border-radius: 12px;
+				--slider-thumb: var(--primary-color);
+				--slider-track: #e0e0e0;
+				--hero-overlay: rgba(0, 0, 0, 0.4);
+				--footer-bg: #f1f5f9;
+				--border-color: #e2e8f0;
+				--info-card-bg: #f1f5f9;
+				--nav-hover: #f1f5f9;
+				--input-bg: #f1f5f9;
+				--control-hover: rgba(71, 118, 230, 0.05);
+			}
+			.dark-mode {
+				--bg-color: #0f172a;
+				--text-color: #e2e8f0;
+				--card-bg: #1e293b;
+				--primary-color: #8e54e9;
+				--secondary-color: #4776e6;
+				--accent-color: #4caf50;
+				--gradient-bg: linear-gradient(120deg, #0f172a, #1e293b);
+				--button-bg: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--secondary-color)
+				);
+				--button-hover-bg: linear-gradient(
+					135deg,
+					var(--secondary-color),
+					var(--primary-color)
+				);
+				--button-text-color: #ffffff;
+				--shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+				--card-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+				--slider-thumb: var(--primary-color);
+				--slider-track: #334155;
+				--hero-overlay: rgba(0, 0, 0, 0.6);
+				--footer-bg: #1e293b;
+				--border-color: #334155;
+				--info-card-bg: #334155;
+				--nav-hover: #334155;
+				--input-bg: #334155;
+				--control-hover: rgba(142, 84, 233, 0.1);
+			}
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+				transition: background-color 0.3s, color 0.3s, border-color 0.3s,
+					box-shadow 0.3s;
+			}
+			body {
+				font-family: "Inter", system-ui, -apple-system, sans-serif;
+				background: var(--gradient-bg);
+				color: var(--text-color);
+				scroll-behavior: smooth;
+				line-height: 1.6;
+			}
+			.gradient-logo {
+				font-size: 1.5rem;
+				font-weight: bold;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--secondary-color)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+			.hero-bg {
+				position: absolute;
+				inset: 0;
+				background-image: url("https://images.unsplash.com/photo-1636953056323-9c09fdd74fa6?q=80&w=1920");
+				background-size: cover;
+				background-position: center;
+				z-index: -2;
+			}
+			.hero-overlay {
+				position: absolute;
+				inset: 0;
+				background: var(--hero-overlay);
+				background-image: linear-gradient(
+					135deg,
+					rgba(71, 118, 230, 0.7),
+					rgba(142, 84, 233, 0.7)
+				);
+				z-index: -1;
+			}
+			.hero-title {
+				font-size: 4rem;
+				font-weight: 800;
+				line-height: 1.2;
+				text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+				opacity: 0;
+				animation: fadeInUp 1s ease forwards 0.3s;
+			}
+			.hero-subtitle {
+				font-size: 1.5rem;
+				text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+				opacity: 0;
+				animation: fadeInUp 1s ease forwards 0.5s;
+			}
+			.hero-btn {
+				padding: 15px 35px;
+				font-size: 1.1rem;
+				border-radius: 50px;
+				background: white;
+				color: var(--primary-color);
+				font-weight: 600;
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+				opacity: 0;
+				animation: fadeInUp 1s ease forwards 0.7s;
+				box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+			}
+			.hero-btn:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+			}
+			.hero-btn:before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: rgba(255, 255, 255, 0.2);
+				transition: all 0.6s ease;
+				z-index: -1;
+			}
+			.hero-btn:hover:before {
+				left: 100%;
+			}
+			.particle {
+				position: absolute;
+				border-radius: 50%;
+				background: rgba(255, 255, 255, 0.3);
+				pointer-events: none;
+			}
+			nav {
+				background-color: var(--card-bg);
+				border-bottom: 1px solid var(--border-color);
+			}
+			nav a {
+				position: relative;
+				transition: all 0.3s;
+			}
+			nav a:hover,
+			nav a.active {
+				background: var(--nav-hover);
+				color: var(--primary-color);
+			}
+			nav a::after {
+				content: "";
+				position: absolute;
+				width: 0;
+				height: 2px;
+				bottom: 0;
+				left: 50%;
+				background: var(--button-bg);
+				transition: all 0.3s;
+				transform: translateX(-50%);
+				opacity: 0;
+			}
+			nav a:hover::after,
+			nav a.active::after {
+				width: 60%;
+				opacity: 1;
+			}
+			.radio-group {
+				background: var(--input-bg);
+				padding: 6px;
+				border-radius: 50px;
+				box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+				position: relative;
+				border: 1px solid var(--border-color);
+			}
+			.radio-group-bg {
+				position: absolute;
+				top: 6px;
+				left: 6px;
+				height: calc(100% - 12px);
+				border-radius: 50px;
+				background: var(--primary-color);
+				transition: all 0.3s ease;
+				z-index: 1;
+			}
+			.radio-label {
+				padding: 12px 24px;
+				border-radius: 50px;
+				transition: all 0.3s;
+				font-weight: 600;
+				z-index: 2;
+				color: var(--text-color);
+				cursor: pointer;
+				user-select: none;
+			}
+			.radio-label input {
+				position: absolute;
+				opacity: 0;
+			}
+			.radio-label input:checked + span {
+				color: white;
+			}
+			.control-group {
+				border: 1px solid var(--border-color);
+				background: var(--card-bg);
+				transition: all 0.3s ease;
+			}
+			.control-group:hover {
+				background: var(--control-hover);
+				border-color: var(--primary-color);
+			}
+
+			#darkModeToggle {
+				position: relative;
+				width: 40px;
+				height: 40px;
+				border-radius: 50%;
+				background-color: var(--input-bg);
+				border: 1px solid var(--border-color);
+				cursor: pointer;
+				overflow: hidden;
+				transition: all 0.3s ease;
+				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+				padding: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#darkModeToggle:hover {
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+				background-color: var(--nav-hover);
+			}
+
+			.sun-icon,
+			.moon-icon {
+				position: absolute;
+				width: 20px !important;
+				height: 20px !important;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				transition: opacity 0.3s ease;
+			}
+
+			.sun-icon {
+				opacity: 0;
+				stroke: var(--secondary-color);
+				stroke-width: 2;
+			}
+
+			.moon-icon {
+				opacity: 1;
+				stroke: var(--primary-color);
+				stroke-width: 2;
+			}
+
+			.dark-mode .sun-icon {
+				opacity: 1;
+			}
+
+			.dark-mode .moon-icon {
+				opacity: 0;
+			}
+
+			.dark-mode #darkModeToggle {
+				background-color: rgba(142, 84, 233, 0.15);
+			}
+			input[type="range"] {
+				-webkit-appearance: none;
+				width: 100%;
+				height: 6px;
+				background: var(--slider-track);
+				border-radius: 5px;
+				outline: none;
+			}
+			input[type="range"]::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background: var(--slider-thumb);
+				cursor: pointer;
+				border: 3px solid white;
+				box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+				transition: all 0.3s;
+			}
+			input[type="range"]::-webkit-slider-thumb:hover {
+				transform: scale(1.1);
+			}
+			.slider-value {
+				color: var(--primary-color);
+			}
+			.canvas-container {
+				background: var(--card-bg);
+				border: 1px solid var(--border-color);
+				border-radius: var(--border-radius);
+			}
+			.about-card {
+				background: var(--info-card-bg);
+				border-radius: var(--border-radius);
+				border: 1px solid var(--border-color);
+			}
+			footer {
+				background: var(--footer-bg);
+				border-top: 1px solid var(--border-color);
+			}
+			.social-icon {
+				background: var(--input-bg);
+				color: var(--text-color);
+				border: 1px solid var(--border-color);
+			}
+			.social-icon:hover {
+				color: white;
+				border-color: transparent;
+			}
+			.footer-heading::after {
+				background: var(--button-bg);
+			}
+			.newsletter-input {
+				background: var(--input-bg);
+				color: var(--text-color);
+				border: 1px solid var(--border-color);
+			}
+			.dark-mode .radio-group {
+				background: rgba(50, 50, 50, 0.3);
+			}
+			.dark-mode .social-icon svg {
+				fill: var(--text-color);
+			}
+			.dark-mode .social-icon:hover svg {
+				fill: white;
+			}
+			@keyframes fadeInUp {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(-20px);
+				}
+			}
+			@media (max-width: 900px) {
+				.hero-title {
+					font-size: 2.5rem;
+				}
+				.hero-subtitle {
+					font-size: 1.2rem;
+				}
+			}
+			@media (max-width: 768px) {
+				nav ul.active {
+					transform: translateX(0);
+					opacity: 1;
+					visibility: visible;
+				}
+				nav ul {
+					position: fixed;
+					top: 70px;
+					right: 0;
+					background: var(--card-bg);
+					width: 250px;
+					flex-direction: column;
+					padding: 2rem;
+					border-radius: 0 0 0 var(--border-radius);
+					border-left: 1px solid var(--border-color);
+					border-bottom: 1px solid var(--border-color);
+					transform: translateX(100%);
+					transition: all 0.3s ease;
+					opacity: 0;
+					visibility: hidden;
+					box-shadow: var(--shadow);
+				}
+				nav ul li {
+					width: 100%;
+					margin-bottom: 1rem;
+				}
+				nav ul li a {
+					width: 100%;
+					display: block;
+					text-align: center;
+					padding: 1rem;
+				}
+				.hamburger-menu.active span:nth-child(1) {
+					transform: translateY(9.5px) rotate(45deg);
+				}
+				.hamburger-menu.active span:nth-child(2) {
+					opacity: 0;
+				}
+				.hamburger-menu.active span:nth-child(3) {
+					transform: translateY(-9.5px) rotate(-45deg);
+				}
+			}
+			@media (max-width: 600px) {
+				.radio-label {
+					padding: 10px 15px;
+					font-size: 0.9rem;
+				}
+			}
+			@media (max-width: 400px) {
+				.radio-label {
+					padding: 8px 10px;
+					font-size: 0.8rem;
+				}
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeInRight {
+				from {
+					opacity: 0;
+					transform: translateX(-30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes fadeInLeft {
+				from {
+					opacity: 0;
+					transform: translateX(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes scaleIn {
+				from {
+					opacity: 0;
+					transform: scale(0.9);
+				}
+				to {
+					opacity: 1;
+					transform: scale(1);
+				}
+			}
+
+			.animate-on-scroll {
+				opacity: 0;
+			}
+
+			.fade-in {
+				animation: fadeIn 0.6s ease forwards;
+			}
+
+			.fade-in-up {
+				animation: fadeInUp 0.8s ease forwards;
+			}
+
+			.fade-in-right {
+				animation: fadeInRight 0.8s ease forwards;
+			}
+
+			.fade-in-left {
+				animation: fadeInLeft 0.8s ease forwards;
+			}
+
+			.scale-in {
+				animation: scaleIn 0.7s ease forwards;
+			}
+
+			.delay-100 {
+				animation-delay: 0.1s;
+			}
+			.delay-200 {
+				animation-delay: 0.2s;
+			}
+			.delay-300 {
+				animation-delay: 0.3s;
+			}
+			.delay-400 {
+				animation-delay: 0.4s;
+			}
+			.delay-500 {
+				animation-delay: 0.5s;
+			}
+
+			.page-loader {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: var(--bg-color);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 9999;
+				transition: opacity 0.5s ease, visibility 0.5s ease;
+			}
+
+			.loader-hidden {
+				opacity: 0;
+				visibility: hidden;
+			}
+
+			.loader-content {
+				text-align: center;
+			}
+
+			.loader-spinner {
+				width: 50px;
+				height: 50px;
+				border: 5px solid var(--border-color);
+				border-radius: 50%;
+				border-top-color: var(--primary-color);
+				animation: spin 1s linear infinite;
+				margin: 0 auto 20px;
+			}
+
+			input[type="range"]:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+
+			input[type="range"]:disabled::-webkit-slider-thumb {
+				background: var(--slider-track);
+				border-color: var(--border-color);
+				cursor: not-allowed;
+				transform: scale(0.9);
+				box-shadow: none;
+			}
+
+			.control-group.disabled {
+				background-color: var(--input-bg);
+				opacity: 0.8;
+			}
+
+			.control-group.disabled label {
+				color: var(--text-color);
+				opacity: 0.7;
+			}
+
+			.control-group.disabled .slider-value {
+				color: var(--text-color);
+				opacity: 0.8;
+			}
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			nav .gradient-logo {
+				opacity: 0;
+				animation: fadeIn 0.8s ease forwards;
+			}
+
+			nav ul li {
+				opacity: 0;
+				animation: fadeIn 0.5s ease forwards;
+			}
+
+			nav ul li:nth-child(1) {
+				animation-delay: 0.1s;
+			}
+			nav ul li:nth-child(2) {
+				animation-delay: 0.2s;
+			}
+			nav ul li:nth-child(3) {
+				animation-delay: 0.3s;
+			}
+
+			@keyframes sliderAppear {
+				from {
+					opacity: 0;
+					transform: translateX(-20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+		</style>
+	</head>
+	<body class="min-h-screen bg-bg-color text-text-color">
+		<div class="page-loader">
+			<div class="loader-content">
+				<div class="loader-spinner"></div>
+				<div class="gradient-logo">Thermodynamics Simulator</div>
+			</div>
+		</div>
+
+		<nav
+			class="fixed top-0 w-full z-50 shadow-md flex items-center justify-between px-6 py-4"
+		>
+			<div class="flex items-center">
+				<h1 class="gradient-logo">Thermodynamics Simulator</h1>
+			</div>
+			<div class="flex items-center">
+				<div
+					class="hamburger-menu md:hidden cursor-pointer mr-5"
+					id="hamburgerMenu"
+				>
+					<span class="block w-8 h-0.5 bg-text-color mb-1.5 rounded"></span>
+					<span class="block w-8 h-0.5 bg-text-color mb-1.5 rounded"></span>
+					<span class="block w-8 h-0.5 bg-text-color rounded"></span>
+				</div>
+				<ul class="hidden md:flex space-x-2" id="navMenu">
+					<li>
+						<a href="#home" class="px-4 py-2 rounded-md transition duration-300"
+							>Home</a
+						>
+					</li>
+					<li>
+						<a
+							href="#simulator"
+							class="px-4 py-2 rounded-md transition duration-300"
+							>Simulator</a
+						>
+					</li>
+					<li>
+						<a
+							href="#about"
+							class="px-4 py-2 rounded-md transition duration-300"
+							>About</a
+						>
+					</li>
+				</ul>
+				<button
+					id="darkModeToggle"
+					class="ml-5 p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition duration-300 relative w-10 h-10"
+					aria-label="Toggle dark mode"
+				>
+					<svg
+						class="sun-icon"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						fill="none"
+						stroke-width="2"
+					>
+						<circle cx="12" cy="12" r="5"></circle>
+						<line x1="12" y1="1" x2="12" y2="3"></line>
+						<line x1="12" y1="21" x2="12" y2="23"></line>
+						<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+						<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+						<line x1="1" y1="12" x2="3" y2="12"></line>
+						<line x1="21" y1="12" x2="23" y2="12"></line>
+						<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+						<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+					</svg>
+
+					<svg
+						class="moon-icon"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+						fill="none"
+						stroke-width="2"
+					>
+						<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+					</svg>
+				</button>
+			</div>
+		</nav>
+		<div class="h-20"></div>
+
+		<section
+			id="home"
+			class="relative min-h-screen flex items-center justify-center overflow-hidden"
+		>
+			<div class="hero-bg"></div>
+			<div class="hero-overlay"></div>
+			<div class="relative z-10 text-center text-white max-w-5xl mx-auto px-5">
+				<h1 class="hero-title mb-6">Interactive Thermodynamics Simulator</h1>
+				<p class="hero-subtitle max-w-2xl mx-auto mb-8">
+					Explore the fundamental laws of thermodynamics with our immersive
+					simulator. Visualize the relationships between pressure, volume, and
+					temperature in real-time and discover the beauty of physical laws
+					governing gas behavior.
+				</p>
+				<a href="#simulator">
+					<button
+						class="hero-btn hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+					>
+						Begin Your Journey
+					</button>
+				</a>
+			</div>
+		</section>
+
+		<section
+			id="simulator"
+			class="py-24 min-h-screen flex items-center justify-center"
+		>
+			<div class="container max-w-6xl mx-auto px-5">
+				<div
+					class="text-center mb-12 animate-on-scroll"
+					data-animation="fade-in-up"
+				>
+					<h2
+						class="text-3xl font-bold mb-5"
+						style="
+							background: var(--button-bg);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							background-clip: text;
+						"
+					>
+						Interactive Gas Simulator
+					</h2>
+					<p class="text-lg max-w-3xl mx-auto">
+						Adjust the parameters below to see how changes in temperature,
+						volume, and pressure affect gas behavior according to the ideal gas
+						law.
+					</p>
+				</div>
+				<div class="flex flex-wrap gap-10">
+					<div
+						class="controls flex-1 min-w-[300px] bg-card-bg rounded-xl p-8 shadow-card animate-on-scroll"
+						data-animation="fade-in-right"
+					>
+						<h2
+							class="text-2xl font-bold mb-6"
+							style="
+								background: var(--button-bg);
+								-webkit-background-clip: text;
+								-webkit-text-fill-color: transparent;
+								background-clip: text;
+							"
+						>
+							Gas Properties
+						</h2>
+						<div
+							class="radio-group flex justify-between mb-10 animate-on-scroll"
+							data-animation="scale-in"
+						>
+							<div class="radio-group-bg"></div>
+							<label class="radio-label flex-1 text-center" id="temp-label">
+								<input type="radio" name="fixed" value="T" checked />
+								<span>Temperature</span>
+							</label>
+							<label class="radio-label flex-1 text-center" id="volume-label">
+								<input type="radio" name="fixed" value="V" />
+								<span>Volume</span>
+							</label>
+							<label class="radio-label flex-1 text-center" id="pressure-label">
+								<input type="radio" name="fixed" value="P" />
+								<span>Pressure</span>
+							</label>
+						</div>
+						<div
+							class="control-group p-6 rounded-xl mb-6 hover:shadow-md hover:-translate-y-0.5 transition-all animate-on-scroll"
+							data-animation="fade-in-up"
+							data-delay="100"
+						>
+							<label
+								for="tSlider"
+								class="block mb-4 font-semibold text-lg"
+								style="color: var(--primary-color)"
+								>Temperature (K)</label
+							>
+							<div class="slider-container">
+								<input
+									type="range"
+									id="tSlider"
+									class="w-full"
+									min="10"
+									max="100"
+									step="0.1"
+									value="50"
+								/>
+								<div class="flex justify-between items-center mt-2">
+									<div>
+										<span id="tValue" class="slider-value text-2xl font-bold"
+											>50</span
+										>
+										<span class="unit text-sm opacity-70">K</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div
+							class="control-group p-6 rounded-xl mb-6 hover:shadow-md hover:-translate-y-0.5 transition-all animate-on-scroll"
+							data-animation="fade-in-up"
+							data-delay="200"
+						>
+							<label
+								for="vSlider"
+								class="block mb-4 font-semibold text-lg"
+								style="color: var(--primary-color)"
+								>Volume (units)</label
+							>
+							<div class="slider-container">
+								<input
+									type="range"
+									id="vSlider"
+									class="w-full"
+									min="1"
+									max="10"
+									step="0.1"
+									value="5"
+								/>
+								<div class="flex justify-between items-center mt-2">
+									<div>
+										<span id="vValue" class="slider-value text-2xl font-bold"
+											>5</span
+										>
+										<span class="unit text-sm opacity-70">units</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div
+							class="control-group p-6 rounded-xl mb-6 hover:shadow-md hover:-translate-y-0.5 transition-all animate-on-scroll"
+							data-animation="fade-in-up"
+							data-delay="300"
+						>
+							<label
+								for="pSlider"
+								class="block mb-4 font-semibold text-lg"
+								style="color: var(--primary-color)"
+								>Pressure (units)</label
+							>
+							<div class="slider-container">
+								<input
+									type="range"
+									id="pSlider"
+									class="w-full"
+									min="1"
+									max="50"
+									step="0.1"
+									value="10"
+								/>
+								<div class="flex justify-between items-center mt-2">
+									<div>
+										<span id="pValue" class="slider-value text-2xl font-bold"
+											>10</span
+										>
+										<span class="unit text-sm opacity-70">units</span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<button
+							id="resetBtn"
+							class="w-full py-4 text-lg font-semibold rounded-lg text-button-text shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 animate-on-scroll"
+							data-animation="scale-in"
+							data-delay="400"
+							style="background: var(--button-bg)"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 24 24"
+								class="w-5 h-5"
+							>
+								<path
+									fill="currentColor"
+									d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 12h7V5l-2.35 1.35z"
+								/>
+							</svg>
+							Reset Simulation
+						</button>
+						<div class="text-center mt-5 text-sm opacity-70" id="statusBar">
+							Current: T = 50, V = 5, P = 10
+						</div>
+					</div>
+					<div class="visualizations flex-1 min-w-[300px] flex flex-col gap-8">
+						<div
+							class="canvas-container flex-1 p-8 shadow-md hover:shadow-lg transition-all animate-on-scroll"
+							data-animation="fade-in-left"
+							data-delay="100"
+						>
+							<h2
+								class="text-xl font-semibold mb-5 text-center"
+								style="color: var(--primary-color)"
+							>
+								P-V Diagram
+							</h2>
+							<div class="aspect-square w-full">
+								<canvas id="pvCanvas" class="w-full h-full"></canvas>
+							</div>
+						</div>
+						<div
+							class="canvas-container flex-1 p-8 shadow-md hover:shadow-lg transition-all animate-on-scroll"
+							data-animation="fade-in-left"
+							data-delay="300"
+						>
+							<h2
+								class="text-xl font-semibold mb-5 text-center"
+								style="color: var(--primary-color)"
+							>
+								Gas Particle Simulation
+							</h2>
+							<div class="aspect-square w-full">
+								<canvas id="gasCanvas" class="w-full h-full"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section
+			id="about"
+			class="py-24 min-h-screen flex items-center justify-center"
+		>
+			<div class="container max-w-6xl mx-auto px-5">
+				<div
+					class="card bg-card-bg shadow-lg p-10 rounded-xl text-center animate-on-scroll"
+					data-animation="scale-in"
+				>
+					<h2
+						class="text-3xl font-bold mb-5"
+						style="
+							background: var(--button-bg);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							background-clip: text;
+						"
+					>
+						About the Simulation
+					</h2>
+					<p class="text-lg mb-8 max-w-3xl mx-auto">
+						This simulation demonstrates the ideal gas law:
+						<strong>P × V = n × R × T</strong>, where P is pressure, V is
+						volume, T is temperature, n is the number of moles, and R is the gas
+						constant. For simplicity, we keep n and R constant, so our
+						relationship becomes <strong>P × V = T</strong>.
+					</p>
+					<div class="flex flex-wrap justify-around gap-6 mt-8">
+						<div
+							class="about-card flex-1 min-w-[250px] p-6 hover:shadow-md transition-all duration-300 animate-on-scroll"
+							data-animation="fade-in-up"
+							data-delay="100"
+						>
+							<div
+								class="h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+								style="background: var(--button-bg)"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-8 w-8 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+									/>
+								</svg>
+							</div>
+							<h3
+								class="text-xl font-semibold mb-3"
+								style="color: var(--primary-color)"
+							>
+								Boyle's Law
+							</h3>
+							<p>
+								For constant temperature (T), pressure and volume are inversely
+								proportional:
+							</p>
+							<p class="mt-2 font-bold">P × V = constant</p>
+						</div>
+						<div
+							class="about-card flex-1 min-w-[250px] p-6 hover:shadow-md transition-all duration-300 animate-on-scroll"
+							data-animation="fade-in-up"
+							data-delay="200"
+						>
+							<div
+								class="h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+								style="background: var(--button-bg)"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-8 w-8 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/>
+								</svg>
+							</div>
+							<h3
+								class="text-xl font-semibold mb-3"
+								style="color: var(--primary-color)"
+							>
+								Charles's Law
+							</h3>
+							<p>
+								For constant pressure (P), volume is directly proportional to
+								temperature:
+							</p>
+							<p class="mt-2 font-bold">V / T = constant</p>
+						</div>
+						<div
+							class="about-card flex-1 min-w-[250px] p-6 hover:shadow-md transition-all duration-300 animate-on-scroll"
+							data-animation="fade-in-up"
+							data-delay="300"
+						>
+							<div
+								class="h-16 w-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+								style="background: var(--button-bg)"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-8 w-8 text-white"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"
+									/>
+								</svg>
+							</div>
+							<h3
+								class="text-xl font-semibold mb-3"
+								style="color: var(--primary-color)"
+							>
+								Gay-Lussac's Law
+							</h3>
+							<p>
+								For constant volume (V), pressure is directly proportional to
+								temperature:
+							</p>
+							<p class="mt-2 font-bold">P / T = constant</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<footer
+			id="contact"
+			class="py-20 px-5 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]"
+		>
+			<div class="container max-w-6xl mx-auto">
+				<div
+					class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12"
+				>
+					<div
+						class="footer-section text-center md:text-left animate-on-scroll"
+						data-animation="fade-in-right"
+					>
+						<h3 class="gradient-logo text-xl mb-6 inline-block">
+							Thermodynamics Simulator
+						</h3>
+						<p class="mb-4 opacity-80">
+							An interactive educational tool for exploring gas behavior through
+							visualization of thermodynamic principles.
+						</p>
+						<div class="flex justify-center md:justify-start gap-4 mt-5">
+							<a
+								href="#"
+								class="social-icon w-10 h-10 flex items-center justify-center rounded-full transition-all hover:-translate-y-1"
+								aria-label="Twitter"
+							>
+								<svg viewBox="0 0 24 24" class="w-5 h-5">
+									<path
+										d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="social-icon w-10 h-10 flex items-center justify-center rounded-full transition-all hover:-translate-y-1"
+								aria-label="GitHub"
+							>
+								<svg viewBox="0 0 24 24" class="w-5 h-5">
+									<path
+										d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="social-icon w-10 h-10 flex items-center justify-center rounded-full transition-all hover:-translate-y-1"
+								aria-label="LinkedIn"
+							>
+								<svg viewBox="0 0 24 24" class="w-5 h-5">
+									<path
+										d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+									/>
+								</svg>
+							</a>
+							<a
+								href="#"
+								class="social-icon w-10 h-10 flex items-center justify-center rounded-full transition-all hover:-translate-y-1"
+								aria-label="YouTube"
+							>
+								<svg viewBox="0 0 24 24" class="w-5 h-5">
+									<path
+										d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+									/>
+								</svg>
+							</a>
+						</div>
+					</div>
+					<div
+						class="footer-section text-center md:text-left animate-on-scroll"
+						data-animation="fade-in-up"
+						data-delay="100"
+					>
+						<h3
+							class="text-xl font-semibold mb-6 relative footer-heading after:content-[''] after:absolute after:left-0 after:right-0 after:md:left-0 after:md:right-auto after:bottom-[-8px] after:w-16 after:md:w-10 after:h-0.5 after:rounded after:mx-auto after:md:mx-0"
+							style="color: var(--primary-color)"
+						>
+							Navigation
+						</h3>
+						<ul class="space-y-4">
+							<li
+								class="flex items-center justify-center md:justify-start gap-2"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+								</svg>
+								<a href="#home" class="hover:text-primary transition-all"
+									>Home</a
+								>
+							</li>
+							<li
+								class="flex items-center justify-center md:justify-start gap-2"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path
+										d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"
+									/>
+								</svg>
+								<a href="#simulator" class="hover:text-primary transition-all"
+									>Simulator</a
+								>
+							</li>
+							<li
+								class="flex items-center justify-center md:justify-start gap-2"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path
+										d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+									/>
+								</svg>
+								<a href="#about" class="hover:text-primary transition-all"
+									>About</a
+								>
+							</li>
+							<li
+								class="flex items-center justify-center md:justify-start gap-2"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path
+										d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+									/>
+								</svg>
+								<a href="#contact" class="hover:text-primary transition-all"
+									>Contact</a
+								>
+							</li>
+						</ul>
+					</div>
+					<div
+						class="footer-section text-center md:text-left animate-on-scroll"
+						data-animation="fade-in-up"
+						data-delay="200"
+					>
+						<h3
+							class="text-xl font-semibold mb-6 relative footer-heading after:content-[''] after:absolute after:left-0 after:right-0 after:md:left-0 after:md:right-auto after:bottom-[-8px] after:w-16 after:md:w-10 after:h-0.5 after:rounded after:mx-auto after:md:mx-0"
+							style="color: var(--primary-color)"
+						>
+							Contact Information
+						</h3>
+						<div class="space-y-4">
+							<div
+								class="flex items-center justify-center md:justify-start gap-3"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path
+										d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+									/>
+								</svg>
+								<span>info@gasSim.com</span>
+							</div>
+
+							<div
+								class="flex items-center justify-center md:justify-start gap-3"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path
+										d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+									/>
+								</svg>
+								<span>+1 (555) 123-4567</span>
+							</div>
+							<div
+								class="flex items-center justify-center md:justify-start gap-3"
+							>
+								<svg
+									viewBox="0 0 24 24"
+									class="w-5 h-5"
+									style="fill: var(--primary-color)"
+								>
+									<path
+										d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+									/>
+								</svg>
+								<span>123 Science Avenue, Research Park, CA 94043</span>
+							</div>
+						</div>
+					</div>
+					<div class="footer-section text-center md:text-left">
+						<h3
+							class="text-xl font-semibold mb-6 relative footer-heading after:content-[''] after:absolute after:left-0 after:right-0 after:md:left-0 after:md:right-auto after:bottom-[-8px] after:w-16 after:md:w-10 after:h-0.5 after:rounded after:mx-auto after:md:mx-0"
+							style="color: var(--primary-color)"
+						>
+							Newsletter
+						</h3>
+						<p class="text-sm opacity-80 mb-5">
+							Stay updated with our latest developments and educational
+							resources
+						</p>
+						<form class="flex max-w-md mx-auto md:mx-0">
+							<input
+								type="email"
+								placeholder="Your email address"
+								class="newsletter-input flex-1 p-3 rounded-l-md text-text-color outline-none focus:ring-2 focus:ring-primary"
+								aria-label="Email for newsletter"
+							/>
+							<button
+								type="submit"
+								class="p-3 rounded-r-md flex items-center justify-center text-white"
+								style="background: var(--button-bg)"
+							>
+								<svg viewBox="0 0 24 24" class="w-5 h-5 fill-white">
+									<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+								</svg>
+							</button>
+						</form>
+						<div class="mt-6">
+							<div
+								class="flex items-center justify-center md:justify-start gap-3 mb-2"
+							>
+								<input
+									type="checkbox"
+									id="gdpr-consent"
+									class="w-4 h-4 accent-primary"
+								/>
+								<label for="gdpr-consent" class="text-xs opacity-70"
+									>I agree to receive promotional emails</label
+								>
+							</div>
+							<p class="text-xs opacity-70">
+								We respect your privacy. Unsubscribe at any time.
+							</p>
+						</div>
+					</div>
+				</div>
+				<div
+					class="text-center pt-8 border-t border-border-color text-sm opacity-70"
+				>
+					<p>© 2025 Gas Behavior Simulator. All rights reserved.</p>
+					<div class="flex justify-center gap-4 mt-4">
+						<a href="#" class="hover:text-primary transition-all"
+							>Privacy Policy</a
+						>
+						<span>|</span>
+						<a href="#" class="hover:text-primary transition-all"
+							>Terms of Service</a
+						>
+						<span>|</span>
+						<a href="#" class="hover:text-primary transition-all"
+							>Cookie Policy</a
+						>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<script>
+			window.addEventListener("load", function () {
+				setTimeout(function () {
+					const loader = document.querySelector(".page-loader");
+					loader.classList.add("loader-hidden");
+				}, 800);
+			});
+
+			const animateElements = document.querySelectorAll(".animate-on-scroll");
+
+			const animationObserver = new IntersectionObserver(
+				(entries) => {
+					entries.forEach((entry) => {
+						if (entry.isIntersecting) {
+							const el = entry.target;
+							const animationClass = el.dataset.animation || "fade-in-up";
+							const delay = el.dataset.delay || "0";
+							el.style.animationDelay = `${delay}ms`;
+							el.classList.add(animationClass);
+							animationObserver.unobserve(el);
+						}
+					});
+				},
+				{
+					threshold: 0.15,
+					rootMargin: "0px 0px -50px 0px",
+				}
+			);
+
+			animateElements.forEach((el) => {
+				animationObserver.observe(el);
+			});
+
+			const tSlider = document.getElementById("tSlider");
+			const vSlider = document.getElementById("vSlider");
+			const pSlider = document.getElementById("pSlider");
+			const tValue = document.getElementById("tValue");
+			const vValue = document.getElementById("vValue");
+			const pValue = document.getElementById("pValue");
+			const statusBar = document.getElementById("statusBar");
+			const pvCanvas = document.getElementById("pvCanvas");
+			const gasCanvas = document.getElementById("gasCanvas");
+			const pvCtx = pvCanvas.getContext("2d");
+			const gasCtx = gasCanvas.getContext("2d");
+			const darkModeToggle = document.getElementById("darkModeToggle");
+			const resetBtn = document.getElementById("resetBtn");
+			const hamburgerMenu = document.getElementById("hamburgerMenu");
+			const navMenu = document.getElementById("navMenu");
+
+			function updateSliderStyles() {
+				const sliders = [
+					{
+						slider: document.getElementById("tSlider"),
+						group: document.getElementById("tSlider").closest(".control-group"),
+					},
+					{
+						slider: document.getElementById("vSlider"),
+						group: document.getElementById("vSlider").closest(".control-group"),
+					},
+					{
+						slider: document.getElementById("pSlider"),
+						group: document.getElementById("pSlider").closest(".control-group"),
+					},
+				];
+
+				sliders.forEach(({ slider, group }) => {
+					if (slider.disabled) {
+						group.classList.add("disabled");
+					} else {
+						group.classList.remove("disabled");
+					}
+				});
+			}
+
+			hamburgerMenu.addEventListener("click", () => {
+				hamburgerMenu.classList.toggle("active");
+				navMenu.classList.toggle("active");
+			});
+
+			document.querySelectorAll("nav a").forEach((link) => {
+				link.addEventListener("click", () => {
+					hamburgerMenu.classList.remove("active");
+					navMenu.classList.remove("active");
+				});
+			});
+
+			let fixedVar = "T";
+			let T = 50;
+			let V = 5;
+			let P = 10;
+
+			const N = 50;
+			const particles = [];
+			for (let i = 0; i < N; i++) {
+				particles.push({
+					x: Math.random(),
+					y: Math.random(),
+					vx: (Math.random() - 0.5) * 2,
+					vy: (Math.random() - 0.5) * 2,
+				});
+			}
+
+			function resizeCanvases() {
+				pvCanvas.width = pvCanvas.clientWidth;
+				pvCanvas.height = pvCanvas.clientHeight;
+				gasCanvas.width = gasCanvas.clientWidth;
+				gasCanvas.height = gasCanvas.clientHeight;
+			}
+
+			function updateParticles() {
+				const speed = 0.001 * Math.sqrt(T);
+				particles.forEach((p) => {
+					p.x += p.vx * speed;
+					p.y += p.vy * speed;
+					if (p.x < 0) {
+						p.x = 0;
+						p.vx = -p.vx;
+					}
+					if (p.x > 1) {
+						p.x = 1;
+						p.vx = -p.vx;
+					}
+					if (p.y < 0) {
+						p.y = 0;
+						p.vy = -p.vy;
+					}
+					if (p.y > 1) {
+						p.y = 1;
+						p.vy = -p.vy;
+					}
+				});
+			}
+
+			function drawGas() {
+				const w = gasCanvas.width;
+				const h = gasCanvas.height;
+				gasCtx.clearRect(0, 0, w, h);
+				const maxSide = w * 0.9;
+				const k = maxSide / Math.sqrt(10);
+				const side = k * Math.sqrt(V);
+				const left = (w - side) / 2;
+				const top = (h - side) / 2;
+				gasCtx.strokeRect(left, top, side, side);
+				gasCtx.fillStyle = document.body.classList.contains("dark-mode")
+					? "#8e54e9"
+					: "#4776e6";
+				particles.forEach((p) => {
+					const px = left + p.x * side;
+					const py = top + p.y * side;
+					gasCtx.beginPath();
+					gasCtx.arc(px, py, 3, 0, 2 * Math.PI);
+					gasCtx.fill();
+				});
+			}
+
+			function drawPV() {
+				const isDarkMode = document.body.classList.contains("dark-mode");
+				const gridColor = isDarkMode ? "#333" : "#eee";
+				const textColor = isDarkMode ? "#fff" : "#000";
+
+				const w = pvCanvas.width;
+				const h = pvCanvas.height;
+				const margin = Math.min(w, h) * 0.125;
+				const plotWidth = w - 2 * margin;
+				const plotHeight = h - 2 * margin;
+
+				pvCtx.clearRect(0, 0, w, h);
+				pvCtx.strokeStyle = gridColor;
+
+				for (let v = 1; v <= 10; v++) {
+					let x = margin + ((v - 1) / 9) * plotWidth;
+					pvCtx.beginPath();
+					pvCtx.moveTo(x, margin);
+					pvCtx.lineTo(x, h - margin);
+					pvCtx.stroke();
+				}
+				for (let p = 1; p <= 50; p += 5) {
+					let y = h - margin - ((p - 1) / 49) * plotHeight;
+					pvCtx.beginPath();
+					pvCtx.moveTo(margin, y);
+					pvCtx.lineTo(w - margin, y);
+					pvCtx.stroke();
+				}
+
+				pvCtx.strokeStyle = textColor;
+				pvCtx.fillStyle = textColor;
+				pvCtx.lineWidth = 2;
+				pvCtx.beginPath();
+				pvCtx.moveTo(margin, margin);
+				pvCtx.lineTo(margin, h - margin);
+				pvCtx.lineTo(w - margin, h - margin);
+				pvCtx.stroke();
+				pvCtx.lineWidth = 1;
+
+				pvCtx.font = `${Math.min(w, h) * 0.035}px Inter, sans-serif`;
+				pvCtx.fillText("Volume (V)", w - margin, h - margin + margin * 0.4);
+				pvCtx.save();
+				pvCtx.translate(margin - margin * 0.75, h / 2);
+				pvCtx.rotate(-Math.PI / 2);
+				pvCtx.fillText("Pressure (P)", 0, 0);
+				pvCtx.restore();
+
+				pvCtx.font = `${Math.min(w, h) * 0.03}px Inter, sans-serif`;
+				for (let v = 1; v <= 10; v++) {
+					let x = margin + ((v - 1) / 9) * plotWidth;
+					pvCtx.fillText(v, x, h - margin + margin * 0.3);
+				}
+				for (let p = 1; p <= 50; p += 5) {
+					let y = h - margin - ((p - 1) / 49) * plotHeight;
+					pvCtx.fillText(p, margin - margin * 0.5, y + 4);
+				}
+
+				if (fixedVar === "T") {
+					pvCtx.strokeStyle = "#4776e6";
+					pvCtx.lineWidth = 3;
+					pvCtx.beginPath();
+					for (let v = 1; v <= 10; v += 0.1) {
+						let p = T / v;
+						if (p > 50) continue;
+						let x = margin + ((v - 1) / 9) * plotWidth;
+						let y = h - margin - ((p - 1) / 49) * plotHeight;
+						if (v === 1) pvCtx.moveTo(x, y);
+						else pvCtx.lineTo(x, y);
+					}
+					pvCtx.stroke();
+				} else if (fixedVar === "V") {
+					pvCtx.strokeStyle = "#4caf50";
+					pvCtx.lineWidth = 3;
+					let x = margin + ((V - 1) / 9) * plotWidth;
+					pvCtx.beginPath();
+					pvCtx.moveTo(x, h - margin);
+					pvCtx.lineTo(x, margin);
+					pvCtx.stroke();
+				} else if (fixedVar === "P") {
+					pvCtx.strokeStyle = "#ff9800";
+					pvCtx.lineWidth = 3;
+					let y = h - margin - ((P - 1) / 49) * plotHeight;
+					pvCtx.beginPath();
+					pvCtx.moveTo(margin, y);
+					pvCtx.lineTo(w - margin, y);
+					pvCtx.stroke();
+				}
+
+				let x = margin + ((V - 1) / 9) * plotWidth;
+				let y = h - margin - ((P - 1) / 49) * plotHeight;
+				pvCtx.fillStyle = "#ff4081";
+				pvCtx.beginPath();
+				pvCtx.arc(x, y, Math.min(w, h) * 0.02, 0, 2 * Math.PI);
+				pvCtx.fill();
+
+				pvCtx.lineWidth = 1;
+				pvCtx.fillStyle = textColor;
+			}
+
+			function updateDisplay() {
+				tValue.textContent = T.toFixed(1);
+				vValue.textContent = V.toFixed(1);
+				pValue.textContent = P.toFixed(1);
+				statusBar.textContent = `Current: T = ${T.toFixed(1)}, V = ${V.toFixed(
+					1
+				)}, P = ${P.toFixed(1)}`;
+				drawPV();
+			}
+
+			function animate() {
+				updateParticles();
+				drawGas();
+				requestAnimationFrame(animate);
+			}
+
+			animate();
+
+			function updateRadioBackground() {
+				const radioGroup = document.querySelector(".radio-group");
+				const radioGroupBg = document.querySelector(".radio-group-bg");
+				const activeRadio = document.querySelector(
+					'input[name="fixed"]:checked'
+				);
+
+				if (radioGroup && radioGroupBg && activeRadio) {
+					const label = activeRadio.closest(".radio-label");
+					const labelWidth = label.offsetWidth;
+					const labelLeft = label.offsetLeft;
+
+					radioGroupBg.style.width = `${labelWidth}px`;
+					radioGroupBg.style.transform = `translateX(${labelLeft}px)`;
+				}
+			}
+
+			tSlider.addEventListener("input", () => {
+				if (fixedVar !== "T") {
+					T = parseFloat(tSlider.value);
+					if (fixedVar === "V") P = T / V;
+					else if (fixedVar === "P") V = T / P;
+					pSlider.value = P;
+					vSlider.value = V;
+					updateDisplay();
+				}
+			});
+
+			vSlider.addEventListener("input", () => {
+				if (fixedVar !== "V") {
+					V = parseFloat(vSlider.value);
+					if (fixedVar === "T") P = T / V;
+					else if (fixedVar === "P") T = P * V;
+					pSlider.value = P;
+					tSlider.value = T;
+					updateDisplay();
+				}
+			});
+
+			pSlider.addEventListener("input", () => {
+				if (fixedVar !== "P") {
+					P = parseFloat(pSlider.value);
+					if (fixedVar === "T") V = T / P;
+					else if (fixedVar === "V") T = P * V;
+					vSlider.value = V;
+					tSlider.value = T;
+					updateDisplay();
+				}
+			});
+
+			document.querySelectorAll('input[name="fixed"]').forEach((radio) => {
+				radio.addEventListener("change", () => {
+					fixedVar = radio.value;
+					tSlider.disabled = fixedVar === "T";
+					vSlider.disabled = fixedVar === "V";
+					pSlider.disabled = fixedVar === "P";
+					if (fixedVar === "T") P = T / V;
+					else if (fixedVar === "V") P = T / V;
+					else if (fixedVar === "P") V = T / P;
+					pSlider.value = P;
+					vSlider.value = V;
+					updateDisplay();
+					updateRadioBackground();
+					updateSliderStyles();
+				});
+			});
+
+			resetBtn.addEventListener("click", () => {
+				fixedVar = "T";
+				T = 50;
+				V = 5;
+				P = 10;
+				tSlider.value = 50;
+				vSlider.value = 5;
+				pSlider.value = 10;
+				document.querySelector('input[value="T"]').checked = true;
+				tSlider.disabled = true;
+				vSlider.disabled = false;
+				pSlider.disabled = false;
+				updateDisplay();
+				updateRadioBackground();
+				updateSliderStyles();
+			});
+
+			darkModeToggle.addEventListener("click", () => {
+				document.body.classList.toggle("dark-mode");
+				drawPV();
+				updateRadioBackground();
+			});
+
+			window.addEventListener("scroll", () => {
+				let current = "";
+				document.querySelectorAll("section").forEach((section) => {
+					if (pageYOffset >= section.offsetTop - 100) current = section.id;
+				});
+				document.querySelectorAll("nav a").forEach((link) => {
+					link.classList.toggle("active", link.href.includes(current));
+				});
+			});
+
+			window.addEventListener("load", () => {
+				resizeCanvases();
+				updateDisplay();
+				updateRadioBackground();
+				updateSliderStyles();
+			});
+
+			window.addEventListener("resize", () => {
+				resizeCanvases();
+				updateDisplay();
+				updateRadioBackground();
+			});
+
+			tSlider.disabled = true;
+		</script>
+	</body>
+</html>
