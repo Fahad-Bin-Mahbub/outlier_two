@@ -1,0 +1,5771 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>StudyBuddy - Your Smart Study Assistant</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						fontFamily: {
+							sans: ["Poppins", "Inter", "sans-serif"],
+						},
+						colors: {
+							primary: {
+								50: "#eef2ff",
+								100: "#e0e7ff",
+								500: "#6366f1",
+								600: "#4f46e5",
+								700: "#4338ca",
+							},
+							success: "#10b981",
+							warning: "#f59e0b",
+							error: "#ef4444",
+							dark: "#0f172a",
+						},
+						animation: {
+							float: "float 3s ease-in-out infinite",
+							"pulse-glow": "pulse-glow 2s ease-in-out infinite",
+						},
+						keyframes: {
+							float: {
+								"0%, 100%": { transform: "translateY(0)" },
+								"50%": { transform: "translateY(-10px)" },
+							},
+							"pulse-glow": {
+								"0%, 100%": { boxShadow: "0 0 0 0 rgba(99, 102, 241, 0)" },
+								"50%": { boxShadow: "0 0 20px 5px rgba(99, 102, 241, 0.3)" },
+							},
+						},
+					},
+				},
+				darkMode: "class",
+			};
+		</script>
+		<style>
+			.flashcard-container {
+				perspective: 1000px;
+				transform-style: preserve-3d;
+				transition: transform 0.6s;
+				height: 320px;
+
+				width: 100%;
+				max-width: 550px;
+				margin: 0 auto;
+				position: relative;
+			}
+
+			.flashcard {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				transform-style: preserve-3d;
+				transition: transform 0.6s;
+			}
+
+			.flashcard.flipped {
+				transform: rotateY(180deg);
+			}
+
+			.flashcard-front,
+			.flashcard-back {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				-webkit-backface-visibility: hidden;
+				backface-visibility: hidden;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				border-radius: 1rem;
+				overflow: hidden;
+			}
+
+			.flashcard-back {
+				transform: rotateY(180deg);
+			}
+
+			@keyframes slideInRight {
+				from {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			.slide-in-right {
+				animation: slideInRight 0.3s forwards;
+			}
+
+			.tab-content {
+				opacity: 0;
+				height: 0;
+				overflow: hidden;
+				transition: opacity 0.5s ease;
+				display: none;
+			}
+
+			.tab-content.active {
+				opacity: 1;
+				height: auto;
+				overflow: visible;
+				display: block;
+			}
+
+			body.focus-mode::before {
+				content: "";
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: radial-gradient(
+					circle at center,
+					rgba(15, 23, 42, 0.7) 0%,
+					rgba(15, 23, 42, 0.99) 100%
+				);
+				z-index: 40;
+				pointer-events: none;
+			}
+
+			body.focus-mode .flashcard-container {
+				z-index: 41;
+				box-shadow: 0 0 30px 5px rgba(99, 102, 241, 0.5);
+			}
+
+			#close-focus-mode {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: 42;
+				display: none;
+			}
+
+			body.focus-mode #close-focus-mode {
+				display: block;
+			}
+
+			.quiz-option.selected {
+				position: relative;
+				border-color: #4f46e5 !important;
+				background-color: rgba(79, 70, 229, 0.1) !important;
+			}
+
+			.dark .quiz-option.selected {
+				background-color: rgba(79, 70, 229, 0.2) !important;
+			}
+
+			.quiz-option.selected::after {
+				content: "\f00c";
+				font-family: "Font Awesome 5 Free";
+				font-weight: 900;
+				position: absolute;
+				right: 10px;
+				top: 50%;
+				transform: translateY(-50%);
+				color: #4f46e5;
+			}
+
+			@keyframes progress-ring-fill {
+				from {
+					stroke-dashoffset: 283;
+				}
+
+				to {
+					stroke-dashoffset: var(--target-offset);
+				}
+			}
+
+			.progress-ring-animate {
+				animation: progress-ring-fill 1s ease-out forwards;
+			}
+
+			.line-clamp-2 {
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+
+			#recent-sets-list {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				max-height: 300px;
+				overflow-y: auto;
+				margin-top: 10px;
+				padding-right: 5px;
+				border-radius: 10px;
+			}
+
+			#recent-sets-list::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			#recent-sets-list::-webkit-scrollbar-track {
+				background: rgba(0, 0, 0, 0.05);
+				border-radius: 8px;
+			}
+
+			#recent-sets-list::-webkit-scrollbar-thumb {
+				background: rgba(99, 102, 241, 0.3);
+				border-radius: 8px;
+			}
+
+			.dark #recent-sets-list::-webkit-scrollbar-thumb {
+				background: rgba(99, 102, 241, 0.5);
+			}
+
+			#recent-sets-list li {
+				width: 100%;
+				margin-bottom: 8px;
+				border-radius: 12px;
+				transition: all 0.2s ease;
+			}
+
+			.recent-set-link {
+				display: flex !important;
+				align-items: center !important;
+				width: 100% !important;
+				padding: 10px 12px !important;
+				border-radius: 10px !important;
+				border: 1px solid transparent;
+				background-color: rgba(249, 250, 251, 0.5);
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+			}
+
+			.dark .recent-set-link {
+				background-color: rgba(31, 41, 55, 0.4);
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+			}
+
+			.recent-set-link p.font-medium {
+				font-weight: 600 !important;
+				color: rgba(17, 24, 39, 0.9) !important;
+				font-size: 0.9rem !important;
+				margin-bottom: 2px !important;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 160px;
+			}
+
+			.dark .recent-set-link p.font-medium {
+				color: rgba(243, 244, 246, 0.9) !important;
+			}
+
+			.recent-set-link .text-gray-500 {
+				font-size: 0.75rem !important;
+				opacity: 0.85 !important;
+			}
+
+			.recent-set-link:hover {
+				background-color: rgba(243, 244, 246, 0.8) !important;
+				transform: translateX(3px);
+				border-color: rgba(99, 102, 241, 0.3);
+			}
+
+			.dark .recent-set-link:hover {
+				background-color: rgba(55, 65, 81, 0.5) !important;
+				border-color: rgba(99, 102, 241, 0.5);
+			}
+
+			.recent-set-link i {
+				font-size: 1.1rem !important;
+				min-width: 20px !important;
+				text-align: center !important;
+			}
+
+			@media (max-width: 1023px) {
+				#sidebar .mb-6 {
+					margin-bottom: 15px !important;
+				}
+
+				#recent-sets-list {
+					max-height: 200px;
+				}
+
+				#recent-sets-list li {
+					margin-bottom: 6px;
+				}
+
+				.recent-set-link {
+					padding: 8px 10px !important;
+				}
+
+				.recent-set-link i {
+					margin-right: 10px !important;
+				}
+
+				.recent-set-link:active {
+					background-color: rgba(99, 102, 241, 0.1) !important;
+					transform: scale(0.98);
+				}
+
+				.recent-set-link p.font-medium {
+					max-width: 140px;
+				}
+			}
+
+			#recent-sets-list li:only-child {
+				text-align: center;
+				padding: 15px 0;
+				color: rgba(156, 163, 175, 1);
+				font-style: italic;
+				background-color: rgba(243, 244, 246, 0.5);
+				border-radius: 10px;
+			}
+
+			.dark #recent-sets-list li:only-child {
+				background-color: rgba(31, 41, 55, 0.4);
+				color: rgba(156, 163, 175, 0.8);
+			}
+
+			.sidebar h2:has(+ #recent-sets-list) {
+				font-weight: 600;
+				margin-bottom: 12px;
+				position: relative;
+				display: inline-block;
+			}
+
+			.sidebar h2:has(+ #recent-sets-list)::after {
+				content: "";
+				position: absolute;
+				bottom: -4px;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background: linear-gradient(
+					to right,
+					rgba(99, 102, 241, 0.7),
+					transparent
+				);
+			}
+			/* Mobile Responsiveness Fixes */
+			/* Add this CSS to your existing styles */
+
+			/* General text size adjustments for very small screens */
+			@media (max-width: 360px) {
+				body {
+					font-size: 0.875rem; /* Base font size reduction */
+				}
+
+				h1.text-2xl {
+					font-size: 1.25rem;
+				}
+
+				h2.text-xl,
+				h3.text-xl {
+					font-size: 1.125rem;
+				}
+
+				h4.text-lg {
+					font-size: 1rem;
+				}
+
+				.text-sm {
+					font-size: 0.75rem;
+				}
+
+				.text-xs {
+					font-size: 0.675rem;
+				}
+
+				/* More compact padding on cards and containers */
+				.p-6 {
+					padding: 1rem;
+				}
+
+				.p-5 {
+					padding: 0.875rem;
+				}
+
+				.p-4 {
+					padding: 0.75rem;
+				}
+
+				/* Smaller icons on small screens */
+				.text-xl {
+					font-size: 1.125rem;
+				}
+			}
+
+			/* Mobile navigation optimization */
+			.md\\:hidden.flex.overflow-x-auto {
+				gap: 0.25rem !important;
+			}
+
+			@media (max-width: 360px) {
+				.mobile-nav-tab {
+					min-width: 50px !important;
+					padding-left: 0.5rem !important;
+					padding-right: 0.5rem !important;
+				}
+			}
+
+			/* Responsive fixes for the header */
+			@media (max-width: 360px) {
+				header .text-xl {
+					font-size: 1rem;
+				}
+
+				header .space-x-4 {
+					gap: 0.5rem !important;
+				}
+
+				/* Make the profile area smaller */
+				header img.w-9 {
+					width: 1.75rem;
+					height: 1.75rem;
+				}
+			}
+
+			/* Dashboard cards adjustments for small screens */
+			@media (max-width: 360px) {
+				.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4.gap-4 {
+					gap: 0.5rem !important;
+				}
+
+				.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4.gap-4 .w-14 {
+					width: 2.5rem;
+					height: 2.5rem;
+				}
+
+				.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4.gap-4 .text-2xl {
+					font-size: 1.25rem;
+				}
+			}
+
+			/* Flashcard adjustments */
+			@media (max-width: 360px) {
+				.flashcard-container {
+					height: 280px !important; /* Reduce flashcard height */
+				}
+
+				.p-8 {
+					padding: 1.25rem !important;
+				}
+
+				.text-7xl {
+					font-size: 3.5rem !important;
+				}
+
+				/* Card navigation buttons */
+				#prev-card,
+				#next-card {
+					padding: 0.5rem 0.75rem !important;
+				}
+			}
+
+			/* Quiz options adjustment */
+			@media (max-width: 360px) {
+				.quiz-option {
+					padding: 0.625rem !important;
+				}
+
+				.quiz-option .w-8 {
+					width: 1.5rem !important;
+					height: 1.5rem !important;
+					margin-right: 0.5rem !important;
+				}
+			}
+
+			/* Study group card adjustments */
+			@media (max-width: 360px) {
+				.view-group-btn,
+				.join-group-btn {
+					padding: 0.25rem 0.5rem !important;
+					font-size: 0.75rem !important;
+				}
+
+				/* Group icon size reduction */
+				#study-groups-grid .w-14 {
+					width: 2.5rem !important;
+					height: 2.5rem !important;
+				}
+			}
+
+			/* Feedback buttons adjustment */
+			@media (max-width: 360px) {
+				.feedback-btn {
+					padding-top: 0.5rem !important;
+					padding-bottom: 0.5rem !important;
+				}
+			}
+
+			/* Button and form element sizes */
+			@media (max-width: 360px) {
+				.rounded-xl.px-4.py-2.5 {
+					padding: 0.5rem 0.75rem !important;
+				}
+
+				.px-5.py-3 {
+					padding: 0.5rem 0.75rem !important;
+				}
+
+				/* Search inputs */
+				input.pl-12 {
+					padding-left: 2.5rem !important;
+				}
+
+				/* Search icon position */
+				.left-4.top-3\\.5 {
+					left: 0.75rem !important;
+				}
+			}
+
+			/* Sidebar adjustments */
+			@media (max-width: 360px) {
+				#sidebar .p-4 {
+					padding: 0.75rem !important;
+				}
+
+				#sidebar .space-y-2 {
+					margin-top: 0.5rem !important;
+					gap: 0.375rem !important;
+				}
+
+				#sidebar .w-12 {
+					width: 2.25rem !important;
+					height: 2.25rem !important;
+				}
+
+				#sidebar .text-xl {
+					font-size: 1.125rem !important;
+				}
+
+				#sidebar .py-2\\.5 {
+					padding-top: 0.5rem !important;
+					padding-bottom: 0.5rem !important;
+				}
+
+				#sidebar .px-3 {
+					padding-left: 0.625rem !important;
+					padding-right: 0.625rem !important;
+				}
+
+				#sidebar .font-medium {
+					font-size: 0.8125rem !important;
+				}
+			}
+
+			/* Modal adjustments for small screens */
+			@media (max-width: 360px) {
+				div[id$="-modal"] .p-6 {
+					padding: 1rem !important;
+				}
+
+				div[id$="-modal"] .text-xl {
+					font-size: 1.125rem !important;
+				}
+
+				div[id$="-modal"] .space-y-5 {
+					gap: 0.75rem !important;
+				}
+
+				div[id$="-modal"] label {
+					margin-bottom: 0.25rem !important;
+				}
+
+				div[id$="-modal"] .py-2\\.5 {
+					padding-top: 0.375rem !important;
+					padding-bottom: 0.375rem !important;
+				}
+			}
+
+			/* Notification adjustments */
+			#notification-container .w-72 {
+				max-width: calc(100vw - 2rem) !important;
+			}
+
+			/* Tabs content margin adjustment */
+			@media (max-width: 360px) {
+				main .mb-6 {
+					margin-bottom: 1rem !important;
+				}
+
+				main .gap-4 {
+					gap: 0.75rem !important;
+				}
+			}
+
+			/* Footer size adjustments */
+			@media (max-width: 360px) {
+				footer .text-lg {
+					font-size: 1rem !important;
+				}
+
+				footer .w-10 {
+					width: 2rem !important;
+					height: 2rem !important;
+				}
+			}
+			/* Leaderboard/Ranks Tab Select Fixes */
+			@media (max-width: 360px) {
+				/* Fix for selects going out of margin in leaderboard */
+				#leaderboard .flex.flex-wrap.gap-3 {
+					flex-direction: column;
+					align-items: stretch;
+					width: 100%;
+				}
+
+				#leaderboard select.px-4.py-2\.5 {
+					width: 100%;
+					margin-bottom: 0.5rem;
+					font-size: 0.75rem;
+				}
+
+				/* Make sure selects don't overflow on small screens */
+				select.rounded-xl {
+					max-width: 100%;
+					min-width: 0;
+				}
+
+				/* Reduce the text size in select options */
+				select option {
+					font-size: 0.75rem;
+				}
+			}
+
+			/* Profile Tabs Fixes */
+			@media (max-width: 360px) {
+				/* Make profile tabs fit on small screens */
+				#profile .border-b {
+					display: flex;
+					flex-wrap: nowrap;
+					overflow-x: auto;
+					scrollbar-width: none; /* Firefox */
+					-ms-overflow-style: none; /* IE and Edge */
+					padding-bottom: 0.5rem;
+				}
+
+				/* Hide scrollbar */
+				#profile .border-b::-webkit-scrollbar {
+					display: none;
+				}
+
+				/* Adjust profile tab buttons to be more compact */
+				.profile-content-tab {
+					white-space: nowrap;
+					padding: 0.375rem 0.5rem !important;
+					font-size: 0.75rem !important;
+				}
+
+				/* Prevent tabs from becoming too narrow */
+				#my-flashcards-tab {
+					min-width: auto !important;
+				}
+
+				#my-quizzes-tab {
+					min-width: auto !important;
+				}
+
+				#achievements-tab {
+					min-width: auto !important;
+				}
+
+				/* Make sure all contents stay within bounds */
+				#profile .px-4.py-2 {
+					padding-left: 0.5rem !important;
+					padding-right: 0.5rem !important;
+				}
+
+				/* Ensure profile card is responsive */
+				#profile .lg\:grid-cols-3.gap-6 {
+					gap: 0.75rem !important;
+				}
+			}
+
+			/* Ensure all selects across the app are responsive */
+			@media (max-width: 360px) {
+				select.rounded-xl,
+				input.rounded-xl,
+				button.rounded-xl {
+					max-width: 100%;
+					box-sizing: border-box;
+				}
+
+				/* Fix flex items when space is limited */
+				.flex.items-center.justify-between {
+					flex-wrap: wrap;
+					gap: 0.5rem;
+				}
+
+				/* Add some bottom spacing when things wrap */
+				.flex.flex-wrap.gap-3 {
+					margin-bottom: 0.5rem;
+				}
+
+				/* Handle select elements inside flex containers */
+				.flex.flex-wrap.gap-3 select {
+					flex-grow: 1;
+					min-width: 0;
+				}
+			}
+		</style>
+	</head>
+
+	<body
+		class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 dark:from-gray-900 dark:to-dark dark:text-gray-200 transition-all"
+	>
+		<!-- Notification Container -->
+		<div
+			id="notification-container"
+			class="fixed top-5 right-5 z-50 flex flex-col gap-3"
+		></div>
+
+		<!-- Close Focus Mode Button -->
+		<button
+			id="close-focus-mode"
+			class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl shadow-lg"
+		>
+			<i class="fas fa-times mr-2"></i> Exit Focus Mode
+		</button>
+
+		<div class="flex h-screen overflow-hidden">
+			<!-- Sidebar -->
+			<aside
+				id="sidebar"
+				class="w-64 bg-white dark:bg-gray-800 shadow-xl rounded-r-2xl transform transition-all duration-300 h-full fixed lg:relative z-40 -translate-x-full lg:translate-x-0"
+			>
+				<div class="p-4 h-full flex flex-col">
+					<div class="flex items-center space-x-3 mb-8">
+						<div
+							class="w-12 h-12 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl flex items-center justify-center shadow-lg"
+						>
+							<i class="fas fa-brain text-xl"></i>
+						</div>
+						<h1
+							class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+						>
+							StudyBuddy
+						</h1>
+					</div>
+
+					<!-- Categories -->
+					<div class="mb-6">
+						<h2
+							class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2"
+						>
+							Categories
+						</h2>
+						<ul class="space-y-2" id="category-list">
+							<!-- Categories will be dynamically populated -->
+						</ul>
+					</div>
+
+					<!-- Create Button -->
+					<button
+						id="create-set-btn"
+						class="mb-6 w-full bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white px-4 py-3 rounded-xl shadow-md transition-all flex items-center justify-center"
+					>
+						<i class="fas fa-plus mr-2"></i> Create Study Set
+					</button>
+
+					<!-- Recent Sets -->
+					<div class="mb-6">
+						<h2
+							class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2"
+						>
+							Recent Sets
+						</h2>
+						<ul class="space-y-2" id="recent-sets-list">
+							<!-- Recent sets will be dynamically populated -->
+						</ul>
+					</div>
+
+					<!-- Study Tools -->
+					<div class="mb-6">
+						<h2
+							class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2"
+						>
+							Study Tools
+						</h2>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#"
+									id="pomodoro-link"
+									class="flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+								>
+									<i
+										class="fas fa-stopwatch mr-3 text-orange-600 dark:text-orange-500"
+									></i>
+									<span>Pomodoro Timer</span>
+								</a>
+							</li>
+						</ul>
+					</div>
+
+					<!-- Study Groups -->
+					<div class="mt-auto">
+						<h2
+							class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 px-2"
+						>
+							Your Study Groups
+						</h2>
+						<ul class="space-y-2" id="my-groups-list">
+							<!-- User's groups will be dynamically populated -->
+						</ul>
+					</div>
+				</div>
+			</aside>
+
+			<!-- Main Content Area -->
+			<div class="flex-1 flex flex-col overflow-hidden">
+				<!-- Top Navigation -->
+				<header
+					class="bg-white dark:bg-gray-800 shadow-lg rounded-b-2xl z-30 m-2"
+				>
+					<div class="flex items-center justify-between p-4">
+						<!-- Mobile Menu Toggle -->
+						<button
+							id="sidebar-toggle"
+							class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
+						>
+							<i class="fas fa-bars text-xl"></i>
+						</button>
+
+						<!-- Navigation Tabs -->
+						<nav class="hidden md:flex space-x-2">
+							<button
+								class="nav-tab px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all border-b-2 border-primary-600"
+								data-tab="dashboard"
+							>
+								<i class="fas fa-chart-pie mr-2"></i>Dashboard
+							</button>
+							<button
+								class="nav-tab px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+								data-tab="flashcards"
+							>
+								<i class="fas fa-clone mr-2"></i>Flashcards
+							</button>
+							<button
+								class="nav-tab px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+								data-tab="quizzes"
+							>
+								<i class="fas fa-tasks mr-2"></i>Quizzes
+							</button>
+							<button
+								class="nav-tab px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+								data-tab="study-groups"
+							>
+								<i class="fas fa-users mr-2"></i>Study Groups
+							</button>
+							<button
+								class="nav-tab px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+								data-tab="leaderboard"
+							>
+								<i class="fas fa-trophy mr-2"></i>Leaderboard
+							</button>
+							<button
+								class="nav-tab px-4 py-2.5 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all"
+								data-tab="profile"
+							>
+								<i class="fas fa-user mr-2"></i>Profile
+							</button>
+						</nav>
+
+						<!-- Right Side Controls -->
+						<div class="flex items-center space-x-4">
+							<!-- Dark Mode Toggle -->
+							<button
+								id="dark-mode-toggle"
+								class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
+							>
+								<i class="fas fa-moon text-xl"></i>
+							</button>
+
+							<!-- Notifications -->
+							<div class="relative">
+								<button
+									id="notification-button"
+									class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none relative"
+								>
+									<i class="fas fa-bell text-xl"></i>
+									<span
+										class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs"
+										id="notification-count"
+										>0</span
+									>
+								</button>
+							</div>
+
+							<!-- User Profile -->
+							<div class="relative">
+								<button
+									id="profile-menu-button"
+									class="flex items-center focus:outline-none"
+								>
+									<div class="relative">
+										<img
+											src="https://randomuser.me/api/portraits/women/44.jpg"
+											class="w-9 h-9 rounded-full object-cover border-2 border-primary-500"
+											alt="Profile"
+										/>
+										<span
+											class="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"
+										></span>
+									</div>
+									<span class="ml-2 font-medium hidden md:block"
+										>Sarah Johnson</span
+									>
+									<i
+										class="fas fa-chevron-down ml-2 text-xs text-gray-500 dark:text-gray-400 transition-transform duration-300 hidden md:block"
+										id="profile-chevron"
+									></i>
+								</button>
+								<div
+									id="profile-dropdown"
+									class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 hidden"
+								>
+									<a
+										href="#"
+										class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+									>
+										<i class="fas fa-user-circle mr-2"></i> My Profile
+									</a>
+									<a
+										href="#"
+										class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+									>
+										<i class="fas fa-cog mr-2"></i> Settings
+									</a>
+									<div
+										class="border-t border-gray-200 dark:border-gray-700 my-1"
+									></div>
+									<a
+										href="#"
+										class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-red-700 dark:hover:text-red-300"
+									>
+										<i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</header>
+
+				<!-- Main Content Wrapper -->
+				<main
+					class="flex-1 overflow-y-auto p-4 md:p-6 bg-gray-50 dark:bg-gray-900 transition-all m-2 rounded-2xl"
+				>
+					<!-- Dashboard Tab -->
+					<div id="dashboard" class="tab-content active">
+						<div class="flex items-center mb-6">
+							<h1 class="text-2xl font-bold">Welcome to Your Dashboard</h1>
+						</div>
+
+						<!-- Quick Actions Card -->
+						<div
+							class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg mb-6"
+						>
+							<div
+								class="flex flex-col md:flex-row md:items-center md:justify-between"
+							>
+								<div class="mb-4 md:mb-0">
+									<h2
+										class="text-xl font-semibold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+									>
+										Welcome back, Sarah!
+									</h2>
+									<p class="text-gray-600 dark:text-gray-400">
+										Pick up where you left off or start something new.
+									</p>
+								</div>
+								<div class="flex flex-wrap gap-3">
+									<button
+										id="continue-learning-btn"
+										class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white px-5 py-3 rounded-xl shadow-md transition-all flex items-center"
+									>
+										<i class="fas fa-play mr-2"></i> Continue Learning
+									</button>
+									<button
+										id="create-flashcards-btn"
+										class="bg-white dark:bg-gray-700 text-primary-600 dark:text-white border-2 border-primary-600 dark:border-primary-500 px-5 py-3 rounded-xl shadow-md hover:bg-primary-50 dark:hover:bg-gray-600 transition-all"
+									>
+										<i class="fas fa-plus mr-2"></i> Create Flashcards
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Stats Cards -->
+						<div
+							class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+						>
+							<div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md">
+								<div class="flex items-center">
+									<div
+										class="w-14 h-14 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex items-center justify-center text-primary-600 dark:text-primary-500"
+									>
+										<i class="fas fa-book text-xl"></i>
+									</div>
+									<div class="ml-4">
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Study Sets
+										</p>
+										<p class="text-2xl font-bold" id="study-sets-count">0</p>
+									</div>
+								</div>
+							</div>
+							<div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md">
+								<div class="flex items-center">
+									<div
+										class="w-14 h-14 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center text-green-600 dark:text-green-500"
+									>
+										<i class="fas fa-clock text-xl"></i>
+									</div>
+									<div class="ml-4">
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Study Hours
+										</p>
+										<p class="text-2xl font-bold" id="study-hours-count">0</p>
+									</div>
+								</div>
+							</div>
+							<div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md">
+								<div class="flex items-center">
+									<div
+										class="w-14 h-14 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl flex items-center justify-center text-yellow-600 dark:text-yellow-500"
+									>
+										<i class="fas fa-check-circle text-xl"></i>
+									</div>
+									<div class="ml-4">
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Quizzes Completed
+										</p>
+										<p class="text-2xl font-bold" id="quizzes-count">0</p>
+									</div>
+								</div>
+							</div>
+							<div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md">
+								<div class="flex items-center">
+									<div
+										class="w-14 h-14 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-500"
+									>
+										<i class="fas fa-trophy text-xl"></i>
+									</div>
+									<div class="ml-4">
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Badges Earned
+										</p>
+										<p class="text-2xl font-bold" id="badges-count">0</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Progress Section -->
+						<div
+							class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md mb-6"
+						>
+							<h2
+								class="text-lg font-semibold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+							>
+								Study Progress
+							</h2>
+							<div id="study-progress-container" class="space-y-5">
+								<!-- Progress bars will be dynamically populated -->
+							</div>
+						</div>
+					</div>
+
+					<!-- Flashcards Tab -->
+					<div id="flashcards" class="tab-content">
+						<div
+							class="flex flex-col md:flex-row md:items-center justify-between mb-6"
+						>
+							<h1 class="text-2xl font-bold mb-4 md:mb-0">Flashcards</h1>
+							<div class="flex flex-wrap gap-3">
+								<select
+									id="flashcard-set-select"
+									class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
+								>
+									<option value="all">All Study Sets</option>
+									<!-- Study sets will be dynamically populated -->
+								</select>
+								<select
+									id="flashcard-category-select"
+									class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
+								>
+									<option value="all">All Categories</option>
+									<!-- Categories will be dynamically populated -->
+								</select>
+								<button
+									id="add-flashcard-btn"
+									class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white px-4 py-2.5 rounded-xl shadow-md transition-all"
+								>
+									<i class="fas fa-plus mr-2"></i> Add Card
+								</button>
+							</div>
+						</div>
+
+						<!-- Flashcard Progress -->
+						<div
+							class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md mb-6"
+						>
+							<div class="flex flex-wrap items-center justify-between">
+								<div class="flex items-center mb-3 md:mb-0">
+									<span class="mr-3 font-medium" id="flashcard-count"
+										>0 cards</span
+									>
+									<div
+										class="w-32 h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+									>
+										<div
+											class="h-2.5 bg-gradient-to-r from-primary-600 to-primary-500 rounded-full"
+											id="flashcard-progress"
+											style="width: 0%"
+										></div>
+									</div>
+									<span class="ml-3" id="mastered-count">0/0 mastered</span>
+								</div>
+								<div class="flex flex-wrap gap-2">
+									<button
+										id="shuffle-cards-btn"
+										class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3.5 py-2 rounded-xl text-sm flex items-center"
+									>
+										<i class="fas fa-random mr-1.5"></i> Shuffle
+									</button>
+									<button
+										id="focus-mode-btn"
+										class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-3.5 py-2 rounded-xl text-sm flex items-center"
+									>
+										<i class="fas fa-eye mr-1.5"></i> Focus Mode
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<!-- Flashcard Container - Fixed positioning -->
+						<div class="flashcard-container mb-8">
+							<div class="flashcard" id="flashcard">
+								<div
+									class="flashcard-front bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center"
+								>
+									<div
+										class="absolute top-4 right-4 opacity-10 text-7xl text-primary-500"
+									>
+										<i class="fas fa-square-root-alt"></i>
+									</div>
+									<h3 class="text-2xl font-medium mb-6" id="card-question">
+										No flashcard available
+									</h3>
+									<div
+										class="text-7xl mb-6 text-primary-600 dark:text-primary-500 animate-float"
+									>
+										<i class="fas fa-question-circle"></i>
+									</div>
+									<p
+										class="text-gray-500 dark:text-gray-400 text-sm flex items-center"
+									>
+										<i class="fas fa-hand-pointer mr-2"></i> Click to reveal
+										answer
+									</p>
+								</div>
+								<div
+									class="flashcard-back bg-gradient-to-br from-primary-600 to-purple-600 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center justify-center"
+								>
+									<h3 class="text-2xl font-medium mb-6" id="card-answer">
+										Create your first flashcard
+									</h3>
+									<div class="text-7xl mb-6 animate-pulse">
+										<i class="fas fa-check-circle"></i>
+									</div>
+									<p class="text-primary-100" id="card-explanation">
+										Click the "Add Card" button to create your first flashcard.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Card Navigation -->
+						<div class="flex justify-center mb-8">
+							<button
+								id="prev-card"
+								class="bg-gradient-to-r from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white py-3 px-5 rounded-l-xl transition-all"
+							>
+								<i class="fas fa-arrow-left"></i>
+							</button>
+							<div
+								class="px-7 py-3 bg-gradient-to-r from-gray-700 to-gray-600 flex items-center rounded-none"
+							>
+								<span id="current-card-number" class="font-medium text-white"
+									>0</span
+								>
+								<span class="mx-1 text-white">/</span>
+								<span id="total-cards" class="text-white">0</span>
+							</div>
+							<button
+								id="next-card"
+								class="bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white py-3 px-5 rounded-r-xl transition-all"
+							>
+								<i class="fas fa-arrow-right"></i>
+							</button>
+						</div>
+
+						<!-- Feedback Buttons -->
+						<div
+							class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-2xl mx-auto"
+						>
+							<h3
+								class="text-lg font-semibold mb-5 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+							>
+								How well do you know this?
+							</h3>
+							<div class="flex flex-wrap gap-3">
+								<button
+									class="feedback-btn flex-1 py-3.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-300 dark:border-red-800/30 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-all"
+									data-rating="1"
+								>
+									<i class="fas fa-times mr-2"></i> Still Learning
+								</button>
+								<button
+									class="feedback-btn flex-1 py-3.5 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border border-yellow-300 dark:border-yellow-800/30 rounded-xl hover:bg-yellow-100 dark:hover:bg-yellow-900/30 transition-all"
+									data-rating="2"
+								>
+									<i class="fas fa-circle-notch mr-2"></i> Somewhat Know
+								</button>
+								<button
+									class="feedback-btn flex-1 py-3.5 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border border-green-300 dark:border-green-800/30 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/30 transition-all"
+									data-rating="3"
+								>
+									<i class="fas fa-check mr-2"></i> Know Well
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Quizzes Tab -->
+					<div id="quizzes" class="tab-content">
+						<div
+							class="flex flex-col md:flex-row md:items-center justify-between mb-6"
+						>
+							<h1 class="text-2xl font-bold mb-4 md:mb-0">Quizzes</h1>
+							<button
+								id="create-quiz-btn"
+								class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white px-4 py-2.5 rounded-xl shadow-md transition-all"
+							>
+								<i class="fas fa-plus mr-2"></i> Create Quiz
+							</button>
+						</div>
+
+						<!-- Quiz Categories -->
+						<div
+							class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-md mb-6"
+						>
+							<div class="flex flex-wrap gap-2 mb-4" id="quiz-categories">
+								<button
+									data-category="all"
+									class="quiz-category-btn bg-gradient-to-r from-primary-600 to-purple-600 text-white px-4 py-2.5 rounded-xl shadow-sm"
+								>
+									All Quizzes
+								</button>
+								<button
+									data-category="my"
+									class="quiz-category-btn bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-4 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all"
+								>
+									My Quizzes
+								</button>
+								<!-- Category buttons will be dynamically populated -->
+							</div>
+							<div class="relative">
+								<input
+									type="text"
+									id="quiz-search"
+									placeholder="Search quizzes..."
+									class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500"
+								/>
+								<i
+									class="fas fa-search absolute left-4 top-3.5 text-gray-400"
+								></i>
+							</div>
+						</div>
+
+						<!-- Active Quiz Section (initially hidden) -->
+						<div
+							id="active-quiz"
+							class="bg-white dark:bg-gray-800 rounded-2xl p-7 shadow-lg mb-6 hidden"
+						>
+							<h3
+								class="text-xl font-semibold mb-5 flex items-center"
+								id="active-quiz-title"
+							>
+								<i
+									class="fas fa-square-root-alt text-primary-600 dark:text-primary-500 mr-2"
+								></i>
+								Quiz
+							</h3>
+							<div class="mb-6">
+								<div
+									class="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2"
+								>
+									<span
+										>Question <span id="current-question">1</span> of
+										<span id="total-questions">10</span></span
+									>
+									<span
+										id="quiz-timer"
+										class="flex items-center text-gray-500 dark:text-gray-400 font-medium"
+									>
+										<i class="fas fa-stopwatch mr-1.5"></i> Time remaining:
+										15:00
+									</span>
+								</div>
+								<div
+									class="h-2.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden"
+								>
+									<div
+										class="h-2.5 bg-gradient-to-r from-primary-600 to-primary-500 rounded-full"
+										id="question-progress"
+										style="width: 10%"
+									></div>
+								</div>
+							</div>
+							<div class="mb-8" id="question-container">
+								<!-- Questions will be dynamically populated -->
+							</div>
+
+							<div class="flex justify-between">
+								<button
+									id="prev-question-btn"
+									class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-4 rounded-xl transition-all flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+									disabled
+								>
+									<i class="fas fa-arrow-left mr-2"></i> Previous
+								</button>
+								<button
+									id="next-question-btn"
+									class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-4 rounded-xl transition-all flex items-center"
+								>
+									Next <i class="fas fa-arrow-right ml-2"></i>
+								</button>
+							</div>
+						</div>
+
+						<!-- Quiz Results (initially hidden) -->
+						<div
+							id="quiz-results"
+							class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-lg mb-6 hidden"
+						>
+							<div class="text-center mb-8">
+								<div class="inline-block mb-4 relative">
+									<svg class="w-32 h-32 mx-auto" viewBox="0 0 100 100">
+										<circle
+											cx="50"
+											cy="50"
+											r="45"
+											fill="none"
+											stroke="#E2E8F0"
+											stroke-width="8"
+											class="dark:stroke-gray-700"
+										></circle>
+										<circle
+											cx="50"
+											cy="50"
+											r="45"
+											fill="none"
+											class="progress-ring-animate dark:stroke-primary-500 stroke-primary-600"
+											stroke-width="8"
+											stroke-dasharray="283"
+											stroke-dashoffset="283"
+											style="--target-offset: 56.6"
+										></circle>
+									</svg>
+									<div
+										class="absolute inset-0 flex items-center justify-center"
+									>
+										<span
+											class="text-3xl font-bold text-primary-600 dark:text-primary-500"
+											id="quiz-score"
+											>0%</span
+										>
+									</div>
+								</div>
+								<h3
+									class="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+									id="quiz-result-title"
+								>
+									Quiz Results
+								</h3>
+								<p
+									class="text-gray-600 dark:text-gray-400"
+									id="quiz-result-summary"
+								>
+									You completed the quiz!
+								</p>
+							</div>
+
+							<!-- Quiz Analytics -->
+							<div class="bg-gray-50 dark:bg-gray-700/30 p-5 rounded-xl mb-6">
+								<h4 class="font-semibold mb-3">Quiz Analytics</h4>
+								<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+									<div>
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Questions
+										</p>
+										<p class="text-xl font-bold" id="analytics-questions">0</p>
+									</div>
+									<div>
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Correct
+										</p>
+										<p
+											class="text-xl font-bold text-green-600 dark:text-green-400"
+											id="analytics-correct"
+										>
+											0
+										</p>
+									</div>
+									<div>
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Incorrect
+										</p>
+										<p
+											class="text-xl font-bold text-red-600 dark:text-red-400"
+											id="analytics-incorrect"
+										>
+											0
+										</p>
+									</div>
+									<div>
+										<p class="text-sm text-gray-500 dark:text-gray-400">
+											Time Spent
+										</p>
+										<p class="text-xl font-bold" id="analytics-time">0:00</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="flex flex-wrap gap-3 justify-center">
+								<button
+									id="retry-quiz-btn"
+									class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-4 rounded-xl shadow-md transition-all flex items-center"
+								>
+									<i class="fas fa-redo mr-2"></i> Retry Quiz
+								</button>
+								<button
+									id="view-all-quizzes-btn"
+									class="bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 py-2.5 px-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all flex items-center"
+								>
+									<i class="fas fa-list mr-2"></i> View All Quizzes
+								</button>
+							</div>
+						</div>
+
+						<!-- Quizzes Grid -->
+						<div
+							id="quizzes-grid"
+							class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+						>
+							<!-- Quiz cards will be dynamically populated -->
+						</div>
+					</div>
+
+					<!-- Study Groups Tab -->
+					<div id="study-groups" class="tab-content">
+						<div
+							class="flex flex-col md:flex-row md:items-center justify-between mb-6"
+						>
+							<h1 class="text-2xl font-bold mb-4 md:mb-0">Study Groups</h1>
+							<div class="flex flex-wrap gap-3">
+								<select
+									id="view-group-type"
+									class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
+								>
+									<option value="all">All Groups</option>
+									<option value="my">My Groups</option>
+								</select>
+								<button
+									id="create-group-btn"
+									class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white px-4 py-2.5 rounded-xl shadow-md transition-all"
+								>
+									<i class="fas fa-plus mr-2"></i> Create Group
+								</button>
+							</div>
+						</div>
+
+						<!-- View Group Details (initially hidden) -->
+						<div
+							id="group-details"
+							class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg mb-6 hidden"
+						>
+							<div class="flex justify-between items-start mb-6">
+								<div class="flex items-center gap-4">
+									<div
+										id="group-icon"
+										class="w-16 h-16 rounded-xl flex items-center justify-center text-white text-2xl"
+									></div>
+									<div>
+										<h2 class="text-xl font-bold" id="group-detail-name"></h2>
+										<p
+											class="text-sm text-gray-500 dark:text-gray-400"
+											id="group-detail-category"
+										></p>
+									</div>
+								</div>
+								<button
+									id="close-group-details"
+									class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+								>
+									<i class="fas fa-times"></i>
+								</button>
+							</div>
+
+							<div class="mb-6">
+								<h3 class="text-lg font-semibold mb-2">Description</h3>
+								<p
+									class="text-gray-700 dark:text-gray-300"
+									id="group-detail-description"
+								></p>
+							</div>
+
+							<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+								<div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl">
+									<p class="text-sm text-gray-500 dark:text-gray-400">
+										Members
+									</p>
+									<p class="text-2xl font-bold" id="group-detail-members">0</p>
+								</div>
+								<div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl">
+									<p class="text-sm text-gray-500 dark:text-gray-400">
+										Study Sets
+									</p>
+									<p class="text-2xl font-bold" id="group-detail-sets">0</p>
+								</div>
+								<div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl">
+									<p class="text-sm text-gray-500 dark:text-gray-400">
+										Active Since
+									</p>
+									<p class="text-2xl font-bold" id="group-detail-date">
+										April 2025
+									</p>
+								</div>
+							</div>
+
+							<div class="mb-6">
+								<h3 class="text-lg font-semibold mb-3">Group Members</h3>
+								<div class="flex flex-wrap gap-2" id="group-members-list">
+									<!-- Member avatars will be dynamically populated -->
+									<div
+										class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
+									>
+										<span
+											class="text-primary-600 dark:text-primary-400 font-medium"
+											>SJ</span
+										>
+									</div>
+								</div>
+							</div>
+
+							<div>
+								<h3 class="text-lg font-semibold mb-3">
+									Upcoming Study Sessions
+								</h3>
+								<div class="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-xl">
+									<p class="text-center text-gray-500 dark:text-gray-400">
+										No upcoming sessions scheduled.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Study Groups Grid -->
+						<div
+							id="study-groups-grid"
+							class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+						>
+							<!-- Study group cards will be dynamically populated -->
+						</div>
+					</div>
+
+					<!-- Leaderboard Tab -->
+					<div id="leaderboard" class="tab-content">
+						<div class="flex items-center justify-between mb-6">
+							<h1 class="text-2xl font-bold">Leaderboard</h1>
+							<div class="flex flex-wrap gap-3">
+								<select
+									id="leaderboard-type"
+									class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
+								>
+									<option value="weekly">Weekly</option>
+									<option value="monthly">Monthly</option>
+									<option value="alltime">All Time</option>
+								</select>
+								<select
+									id="leaderboard-category"
+									class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-500"
+								>
+									<option value="all">All Categories</option>
+									<!-- Categories will be dynamically populated -->
+								</select>
+							</div>
+						</div>
+
+						<!-- Top 3 Winners -->
+						<div
+							class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg mb-6"
+						>
+							<h2
+								class="text-lg font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+							>
+								Top Performers
+							</h2>
+							<div
+								class="flex flex-col md:flex-row items-center justify-around gap-6 mb-4"
+							>
+								<!-- 2nd Place -->
+								<div class="flex flex-col items-center">
+									<div class="relative mb-3">
+										<div
+											class="absolute -top-2 -right-2 bg-gray-100 dark:bg-gray-700 rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+										>
+											<span class="text-gray-700 dark:text-gray-300 font-bold"
+												>2</span
+											>
+										</div>
+										<img
+											src="https://randomuser.me/api/portraits/men/32.jpg"
+											alt="User"
+											class="w-20 h-20 rounded-full object-cover border-4 border-gray-300 dark:border-gray-600"
+										/>
+									</div>
+									<h3 class="font-semibold">Michael Chen</h3>
+									<p class="text-sm text-gray-500 dark:text-gray-400">
+										850 points
+									</p>
+								</div>
+
+								<!-- 1st Place -->
+								<div
+									class="flex flex-col items-center transform scale-110 mb-4 md:mb-0"
+								>
+									<div class="relative mb-3">
+										<div
+											class="absolute -top-4 -right-2 bg-yellow-400 dark:bg-yellow-500 rounded-full w-10 h-10 flex items-center justify-center shadow-lg animate-pulse-glow"
+										>
+											<i
+												class="fas fa-crown text-yellow-700 dark:text-yellow-800"
+											></i>
+										</div>
+										<img
+											src="https://randomuser.me/api/portraits/women/28.jpg"
+											alt="User"
+											class="w-24 h-24 rounded-full object-cover border-4 border-yellow-400 dark:border-yellow-500"
+										/>
+									</div>
+									<h3 class="font-bold text-lg">Emily Rodriguez</h3>
+									<p
+										class="text-primary-600 dark:text-primary-400 font-semibold"
+									>
+										1250 points
+									</p>
+								</div>
+
+								<!-- 3rd Place -->
+								<div class="flex flex-col items-center">
+									<div class="relative mb-3">
+										<div
+											class="absolute -top-2 -right-2 bg-amber-700 dark:bg-amber-800 rounded-full w-8 h-8 flex items-center justify-center shadow-lg"
+										>
+											<span class="text-white font-bold">3</span>
+										</div>
+										<img
+											src="https://randomuser.me/api/portraits/men/75.jpg"
+											alt="User"
+											class="w-20 h-20 rounded-full object-cover border-4 border-amber-700 dark:border-amber-800"
+										/>
+									</div>
+									<h3 class="font-semibold">David Johnson</h3>
+									<p class="text-sm text-gray-500 dark:text-gray-400">
+										720 points
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- Leaderboard Table -->
+						<div
+							class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden"
+						>
+							<div class="p-4 border-b border-gray-200 dark:border-gray-700">
+								<h3 class="font-semibold">Weekly Ranking</h3>
+							</div>
+							<div class="overflow-x-auto">
+								<table class="w-full">
+									<thead class="bg-gray-50 dark:bg-gray-700/50">
+										<tr>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+											>
+												Rank
+											</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+											>
+												User
+											</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+											>
+												Study Hours
+											</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+											>
+												Cards Mastered
+											</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+											>
+												Quiz Score
+											</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+											>
+												Points
+											</th>
+										</tr>
+									</thead>
+									<tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+										<!-- 1st place -->
+										<tr class="bg-yellow-50 dark:bg-yellow-900/10">
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<div
+														class="bg-yellow-400 dark:bg-yellow-500 w-6 h-6 rounded-full flex items-center justify-center mr-2"
+													>
+														<span
+															class="text-yellow-800 dark:text-yellow-900 font-bold text-xs"
+															>1</span
+														>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<img
+														class="h-8 w-8 rounded-full mr-2"
+														src="https://randomuser.me/api/portraits/women/28.jpg"
+														alt=""
+													/>
+													<div>
+														<div class="font-medium">Emily Rodriguez</div>
+														<div
+															class="text-xs text-gray-500 dark:text-gray-400"
+														>
+															Advanced Physics
+														</div>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">18.5h</td>
+											<td class="px-6 py-4 whitespace-nowrap">87</td>
+											<td class="px-6 py-4 whitespace-nowrap">95%</td>
+											<td
+												class="px-6 py-4 whitespace-nowrap font-bold text-primary-600 dark:text-primary-400"
+											>
+												1250
+											</td>
+										</tr>
+										<!-- 2nd place -->
+										<tr class="bg-gray-50 dark:bg-gray-700/10">
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<div
+														class="bg-gray-300 dark:bg-gray-600 w-6 h-6 rounded-full flex items-center justify-center mr-2"
+													>
+														<span
+															class="text-gray-700 dark:text-gray-300 font-bold text-xs"
+															>2</span
+														>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<img
+														class="h-8 w-8 rounded-full mr-2"
+														src="https://randomuser.me/api/portraits/men/32.jpg"
+														alt=""
+													/>
+													<div>
+														<div class="font-medium">Michael Chen</div>
+														<div
+															class="text-xs text-gray-500 dark:text-gray-400"
+														>
+															Computer Science
+														</div>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">15.2h</td>
+											<td class="px-6 py-4 whitespace-nowrap">65</td>
+											<td class="px-6 py-4 whitespace-nowrap">87%</td>
+											<td class="px-6 py-4 whitespace-nowrap font-bold">850</td>
+										</tr>
+										<!-- 3rd place -->
+										<tr class="bg-amber-50 dark:bg-amber-900/10">
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<div
+														class="bg-amber-700 dark:bg-amber-800 w-6 h-6 rounded-full flex items-center justify-center mr-2"
+													>
+														<span class="text-white font-bold text-xs">3</span>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<img
+														class="h-8 w-8 rounded-full mr-2"
+														src="https://randomuser.me/api/portraits/men/75.jpg"
+														alt=""
+													/>
+													<div>
+														<div class="font-medium">David Johnson</div>
+														<div
+															class="text-xs text-gray-500 dark:text-gray-400"
+														>
+															Biology
+														</div>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">12.8h</td>
+											<td class="px-6 py-4 whitespace-nowrap">58</td>
+											<td class="px-6 py-4 whitespace-nowrap">80%</td>
+											<td class="px-6 py-4 whitespace-nowrap font-bold">720</td>
+										</tr>
+										<!-- 4th place -->
+										<tr>
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<span class="font-semibold mr-2">4</span>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<img
+														class="h-8 w-8 rounded-full mr-2"
+														src="https://randomuser.me/api/portraits/women/44.jpg"
+														alt=""
+													/>
+													<div>
+														<div class="font-medium">Sarah Johnson</div>
+														<div
+															class="text-xs text-gray-500 dark:text-gray-400"
+														>
+															Biology
+														</div>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">10.5h</td>
+											<td class="px-6 py-4 whitespace-nowrap">42</td>
+											<td class="px-6 py-4 whitespace-nowrap">75%</td>
+											<td class="px-6 py-4 whitespace-nowrap font-bold">680</td>
+										</tr>
+										<!-- More users -->
+										<tr class="bg-gray-50 dark:bg-gray-700/10">
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<span class="font-semibold mr-2">5</span>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">
+												<div class="flex items-center">
+													<img
+														class="h-8 w-8 rounded-full mr-2"
+														src="https://randomuser.me/api/portraits/women/62.jpg"
+														alt=""
+													/>
+													<div>
+														<div class="font-medium">Jennifer Williams</div>
+														<div
+															class="text-xs text-gray-500 dark:text-gray-400"
+														>
+															Chemistry
+														</div>
+													</div>
+												</div>
+											</td>
+											<td class="px-6 py-4 whitespace-nowrap">9.5h</td>
+											<td class="px-6 py-4 whitespace-nowrap">38</td>
+											<td class="px-6 py-4 whitespace-nowrap">79%</td>
+											<td class="px-6 py-4 whitespace-nowrap font-bold">610</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+
+					<!-- Profile Tab -->
+					<div id="profile" class="tab-content">
+						<h1 class="text-2xl font-bold mb-6">Profile</h1>
+
+						<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+							<!-- Profile Card -->
+							<div
+								class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg text-center"
+							>
+								<div class="relative mx-auto w-28 h-28 mb-4">
+									<img
+										src="https://randomuser.me/api/portraits/women/44.jpg"
+										alt="Profile"
+										class="w-28 h-28 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
+									/>
+									<div
+										class="absolute bottom-0 right-0 bg-green-500 w-6 h-6 rounded-full border-2 border-white dark:border-gray-800"
+									></div>
+								</div>
+								<h3
+									class="text-xl font-bold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+								>
+									Sarah Johnson
+								</h3>
+								<p class="text-gray-500 dark:text-gray-400 mb-5">
+									Biology Major • Stanford University
+								</p>
+								<div
+									class="grid grid-cols-3 divide-x divide-gray-200 dark:divide-gray-700"
+								>
+									<div class="px-2">
+										<p class="text-2xl font-bold" id="profile-study-sets">0</p>
+										<p class="text-xs text-gray-500 dark:text-gray-400">
+											Study Sets
+										</p>
+									</div>
+									<div class="px-2">
+										<p class="text-2xl font-bold" id="profile-quizzes">0</p>
+										<p class="text-xs text-gray-500 dark:text-gray-400">
+											Quizzes
+										</p>
+									</div>
+									<div class="px-2">
+										<p class="text-2xl font-bold" id="profile-badges">0</p>
+										<p class="text-xs text-gray-500 dark:text-gray-400">
+											Badges
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<!-- User Content -->
+							<div class="lg:col-span-2">
+								<!-- Tabs for user content -->
+								<div
+									class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-lg mb-6"
+								>
+									<div
+										class="flex border-b border-gray-200 dark:border-gray-700 mb-4"
+									>
+										<button
+											class="profile-content-tab py-2 px-4 border-b-2 border-primary-600 text-primary-600 dark:text-primary-500 font-medium"
+											data-tab="my-flashcards"
+										>
+											My Flashcards
+										</button>
+										<button
+											class="profile-content-tab py-2 px-4 border-b-2 border-transparent hover:text-primary-600 dark:hover:text-primary-500"
+											data-tab="my-quizzes"
+										>
+											My Quizzes
+										</button>
+										<button
+											class="profile-content-tab py-2 px-4 border-b-2 border-transparent hover:text-primary-600 dark:hover:text-primary-500"
+											data-tab="achievements"
+										>
+											Achievements
+										</button>
+									</div>
+
+									<!-- My Flashcards Content -->
+									<div
+										id="my-flashcards-content"
+										class="profile-tab-content active"
+									>
+										<div id="profile-flashcards-list" class="space-y-2">
+											<!-- Flashcard sets will be populated dynamically -->
+										</div>
+									</div>
+
+									<!-- My Quizzes Content -->
+									<div
+										id="my-quizzes-content"
+										class="profile-tab-content hidden"
+									>
+										<div id="profile-quizzes-list" class="space-y-2">
+											<!-- Quizzes will be populated dynamically -->
+										</div>
+									</div>
+
+									<!-- Achievements Content -->
+									<div
+										id="achievements-content"
+										class="profile-tab-content hidden"
+									>
+										<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+											<!-- Achievements will be populated dynamically -->
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</main>
+
+				<!-- Footer -->
+				<footer
+					class="bg-white dark:bg-gray-800 p-4 rounded-t-2xl m-2 shadow-lg"
+				>
+					<div
+						class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center"
+					>
+						<div class="flex items-center mb-4 md:mb-0">
+							<div
+								class="w-10 h-10 bg-gradient-to-r from-primary-600 to-purple-600 text-white rounded-xl flex items-center justify-center shadow-lg mr-3"
+							>
+								<i class="fas fa-brain"></i>
+							</div>
+							<div>
+								<h1
+									class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+								>
+									StudyBuddy
+								</h1>
+								<p class="text-xs text-gray-500 dark:text-gray-400">
+									© 2025 StudyBuddy. All rights reserved.
+								</p>
+							</div>
+						</div>
+
+						<div class="flex flex-wrap justify-center gap-4 md:gap-8">
+							<a
+								href="#"
+								class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-500 transition-all"
+								>Terms</a
+							>
+							<a
+								href="#"
+								class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-500 transition-all"
+								>Privacy</a
+							>
+							<a
+								href="#"
+								class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-500 transition-all"
+								>Help Center</a
+							>
+							<a
+								href="#"
+								class="text-sm text-gray-500 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-500 transition-all"
+								>Contact</a
+							>
+						</div>
+					</div>
+				</footer>
+			</div>
+		</div>
+
+		<!-- Create Study Set Modal -->
+		<div
+			id="create-study-set-modal"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden"
+		>
+			<div
+				class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3
+						class="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+					>
+						Create New Study Set
+					</h3>
+					<button
+						class="cancel-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<div class="space-y-5">
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Set Title</label
+						>
+						<input
+							type="text"
+							id="study-set-title"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							placeholder="Enter study set title..."
+						/>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Description</label
+						>
+						<textarea
+							id="study-set-description"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							rows="3"
+							placeholder="Describe your study set..."
+						></textarea>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Category</label
+						>
+						<select
+							id="study-set-category"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+						>
+							<option value="mathematics">Mathematics</option>
+							<option value="biology">Biology</option>
+							<option value="chemistry">Chemistry</option>
+							<option value="physics">Physics</option>
+							<option value="literature">Literature</option>
+							<option value="geography">Geography</option>
+						</select>
+					</div>
+					<div
+						class="flex justify-between pt-5 border-t border-gray-200 dark:border-gray-700"
+					>
+						<button
+							class="cancel-modal bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-5 rounded-xl transition-all"
+						>
+							Cancel
+						</button>
+						<button
+							id="create-study-set-save-btn"
+							class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-5 rounded-xl shadow-md transition-all"
+						>
+							Create Study Set
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Create Flashcard Modal -->
+		<div
+			id="create-flashcard-modal"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden"
+		>
+			<div
+				class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3
+						class="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+					>
+						Create New Flashcard
+					</h3>
+					<button
+						class="cancel-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<div class="space-y-5">
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Study Set</label
+						>
+						<select
+							id="flashcard-set"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+						>
+							<!-- Study sets will be dynamically populated -->
+						</select>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Category</label
+						>
+						<select
+							id="flashcard-category"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+						>
+							<!-- Categories will be dynamically populated -->
+						</select>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Question</label
+						>
+						<textarea
+							id="flashcard-question"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							rows="3"
+							placeholder="Enter your question..."
+						></textarea>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Answer</label
+						>
+						<textarea
+							id="flashcard-answer"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							rows="3"
+							placeholder="Enter the answer..."
+						></textarea>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Explanation (Optional)</label
+						>
+						<textarea
+							id="flashcard-explanation"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							rows="2"
+							placeholder="Add an explanation..."
+						></textarea>
+					</div>
+					<div
+						class="flex justify-between pt-5 border-t border-gray-200 dark:border-gray-700"
+					>
+						<button
+							class="cancel-modal bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-5 rounded-xl transition-all"
+						>
+							Cancel
+						</button>
+						<button
+							id="save-flashcard-btn"
+							class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-5 rounded-xl shadow-md transition-all"
+						>
+							Save Card
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Create Quiz Modal -->
+		<div
+			id="create-quiz-modal"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden"
+		>
+			<div
+				class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0 overflow-y-auto max-h-[90vh]"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3
+						class="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+					>
+						Create New Quiz
+					</h3>
+					<button
+						class="cancel-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<div class="space-y-5">
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Quiz Title</label
+						>
+						<input
+							type="text"
+							id="quiz-title"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							placeholder="Enter quiz title..."
+						/>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Description</label
+						>
+						<textarea
+							id="quiz-description"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							rows="2"
+							placeholder="Describe your quiz..."
+						></textarea>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Category</label
+						>
+						<select
+							id="quiz-category"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+						>
+							<option value="mathematics">Mathematics</option>
+							<option value="biology">Biology</option>
+							<option value="chemistry">Chemistry</option>
+							<option value="physics">Physics</option>
+							<option value="literature">Literature</option>
+							<option value="geography">Geography</option>
+						</select>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Time Limit (minutes)</label
+						>
+						<input
+							type="number"
+							id="quiz-time-limit"
+							min="1"
+							max="60"
+							value="15"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+						/>
+					</div>
+
+					<!-- Quiz Questions Section -->
+					<div>
+						<div class="flex items-center justify-between mb-2">
+							<label
+								class="text-sm font-medium text-gray-700 dark:text-gray-300"
+								>Questions</label
+							>
+							<button
+								id="add-question-btn"
+								class="text-primary-600 dark:text-primary-400 text-sm hover:underline"
+							>
+								<i class="fas fa-plus mr-1"></i> Add Question
+							</button>
+						</div>
+
+						<div id="quiz-questions-container" class="space-y-4">
+							<!-- Question template - will be cloned for new questions -->
+							<div
+								class="quiz-question-item border border-gray-200 dark:border-gray-700 rounded-xl p-4"
+							>
+								<div class="flex justify-between items-start mb-3">
+									<span class="font-medium">Question 1</span>
+									<button
+										class="remove-question-btn text-red-500 hover:text-red-700 dark:hover:text-red-400"
+									>
+										<i class="fas fa-trash"></i>
+									</button>
+								</div>
+								<div class="space-y-3">
+									<div>
+										<input
+											type="text"
+											placeholder="Enter question..."
+											class="quiz-question-text w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+										/>
+									</div>
+									<div class="space-y-2">
+										<div class="flex gap-2 items-center">
+											<div
+												class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
+											>
+												<span
+													class="text-xs font-medium text-primary-700 dark:text-primary-300"
+													>A</span
+												>
+											</div>
+											<input
+												type="text"
+												placeholder="Option A"
+												class="quiz-option-text w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+											/>
+											<input
+												type="radio"
+												name="quiz-correct-1"
+												value="0"
+												class="quiz-correct-option w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+											/>
+										</div>
+										<div class="flex gap-2 items-center">
+											<div
+												class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
+											>
+												<span
+													class="text-xs font-medium text-primary-700 dark:text-primary-300"
+													>B</span
+												>
+											</div>
+											<input
+												type="text"
+												placeholder="Option B"
+												class="quiz-option-text w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+											/>
+											<input
+												type="radio"
+												name="quiz-correct-1"
+												value="1"
+												class="quiz-correct-option w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+											/>
+										</div>
+										<div class="flex gap-2 items-center">
+											<div
+												class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
+											>
+												<span
+													class="text-xs font-medium text-primary-700 dark:text-primary-300"
+													>C</span
+												>
+											</div>
+											<input
+												type="text"
+												placeholder="Option C"
+												class="quiz-option-text w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+											/>
+											<input
+												type="radio"
+												name="quiz-correct-1"
+												value="2"
+												class="quiz-correct-option w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+											/>
+										</div>
+										<div class="flex gap-2 items-center">
+											<div
+												class="w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
+											>
+												<span
+													class="text-xs font-medium text-primary-700 dark:text-primary-300"
+													>D</span
+												>
+											</div>
+											<input
+												type="text"
+												placeholder="Option D"
+												class="quiz-option-text w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+											/>
+											<input
+												type="radio"
+												name="quiz-correct-1"
+												value="3"
+												class="quiz-correct-option w-4 h-4 text-primary-600 bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div
+						class="flex justify-between pt-5 border-t border-gray-200 dark:border-gray-700"
+					>
+						<button
+							class="cancel-modal bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-5 rounded-xl transition-all"
+						>
+							Cancel
+						</button>
+						<button
+							id="create-quiz-save-btn"
+							class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-5 rounded-xl shadow-md transition-all"
+						>
+							Create Quiz
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Create Study Group Modal -->
+		<div
+			id="create-group-modal"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden"
+		>
+			<div
+				class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 transform transition-all duration-300 scale-95 opacity-0"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3
+						class="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+					>
+						Create New Study Group
+					</h3>
+					<button
+						class="cancel-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<div class="space-y-5">
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Group Name</label
+						>
+						<input
+							type="text"
+							id="group-name"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							placeholder="Enter group name..."
+						/>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Description</label
+						>
+						<textarea
+							id="group-description"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+							rows="3"
+							placeholder="Describe your group..."
+						></textarea>
+					</div>
+					<div>
+						<label
+							class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+							>Category</label
+						>
+						<select
+							id="group-category"
+							class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+						>
+							<option value="mathematics">Mathematics</option>
+							<option value="biology">Biology</option>
+							<option value="chemistry">Chemistry</option>
+							<option value="physics">Physics</option>
+							<option value="literature">Literature</option>
+							<option value="geography">Geography</option>
+						</select>
+					</div>
+					<div
+						class="flex justify-between pt-5 border-t border-gray-200 dark:border-gray-700"
+					>
+						<button
+							class="cancel-modal bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-5 rounded-xl transition-all"
+						>
+							Cancel
+						</button>
+						<button
+							id="create-group-save-btn"
+							class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-5 rounded-xl shadow-md transition-all"
+						>
+							Create Group
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Notification Details Modal -->
+		<div
+			id="notification-details-modal"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden"
+		>
+			<div
+				class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3
+						class="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+					>
+						Notifications
+					</h3>
+					<button
+						class="cancel-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<div id="notifications-list" class="space-y-4 max-h-96 overflow-y-auto">
+					<!-- Notifications will be dynamically populated -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Pomodoro Timer Modal -->
+		<div
+			id="pomodoro-modal"
+			class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm hidden"
+		>
+			<div
+				class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3
+						class="text-xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-purple-600"
+					>
+						Pomodoro Timer
+					</h3>
+					<button
+						class="cancel-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-all"
+					>
+						<i class="fas fa-times"></i>
+					</button>
+				</div>
+				<div class="text-center mb-6">
+					<div class="w-48 h-48 mx-auto relative">
+						<svg class="w-full h-full" viewBox="0 0 100 100">
+							<circle
+								cx="50"
+								cy="50"
+								r="45"
+								fill="none"
+								stroke="#E2E8F0"
+								stroke-width="8"
+								class="dark:stroke-gray-700"
+							></circle>
+							<circle
+								cx="50"
+								cy="50"
+								r="45"
+								fill="none"
+								stroke-width="8"
+								id="pomodoro-progress"
+								stroke-dasharray="283"
+								stroke-dashoffset="0"
+								class="transform -rotate-90 origin-center transition-all duration-1000 stroke-primary-600 dark:stroke-primary-500"
+							></circle>
+						</svg>
+						<div
+							class="absolute inset-0 flex items-center justify-center flex-col"
+						>
+							<span
+								class="text-4xl font-bold text-primary-600 dark:text-primary-500"
+								id="pomodoro-time"
+								>25:00</span
+							>
+							<span
+								class="text-sm text-gray-500 dark:text-gray-400"
+								id="pomodoro-status"
+								>Focus Time</span
+							>
+						</div>
+					</div>
+				</div>
+				<div class="flex justify-center space-x-4 mb-6">
+					<button
+						id="pomodoro-start"
+						class="bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white py-2.5 px-5 rounded-xl shadow-md transition-all"
+					>
+						<i class="fas fa-play mr-2"></i> Start
+					</button>
+					<button
+						id="pomodoro-pause"
+						class="hidden bg-yellow-500 hover:bg-yellow-600 text-white py-2.5 px-5 rounded-xl shadow-md transition-all"
+					>
+						<i class="fas fa-pause mr-2"></i> Pause
+					</button>
+					<button
+						id="pomodoro-reset"
+						class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 py-2.5 px-5 rounded-xl transition-all"
+					>
+						<i class="fas fa-redo mr-2"></i> Reset
+					</button>
+				</div>
+				<div class="grid grid-cols-3 gap-3">
+					<button
+						class="pomodoro-mode-btn bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border border-gray-300 dark:border-gray-600 py-1.5 px-2 rounded-lg hover:bg-primary-200 dark:hover:bg-primary-900/50 transition-all text-sm"
+						data-minutes="25"
+					>
+						25 min
+					</button>
+					<button
+						class="pomodoro-mode-btn bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all text-sm"
+						data-minutes="15"
+					>
+						15 min
+					</button>
+					<button
+						class="pomodoro-mode-btn bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 py-1.5 px-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all text-sm"
+						data-minutes="5"
+					>
+						5 min
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const categories = [
+					{
+						id: "mathematics",
+						name: "Mathematics",
+						icon: "fas fa-calculator",
+						color: "red",
+					},
+					{
+						id: "biology",
+						name: "Biology",
+						icon: "fas fa-flask",
+						color: "green",
+					},
+					{
+						id: "chemistry",
+						name: "Chemistry",
+						icon: "fas fa-atom",
+						color: "purple",
+					},
+					{
+						id: "physics",
+						name: "Physics",
+						icon: "fas fa-bolt",
+						color: "blue",
+					},
+					{
+						id: "literature",
+						name: "Literature",
+						icon: "fas fa-book",
+						color: "amber",
+					},
+					{
+						id: "geography",
+						name: "Geography",
+						icon: "fas fa-globe",
+						color: "teal",
+					},
+					{
+						id: "history",
+						name: "History",
+						icon: "fas fa-landmark",
+						color: "red",
+					},
+					{
+						id: "computer-science",
+						name: "Computer Science",
+						icon: "fas fa-laptop-code",
+						color: "indigo",
+					},
+				];
+
+				const defaultNotifications = [
+					{
+						id: 1,
+						type: "badge",
+						title: "New Badge Earned!",
+						message:
+							'You\'ve earned the "5-Day Streak" badge. Keep up the good work!',
+						time: "Today, 10:35 AM",
+						icon: "fas fa-certificate",
+						color: "primary",
+					},
+					{
+						id: 2,
+						type: "group",
+						title: "New Group Invite",
+						message:
+							'Alex Chen invited you to join "Advanced Calculus Study Group"',
+						time: "Yesterday, 4:20 PM",
+						icon: "fas fa-user-plus",
+						color: "green",
+						actions: true,
+					},
+					{
+						id: 3,
+						type: "reminder",
+						title: "Quiz Reminder",
+						message:
+							'Your "Calculus Fundamentals" quiz is scheduled for tomorrow.',
+						time: "Yesterday, 1:15 PM",
+						icon: "fas fa-bell",
+						color: "blue",
+					},
+					{
+						id: 4,
+						type: "message",
+						title: "New Message",
+						message:
+							"Emily from Biology Study Group sent you a message about tomorrow's session.",
+						time: "Today, 3:45 PM",
+						icon: "fas fa-comment",
+						color: "purple",
+					},
+					{
+						id: 5,
+						type: "badge",
+						title: "Achievement Unlocked!",
+						message:
+							'You\'ve completed 10 quizzes and earned the "Quiz Master" badge!',
+						time: "Today, 2:10 PM",
+						icon: "fas fa-trophy",
+						color: "amber",
+					},
+				];
+
+				function saveToLocalStorage(key, data) {
+					localStorage.setItem(key, JSON.stringify(data));
+				}
+
+				function getFromLocalStorage(key, defaultValue = []) {
+					const data = localStorage.getItem(key);
+					return data ? JSON.parse(data) : defaultValue;
+				}
+
+				if (!localStorage.getItem("studySets")) {
+					const defaultStudySets = [
+						{
+							id: 1,
+							title: "Calculus Fundamentals",
+							description:
+								"Basic calculus concepts including derivatives and integrals",
+							category: "mathematics",
+							createdAt: new Date().toISOString(),
+						},
+						{
+							id: 2,
+							title: "Cell Biology",
+							description: "Structure and function of cells",
+							category: "biology",
+							createdAt: new Date().toISOString(),
+						},
+						{
+							id: 3,
+							title: "World Geography",
+							description: "Countries, capitals, and geographical features",
+							category: "geography",
+							createdAt: new Date().toISOString(),
+						},
+						{
+							id: 4,
+							title: "Organic Chemistry",
+							description: "Carbon-based compounds and reactions",
+							category: "chemistry",
+							createdAt: new Date().toISOString(),
+						},
+					];
+					saveToLocalStorage("studySets", defaultStudySets);
+				}
+
+				if (!localStorage.getItem("flashcards")) {
+					const defaultFlashcards = [
+						{
+							id: 1,
+							question: "What is the derivative of e^x?",
+							answer: "e^x",
+							explanation:
+								"The derivative of e^x is e^x because the exponential function is its own derivative.",
+							category: "mathematics",
+							setId: 1,
+							mastered: false,
+						},
+						{
+							id: 2,
+							question: "What is the capital of France?",
+							answer: "Paris",
+							explanation:
+								"Paris is the capital and most populous city of France.",
+							category: "geography",
+							setId: 3,
+							mastered: false,
+						},
+						{
+							id: 3,
+							question: "What is the chemical symbol for gold?",
+							answer: "Au",
+							explanation:
+								'The symbol Au comes from the Latin word for gold, "aurum".',
+							category: "chemistry",
+							setId: 4,
+							mastered: false,
+						},
+						{
+							id: 4,
+							question: "What is the powerhouse of the cell?",
+							answer: "Mitochondria",
+							explanation:
+								"Mitochondria generate most of the cell's supply of adenosine triphosphate (ATP), used as a source of chemical energy.",
+							category: "biology",
+							setId: 2,
+							mastered: false,
+						},
+						{
+							id: 5,
+							question: "What is Newton's First Law?",
+							answer:
+								"An object at rest stays at rest, and an object in motion stays in motion unless acted upon by an external force.",
+							explanation:
+								"Also known as the law of inertia, this principle forms the foundation of classical mechanics.",
+							category: "physics",
+							setId: null,
+							mastered: false,
+						},
+						{
+							id: 6,
+							question: 'Who wrote "Pride and Prejudice"?',
+							answer: "Jane Austen",
+							explanation:
+								"Published in 1813, Pride and Prejudice is one of Jane Austen's most famous novels.",
+							category: "literature",
+							setId: null,
+							mastered: false,
+						},
+						{
+							id: 7,
+							question: "What is the quadratic formula?",
+							answer: "x = (-b ± √(b² - 4ac)) / 2a",
+							explanation:
+								"This formula is used to solve quadratic equations of the form ax² + bx + c = 0.",
+							category: "mathematics",
+							setId: 1,
+							mastered: false,
+						},
+						{
+							id: 8,
+							question: "What is photosynthesis?",
+							answer:
+								"The process by which plants convert light energy into chemical energy",
+							explanation:
+								"Plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar.",
+							category: "biology",
+							setId: 2,
+							mastered: false,
+						},
+						{
+							id: 9,
+							question: "What is the principle of conservation of energy?",
+							answer:
+								"Energy cannot be created or destroyed, only transformed from one form to another",
+							explanation:
+								"This is the first law of thermodynamics and a fundamental principle of physics.",
+							category: "physics",
+							setId: null,
+							mastered: false,
+						},
+						{
+							id: 10,
+							question: "What year did World War II end?",
+							answer: "1945",
+							explanation:
+								"WWII ended with the surrender of Japan in September 1945 after the dropping of atomic bombs on Hiroshima and Nagasaki.",
+							category: "history",
+							setId: null,
+							mastered: false,
+						},
+						{
+							id: 11,
+							question: "What is HTML?",
+							answer: "HyperText Markup Language",
+							explanation:
+								"HTML is the standard markup language for creating web pages and web applications.",
+							category: "computer-science",
+							setId: null,
+							mastered: false,
+						},
+						{
+							id: 12,
+							question: "What is the pH of pure water?",
+							answer: "7",
+							explanation:
+								"Pure water has a pH of 7, which is considered neutral (neither acidic nor basic).",
+							category: "chemistry",
+							setId: 4,
+							mastered: false,
+						},
+					];
+					saveToLocalStorage("flashcards", defaultFlashcards);
+				}
+
+				if (!localStorage.getItem("quizzes")) {
+					const defaultQuizzes = [
+						{
+							id: 1,
+							title: "Calculus Fundamentals",
+							description:
+								"Test your knowledge of basic calculus concepts including derivatives and integrals.",
+							category: "mathematics",
+							timeLimit: 15,
+							isOwner: false,
+							questions: [
+								{
+									question: "What is the antiderivative of ln(x)?",
+									options: [
+										"x * ln(x)",
+										"x * ln(x) - x + C",
+										"1/x + C",
+										"ln(ln(x)) + C",
+									],
+									correctAnswer: 1,
+								},
+								{
+									question:
+										"What is the limit of (1 + 1/n)^n as n approaches infinity?",
+									options: ["1", "2", "e", "Infinity"],
+									correctAnswer: 2,
+								},
+								{
+									question: "The derivative of sin(x) is:",
+									options: ["cos(x)", "-sin(x)", "-cos(x)", "tan(x)"],
+									correctAnswer: 0,
+								},
+							],
+						},
+						{
+							id: 2,
+							title: "Cell Biology",
+							description:
+								"Explore the processes of cell division and cellular components in this comprehensive biology quiz.",
+							category: "biology",
+							timeLimit: 20,
+							isOwner: false,
+							questions: [
+								{
+									question:
+										"Which organelle is known as the powerhouse of the cell?",
+									options: [
+										"Nucleus",
+										"Mitochondria",
+										"Golgi Apparatus",
+										"Endoplasmic Reticulum",
+									],
+									correctAnswer: 1,
+								},
+								{
+									question:
+										"During which phase of mitosis do the chromosomes align at the metaphase plate?",
+									options: ["Prophase", "Metaphase", "Anaphase", "Telophase"],
+									correctAnswer: 1,
+								},
+								{
+									question: "What is the main function of ribosomes?",
+									options: [
+										"Protein synthesis",
+										"Lipid synthesis",
+										"Energy production",
+										"Cell division",
+									],
+									correctAnswer: 0,
+								},
+							],
+						},
+						{
+							id: 3,
+							title: "World Geography",
+							description:
+								"Test your knowledge of countries, capitals, landmarks, and geographical features around the world.",
+							category: "geography",
+							timeLimit: 15,
+							isOwner: true,
+							questions: [
+								{
+									question: "Which is the largest ocean on Earth?",
+									options: [
+										"Atlantic Ocean",
+										"Indian Ocean",
+										"Arctic Ocean",
+										"Pacific Ocean",
+									],
+									correctAnswer: 3,
+								},
+								{
+									question: "Which country is both in Europe and Asia?",
+									options: ["Turkey", "Egypt", "Greece", "Italy"],
+									correctAnswer: 0,
+								},
+								{
+									question: "Which mountain range separates Europe from Asia?",
+									options: ["Alps", "Himalayas", "Ural Mountains", "Andes"],
+									correctAnswer: 2,
+								},
+							],
+						},
+						{
+							id: 4,
+							title: "Periodic Table Quiz",
+							description:
+								"Test your knowledge of chemical elements, their properties, and their places in the periodic table.",
+							category: "chemistry",
+							timeLimit: 12,
+							isOwner: true,
+							questions: [
+								{
+									question: "Which element has the symbol Fe?",
+									options: ["Iron", "Fluorine", "Francium", "Fermium"],
+									correctAnswer: 0,
+								},
+								{
+									question: "Which of these is a noble gas?",
+									options: ["Chlorine", "Neon", "Sodium", "Magnesium"],
+									correctAnswer: 1,
+								},
+								{
+									question: "Which element is liquid at room temperature?",
+									options: ["Argon", "Aluminum", "Mercury", "Potassium"],
+									correctAnswer: 2,
+								},
+							],
+						},
+						{
+							id: 5,
+							title: "Programming Basics",
+							description:
+								"A fundamental quiz about programming concepts, syntax, and principles for beginners.",
+							category: "computer-science",
+							timeLimit: 15,
+							isOwner: false,
+							questions: [
+								{
+									question: "What does HTML stand for?",
+									options: [
+										"Hyperlinks and Text Markup Language",
+										"Home Tool Markup Language",
+										"HyperText Markup Language",
+										"Highly Textual Markup Language",
+									],
+									correctAnswer: 2,
+								},
+								{
+									question: "Which of these is not a programming language?",
+									options: ["Java", "HTML", "Python", "C++"],
+									correctAnswer: 1,
+								},
+								{
+									question:
+										"What symbol is used for single-line comments in JavaScript?",
+									options: ["#", "//", "/* */", "<!---->"],
+									correctAnswer: 1,
+								},
+							],
+						},
+					];
+					saveToLocalStorage("quizzes", defaultQuizzes);
+				}
+
+				if (!localStorage.getItem("studyGroups")) {
+					const defaultGroups = [
+						{
+							id: 1,
+							name: "Calculus Club",
+							description:
+								"Join us for in-depth discussions on advanced calculus topics including multivariable calculus and differential equations.",
+							category: "mathematics",
+							members: 16,
+							createdAt: "2025-01-15",
+							studySets: 3,
+							joined: false,
+						},
+						{
+							id: 2,
+							name: "Physics Study Group",
+							description:
+								"A collaborative group focused on classical and quantum physics concepts.",
+							category: "physics",
+							members: 28,
+							createdAt: "2025-02-03",
+							studySets: 5,
+							joined: false,
+						},
+						{
+							id: 3,
+							name: "Literature Circle",
+							description:
+								"Weekly discussions on classic and contemporary literature and poetry.",
+							category: "literature",
+							members: 15,
+							createdAt: "2025-01-20",
+							studySets: 2,
+							joined: false,
+						},
+						{
+							id: 4,
+							name: "Pre-Med Biology Group",
+							description:
+								"Prepare for medical school entrance exams with our focused study group covering all aspects of biology.",
+							category: "biology",
+							members: 24,
+							createdAt: "2024-12-10",
+							studySets: 8,
+							joined: false,
+						},
+						{
+							id: 5,
+							name: "Organic Chemistry Lab",
+							description:
+								"Focus on organic chemistry problems, reaction mechanisms, and lab techniques.",
+							category: "chemistry",
+							members: 12,
+							createdAt: "2025-02-15",
+							studySets: 4,
+							joined: false,
+						},
+						{
+							id: 6,
+							name: "World History Explorers",
+							description:
+								"Journey through different historical periods and civilizations with weekly discussion sessions.",
+							category: "history",
+							members: 19,
+							createdAt: "2025-01-05",
+							studySets: 3,
+							joined: false,
+						},
+						{
+							id: 7,
+							name: "Coding Bootcamp",
+							description:
+								"Learn programming languages, algorithms, and web development through collaborative projects.",
+							category: "computer-science",
+							members: 32,
+							createdAt: "2024-11-30",
+							studySets: 6,
+							joined: false,
+						},
+						{
+							id: 8,
+							name: "Global Geography",
+							description:
+								"Explore countries, cultures, and geographical features from around the world.",
+							category: "geography",
+							members: 14,
+							createdAt: "2025-02-20",
+							studySets: 2,
+							joined: false,
+						},
+					];
+					saveToLocalStorage("studyGroups", defaultGroups);
+				}
+
+				if (!localStorage.getItem("notifications")) {
+					saveToLocalStorage("notifications", defaultNotifications);
+				}
+
+				function showNotification(message, type = "info") {
+					const container = document.getElementById("notification-container");
+					if (!container) return;
+
+					const notification = document.createElement("div");
+
+					let bgColor, iconClass;
+					switch (type) {
+						case "success":
+							bgColor = "bg-gradient-to-r from-green-600 to-green-500";
+							iconClass = "fas fa-check-circle";
+							break;
+						case "error":
+							bgColor = "bg-gradient-to-r from-red-600 to-red-500";
+							iconClass = "fas fa-exclamation-circle";
+							break;
+						case "warning":
+							bgColor = "bg-gradient-to-r from-yellow-600 to-yellow-500";
+							iconClass = "fas fa-exclamation-triangle";
+							break;
+						default:
+							bgColor = "bg-gradient-to-r from-primary-600 to-purple-600";
+							iconClass = "fas fa-info-circle";
+					}
+
+					notification.className = `${bgColor} text-white p-4 rounded-xl shadow-lg slide-in-right w-72 flex items-start`;
+					notification.innerHTML = `
+						   <i class="${iconClass} mr-3 mt-1"></i>
+						   <div class="flex-1">${message}</div>
+						   <button class="text-white ml-2 hover:text-gray-200 focus:outline-none">
+						     <i class="fas fa-times"></i>
+						   </button>
+						 `;
+
+					container.appendChild(notification);
+
+					const closeBtn = notification.querySelector("button");
+					closeBtn.addEventListener("click", () => {
+						notification.style.opacity = "0";
+						notification.style.transform = "translateX(100%)";
+						setTimeout(() => {
+							notification.remove();
+						}, 300);
+					});
+
+					setTimeout(() => {
+						notification.style.opacity = "0";
+						notification.style.transform = "translateX(100%)";
+						setTimeout(() => {
+							notification.remove();
+						}, 300);
+					}, 5000);
+
+					return notification;
+				}
+
+				function handleModal(modalId, openFn = null, closeFn = null) {
+					const modal = document.getElementById(modalId);
+					if (!modal) return { openModal: () => {}, closeModal: () => {} };
+
+					const modalContent = modal.querySelector("div");
+					const closeBtns = modal.querySelectorAll(".cancel-modal");
+
+					function openModal() {
+						modal.classList.remove("hidden");
+						setTimeout(() => {
+							modalContent.classList.remove("scale-95", "opacity-0");
+							if (openFn) openFn();
+						}, 10);
+					}
+
+					function closeModal() {
+						modalContent.classList.add("scale-95", "opacity-0");
+						setTimeout(() => {
+							modal.classList.add("hidden");
+							if (closeFn) closeFn();
+						}, 300);
+					}
+
+					closeBtns.forEach((btn) => {
+						btn.addEventListener("click", closeModal);
+					});
+
+					modal.addEventListener("click", (e) => {
+						if (e.target === modal) closeModal();
+					});
+
+					return { openModal, closeModal };
+				}
+
+				function populateCategoryList() {
+					const categoryList = document.getElementById("category-list");
+					if (!categoryList) return;
+
+					categoryList.innerHTML = "";
+
+					categories.forEach((category) => {
+						const li = document.createElement("li");
+						li.innerHTML = `
+						     <a href="#" data-category="${category.id}" class="sidebar-link flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all relative overflow-hidden">
+						       <i class="${category.icon} mr-3 text-${category.color}-600 dark:text-${category.color}-500"></i>
+						       <span>${category.name}</span>
+						       <span class="ml-auto bg-${category.color}-50 dark:bg-${category.color}-500/30 text-${category.color}-700 dark:text-${category.color}-300 text-xs rounded-full px-2 py-0.5" id="${category.id}-count">0</span>
+						     </a>
+						   `;
+						categoryList.appendChild(li);
+					});
+
+					const categoryLinks = document.querySelectorAll(".sidebar-link");
+					categoryLinks.forEach((link) => {
+						link.addEventListener("click", (e) => {
+							e.preventDefault();
+							const category = link.getAttribute("data-category");
+
+							showTab("flashcards");
+							filterFlashcardsByCategory(category);
+
+							const sidebar = document.getElementById("sidebar");
+							if (window.innerWidth < 1024 && sidebar) {
+								sidebar.classList.add("-translate-x-full");
+								sidebar.classList.remove("translate-x-0");
+							}
+
+							showNotification(`Showing flashcards for ${category}`, "info");
+						});
+					});
+
+					updateCategoryCounts();
+				}
+
+				function updateCategoryCounts() {
+					const flashcards = getFromLocalStorage("flashcards");
+
+					categories.forEach((category) => {
+						const countEl = document.getElementById(`${category.id}-count`);
+						if (countEl) {
+							const count = flashcards.filter(
+								(card) => card.category === category.id
+							).length;
+							countEl.textContent = count;
+						}
+					});
+				}
+
+				function populateStudySetDropdown() {
+					const select = document.getElementById("flashcard-set-select");
+					const modalSelect = document.getElementById("flashcard-set");
+					const studySets = getFromLocalStorage("studySets");
+
+					if (select) {
+						select.innerHTML = '<option value="all">All Study Sets</option>';
+
+						studySets.forEach((set) => {
+							const option = document.createElement("option");
+							option.value = set.id;
+							option.textContent = set.title;
+							select.appendChild(option);
+						});
+					}
+
+					if (modalSelect) {
+						modalSelect.innerHTML = "";
+
+						studySets.forEach((set) => {
+							const option = document.createElement("option");
+							option.value = set.id;
+							option.textContent = set.title;
+							modalSelect.appendChild(option);
+						});
+					}
+				}
+
+				function populateFlashcardCategoryDropdown() {
+					const select = document.getElementById("flashcard-category-select");
+					const modalSelect = document.getElementById("flashcard-category");
+					const leaderboardSelect = document.getElementById(
+						"leaderboard-category"
+					);
+
+					if (select) {
+						select.innerHTML = '<option value="all">All Categories</option>';
+
+						categories.forEach((category) => {
+							const option = document.createElement("option");
+							option.value = category.id;
+							option.textContent = category.name;
+							select.appendChild(option);
+						});
+					}
+
+					if (modalSelect) {
+						modalSelect.innerHTML = "";
+
+						categories.forEach((category) => {
+							const option = document.createElement("option");
+							option.value = category.id;
+							option.textContent = category.name;
+							modalSelect.appendChild(option);
+						});
+					}
+
+					if (leaderboardSelect) {
+						leaderboardSelect.innerHTML =
+							'<option value="all">All Categories</option>';
+
+						categories.forEach((category) => {
+							const option = document.createElement("option");
+							option.value = category.id;
+							option.textContent = category.name;
+							leaderboardSelect.appendChild(option);
+						});
+					}
+				}
+
+				function filterFlashcardsByCategory(categoryId) {
+					const categorySelect = document.getElementById(
+						"flashcard-category-select"
+					);
+					if (categorySelect) {
+						categorySelect.value = categoryId;
+					}
+
+					updateFlashcardUI();
+				}
+
+				function filterFlashcardsBySet(setId) {
+					const setSelect = document.getElementById("flashcard-set-select");
+					if (setSelect) {
+						setSelect.value = setId;
+					}
+
+					updateFlashcardUI();
+				}
+
+				function updateFlashcardUI() {
+					const flashcards = getFromLocalStorage("flashcards");
+					const categorySelect = document.getElementById(
+						"flashcard-category-select"
+					);
+					const setSelect = document.getElementById("flashcard-set-select");
+
+					const selectedCategory = categorySelect
+						? categorySelect.value
+						: "all";
+					const selectedSet = setSelect ? setSelect.value : "all";
+
+					let filteredFlashcards = flashcards;
+
+					if (selectedCategory !== "all") {
+						filteredFlashcards = filteredFlashcards.filter(
+							(card) => card.category === selectedCategory
+						);
+					}
+
+					if (selectedSet !== "all") {
+						filteredFlashcards = filteredFlashcards.filter(
+							(card) => card.setId === parseInt(selectedSet)
+						);
+					}
+
+					const flashcardCount = document.getElementById("flashcard-count");
+					const masteredCount = document.getElementById("mastered-count");
+					const progressBar = document.getElementById("flashcard-progress");
+					const totalCards = document.getElementById("total-cards");
+					const currentCardNumber = document.getElementById(
+						"current-card-number"
+					);
+
+					if (flashcardCount)
+						flashcardCount.textContent = `${filteredFlashcards.length} cards`;
+
+					const masteredCards = filteredFlashcards.filter(
+						(card) => card.mastered
+					).length;
+					if (masteredCount)
+						masteredCount.textContent = `${masteredCards}/${filteredFlashcards.length} mastered`;
+
+					if (progressBar && filteredFlashcards.length > 0) {
+						const progress = (masteredCards / filteredFlashcards.length) * 100;
+						progressBar.style.width = `${progress}%`;
+					} else if (progressBar) {
+						progressBar.style.width = "0%";
+					}
+
+					if (totalCards) totalCards.textContent = filteredFlashcards.length;
+					if (currentCardNumber)
+						currentCardNumber.textContent =
+							filteredFlashcards.length > 0 ? "1" : "0";
+
+					currentCardIndex = 0;
+					if (filteredFlashcards.length > 0) {
+						showFlashcard(filteredFlashcards[0]);
+					} else {
+						showEmptyFlashcard();
+					}
+				}
+
+				function showFlashcard(card) {
+					const questionElement = document.getElementById("card-question");
+					const answerElement = document.getElementById("card-answer");
+					const explanationElement =
+						document.getElementById("card-explanation");
+
+					if (questionElement) questionElement.textContent = card.question;
+					if (answerElement) answerElement.textContent = card.answer;
+					if (explanationElement)
+						explanationElement.textContent =
+							card.explanation || "No explanation provided.";
+
+					const flashcard = document.getElementById("flashcard");
+					if (flashcard) flashcard.classList.remove("flipped");
+				}
+
+				function showEmptyFlashcard() {
+					const questionElement = document.getElementById("card-question");
+					const answerElement = document.getElementById("card-answer");
+					const explanationElement =
+						document.getElementById("card-explanation");
+
+					if (questionElement)
+						questionElement.textContent = "No flashcards available";
+					if (answerElement)
+						answerElement.textContent = "Create your first flashcard";
+					if (explanationElement)
+						explanationElement.textContent =
+							'Click the "Add Card" button to create your first flashcard.';
+				}
+
+				const tabButtons = document.querySelectorAll(".nav-tab");
+				const tabContents = document.querySelectorAll(".tab-content");
+
+				function showTab(tabId) {
+					tabContents.forEach((content) => {
+						content.classList.remove("active");
+					});
+
+					const selectedTab = document.getElementById(tabId);
+					if (selectedTab) {
+						selectedTab.classList.add("active");
+					}
+
+					tabButtons.forEach((button) => {
+						if (button.getAttribute("data-tab") === tabId) {
+							button.classList.add("border-b-2", "border-primary-600");
+						} else {
+							button.classList.remove("border-b-2", "border-primary-600");
+						}
+					});
+				}
+
+				tabButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const tabId = button.getAttribute("data-tab");
+						showTab(tabId);
+					});
+				});
+
+				const sidebarToggle = document.getElementById("sidebar-toggle");
+				const sidebar = document.getElementById("sidebar");
+
+				if (sidebarToggle && sidebar) {
+					sidebarToggle.addEventListener("click", (e) => {
+						e.stopPropagation();
+						if (sidebar.classList.contains("-translate-x-full")) {
+							sidebar.classList.remove("-translate-x-full");
+							sidebar.classList.add("translate-x-0");
+						} else {
+							sidebar.classList.add("-translate-x-full");
+							sidebar.classList.remove("translate-x-0");
+						}
+					});
+
+					document.addEventListener("click", function (event) {
+						if (window.innerWidth < 1024) {
+							if (
+								!sidebar.contains(event.target) &&
+								!sidebar.classList.contains("-translate-x-full") &&
+								event.target.id !== "sidebar-toggle"
+							) {
+								sidebar.classList.add("-translate-x-full");
+								sidebar.classList.remove("translate-x-0");
+							}
+						}
+					});
+				}
+
+				const profileMenuButton = document.getElementById(
+					"profile-menu-button"
+				);
+				const profileDropdown = document.getElementById("profile-dropdown");
+				const profileChevron = document.getElementById("profile-chevron");
+
+				if (profileMenuButton && profileDropdown) {
+					profileMenuButton.addEventListener("click", () => {
+						profileDropdown.classList.toggle("hidden");
+						if (profileChevron) {
+							profileChevron.classList.toggle("transform");
+							profileChevron.classList.toggle("rotate-180");
+						}
+					});
+
+					document.addEventListener("click", (e) => {
+						if (
+							!profileMenuButton.contains(e.target) &&
+							!profileDropdown.contains(e.target)
+						) {
+							profileDropdown.classList.add("hidden");
+							if (profileChevron) {
+								profileChevron.classList.remove("rotate-180");
+							}
+						}
+					});
+				}
+
+				const darkModeToggle = document.getElementById("dark-mode-toggle");
+				if (darkModeToggle) {
+					darkModeToggle.addEventListener("click", () => {
+						document.documentElement.classList.toggle("dark");
+
+						if (document.documentElement.classList.contains("dark")) {
+							darkModeToggle.innerHTML = '<i class="fas fa-sun text-xl"></i>';
+							localStorage.setItem("darkMode", "enabled");
+							showNotification("Dark mode enabled", "info");
+						} else {
+							darkModeToggle.innerHTML = '<i class="fas fa-moon text-xl"></i>';
+							localStorage.setItem("darkMode", "disabled");
+							showNotification("Light mode enabled", "info");
+						}
+					});
+				}
+
+				if (
+					localStorage.getItem("darkMode") === "enabled" ||
+					(localStorage.getItem("darkMode") === null &&
+						window.matchMedia("(prefers-color-scheme: dark)").matches)
+				) {
+					document.documentElement.classList.add("dark");
+					if (darkModeToggle)
+						darkModeToggle.innerHTML = '<i class="fas fa-sun text-xl"></i>';
+				}
+
+				const flashcardElement = document.getElementById("flashcard");
+				if (flashcardElement) {
+					flashcardElement.addEventListener("click", () => {
+						flashcardElement.classList.toggle("flipped");
+					});
+				}
+
+				let currentCardIndex = 0;
+				const prevCardBtn = document.getElementById("prev-card");
+				const nextCardBtn = document.getElementById("next-card");
+
+				if (prevCardBtn) {
+					prevCardBtn.addEventListener("click", () => {
+						const flashcards = getFilteredFlashcards();
+						if (currentCardIndex > 0) {
+							currentCardIndex--;
+							showFlashcard(flashcards[currentCardIndex]);
+							updateCardCounter();
+						} else {
+							showNotification("You are at the first card", "info");
+						}
+					});
+				}
+
+				if (nextCardBtn) {
+					nextCardBtn.addEventListener("click", () => {
+						const flashcards = getFilteredFlashcards();
+						if (currentCardIndex < flashcards.length - 1) {
+							currentCardIndex++;
+							showFlashcard(flashcards[currentCardIndex]);
+							updateCardCounter();
+						} else {
+							showNotification("You reached the last card", "info");
+						}
+					});
+				}
+
+				function getFilteredFlashcards() {
+					const flashcards = getFromLocalStorage("flashcards");
+					const categorySelect = document.getElementById(
+						"flashcard-category-select"
+					);
+					const setSelect = document.getElementById("flashcard-set-select");
+
+					const selectedCategory = categorySelect
+						? categorySelect.value
+						: "all";
+					const selectedSet = setSelect ? setSelect.value : "all";
+
+					let filteredFlashcards = flashcards;
+
+					if (selectedCategory !== "all") {
+						filteredFlashcards = filteredFlashcards.filter(
+							(card) => card.category === selectedCategory
+						);
+					}
+
+					if (selectedSet !== "all") {
+						filteredFlashcards = filteredFlashcards.filter(
+							(card) => card.setId === parseInt(selectedSet)
+						);
+					}
+
+					return filteredFlashcards;
+				}
+
+				function updateCardCounter() {
+					const currentCardNumber = document.getElementById(
+						"current-card-number"
+					);
+					if (currentCardNumber) {
+						currentCardNumber.textContent = currentCardIndex + 1;
+					}
+				}
+
+				const shuffleCardsBtn = document.getElementById("shuffle-cards-btn");
+				if (shuffleCardsBtn) {
+					shuffleCardsBtn.addEventListener("click", () => {
+						const flashcards = getFilteredFlashcards();
+						if (flashcards.length <= 1) {
+							showNotification("Not enough cards to shuffle", "warning");
+							return;
+						}
+
+						let shuffled = [...flashcards];
+						for (let i = shuffled.length - 1; i > 0; i--) {
+							const j = Math.floor(Math.random() * (i + 1));
+							[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+						}
+
+						currentCardIndex = 0;
+						showFlashcard(shuffled[0]);
+						updateCardCounter();
+						showNotification("Cards shuffled!", "success");
+					});
+				}
+
+				const focusModeBtn = document.getElementById("focus-mode-btn");
+				const closeFocusModeBtn = document.getElementById("close-focus-mode");
+
+				if (focusModeBtn) {
+					focusModeBtn.addEventListener("click", () => {
+						document.body.classList.add("focus-mode");
+						focusModeBtn.innerHTML =
+							'<i class="fas fa-eye-slash mr-1.5"></i> Exit Focus';
+						showNotification("Focus mode activated", "success");
+					});
+				}
+
+				if (closeFocusModeBtn) {
+					closeFocusModeBtn.addEventListener("click", () => {
+						document.body.classList.remove("focus-mode");
+						if (focusModeBtn) {
+							focusModeBtn.innerHTML =
+								'<i class="fas fa-eye mr-1.5"></i> Focus Mode';
+						}
+						showNotification("Focus mode deactivated", "info");
+					});
+				}
+
+				const feedbackButtons = document.querySelectorAll(".feedback-btn");
+				feedbackButtons.forEach((button) => {
+					button.addEventListener("click", () => {
+						const rating = button.getAttribute("data-rating");
+						const flashcards = getFromLocalStorage("flashcards");
+						const filteredFlashcards = getFilteredFlashcards();
+
+						if (filteredFlashcards.length === 0) return;
+
+						const currentCard = filteredFlashcards[currentCardIndex];
+
+						const cardIndex = flashcards.findIndex(
+							(card) => card.id === currentCard.id
+						);
+						if (cardIndex !== -1) {
+							flashcards[cardIndex].mastered = rating === "3";
+							saveToLocalStorage("flashcards", flashcards);
+
+							updateFlashcardUI();
+						}
+
+						let message, type;
+						if (rating === "1") {
+							message = "We'll review this card more frequently";
+							type = "info";
+						} else if (rating === "2") {
+							message = "We'll help you reinforce this knowledge";
+							type = "info";
+						} else {
+							message = "Great! You've mastered this card";
+							type = "success";
+						}
+
+						showNotification(message, type);
+
+						setTimeout(() => {
+							if (currentCardIndex < filteredFlashcards.length - 1) {
+								currentCardIndex++;
+								showFlashcard(filteredFlashcards[currentCardIndex]);
+								updateCardCounter();
+							}
+						}, 1000);
+					});
+				});
+
+				function populateQuizCategories() {
+					const categoryContainer = document.getElementById("quiz-categories");
+					if (!categoryContainer) return;
+
+					const allButton = categoryContainer.querySelector(
+						'[data-category="all"]'
+					);
+					const myButton = categoryContainer.querySelector(
+						'[data-category="my"]'
+					);
+
+					categoryContainer.innerHTML = "";
+					categoryContainer.appendChild(allButton);
+					categoryContainer.appendChild(myButton);
+
+					categories.forEach((category) => {
+						const button = document.createElement("button");
+						button.className =
+							"quiz-category-btn bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 px-4 py-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all";
+						button.setAttribute("data-category", category.id);
+						button.innerHTML = `<i class="${category.icon} mr-1.5 text-${category.color}-600 dark:text-${category.color}-500"></i> ${category.name}`;
+						categoryContainer.appendChild(button);
+					});
+
+					updateQuizCategoryButtons();
+				}
+
+				function updateQuizCategoryButtons() {
+					const categoryButtons =
+						document.querySelectorAll(".quiz-category-btn");
+					categoryButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							categoryButtons.forEach((btn) => {
+								btn.classList.remove(
+									"bg-gradient-to-r",
+									"from-primary-600",
+									"to-purple-600",
+									"text-white"
+								);
+								btn.classList.add(
+									"bg-white",
+									"dark:bg-gray-700",
+									"text-gray-700",
+									"dark:text-gray-300",
+									"border",
+									"border-gray-300",
+									"dark:border-gray-600"
+								);
+							});
+
+							button.classList.remove(
+								"bg-white",
+								"dark:bg-gray-700",
+								"text-gray-700",
+								"dark:text-gray-300",
+								"border",
+								"border-gray-300",
+								"dark:border-gray-600"
+							);
+							button.classList.add(
+								"bg-gradient-to-r",
+								"from-primary-600",
+								"to-purple-600",
+								"text-white"
+							);
+
+							const category = button.getAttribute("data-category");
+							populateQuizzesGrid(category);
+						});
+					});
+				}
+
+				function filterQuizzesByCategory(category) {
+					const quizzes = getFromLocalStorage("quizzes");
+
+					if (category === "all") {
+						return quizzes;
+					} else if (category === "my") {
+						return quizzes.filter((quiz) => quiz.isOwner);
+					} else {
+						return quizzes.filter((quiz) => quiz.category === category);
+					}
+				}
+
+				const quizSearch = document.getElementById("quiz-search");
+				if (quizSearch) {
+					quizSearch.addEventListener("input", () => {
+						const searchTerm = quizSearch.value.toLowerCase();
+						const quizzes = getFromLocalStorage("quizzes");
+						const filteredQuizzes = quizzes.filter(
+							(quiz) =>
+								quiz.title.toLowerCase().includes(searchTerm) ||
+								quiz.description.toLowerCase().includes(searchTerm)
+						);
+
+						populateQuizzesGrid("search", filteredQuizzes);
+					});
+				}
+
+				function populateQuizzesGrid(category = "all", customQuizzes = null) {
+					const quizzesGrid = document.getElementById("quizzes-grid");
+					if (!quizzesGrid) return;
+
+					quizzesGrid.innerHTML = "";
+
+					const quizzes = customQuizzes || filterQuizzesByCategory(category);
+
+					if (quizzes.length === 0) {
+						quizzesGrid.innerHTML = `
+						     <div class="col-span-1 md:col-span-2 lg:col-span-3 p-10 text-center">
+						       <i class="fas fa-search text-5xl text-gray-300 dark:text-gray-600 mb-3"></i>
+						       <p class="text-gray-500 dark:text-gray-400">No quizzes found.</p>
+						     </div>
+						   `;
+						return;
+					}
+
+					quizzes.forEach((quiz) => {
+						const categoryObj = categories.find(
+							(cat) => cat.id === quiz.category
+						);
+						const card = document.createElement("div");
+						card.className =
+							"bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden";
+						card.innerHTML = `
+						     <div class="h-3 bg-gradient-to-r from-${categoryObj?.color}-600 to-${categoryObj?.color}-500"></div>
+						     <div class="p-5">
+						       <div class="flex justify-between mb-3">
+						         <span class="inline-block bg-${categoryObj?.color}-50 dark:bg-${categoryObj?.color}-900/30 text-${categoryObj?.color}-800 dark:text-${categoryObj?.color}-300 text-xs px-2.5 py-1 rounded-full">${categoryObj?.name}</span>
+						         <span class="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+						           <i class="far fa-clock mr-1"></i> ${quiz.timeLimit} mins
+						         </span>
+						       </div>
+						       <h4 class="text-lg font-semibold mb-2">${quiz.title}</h4>
+						       <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 line-clamp-2">${quiz.description}</p>
+						       <div class="flex justify-between items-center">
+						         <span class="text-xs text-gray-500 dark:text-gray-400">${quiz.questions.length} questions</span>
+						         <button class="start-quiz-btn bg-gradient-to-r from-${categoryObj?.color}-600 to-${categoryObj?.color}-500 hover:from-${categoryObj?.color}-700 hover:to-${categoryObj?.color}-600 text-white text-sm py-1.5 px-3 rounded-xl transition-all flex items-center" data-quiz-id="${quiz.id}">
+						           Start Quiz <i class="fas fa-arrow-right ml-1.5"></i>
+						         </button>
+						       </div>
+						     </div>
+						   `;
+						quizzesGrid.appendChild(card);
+					});
+
+					const startQuizButtons = document.querySelectorAll(".start-quiz-btn");
+					startQuizButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const quizId = parseInt(button.getAttribute("data-quiz-id"));
+							startQuiz(quizId);
+						});
+					});
+				}
+
+				let currentQuizId = null;
+				let currentQuestionIndex = 0;
+				let quizAnswers = [];
+				let quizTimerInterval = null;
+				let quizStartTime = null;
+
+				function startQuiz(quizId) {
+					const quizzes = getFromLocalStorage("quizzes");
+					const quiz = quizzes.find((q) => q.id === quizId);
+
+					if (!quiz) {
+						showNotification("Quiz not found", "error");
+						return;
+					}
+
+					const quizzesGrid = document.getElementById("quizzes-grid");
+					const activeQuiz = document.getElementById("active-quiz");
+
+					if (quizzesGrid) quizzesGrid.classList.add("hidden");
+					if (activeQuiz) activeQuiz.classList.remove("hidden");
+
+					const quizTitle = document.getElementById("active-quiz-title");
+					if (quizTitle) {
+						const categoryObj = categories.find(
+							(cat) => cat.id === quiz.category
+						);
+						quizTitle.innerHTML = `<i class="${categoryObj?.icon} text-${categoryObj?.color}-600 dark:text-${categoryObj?.color}-500 mr-2"></i> ${quiz.title}`;
+					}
+
+					const totalQuestions = document.getElementById("total-questions");
+					if (totalQuestions)
+						totalQuestions.textContent = quiz.questions.length;
+
+					populateQuizQuestions(quiz);
+
+					currentQuizId = quizId;
+					currentQuestionIndex = 0;
+					quizAnswers = new Array(quiz.questions.length).fill(-1);
+					updateQuizUI();
+
+					startQuizTimer(quiz.timeLimit * 60);
+
+					showNotification("Quiz started! Good luck!", "success");
+				}
+
+				function populateQuizQuestions(quiz) {
+					const questionContainer =
+						document.getElementById("question-container");
+					if (!questionContainer) return;
+
+					questionContainer.innerHTML = "";
+
+					quiz.questions.forEach((q, index) => {
+						const questionDiv = document.createElement("div");
+						questionDiv.className = `quiz-question ${
+							index === 0 ? "" : "hidden"
+						}`;
+						questionDiv.setAttribute("data-question", index + 1);
+
+						let optionsHTML = "";
+						q.options.forEach((option, optIndex) => {
+							optionsHTML += `
+						       <div class="quiz-option border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-xl p-4 hover:border-primary-600 cursor-pointer transition-all" data-option="${optIndex}">
+						         <div class="flex items-center">
+						           <div class="w-8 h-8 rounded-lg border border-gray-300 dark:border-gray-600 flex items-center justify-center mr-3 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
+						             <span class="text-sm font-medium">${String.fromCharCode(
+														65 + optIndex
+													)}</span>
+						           </div>
+						           <span class="text-gray-900 dark:text-white">${option}</span>
+						         </div>
+						       </div>
+						     `;
+						});
+
+						questionDiv.innerHTML = `
+						     <h4 class="text-lg font-medium mb-5">${q.question}</h4>
+						     <div class="space-y-3">
+						       ${optionsHTML}
+						     </div>
+						   `;
+
+						questionContainer.appendChild(questionDiv);
+					});
+
+					const quizOptions = document.querySelectorAll(".quiz-option");
+					quizOptions.forEach((option) => {
+						option.addEventListener("click", () => {
+							const questionContainer = option.closest(".quiz-question");
+							const questionIndex =
+								parseInt(questionContainer.getAttribute("data-question")) - 1;
+							const optionIndex = parseInt(option.getAttribute("data-option"));
+
+							const options =
+								questionContainer.querySelectorAll(".quiz-option");
+							options.forEach((opt) => {
+								opt.classList.remove("selected");
+							});
+
+							option.classList.add("selected");
+
+							quizAnswers[questionIndex] = optionIndex;
+						});
+					});
+				}
+
+				function updateQuizUI() {
+					const currentQuestion = document.getElementById("current-question");
+					if (currentQuestion)
+						currentQuestion.textContent = currentQuestionIndex + 1;
+
+					const progressBar = document.getElementById("question-progress");
+					const quizzes = getFromLocalStorage("quizzes");
+					const quiz = quizzes.find((q) => q.id === currentQuizId);
+
+					if (progressBar && quiz) {
+						const progress =
+							((currentQuestionIndex + 1) / quiz.questions.length) * 100;
+						progressBar.style.width = `${progress}%`;
+					}
+
+					const questions = document.querySelectorAll(".quiz-question");
+					questions.forEach((question, index) => {
+						if (index === currentQuestionIndex) {
+							question.classList.remove("hidden");
+						} else {
+							question.classList.add("hidden");
+						}
+					});
+
+					const prevBtn = document.getElementById("prev-question-btn");
+					if (prevBtn) {
+						prevBtn.disabled = currentQuestionIndex === 0;
+					}
+
+					const nextBtn = document.getElementById("next-question-btn");
+					if (nextBtn && quiz) {
+						if (currentQuestionIndex === quiz.questions.length - 1) {
+							nextBtn.innerHTML = 'Finish <i class="fas fa-check ml-2"></i>';
+						} else {
+							nextBtn.innerHTML =
+								'Next <i class="fas fa-arrow-right ml-2"></i>';
+						}
+					}
+				}
+
+				const prevQuestionBtn = document.getElementById("prev-question-btn");
+				if (prevQuestionBtn) {
+					prevQuestionBtn.addEventListener("click", () => {
+						if (currentQuestionIndex > 0) {
+							currentQuestionIndex--;
+							updateQuizUI();
+						}
+					});
+				}
+
+				const nextQuestionBtn = document.getElementById("next-question-btn");
+				if (nextQuestionBtn) {
+					nextQuestionBtn.addEventListener("click", () => {
+						const quizzes = getFromLocalStorage("quizzes");
+						const quiz = quizzes.find((q) => q.id === currentQuizId);
+
+						if (!quiz) return;
+
+						if (quizAnswers[currentQuestionIndex] === -1) {
+							showNotification("Please select an answer", "warning");
+							return;
+						}
+
+						if (currentQuestionIndex < quiz.questions.length - 1) {
+							currentQuestionIndex++;
+							updateQuizUI();
+						} else {
+							finishQuiz();
+						}
+					});
+				}
+
+				function startQuizTimer(seconds) {
+					if (quizTimerInterval) {
+						clearInterval(quizTimerInterval);
+					}
+
+					const timerElement = document.getElementById("quiz-timer");
+					if (!timerElement) return;
+
+					let remainingSeconds = seconds;
+					quizStartTime = new Date();
+
+					quizTimerInterval = setInterval(() => {
+						remainingSeconds--;
+
+						if (remainingSeconds <= 0) {
+							clearInterval(quizTimerInterval);
+							finishQuiz();
+							return;
+						}
+
+						const minutes = Math.floor(remainingSeconds / 60);
+						const seconds = remainingSeconds % 60;
+						timerElement.innerHTML = `
+						     <i class="fas fa-stopwatch mr-1.5"></i>
+						     Time remaining: ${minutes.toString().padStart(2, "0")}:${seconds
+							.toString()
+							.padStart(2, "0")}
+						   `;
+
+						if (minutes < 2) {
+							timerElement.classList.add("text-red-500", "animate-pulse");
+						}
+					}, 1000);
+				}
+
+				function finishQuiz() {
+					clearInterval(quizTimerInterval);
+
+					const quizzes = getFromLocalStorage("quizzes");
+					const quiz = quizzes.find((q) => q.id === currentQuizId);
+
+					if (!quiz) return;
+
+					let correctAnswers = 0;
+					quizAnswers.forEach((answer, index) => {
+						if (answer === quiz.questions[index].correctAnswer) {
+							correctAnswers++;
+						}
+					});
+
+					const scorePercentage = Math.round(
+						(correctAnswers / quiz.questions.length) * 100
+					);
+
+					const timeSpent = Math.floor((new Date() - quizStartTime) / 1000);
+					const timeMinutes = Math.floor(timeSpent / 60);
+					const timeSeconds = timeSpent % 60;
+					const timeFormatted = `${timeMinutes}:${timeSeconds
+						.toString()
+						.padStart(2, "0")}`;
+
+					const activeQuiz = document.getElementById("active-quiz");
+					const quizResults = document.getElementById("quiz-results");
+
+					if (activeQuiz) activeQuiz.classList.add("hidden");
+					if (quizResults) quizResults.classList.remove("hidden");
+
+					const quizScore = document.getElementById("quiz-score");
+					const quizResultTitle = document.getElementById("quiz-result-title");
+					const quizResultSummary = document.getElementById(
+						"quiz-result-summary"
+					);
+
+					if (quizScore) quizScore.textContent = `${scorePercentage}%`;
+
+					if (quizResultTitle) {
+						if (scorePercentage >= 80) {
+							quizResultTitle.textContent = "Great job!";
+						} else if (scorePercentage >= 60) {
+							quizResultTitle.textContent = "Good effort!";
+						} else {
+							quizResultTitle.textContent = "Keep practicing!";
+						}
+					}
+
+					if (quizResultSummary) {
+						quizResultSummary.textContent = `You scored ${correctAnswers}/${quiz.questions.length} on the ${quiz.title}`;
+					}
+
+					const analyticsQuestions = document.getElementById(
+						"analytics-questions"
+					);
+					const analyticsCorrect = document.getElementById("analytics-correct");
+					const analyticsIncorrect = document.getElementById(
+						"analytics-incorrect"
+					);
+					const analyticsTime = document.getElementById("analytics-time");
+
+					if (analyticsQuestions)
+						analyticsQuestions.textContent = quiz.questions.length;
+					if (analyticsCorrect) analyticsCorrect.textContent = correctAnswers;
+					if (analyticsIncorrect)
+						analyticsIncorrect.textContent =
+							quiz.questions.length - correctAnswers;
+					if (analyticsTime) analyticsTime.textContent = timeFormatted;
+
+					const progressRing = document.querySelector(".progress-ring-animate");
+					if (progressRing) {
+						progressRing.style.setProperty(
+							"--target-offset",
+							(283 * (1 - scorePercentage / 100)).toFixed(1)
+						);
+					}
+
+					const quizAttempts = getFromLocalStorage("quizAttempts", []);
+					quizAttempts.push({
+						id: Date.now(),
+						quizId: quiz.id,
+						quizTitle: quiz.title,
+						score: scorePercentage,
+						correctAnswers,
+						totalQuestions: quiz.questions.length,
+						timeSpent: timeFormatted,
+						date: new Date().toISOString(),
+					});
+					saveToLocalStorage("quizAttempts", quizAttempts);
+
+					const quizzesCount = document.getElementById("quizzes-count");
+					if (quizzesCount) {
+						const currentCount = parseInt(quizzesCount.textContent || "0");
+						quizzesCount.textContent = currentCount + 1;
+					}
+
+					const profileQuizzes = document.getElementById("profile-quizzes");
+					if (profileQuizzes) {
+						const currentCount = parseInt(profileQuizzes.textContent || "0");
+						profileQuizzes.textContent = currentCount + 1;
+					}
+
+					updateProfileStats();
+					updateProfileQuizzesList();
+
+					showNotification("Quiz completed! Check your results.", "success");
+				}
+
+				const viewAllQuizzesBtn = document.getElementById(
+					"view-all-quizzes-btn"
+				);
+				if (viewAllQuizzesBtn) {
+					viewAllQuizzesBtn.addEventListener("click", () => {
+						const quizResults = document.getElementById("quiz-results");
+						const quizzesGrid = document.getElementById("quizzes-grid");
+
+						if (quizResults) quizResults.classList.add("hidden");
+						if (quizzesGrid) quizzesGrid.classList.remove("hidden");
+					});
+				}
+
+				const retryQuizBtn = document.getElementById("retry-quiz-btn");
+				if (retryQuizBtn) {
+					retryQuizBtn.addEventListener("click", () => {
+						if (currentQuizId) {
+							startQuiz(currentQuizId);
+						}
+					});
+				}
+
+				const createQuizBtn = document.getElementById("create-quiz-btn");
+				const createQuizModal = handleModal("create-quiz-modal");
+				const createQuizSaveBtn = document.getElementById(
+					"create-quiz-save-btn"
+				);
+
+				const addQuestionBtn = document.getElementById("add-question-btn");
+				if (addQuestionBtn) {
+					addQuestionBtn.addEventListener("click", () => {
+						const container = document.getElementById(
+							"quiz-questions-container"
+						);
+						const questionItems = container.querySelectorAll(
+							".quiz-question-item"
+						);
+						const newIndex = questionItems.length + 1;
+
+						const template = questionItems[0].cloneNode(true);
+
+						template.querySelector(
+							".font-medium"
+						).textContent = `Question ${newIndex}`;
+
+						template.querySelectorAll('input[type="text"]').forEach((input) => {
+							input.value = "";
+						});
+
+						template
+							.querySelectorAll('input[type="radio"]')
+							.forEach((radio) => {
+								radio.name = `quiz-correct-${newIndex}`;
+								radio.checked = false;
+							});
+
+						template
+							.querySelector(".remove-question-btn")
+							.addEventListener("click", function () {
+								this.closest(".quiz-question-item").remove();
+
+								const items = container.querySelectorAll(".quiz-question-item");
+								items.forEach((item, idx) => {
+									item.querySelector(".font-medium").textContent = `Question ${
+										idx + 1
+									}`;
+									item
+										.querySelectorAll('input[type="radio"]')
+										.forEach((radio) => {
+											radio.name = `quiz-correct-${idx + 1}`;
+										});
+								});
+							});
+
+						container.appendChild(template);
+					});
+				}
+
+				const initialRemoveBtn = document.querySelector(".remove-question-btn");
+				if (initialRemoveBtn) {
+					initialRemoveBtn.addEventListener("click", function () {
+						const container = document.getElementById(
+							"quiz-questions-container"
+						);
+						const questionItems = container.querySelectorAll(
+							".quiz-question-item"
+						);
+						if (questionItems.length > 1) {
+							this.closest(".quiz-question-item").remove();
+
+							const items = container.querySelectorAll(".quiz-question-item");
+							items.forEach((item, idx) => {
+								item.querySelector(".font-medium").textContent = `Question ${
+									idx + 1
+								}`;
+								item
+									.querySelectorAll('input[type="radio"]')
+									.forEach((radio) => {
+										radio.name = `quiz-correct-${idx + 1}`;
+									});
+							});
+						} else {
+							showNotification("Cannot remove the only question", "warning");
+						}
+					});
+				}
+
+				if (createQuizBtn && createQuizModal) {
+					createQuizBtn.addEventListener("click", () => {
+						createQuizModal.openModal();
+					});
+				}
+
+				if (createQuizSaveBtn) {
+					createQuizSaveBtn.addEventListener("click", () => {
+						const title = document.getElementById("quiz-title").value;
+						const description =
+							document.getElementById("quiz-description").value;
+						const category = document.getElementById("quiz-category").value;
+						const timeLimit = parseInt(
+							document.getElementById("quiz-time-limit").value
+						);
+
+						if (!title) {
+							showNotification("Please enter a title for your quiz", "error");
+							return;
+						}
+
+						const questionItems = document.querySelectorAll(
+							".quiz-question-item"
+						);
+						const questions = [];
+
+						let isValid = true;
+
+						questionItems.forEach((item, index) => {
+							const questionText = item.querySelector(
+								".quiz-question-text"
+							).value;
+							if (!questionText) {
+								showNotification(
+									`Please enter text for Question ${index + 1}`,
+									"error"
+								);
+								isValid = false;
+								return;
+							}
+
+							const options = [];
+							item.querySelectorAll(".quiz-option-text").forEach((optInput) => {
+								options.push(optInput.value || `Option ${options.length + 1}`);
+							});
+
+							const correctOption = item.querySelector(
+								'input[name="quiz-correct-' + (index + 1) + '"]:checked'
+							);
+							if (!correctOption) {
+								showNotification(
+									`Please select a correct answer for Question ${index + 1}`,
+									"error"
+								);
+								isValid = false;
+								return;
+							}
+
+							questions.push({
+								question: questionText,
+								options: options,
+								correctAnswer: parseInt(correctOption.value),
+							});
+						});
+
+						if (!isValid) return;
+
+						const quizzes = getFromLocalStorage("quizzes");
+						const newQuiz = {
+							id: Date.now(),
+							title,
+							description,
+							category,
+							timeLimit: timeLimit || 15,
+							isOwner: true,
+							questions: questions,
+						};
+
+						quizzes.push(newQuiz);
+						saveToLocalStorage("quizzes", quizzes);
+
+						document.getElementById("quiz-title").value = "";
+						document.getElementById("quiz-description").value = "";
+
+						createQuizModal.closeModal();
+
+						populateQuizzesGrid();
+
+						showNotification("Quiz created successfully!", "success");
+					});
+				}
+
+				function filterStudyGroups(type = "all") {
+					const groups = getFromLocalStorage("studyGroups");
+
+					if (type === "my") {
+						return groups.filter((group) => group.joined);
+					}
+
+					return groups;
+				}
+
+				function populateStudyGroupsGrid(type = "all") {
+					const studyGroupsGrid = document.getElementById("study-groups-grid");
+					if (!studyGroupsGrid) return;
+
+					studyGroupsGrid.innerHTML = "";
+
+					const groups = filterStudyGroups(type);
+
+					if (groups.length === 0) {
+						studyGroupsGrid.innerHTML = `
+						     <div class="col-span-1 md:col-span-2 lg:col-span-3 p-10 text-center">
+						       <i class="fas fa-users text-5xl text-gray-300 dark:text-gray-600 mb-3"></i>
+						       <p class="text-gray-500 dark:text-gray-400">No study groups found.</p>
+						     </div>
+						   `;
+						return;
+					}
+
+					groups.forEach((group) => {
+						const categoryObj = categories.find(
+							(cat) => cat.id === group.category
+						);
+						const card = document.createElement("div");
+						card.className =
+							"bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden";
+						card.innerHTML = `
+						     <div class="h-24 bg-gradient-to-r from-${categoryObj?.color}-600 to-${
+							categoryObj?.color
+						}-500 relative">
+						       <div class="absolute bottom-0 right-0 p-2 rounded-tl-lg text-white text-xs font-medium bg-black bg-opacity-20">
+						         <i class="fas fa-users mr-1"></i> ${group.members} members
+						       </div>
+						     </div>
+						     <div class="p-5 mt-8">
+						       <div class="flex items-center gap-3 -mt-10 mb-3">
+						         <div class="w-14 h-14 rounded-full bg-gradient-to-br from-${
+												categoryObj?.color
+											}-600 to-${
+							categoryObj?.color
+						}-400 flex items-center justify-center text-white border-2 border-white dark:border-gray-800 text-xl shadow-lg">
+						           <i class="${categoryObj?.icon}"></i>
+						         </div>
+						         <div>
+						           <h4 class="text-lg font-semibold text-gray-900 dark:text-white">${
+													group.name
+												}</h4>
+						           <p class="text-xs text-gray-500 dark:text-gray-400">Created ${new Date(
+													group.createdAt
+												).toLocaleDateString()}</p>
+						         </div>
+						       </div>
+						       <p class="text-sm text-gray-700 dark:text-gray-300 mb-4 line-clamp-2">${
+											group.description
+										}</p>
+						       <div class="flex justify-between items-center">
+						         <span class="inline-block bg-${categoryObj?.color}-50 dark:bg-${
+							categoryObj?.color
+						}-900/30 text-${categoryObj?.color}-800 dark:text-${
+							categoryObj?.color
+						}-300 text-xs px-2.5 py-1 rounded-full">${categoryObj?.name}</span>
+						         <div class="flex gap-2">
+						           <button class="view-group-btn bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm py-1.5 px-3 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all" data-group-id="${
+													group.id
+												}">
+						             <i class="fas fa-eye mr-1.5"></i> View
+						           </button>
+						           <button class="join-group-btn ${
+													group.joined
+														? "bg-green-600 hover:bg-green-700"
+														: `bg-gradient-to-r from-${categoryObj?.color}-600 to-${categoryObj?.color}-500 hover:from-${categoryObj?.color}-700 hover:to-${categoryObj?.color}-600`
+												} text-white text-sm py-1.5 px-3 rounded-xl transition-all flex items-center" data-group-id="${
+							group.id
+						}">
+						             ${
+														group.joined
+															? '<i class="fas fa-check mr-1.5"></i> Joined'
+															: '<i class="fas fa-user-plus mr-1.5"></i> Join'
+													}
+						           </button>
+						         </div>
+						       </div>
+						     </div>
+						   `;
+						studyGroupsGrid.appendChild(card);
+					});
+
+					const joinButtons = document.querySelectorAll(".join-group-btn");
+					joinButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const groupId = parseInt(button.getAttribute("data-group-id"));
+							joinStudyGroup(groupId, button);
+						});
+					});
+
+					const viewButtons = document.querySelectorAll(".view-group-btn");
+					viewButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const groupId = parseInt(button.getAttribute("data-group-id"));
+							viewStudyGroup(groupId);
+						});
+					});
+				}
+
+				function viewStudyGroup(groupId) {
+					const groups = getFromLocalStorage("studyGroups");
+					const group = groups.find((g) => g.id === groupId);
+
+					if (!group) return;
+
+					const groupDetails = document.getElementById("group-details");
+					const groupsGrid = document.getElementById("study-groups-grid");
+					const groupIcon = document.getElementById("group-icon");
+					const groupName = document.getElementById("group-detail-name");
+					const groupCategory = document.getElementById(
+						"group-detail-category"
+					);
+					const groupDescription = document.getElementById(
+						"group-detail-description"
+					);
+					const groupMembers = document.getElementById("group-detail-members");
+					const groupSets = document.getElementById("group-detail-sets");
+					const groupDate = document.getElementById("group-detail-date");
+
+					const categoryObj = categories.find(
+						(cat) => cat.id === group.category
+					);
+
+					if (groupIcon)
+						groupIcon.className = `w-16 h-16 rounded-xl flex items-center justify-center text-white text-2xl bg-gradient-to-r from-${categoryObj?.color}-600 to-${categoryObj?.color}-500`;
+					if (groupIcon)
+						groupIcon.innerHTML = `<i class="${categoryObj?.icon}"></i>`;
+					if (groupName) groupName.textContent = group.name;
+					if (groupCategory) groupCategory.textContent = categoryObj?.name;
+					if (groupDescription)
+						groupDescription.textContent = group.description;
+					if (groupMembers) groupMembers.textContent = group.members;
+					if (groupSets) groupSets.textContent = group.studySets;
+					if (groupDate)
+						groupDate.textContent = new Date(
+							group.createdAt
+						).toLocaleDateString("en-US", { year: "numeric", month: "long" });
+
+					const membersList = document.getElementById("group-members-list");
+					if (membersList) {
+						membersList.innerHTML = "";
+
+						if (group.joined) {
+							const you = document.createElement("div");
+							you.className =
+								"w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center";
+							you.innerHTML =
+								'<span class="text-primary-600 dark:text-primary-400 font-medium">SJ</span>';
+							membersList.appendChild(you);
+						}
+
+						const colors = [
+							"red",
+							"blue",
+							"green",
+							"purple",
+							"amber",
+							"teal",
+							"indigo",
+							"pink",
+						];
+						const displayCount = Math.min(
+							group.members - (group.joined ? 1 : 0),
+							9
+						);
+
+						for (let i = 0; i < displayCount; i++) {
+							const color = colors[Math.floor(Math.random() * colors.length)];
+							const initials =
+								String.fromCharCode(65 + Math.floor(Math.random() * 26)) +
+								String.fromCharCode(65 + Math.floor(Math.random() * 26));
+
+							const member = document.createElement("div");
+							member.className = `w-10 h-10 rounded-full bg-${color}-100 dark:bg-${color}-900/30 flex items-center justify-center`;
+							member.innerHTML = `<span class="text-${color}-600 dark:text-${color}-400 font-medium">${initials}</span>`;
+							membersList.appendChild(member);
+						}
+
+						if (group.members > 10) {
+							const more = document.createElement("div");
+							more.className =
+								"w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center";
+							more.innerHTML = `<span class="text-gray-600 dark:text-gray-400 font-medium">+${
+								group.members - 10
+							}</span>`;
+							membersList.appendChild(more);
+						}
+					}
+
+					if (groupDetails) groupDetails.classList.remove("hidden");
+					if (groupsGrid) groupsGrid.classList.add("hidden");
+				}
+
+				const closeGroupDetails = document.getElementById(
+					"close-group-details"
+				);
+				if (closeGroupDetails) {
+					closeGroupDetails.addEventListener("click", () => {
+						const groupDetails = document.getElementById("group-details");
+						const groupsGrid = document.getElementById("study-groups-grid");
+
+						if (groupDetails) groupDetails.classList.add("hidden");
+						if (groupsGrid) groupsGrid.classList.remove("hidden");
+					});
+				}
+
+				const viewGroupType = document.getElementById("view-group-type");
+				if (viewGroupType) {
+					viewGroupType.addEventListener("change", () => {
+						populateStudyGroupsGrid(viewGroupType.value);
+					});
+				}
+
+				function joinStudyGroup(groupId, buttonElement) {
+					const groups = getFromLocalStorage("studyGroups");
+					const groupIndex = groups.findIndex((group) => group.id === groupId);
+
+					if (groupIndex === -1) return;
+
+					const group = groups[groupIndex];
+					const categoryObj = categories.find(
+						(cat) => cat.id === group.category
+					);
+
+					if (group.joined) {
+						return;
+					}
+
+					groups[groupIndex].joined = true;
+					groups[groupIndex].members += 1;
+					saveToLocalStorage("studyGroups", groups);
+
+					buttonElement.innerHTML =
+						'<i class="fas fa-check mr-1.5"></i> Joined';
+					buttonElement.classList.add("bg-green-600", "hover:bg-green-700");
+					buttonElement.classList.remove(
+						"bg-gradient-to-r",
+						`from-${categoryObj?.color}-600`,
+						`to-${categoryObj?.color}-500`,
+						`hover:from-${categoryObj?.color}-700`,
+						`hover:to-${categoryObj?.color}-600`
+					);
+
+					updateMyGroupsList();
+
+					showNotification(
+						`You've joined the "${group.name}" group!`,
+						"success"
+					);
+				}
+
+				function updateMyGroupsList() {
+					const myGroupsList = document.getElementById("my-groups-list");
+					if (!myGroupsList) return;
+
+					myGroupsList.innerHTML = "";
+
+					const groups = getFromLocalStorage("studyGroups");
+					const joinedGroups = groups.filter((group) => group.joined);
+
+					if (joinedGroups.length === 0) {
+						myGroupsList.innerHTML = `
+						     <li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+						       No groups joined yet
+						     </li>
+						   `;
+						return;
+					}
+
+					joinedGroups.forEach((group) => {
+						const categoryObj = categories.find(
+							(cat) => cat.id === group.category
+						);
+						const li = document.createElement("li");
+						li.innerHTML = `
+						     <a href="#" data-group-id="${group.id}" class="group-link flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+						       <i class="${categoryObj?.icon} mr-3 text-${categoryObj?.color}-600 dark:text-${categoryObj?.color}-500"></i>
+						       <span>${group.name}</span>
+						     </a>
+						   `;
+						myGroupsList.appendChild(li);
+					});
+
+					const groupLinks = myGroupsList.querySelectorAll(".group-link");
+					groupLinks.forEach((link) => {
+						link.addEventListener("click", (e) => {
+							e.preventDefault();
+							const groupId = parseInt(link.getAttribute("data-group-id"));
+
+							showTab("study-groups");
+
+							viewStudyGroup(groupId);
+
+							if (window.innerWidth < 1024) {
+								sidebar.classList.add("-translate-x-full");
+								sidebar.classList.remove("translate-x-0");
+							}
+						});
+					});
+				}
+
+				const createGroupBtn = document.getElementById("create-group-btn");
+				const createGroupModal = handleModal("create-group-modal");
+				const createGroupSaveBtn = document.getElementById(
+					"create-group-save-btn"
+				);
+
+				if (createGroupBtn && createGroupModal) {
+					createGroupBtn.addEventListener("click", () => {
+						createGroupModal.openModal();
+					});
+				}
+
+				if (createGroupSaveBtn) {
+					createGroupSaveBtn.addEventListener("click", () => {
+						const name = document.getElementById("group-name").value;
+						const description =
+							document.getElementById("group-description").value;
+						const category = document.getElementById("group-category").value;
+
+						if (!name) {
+							showNotification(
+								"Please enter a name for your study group",
+								"error"
+							);
+							return;
+						}
+
+						const groups = getFromLocalStorage("studyGroups");
+						const newGroup = {
+							id: Date.now(),
+							name,
+							description,
+							category,
+							members: 1,
+							createdAt: new Date().toISOString(),
+							studySets: 0,
+							joined: true,
+						};
+
+						groups.push(newGroup);
+						saveToLocalStorage("studyGroups", groups);
+
+						document.getElementById("group-name").value = "";
+						document.getElementById("group-description").value = "";
+
+						createGroupModal.closeModal();
+
+						populateStudyGroupsGrid();
+						viewStudyGroup(newGroup.id);
+
+						updateMyGroupsList();
+
+						showNotification("Study group created successfully!", "success");
+					});
+				}
+
+				function updateProfileStats() {
+					const studySetsCount = document.getElementById("study-sets-count");
+					const quizzesCount = document.getElementById("quizzes-count");
+					const badgesCount = document.getElementById("badges-count");
+					const studyHoursCount = document.getElementById("study-hours-count");
+
+					const profileStudySets =
+						document.getElementById("profile-study-sets");
+					const profileQuizzes = document.getElementById("profile-quizzes");
+					const profileBadges = document.getElementById("profile-badges");
+
+					const studySets = getFromLocalStorage("studySets");
+					const quizAttempts = getFromLocalStorage("quizAttempts", []);
+
+					if (studySetsCount) studySetsCount.textContent = studySets.length;
+					if (profileStudySets) profileStudySets.textContent = studySets.length;
+
+					if (quizzesCount) quizzesCount.textContent = quizAttempts.length;
+					if (profileQuizzes) profileQuizzes.textContent = quizAttempts.length;
+
+					if (badgesCount) badgesCount.textContent = "3";
+					if (profileBadges) profileBadges.textContent = "3";
+
+					if (studyHoursCount) studyHoursCount.textContent = "12";
+				}
+
+				const profileContentTabs = document.querySelectorAll(
+					".profile-content-tab"
+				);
+				profileContentTabs.forEach((tab) => {
+					tab.addEventListener("click", () => {
+						profileContentTabs.forEach((t) => {
+							t.classList.remove(
+								"border-primary-600",
+								"text-primary-600",
+								"dark:text-primary-500"
+							);
+							t.classList.add(
+								"border-transparent",
+								"hover:text-primary-600",
+								"dark:hover:text-primary-500"
+							);
+						});
+
+						tab.classList.remove(
+							"border-transparent",
+							"hover:text-primary-600",
+							"dark:hover:text-primary-500"
+						);
+						tab.classList.add(
+							"border-primary-600",
+							"text-primary-600",
+							"dark:text-primary-500"
+						);
+
+						const tabId = tab.getAttribute("data-tab");
+						const contents = document.querySelectorAll(".profile-tab-content");
+
+						contents.forEach((content) => {
+							content.classList.add("hidden");
+						});
+
+						const activeContent = document.getElementById(`${tabId}-content`);
+						if (activeContent) {
+							activeContent.classList.remove("hidden");
+						}
+					});
+				});
+
+				function updateProfileFlashcardsList() {
+					const flashcardsListElement = document.getElementById(
+						"profile-flashcards-list"
+					);
+					if (!flashcardsListElement) return;
+
+					flashcardsListElement.innerHTML = "";
+
+					const studySets = getFromLocalStorage("studySets");
+					const flashcards = getFromLocalStorage("flashcards");
+
+					if (studySets.length === 0) {
+						flashcardsListElement.innerHTML = `
+						     <div class="p-4 text-center">
+						       <p class="text-gray-500 dark:text-gray-400">No study sets created yet.</p>
+						     </div>
+						   `;
+						return;
+					}
+
+					studySets.forEach((set) => {
+						const categoryObj = categories.find(
+							(cat) => cat.id === set.category
+						);
+						const setCards = flashcards.filter((card) => card.setId === set.id);
+						const item = document.createElement("div");
+						item.className =
+							"bg-white dark:bg-gray-700 rounded-xl p-4 flex items-center justify-between";
+						item.innerHTML = `
+						     <div class="flex items-center">
+						       <div class="w-10 h-10 rounded-lg bg-${categoryObj?.color}-100 dark:bg-${categoryObj?.color}-900/30 flex items-center justify-center mr-3">
+						         <i class="${categoryObj?.icon} text-${categoryObj?.color}-600 dark:text-${categoryObj?.color}-400"></i>
+						       </div>
+						       <div>
+						         <p class="font-medium">${set.title}</p>
+						         <p class="text-xs text-gray-500 dark:text-gray-400">${setCards.length} cards</p>
+						       </div>
+						     </div>
+						     <button class="study-set-btn text-sm text-primary-600 dark:text-primary-400 hover:underline" data-set-id="${set.id}">
+						       Study
+						     </button>
+						   `;
+						flashcardsListElement.appendChild(item);
+					});
+
+					const studyButtons =
+						flashcardsListElement.querySelectorAll(".study-set-btn");
+					studyButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const setId = button.getAttribute("data-set-id");
+
+							showTab("flashcards");
+							filterFlashcardsBySet(setId);
+						});
+					});
+				}
+
+				function updateProfileQuizzesList() {
+					const quizzesListElement = document.getElementById(
+						"profile-quizzes-list"
+					);
+					if (!quizzesListElement) return;
+
+					quizzesListElement.innerHTML = "";
+
+					const quizAttempts = getFromLocalStorage("quizAttempts", []);
+
+					if (quizAttempts.length === 0) {
+						quizzesListElement.innerHTML = `
+						     <div class="p-4 text-center">
+						       <p class="text-gray-500 dark:text-gray-400">No quizzes attempted yet.</p>
+						     </div>
+						   `;
+						return;
+					}
+
+					quizAttempts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+					const recentAttempts = quizAttempts.slice(0, 5);
+
+					recentAttempts.forEach((attempt) => {
+						const scoreColor =
+							attempt.score >= 80
+								? "green"
+								: attempt.score >= 60
+								? "yellow"
+								: "red";
+						const item = document.createElement("div");
+						item.className =
+							"bg-white dark:bg-gray-700 rounded-xl p-4 flex items-center justify-between";
+						item.innerHTML = `
+						     <div class="flex items-center">
+						       <div class="w-10 h-10 rounded-lg bg-${scoreColor}-100 dark:bg-${scoreColor}-900/30 flex items-center justify-center mr-3">
+						         <i class="fas fa-graduation-cap text-${scoreColor}-600 dark:text-${scoreColor}-400"></i>
+						       </div>
+						       <div>
+						         <p class="font-medium">${attempt.quizTitle}</p>
+						         <p class="text-xs text-gray-500 dark:text-gray-400">
+						           ${attempt.correctAnswers}/${
+							attempt.totalQuestions
+						} correct • ${new Date(attempt.date).toLocaleDateString()}
+						         </p>
+						       </div>
+						     </div>
+						     <div class="text-${scoreColor}-600 dark:text-${scoreColor}-400 font-bold">
+						       ${attempt.score}%
+						     </div>
+						   `;
+						quizzesListElement.appendChild(item);
+					});
+				}
+
+				function updateProfileAchievements() {
+					const achievementsContainer = document.getElementById(
+						"achievements-content"
+					);
+					if (!achievementsContainer) return;
+
+					const achievements = [
+						{
+							id: 1,
+							name: "5-Day Streak",
+							description: "Studied 5 days in a row",
+							icon: "fas fa-fire",
+							color: "amber",
+							unlocked: true,
+						},
+						{
+							id: 2,
+							name: "Quiz Master",
+							description: "Completed 10+ quizzes",
+							icon: "fas fa-graduation-cap",
+							color: "primary",
+							unlocked: false,
+						},
+						{
+							id: 3,
+							name: "Content Creator",
+							description: "Created 5+ study sets",
+							icon: "fas fa-book",
+							color: "emerald",
+							unlocked: true,
+						},
+						{
+							id: 4,
+							name: "Distinguished",
+							description: "Earn perfect scores in 5 quizzes",
+							icon: "fas fa-star",
+							color: "amber",
+							unlocked: false,
+						},
+						{
+							id: 5,
+							name: "Early Bird",
+							description: "Study before 8 AM for 7 days",
+							icon: "fas fa-coffee",
+							color: "orange",
+							unlocked: true,
+						},
+						{
+							id: 6,
+							name: "Night Owl",
+							description: "Complete 10 study sessions after 10 PM",
+							icon: "fas fa-moon",
+							color: "indigo",
+							unlocked: false,
+						},
+						{
+							id: 7,
+							name: "Group Leader",
+							description: "Create and manage a study group with 5+ members",
+							icon: "fas fa-users",
+							color: "blue",
+							unlocked: false,
+						},
+						{
+							id: 8,
+							name: "Flash Master",
+							description: "Master 50+ flashcards",
+							icon: "fas fa-bolt",
+							color: "yellow",
+							unlocked: false,
+						},
+					];
+
+					const achievementsDiv = achievementsContainer.querySelector(".grid");
+					if (achievementsDiv) {
+						achievementsDiv.innerHTML = "";
+
+						achievements.forEach((achievement) => {
+							const opacity = achievement.unlocked ? "" : "opacity-40";
+							const glow = achievement.unlocked ? "animate-pulse" : "";
+							const item = document.createElement("div");
+							item.className = `bg-gray-50 dark:bg-gray-700/30 rounded-xl p-4 text-center ${opacity}`;
+							item.innerHTML = `
+						           <div class="w-16 h-16 bg-gradient-to-r from-${achievement.color}-500 to-${achievement.color}-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg ${glow}">
+						             <i class="${achievement.icon} text-white text-xl"></i>
+						           </div>
+						           <h4 class="font-medium mb-1">${achievement.name}</h4>
+						           <p class="text-xs text-gray-500 dark:text-gray-400">${achievement.description}</p>
+						         `;
+							achievementsDiv.appendChild(item);
+						});
+					}
+				}
+
+				const addFlashcardBtn = document.getElementById("add-flashcard-btn");
+				const createFlashcardModal = handleModal("create-flashcard-modal");
+				const saveFlashcardBtn = document.getElementById("save-flashcard-btn");
+
+				if (addFlashcardBtn && createFlashcardModal) {
+					addFlashcardBtn.addEventListener("click", () => {
+						createFlashcardModal.openModal();
+					});
+				}
+
+				if (saveFlashcardBtn) {
+					saveFlashcardBtn.addEventListener("click", () => {
+						const setId = document.getElementById("flashcard-set").value;
+						const category =
+							document.getElementById("flashcard-category").value;
+						const question =
+							document.getElementById("flashcard-question").value;
+						const answer = document.getElementById("flashcard-answer").value;
+						const explanation = document.getElementById(
+							"flashcard-explanation"
+						).value;
+
+						if (!question || !answer) {
+							showNotification(
+								"Please enter both question and answer",
+								"error"
+							);
+							return;
+						}
+
+						const flashcards = getFromLocalStorage("flashcards");
+						const newFlashcard = {
+							id: Date.now(),
+							question,
+							answer,
+							explanation,
+							category,
+							setId: setId ? parseInt(setId) : null,
+							mastered: false,
+						};
+
+						flashcards.push(newFlashcard);
+						saveToLocalStorage("flashcards", flashcards);
+
+						document.getElementById("flashcard-question").value = "";
+						document.getElementById("flashcard-answer").value = "";
+						document.getElementById("flashcard-explanation").value = "";
+
+						createFlashcardModal.closeModal();
+
+						filterFlashcardsByCategory(category);
+
+						updateCategoryCounts();
+						updateProfileFlashcardsList();
+
+						showNotification("Flashcard created successfully!", "success");
+					});
+				}
+
+				const createSetBtn = document.getElementById("create-set-btn");
+				const createStudySetModal = handleModal("create-study-set-modal");
+				const createStudySetSaveBtn = document.getElementById(
+					"create-study-set-save-btn"
+				);
+
+				if (createSetBtn && createStudySetModal) {
+					createSetBtn.addEventListener("click", () => {
+						createStudySetModal.openModal();
+					});
+				}
+
+				if (createStudySetSaveBtn) {
+					createStudySetSaveBtn.addEventListener("click", () => {
+						const title = document.getElementById("study-set-title").value;
+						const description = document.getElementById(
+							"study-set-description"
+						).value;
+						const category =
+							document.getElementById("study-set-category").value;
+
+						if (!title) {
+							showNotification(
+								"Please enter a title for your study set",
+								"error"
+							);
+							return;
+						}
+
+						const studySets = getFromLocalStorage("studySets");
+						const newStudySet = {
+							id: Date.now(),
+							title,
+							description,
+							category,
+							createdAt: new Date().toISOString(),
+						};
+
+						studySets.push(newStudySet);
+						saveToLocalStorage("studySets", studySets);
+
+						document.getElementById("study-set-title").value = "";
+						document.getElementById("study-set-description").value = "";
+
+						createStudySetModal.closeModal();
+
+						populateStudySetDropdown();
+						updateCategoryCounts();
+						updateProfileStats();
+						updateProfileFlashcardsList();
+						updateRecentSetsList();
+
+						showNotification(
+							`Study set "${title}" created successfully!`,
+							"success"
+						);
+
+						const studySetsCount = document.getElementById("study-sets-count");
+						if (studySetsCount) {
+							studySetsCount.textContent = studySets.length;
+						}
+					});
+				}
+
+				let pomodoroInterval;
+				let pomodoroSeconds = 25 * 60;
+
+				const pomodoroLink = document.getElementById("pomodoro-link");
+				const pomodoroModal = handleModal("pomodoro-modal");
+				const pomodoroStart = document.getElementById("pomodoro-start");
+				const pomodoroPause = document.getElementById("pomodoro-pause");
+				const pomodoroReset = document.getElementById("pomodoro-reset");
+				const pomodoroProgress = document.getElementById("pomodoro-progress");
+				const pomodoroTime = document.getElementById("pomodoro-time");
+				const pomodoroStatus = document.getElementById("pomodoro-status");
+
+				if (pomodoroLink && pomodoroModal) {
+					pomodoroLink.addEventListener("click", (e) => {
+						e.preventDefault();
+						pomodoroModal.openModal();
+					});
+				}
+
+				const pomodoroModeBtns =
+					document.querySelectorAll(".pomodoro-mode-btn");
+				pomodoroModeBtns.forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const minutes = parseInt(btn.getAttribute("data-minutes"));
+						pomodoroSeconds = minutes * 60;
+						updatePomodoroUI();
+
+						if (pomodoroInterval) {
+							clearInterval(pomodoroInterval);
+							pomodoroInterval = null;
+							pomodoroStart.classList.remove("hidden");
+							pomodoroPause.classList.add("hidden");
+						}
+
+						pomodoroModeBtns.forEach((b) => {
+							b.classList.remove(
+								"bg-primary-100",
+								"dark:bg-primary-900/30",
+								"text-primary-700",
+								"dark:text-primary-300"
+							);
+							b.classList.add(
+								"bg-white",
+								"dark:bg-gray-700",
+								"text-gray-700",
+								"dark:text-gray-300"
+							);
+						});
+						btn.classList.remove(
+							"bg-white",
+							"dark:bg-gray-700",
+							"text-gray-700",
+							"dark:text-gray-300"
+						);
+						btn.classList.add(
+							"bg-primary-100",
+							"dark:bg-primary-900/30",
+							"text-primary-700",
+							"dark:text-primary-300"
+						);
+
+						if (minutes === 25) {
+							pomodoroStatus.textContent = "Focus Time";
+						} else if (minutes === 15) {
+							pomodoroStatus.textContent = "Medium Break";
+						} else {
+							pomodoroStatus.textContent = "Short Break";
+						}
+					});
+				});
+
+				if (pomodoroStart) {
+					pomodoroStart.addEventListener("click", () => {
+						pomodoroStart.classList.add("hidden");
+						pomodoroPause.classList.remove("hidden");
+
+						pomodoroInterval = setInterval(() => {
+							pomodoroSeconds--;
+							updatePomodoroUI();
+
+							if (pomodoroSeconds <= 0) {
+								clearInterval(pomodoroInterval);
+								showNotification("Timer completed!", "success");
+
+								pomodoroStart.classList.remove("hidden");
+								pomodoroPause.classList.add("hidden");
+							}
+						}, 1000);
+					});
+				}
+
+				if (pomodoroPause) {
+					pomodoroPause.addEventListener("click", () => {
+						clearInterval(pomodoroInterval);
+						pomodoroInterval = null;
+						pomodoroStart.classList.remove("hidden");
+						pomodoroPause.classList.add("hidden");
+					});
+				}
+
+				if (pomodoroReset) {
+					pomodoroReset.addEventListener("click", () => {
+						clearInterval(pomodoroInterval);
+						pomodoroInterval = null;
+						pomodoroSeconds = 25 * 60;
+						updatePomodoroUI();
+						pomodoroStart.classList.remove("hidden");
+						pomodoroPause.classList.add("hidden");
+						pomodoroStatus.textContent = "Focus Time";
+
+						pomodoroModeBtns.forEach((b) => {
+							b.classList.remove(
+								"bg-primary-100",
+								"dark:bg-primary-900/30",
+								"text-primary-700",
+								"dark:text-primary-300"
+							);
+							b.classList.add(
+								"bg-white",
+								"dark:bg-gray-700",
+								"text-gray-700",
+								"dark:text-gray-300"
+							);
+						});
+						pomodoroModeBtns[0].classList.remove(
+							"bg-white",
+							"dark:bg-gray-700",
+							"text-gray-700",
+							"dark:text-gray-300"
+						);
+						pomodoroModeBtns[0].classList.add(
+							"bg-primary-100",
+							"dark:bg-primary-900/30",
+							"text-primary-700",
+							"dark:text-primary-300"
+						);
+					});
+				}
+
+				function updatePomodoroUI() {
+					if (!pomodoroTime || !pomodoroProgress) return;
+
+					const minutes = Math.floor(pomodoroSeconds / 60);
+					const seconds = pomodoroSeconds % 60;
+					pomodoroTime.textContent = `${minutes
+						.toString()
+						.padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+					const totalSeconds =
+						pomodoroStatus.textContent === "Focus Time"
+							? 25 * 60
+							: pomodoroStatus.textContent === "Medium Break"
+							? 15 * 60
+							: 5 * 60;
+					const dashoffset = 283 * (pomodoroSeconds / totalSeconds);
+					pomodoroProgress.style.strokeDashoffset = dashoffset;
+				}
+
+				function updateNotifications() {
+					const notificationsList =
+						document.getElementById("notifications-list");
+					if (!notificationsList) return;
+
+					notificationsList.innerHTML = "";
+
+					const notifications = getFromLocalStorage("notifications", []);
+
+					notifications.forEach((notification) => {
+						const item = document.createElement("div");
+						item.className =
+							"bg-white dark:bg-gray-700 p-4 rounded-xl shadow-sm flex items-start border border-gray-100 dark:border-gray-600";
+
+						let actionsHTML = "";
+						if (notification.actions) {
+							actionsHTML = `
+						           <div class="flex space-x-2 mt-3">
+						             <button class="notification-accept bg-primary-600 hover:bg-primary-700 text-white text-xs py-1.5 px-3 rounded-lg transition-all" data-id="${notification.id}">
+						               Accept
+						             </button>
+						             <button class="notification-decline bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-gray-300 text-xs py-1.5 px-3 rounded-lg transition-all" data-id="${notification.id}">
+						               Decline
+						             </button>
+						           </div>
+						         `;
+						}
+
+						item.innerHTML = `
+						         <div class="bg-${notification.color}-100 dark:bg-${notification.color}-900/30 p-2 rounded-lg mr-3">
+						           <i class="${notification.icon} text-${notification.color}-600 dark:text-${notification.color}-400"></i>
+						         </div>
+						         <div class="flex-1">
+						           <p class="font-medium">${notification.title}</p>
+						           <p class="text-sm text-gray-500 dark:text-gray-400">${notification.message}</p>
+						           <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">${notification.time}</p>
+						           ${actionsHTML}
+						         </div>
+						       `;
+
+						notificationsList.appendChild(item);
+					});
+
+					const acceptButtons = document.querySelectorAll(
+						".notification-accept"
+					);
+					const declineButtons = document.querySelectorAll(
+						".notification-decline"
+					);
+
+					acceptButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const id = parseInt(button.getAttribute("data-id"));
+							removeNotification(id);
+							showNotification("Invitation accepted!", "success");
+						});
+					});
+
+					declineButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							const id = parseInt(button.getAttribute("data-id"));
+							removeNotification(id);
+							showNotification("Invitation declined", "info");
+						});
+					});
+
+					const notificationCount =
+						document.getElementById("notification-count");
+					if (notificationCount) {
+						notificationCount.textContent = notifications.length;
+					}
+				}
+
+				function removeNotification(id) {
+					const notifications = getFromLocalStorage("notifications", []);
+					const updatedNotifications = notifications.filter(
+						(notification) => notification.id !== id
+					);
+					saveToLocalStorage("notifications", updatedNotifications);
+					updateNotifications();
+				}
+
+				const notificationButton = document.getElementById(
+					"notification-button"
+				);
+				const notificationModal = handleModal("notification-details-modal");
+
+				if (notificationButton && notificationModal) {
+					notificationButton.addEventListener("click", () => {
+						notificationModal.openModal();
+						updateNotifications();
+					});
+				}
+
+				populateCategoryList();
+				populateStudySetDropdown();
+				populateFlashcardCategoryDropdown();
+				updateFlashcardUI();
+				populateQuizCategories();
+				populateQuizzesGrid();
+				populateStudyGroupsGrid();
+				updateMyGroupsList();
+				updateProfileStats();
+				updateProfileFlashcardsList();
+				updateProfileQuizzesList();
+				updateProfileAchievements();
+				updateNotifications();
+
+				function updateRecentSetsList() {
+					const recentSetsList = document.getElementById("recent-sets-list");
+					if (!recentSetsList) return;
+
+					const studySets = getFromLocalStorage("studySets");
+
+					const sortedSets = [...studySets]
+						.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+						.slice(0, 5);
+
+					if (sortedSets.length === 0) {
+						recentSetsList.innerHTML = `
+						         <li class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">
+						           No study sets yet
+						         </li>
+						       `;
+						return;
+					}
+
+					recentSetsList.innerHTML = "";
+
+					sortedSets.forEach((set) => {
+						const categoryObj = categories.find(
+							(cat) => cat.id === set.category
+						);
+						if (!categoryObj) return;
+
+						const li = document.createElement("li");
+						li.innerHTML = `
+						         <a href="#" data-set-id="${
+												set.id
+											}" class="recent-set-link flex items-center px-3 py-2.5 text-sm rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+						           <i class="${categoryObj.icon} mr-3 text-${
+							categoryObj.color
+						}-600 dark:text-${categoryObj.color}-500"></i>
+						           <div class="flex-1">
+						             <p class="font-medium">${set.title}</p>
+						             <p class="text-xs text-gray-500 dark:text-gray-400">${new Date(
+														set.createdAt
+													).toLocaleDateString()}</p>
+						           </div>
+						         </a>
+						       `;
+						recentSetsList.appendChild(li);
+					});
+
+					const recentSetLinks =
+						recentSetsList.querySelectorAll(".recent-set-link");
+					recentSetLinks.forEach((link) => {
+						link.addEventListener("click", (e) => {
+							e.preventDefault();
+							const setId = link.getAttribute("data-set-id");
+
+							showTab("flashcards");
+							filterFlashcardsBySet(setId);
+
+							if (window.innerWidth < 1024 && sidebar) {
+								sidebar.classList.add("-translate-x-full");
+								sidebar.classList.remove("translate-x-0");
+							}
+						});
+					});
+				}
+
+				function updateStudyProgress() {
+					const container = document.getElementById("study-progress-container");
+					if (!container) return;
+
+					const progressItems = [
+						{ name: "Complete Biology Flashcards", progress: 65 },
+						{ name: "Calculus Quiz Preparation", progress: 40 },
+						{ name: "Physics Study Group Project", progress: 20 },
+						{ name: "Computer Science Programming Tasks", progress: 75 },
+						{ name: "Chemistry Lab Report", progress: 90 },
+						{ name: "History Essay Research", progress: 35 },
+					];
+
+					container.innerHTML = "";
+
+					progressItems.forEach((item) => {
+						const div = document.createElement("div");
+						div.innerHTML = `
+						         <div class="flex justify-between text-sm mb-1">
+						           <p>${item.name}</p>
+						           <p>${item.progress}%</p>
+						         </div>
+						         <div class="h-2.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+						           <div class="h-2.5 bg-gradient-to-r from-primary-600 to-primary-500 rounded-full progress-bar" style="width: ${item.progress}%"></div>
+						         </div>
+						       `;
+						container.appendChild(div);
+					});
+				}
+
+				updateStudyProgress();
+				updateRecentSetsList();
+
+				const header = document.querySelector("header");
+				const mobileNav = document.createElement("div");
+				mobileNav.className =
+					"md:hidden flex overflow-x-auto space-x-1 p-2 bg-white dark:bg-gray-800 rounded-xl shadow-inner mt-2";
+				mobileNav.innerHTML = `
+			        <button class="mobile-nav-tab flex-shrink-0 px-3 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all border-b-2 border-primary-600 flex flex-col items-center text-xs" data-tab="dashboard">
+			            <i class="fas fa-chart-pie mb-1 text-sm"></i>Dashboard
+			        </button>
+			        <button class="mobile-nav-tab flex-shrink-0 px-3 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all flex flex-col items-center text-xs" data-tab="flashcards">
+			            <i class="fas fa-clone mb-1 text-sm"></i>Cards
+			        </button>
+			        <button class="mobile-nav-tab flex-shrink-0 px-3 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all flex flex-col items-center text-xs" data-tab="quizzes">
+			            <i class="fas fa-tasks mb-1 text-sm"></i>Quizzes
+			        </button>
+			        <button class="mobile-nav-tab flex-shrink-0 px-3 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all flex flex-col items-center text-xs" data-tab="study-groups">
+			            <i class="fas fa-users mb-1 text-sm"></i>Groups
+			        </button>
+			        <button class="mobile-nav-tab flex-shrink-0 px-3 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all flex flex-col items-center text-xs" data-tab="leaderboard">
+			            <i class="fas fa-trophy mb-1 text-sm"></i>Ranks
+			        </button>
+			        <button class="mobile-nav-tab flex-shrink-0 px-3 py-2 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all flex flex-col items-center text-xs" data-tab="profile">
+			            <i class="fas fa-user mb-1 text-sm"></i>Profile
+			        </button>
+			    `;
+
+				if (header) {
+					header.parentNode.insertBefore(mobileNav, header.nextSibling);
+
+					const mobileNavTabs = document.querySelectorAll(".mobile-nav-tab");
+					mobileNavTabs.forEach((tab) => {
+						tab.addEventListener("click", () => {
+							const tabId = tab.getAttribute("data-tab");
+
+							mobileNavTabs.forEach((t) => {
+								t.classList.remove("border-b-2", "border-primary-600");
+							});
+							tab.classList.add("border-b-2", "border-primary-600");
+
+							showTab(tabId);
+
+							if (sidebar && window.innerWidth < 1024) {
+								sidebar.classList.add("-translate-x-full");
+								sidebar.classList.remove("translate-x-0");
+							}
+						});
+					});
+				}
+
+				const originalShowTab = window.showTab;
+				window.showTab = function (tabId) {
+					originalShowTab(tabId);
+
+					const mobileNavTabs = document.querySelectorAll(".mobile-nav-tab");
+					mobileNavTabs.forEach((tab) => {
+						if (tab.getAttribute("data-tab") === tabId) {
+							tab.classList.add("border-b-2", "border-primary-600");
+						} else {
+							tab.classList.remove("border-b-2", "border-primary-600");
+						}
+					});
+				};
+
+				const continueBtn = document.getElementById("continue-learning-btn");
+				if (continueBtn) {
+					continueBtn.addEventListener("click", () => {
+						showTab("flashcards");
+						showNotification("Continuing where you left off!", "success");
+					});
+				}
+
+				const createFlashcardsBtn = document.getElementById(
+					"create-flashcards-btn"
+				);
+				if (createFlashcardsBtn) {
+					createFlashcardsBtn.addEventListener("click", () => {
+						showTab("flashcards");
+						if (addFlashcardBtn) {
+							addFlashcardBtn.click();
+						}
+					});
+				}
+
+				setTimeout(() => {
+					showNotification("Welcome to StudyBuddy! Ready to learn?", "success");
+				}, 1000);
+			});
+			const mobileNavStyle = document.createElement("style");
+			mobileNavStyle.textContent = `
+    /* Better mobile nav scrolling */
+    .md\\:hidden.flex.overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    /* Hide scrollbar */
+    .md\\:hidden.flex.overflow-x-auto::-webkit-scrollbar {
+        display: none;
+    }
+    
+    /* Active state for mobile nav tabs */
+    .mobile-nav-tab.border-b-2 {
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+    
+    /* Better mobile nav tabs sizing */
+    .mobile-nav-tab {
+        min-width: 60px;
+    }
+`;
+			document.head.appendChild(mobileNavStyle);
+		</script>
+	</body>
+</html>
