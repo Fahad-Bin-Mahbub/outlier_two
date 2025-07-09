@@ -1,0 +1,4859 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>EventFlow - Event Management Application</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap");
+
+			:root {
+				--primary-color: #4361ee;
+				--primary-hover: #3a56d4;
+				--primary-light: #eef2ff;
+				--secondary-color: #3a0ca3;
+				--accent-color: #4cc9f0;
+				--success-color: #34d399;
+				--warning-color: #fbbf24;
+				--danger-color: #f87171;
+
+				--background-color: #ffffff;
+				--background-alt: #f9fafb;
+				--card-color: #ffffff;
+
+				--text-primary: #111827;
+				--text-secondary: #4b5563;
+				--text-muted: #9ca3af;
+				--text-light: #ffffff;
+
+				--border-color: #e5e7eb;
+				--border-radius-sm: 6px;
+				--border-radius: 10px;
+				--border-radius-lg: 16px;
+				--border-radius-xl: 24px;
+				--border-radius-full: 9999px;
+
+				--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+				--shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+				--shadow-md: 0 8px 16px rgba(0, 0, 0, 0.06);
+				--shadow-lg: 0 20px 24px rgba(0, 0, 0, 0.06);
+
+				--transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+				--transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+				--transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+				--spacing-xs: 0.25rem;
+				--spacing-sm: 0.5rem;
+				--spacing-md: 1rem;
+				--spacing-lg: 1.5rem;
+				--spacing-xl: 2rem;
+				--spacing-2xl: 3rem;
+
+				--header-height: 75px;
+				--container-max-width: 1280px;
+				--sidebar-width: 280px;
+			}
+
+			*,
+			*::before,
+			*::after {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			html {
+				font-size: 16px;
+				scroll-behavior: smooth;
+			}
+
+			body {
+				font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont,
+					sans-serif;
+				background-color: var(--background-alt);
+				color: var(--text-primary);
+				line-height: 1.5;
+				overflow-x: hidden;
+				min-height: 100vh;
+				font-weight: 400;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-family: "Montserrat", sans-serif;
+				font-weight: 600;
+				line-height: 1.3;
+				color: var(--text-primary);
+				margin-bottom: 0.5em;
+			}
+
+			a {
+				color: var(--primary-color);
+				text-decoration: none;
+				transition: color var(--transition-fast);
+			}
+
+			a:hover {
+				color: var(--primary-hover);
+			}
+
+			img {
+				max-width: 100%;
+				height: auto;
+			}
+
+			button,
+			.button {
+				font-family: "Plus Jakarta Sans", sans-serif;
+				font-weight: 500;
+			}
+
+			.container {
+				width: 100%;
+				max-width: var(--container-max-width);
+				margin: 0 auto;
+				padding-right: 0 var(--spacing-xl);
+				padding-top: var(--spacing-sm);
+			}
+
+			.app-wrapper {
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			header {
+				background-color: var(--card-color);
+				color: var(--text-primary);
+				height: var(--header-height);
+				box-shadow: var(--shadow);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+
+			.header-content {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				height: 100%;
+				gap: var(--spacing-sm);
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+				font-size: 1.5rem;
+				font-weight: 700;
+				color: var(--text-primary);
+				flex-shrink: 0;
+			}
+
+			.logo-icon {
+				background: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				width: 38px;
+				height: 38px;
+				border-radius: var(--border-radius);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 0.75rem;
+			}
+
+			.nav-toggle {
+				display: none;
+				background: none;
+				border: none;
+				color: var(--text-primary);
+				font-size: 1.25rem;
+				cursor: pointer;
+				width: 40px;
+				height: 40px;
+				border-radius: var(--border-radius);
+				transition: background-color var(--transition-fast);
+			}
+
+			.nav-toggle:hover {
+				background-color: var(--background-alt);
+			}
+
+			.nav-menu {
+				display: flex;
+				align-items: center;
+				list-style: none;
+				margin: 0px;
+				padding: 0px;
+				height: 100%;
+				flex: 1;
+				justify-content: center;
+			}
+
+			.nav-menu li {
+				margin: 0 var(--spacing-sm);
+				height: 100%;
+				display: flex;
+				align-items: center;
+				position: relative;
+			}
+
+			.nav-menu a {
+				color: var(--text-secondary);
+				text-decoration: none;
+				font-weight: 500;
+				transition: color var(--transition-fast);
+				display: flex;
+				align-items: center;
+				padding: 0 var(--spacing-sm);
+				height: 100%;
+				position: relative;
+			}
+
+			.nav-link-icon {
+				margin-right: var(--spacing-sm);
+				font-size: 1.2rem;
+				transition: transform var(--transition-fast);
+			}
+
+			.nav-menu a:hover {
+				color: var(--primary-color);
+			}
+
+			.nav-menu a:hover .nav-link-icon {
+				transform: translateY(-2px);
+			}
+
+			.nav-menu a.active {
+				color: var(--primary-color);
+				font-weight: 600;
+			}
+
+			.nav-menu a.active::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 3px;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				border-radius: var(--border-radius-full) var(--border-radius-full) 0 0;
+			}
+
+			.header-actions {
+				display: flex;
+				align-items: center;
+				flex-shrink: 0;
+			}
+
+			.header-button {
+				background: none;
+				border: none;
+				width: 40px;
+				height: 40px;
+				border-radius: var(--border-radius-full);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--text-secondary);
+				cursor: pointer;
+				margin-left: var(--spacing-sm);
+				transition: all var(--transition-fast);
+			}
+
+			.header-button:hover {
+				background-color: var(--background-alt);
+				color: var(--primary-color);
+				transform: translateY(-2px);
+			}
+
+			.header-button.has-badge {
+				position: relative;
+			}
+
+			.badge {
+				position: absolute;
+				top: -2px;
+				right: -2px;
+				width: 18px;
+				height: 18px;
+				background-color: var(--primary-color);
+				color: white;
+				font-size: 0.7rem;
+				font-weight: 600;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: var(--border-radius-full);
+			}
+
+			.user-profile {
+				display: flex;
+				align-items: center;
+				cursor: pointer;
+				padding: var(--spacing-sm) var(--spacing-md);
+				border-radius: var(--border-radius);
+				margin-left: var(--spacing-md);
+				transition: background-color var(--transition-fast);
+				position: relative;
+			}
+
+			.user-profile:hover {
+				background-color: var(--background-alt);
+			}
+
+			.user-avatar {
+				width: 38px;
+				height: 38px;
+				border-radius: var(--border-radius-full);
+				background: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: 600;
+				margin-right: var(--spacing-sm);
+				font-size: 0.9rem;
+			}
+
+			.user-info {
+				display: none;
+			}
+
+			@media (min-width: 768px) {
+				.user-info {
+					display: block;
+				}
+			}
+
+			.user-name {
+				font-size: 0.9rem;
+				font-weight: 600;
+				color: var(--text-primary);
+			}
+
+			.user-role {
+				font-size: 0.75rem;
+				color: var(--text-muted);
+			}
+
+			.user-dropdown-icon {
+				margin-left: var(--spacing-sm);
+				color: var(--text-muted);
+				transition: transform var(--transition-fast);
+			}
+
+			.user-profile.active .user-dropdown-icon {
+				transform: rotate(180deg);
+			}
+
+			.user-dropdown {
+				position: absolute;
+				top: calc(100% + 8px);
+				right: 0;
+				width: 250px;
+				background-color: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow-lg);
+				opacity: 0;
+				visibility: hidden;
+				transform: translateY(10px);
+				transition: all var(--transition-fast);
+				z-index: 101;
+				overflow: hidden;
+				border: 1px solid var(--border-color);
+			}
+
+			.user-profile.active .user-dropdown {
+				opacity: 1;
+				visibility: visible;
+				transform: translateY(0);
+			}
+
+			.dropdown-header {
+				padding: var(--spacing-md);
+				border-bottom: 1px solid var(--border-color);
+				display: flex;
+				align-items: center;
+				background-color: var(--primary-light);
+			}
+
+			.dropdown-header-avatar {
+				width: 50px;
+				height: 50px;
+				border-radius: var(--border-radius-full);
+				background: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: 600;
+				margin-right: var(--spacing-md);
+				font-size: 1.25rem;
+			}
+
+			.dropdown-header-info h4 {
+				font-size: 1rem;
+				margin-bottom: 0.2rem;
+			}
+
+			.dropdown-header-info p {
+				font-size: 0.8rem;
+				color: var(--text-secondary);
+			}
+
+			.dropdown-tabs {
+				display: flex;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.dropdown-tab {
+				flex: 1;
+				text-align: center;
+				padding: var(--spacing-sm) 0;
+				font-size: 0.85rem;
+				font-weight: 500;
+				color: var(--text-secondary);
+				cursor: pointer;
+				transition: all var(--transition-fast);
+				border-bottom: 2px solid transparent;
+			}
+
+			.dropdown-tab:hover {
+				color: var(--primary-color);
+			}
+
+			.dropdown-tab.active {
+				color: var(--primary-color);
+				border-bottom-color: var(--primary-color);
+			}
+
+			.dropdown-content {
+				max-height: 350px;
+				overflow-y: auto;
+			}
+
+			.dropdown-tab-content {
+				display: none;
+			}
+
+			.dropdown-tab-content.active {
+				display: block;
+				animation: fadeIn 0.3s ease;
+			}
+
+			.profile-section {
+				padding: var(--spacing-md);
+			}
+
+			.profile-links {
+				list-style: none;
+			}
+
+			.profile-link {
+				display: flex;
+				align-items: center;
+				padding: var(--spacing-sm) 0;
+				color: var(--text-secondary);
+				transition: color var(--transition-fast);
+				font-size: 0.9rem;
+			}
+
+			.profile-link:hover {
+				color: var(--primary-color);
+			}
+
+			.profile-link-icon {
+				margin-right: var(--spacing-md);
+				width: 18px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.upcoming-event {
+				padding: var(--spacing-md);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.upcoming-event:last-child {
+				border-bottom: none;
+			}
+
+			.upcoming-event-date {
+				font-size: 0.8rem;
+				color: var(--primary-color);
+				font-weight: 500;
+				margin-bottom: var(--spacing-xs);
+			}
+
+			.upcoming-event-title {
+				font-size: 0.95rem;
+				font-weight: 600;
+				margin-bottom: var(--spacing-xs);
+			}
+
+			.upcoming-event-meta {
+				display: flex;
+				align-items: center;
+				font-size: 0.8rem;
+				color: var(--text-muted);
+			}
+
+			.meta-item {
+				display: flex;
+				align-items: center;
+				margin-right: var(--spacing-md);
+			}
+
+			.meta-icon {
+				margin-right: var(--spacing-xs);
+			}
+
+			.settings-section {
+				padding: var(--spacing-md);
+			}
+
+			.settings-list {
+				list-style: none;
+			}
+
+			.settings-item {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: var(--spacing-sm) 0;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.settings-item:last-child {
+				border-bottom: none;
+			}
+
+			.settings-item-label {
+				display: flex;
+				align-items: center;
+				font-size: 0.9rem;
+			}
+
+			.settings-item-icon {
+				margin-right: var(--spacing-md);
+				color: var(--text-muted);
+			}
+
+			.toggle-switch {
+				position: relative;
+				display: inline-block;
+				width: 36px;
+				height: 20px;
+			}
+
+			.toggle-switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.toggle-slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: var(--border-color);
+				transition: var(--transition-fast);
+				border-radius: var(--border-radius-full);
+			}
+
+			.toggle-slider:before {
+				position: absolute;
+				content: "";
+				height: 16px;
+				width: 16px;
+				left: 2px;
+				bottom: 2px;
+				background-color: white;
+				transition: var(--transition-fast);
+				border-radius: var(--border-radius-full);
+			}
+
+			input:checked + .toggle-slider {
+				background-color: var(--primary-color);
+			}
+
+			input:checked + .toggle-slider:before {
+				transform: translateX(16px);
+			}
+
+			.logout-section {
+				padding: var(--spacing-md);
+				border-top: 1px solid var(--border-color);
+			}
+
+			.logout-button {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 100%;
+				padding: var(--spacing-sm) 0;
+				background-color: var(--background-alt);
+				color: var(--danger-color);
+				border: none;
+				border-radius: var(--border-radius);
+				font-weight: 500;
+				cursor: pointer;
+				transition: all var(--transition-fast);
+			}
+
+			.logout-button:hover {
+				background-color: rgba(248, 113, 113, 0.1);
+			}
+
+			.logout-icon {
+				margin-right: var(--spacing-sm);
+			}
+
+			main {
+				flex: 1;
+				padding: var(--spacing-xl) 0 var(--spacing-2xl);
+			}
+
+			.section {
+				margin-bottom: var(--spacing-2xl);
+			}
+
+			.section-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: var(--spacing-lg);
+				padding-top: var(--spacing-xl);
+			}
+
+			.section-title {
+				font-size: 1.8rem;
+				color: var(--text-primary);
+				margin-bottom: 0;
+				font-weight: 700;
+				display: inline-block;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--secondary-color)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-fill-color: transparent;
+			}
+
+			.section-actions {
+				display: flex;
+				gap: var(--spacing-sm);
+			}
+
+			.button {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.625rem 1.25rem;
+				background-color: var(--primary-color);
+				color: white;
+				border: none;
+				border-radius: var(--border-radius);
+				font-size: 0.95rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all var(--transition-normal);
+				text-decoration: none;
+				line-height: 1.5;
+			}
+
+			.button:hover {
+				background-color: var(--primary-hover);
+				box-shadow: var(--shadow-md);
+				transform: translateY(-2px);
+			}
+
+			.button:active {
+				transform: translateY(0);
+				box-shadow: var(--shadow-sm);
+			}
+
+			.button-icon {
+				margin-right: var(--spacing-sm);
+			}
+
+			.button-secondary {
+				background-color: var(--secondary-color);
+			}
+
+			.button-secondary:hover {
+				background-color: #2f0a87;
+			}
+
+			.button-success {
+				background-color: var(--success-color);
+			}
+
+			.button-success:hover {
+				background-color: #22c58b;
+			}
+
+			.button-danger {
+				background-color: var(--danger-color);
+			}
+
+			.button-danger:hover {
+				background-color: #f05252;
+			}
+
+			.button-warning {
+				background-color: var(--warning-color);
+			}
+
+			.button-warning:hover {
+				background-color: #e3a008;
+			}
+
+			.button-outline {
+				background-color: transparent;
+				color: var(--primary-color);
+				border: 1px solid currentColor;
+			}
+
+			.button-outline:hover {
+				background-color: var(--primary-light);
+				box-shadow: none;
+			}
+
+			.button-link {
+				background-color: transparent;
+				color: var(--primary-color);
+				padding: 0;
+				border-radius: 0;
+			}
+
+			.button-link:hover {
+				background-color: transparent;
+				text-decoration: underline;
+				box-shadow: none;
+			}
+
+			.button-sm {
+				padding: 0.375rem 0.75rem;
+				font-size: 0.8rem;
+			}
+
+			.button-lg {
+				padding: 0.75rem 1.5rem;
+				font-size: 1.1rem;
+			}
+
+			.button-block {
+				display: block;
+				width: 100%;
+			}
+
+			.dashboard {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				margin-top: var(--spacing-xl);
+				padding-top: 5px;
+			}
+
+			.dashboard-card {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				transition: all var(--transition-normal);
+				position: relative;
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				border: 1px solid var(--border-color);
+			}
+
+			.dashboard-card:hover {
+				transform: translateY(-5px);
+				box-shadow: var(--shadow-md);
+				border-color: rgba(67, 97, 238, 0.3);
+			}
+
+			.dashboard-card::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 5px;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				opacity: 0;
+				transition: opacity var(--transition-normal);
+			}
+
+			.dashboard-card:hover::before {
+				opacity: 1;
+			}
+
+			.card-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: var(--spacing-md);
+			}
+
+			.card-title {
+				font-size: 1.1rem;
+				color: var(--text-secondary);
+				font-weight: 500;
+			}
+
+			.card-icon {
+				width: 48px;
+				height: 48px;
+				border-radius: var(--border-radius);
+				background-color: var(--primary-light);
+				color: var(--primary-color);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.5rem;
+			}
+
+			.card-content {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.stat-number {
+				font-size: 2.5rem;
+				font-weight: 700;
+				color: var(--text-primary);
+				margin: var(--spacing-md) 0;
+				line-height: 1;
+			}
+
+			.stat-change {
+				display: flex;
+				align-items: center;
+				font-size: 0.9rem;
+				margin-top: auto;
+			}
+
+			.stat-change-positive {
+				color: var(--success-color);
+			}
+
+			.stat-change-negative {
+				color: var(--danger-color);
+			}
+
+			.change-icon {
+				margin-right: var(--spacing-xs);
+			}
+
+			.timeline-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				border: 1px solid var(--border-color);
+			}
+
+			.timeline {
+				position: relative;
+				padding: var(--spacing-md) 0;
+			}
+
+			.timeline::before {
+				content: "";
+				position: absolute;
+				height: 100%;
+				width: 3px;
+				background: var(--primary-light);
+				left: 24px;
+				top: 0;
+				border-radius: var(--border-radius-full);
+			}
+
+			.timeline-event {
+				margin-left: 55px;
+				position: relative;
+				margin-bottom: var(--spacing-xl);
+				padding-bottom: var(--spacing-md);
+				transition: transform var(--transition-normal);
+			}
+
+			.timeline-event:hover {
+				transform: translateX(5px);
+			}
+
+			.timeline-event:last-child {
+				margin-bottom: 0;
+				padding-bottom: 0;
+			}
+
+			.timeline-event::before {
+				content: "";
+				position: absolute;
+				width: 15px;
+				height: 15px;
+				border-radius: 50%;
+				background: var(--primary-color);
+				left: -34px;
+				top: 5px;
+				border: 3px solid white;
+				box-shadow: var(--shadow-sm);
+				z-index: 1;
+			}
+
+			.timeline-date {
+				font-size: 0.85rem;
+				color: var(--primary-color);
+				font-weight: 600;
+				margin-bottom: var(--spacing-xs);
+				display: flex;
+				align-items: center;
+			}
+
+			.timeline-date-icon {
+				margin-right: var(--spacing-xs);
+			}
+
+			.timeline-title {
+				font-size: 1.1rem;
+				margin-bottom: var(--spacing-xs);
+				color: var(--text-primary);
+			}
+
+			.timeline-desc {
+				color: var(--text-secondary);
+				font-size: 0.95rem;
+			}
+
+			.timeline-tags {
+				display: flex;
+				flex-wrap: wrap;
+				margin-top: var(--spacing-sm);
+				gap: var(--spacing-xs);
+			}
+
+			.timeline-tag {
+				background-color: var(--primary-light);
+				color: var(--primary-color);
+				font-size: 0.75rem;
+				font-weight: 500;
+				padding: 0.15rem 0.5rem;
+				border-radius: var(--border-radius-full);
+			}
+
+			.registration-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				border: 1px solid var(--border-color);
+			}
+
+			.form-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: var(--spacing-lg);
+			}
+
+			.form-section {
+				margin-bottom: var(--spacing-xl);
+			}
+
+			.form-section-title {
+				font-size: 1.2rem;
+				margin-bottom: var(--spacing-md);
+				padding-bottom: var(--spacing-sm);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.form-row {
+				margin-bottom: var(--spacing-md);
+			}
+
+			.form-label {
+				display: block;
+				margin-bottom: var(--spacing-sm);
+				font-weight: 500;
+				font-size: 0.95rem;
+				color: var(--text-primary);
+			}
+
+			.form-label.required::after {
+				content: "*";
+				color: var(--danger-color);
+				margin-left: var(--spacing-xs);
+			}
+
+			.form-input,
+			.form-select,
+			.form-textarea {
+				width: 100%;
+				padding: 0.75rem 1rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--border-radius);
+				font-size: 1rem;
+				color: var(--text-primary);
+				transition: all var(--transition-fast);
+				background-color: white;
+			}
+
+			.form-input:focus,
+			.form-select:focus,
+			.form-textarea:focus {
+				outline: none;
+				border-color: var(--primary-color);
+				box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+			}
+
+			.form-input::placeholder,
+			.form-textarea::placeholder {
+				color: var(--text-muted);
+			}
+
+			.form-helper {
+				font-size: 0.8rem;
+				color: var(--text-muted);
+				margin-top: var(--spacing-xs);
+			}
+
+			.form-error {
+				font-size: 0.8rem;
+				color: var(--danger-color);
+				margin-top: var(--spacing-xs);
+			}
+
+			.form-input.error,
+			.form-select.error,
+			.form-textarea.error {
+				border-color: var(--danger-color);
+			}
+
+			.form-input-icon {
+				position: relative;
+			}
+
+			.form-input-icon .form-input {
+				padding-left: 2.5rem;
+			}
+
+			.input-icon {
+				position: absolute;
+				top: 50%;
+				left: 1rem;
+				transform: translateY(-50%);
+				color: var(--text-muted);
+			}
+
+			.form-actions {
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--spacing-md);
+				margin-top: var(--spacing-xl);
+			}
+
+			.custom-control {
+				display: flex;
+				align-items: center;
+				margin-bottom: var(--spacing-sm);
+				cursor: pointer;
+			}
+
+			.custom-control-input {
+				position: absolute;
+				opacity: 0;
+				height: 0;
+				width: 0;
+			}
+
+			.custom-control-label {
+				position: relative;
+				padding-left: 2rem;
+				cursor: pointer;
+				font-size: 0.95rem;
+				user-select: none;
+			}
+
+			.checkmark {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 20px;
+				width: 20px;
+				border: 2px solid var(--border-color);
+				border-radius: var(--border-radius-sm);
+				transition: all var(--transition-fast);
+			}
+
+			.custom-radio .checkmark {
+				border-radius: 50%;
+			}
+
+			.custom-control-input:checked ~ .checkmark {
+				background-color: var(--primary-color);
+				border-color: var(--primary-color);
+			}
+
+			.checkmark:after {
+				content: "";
+				position: absolute;
+				display: none;
+			}
+
+			.custom-control-input:checked ~ .checkmark:after {
+				display: block;
+			}
+
+			.custom-checkbox .checkmark:after {
+				left: 6px;
+				top: 2px;
+				width: 5px;
+				height: 10px;
+				border: solid white;
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+
+			.custom-radio .checkmark:after {
+				left: 5px;
+				top: 5px;
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background: white;
+			}
+
+			.chat-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				height: 450px;
+				border: 1px solid var(--border-color);
+			}
+
+			.chat-header {
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				padding: var(--spacing-md) var(--spacing-lg);
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.chat-title {
+				font-size: 1.1rem;
+				font-weight: 600;
+				display: flex;
+				align-items: center;
+			}
+
+			.chat-title-icon {
+				margin-right: var(--spacing-sm);
+			}
+
+			.chat-status {
+				display: flex;
+				align-items: center;
+				font-size: 0.85rem;
+			}
+
+			.status-indicator {
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background-color: var(--success-color);
+				margin-right: var(--spacing-sm);
+				animation: pulse 2s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(0.95);
+					box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+				}
+
+				70% {
+					transform: scale(1);
+					box-shadow: 0 0 0 5px rgba(52, 211, 153, 0);
+				}
+
+				100% {
+					transform: scale(0.95);
+					box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+				}
+			}
+
+			.chat-messages {
+				flex: 1;
+				padding: var(--spacing-lg);
+				overflow-y: auto;
+				display: flex;
+				flex-direction: column;
+				background-color: var(--background-alt);
+			}
+
+			.message {
+				margin-bottom: var(--spacing-md);
+				max-width: 80%;
+				animation: messageIn 0.3s ease;
+			}
+
+			@keyframes messageIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.message-sent {
+				margin-left: auto;
+				background: var(--primary-color);
+				color: white;
+				border-radius: 18px 18px 0 18px;
+				padding: var(--spacing-md) var(--spacing-lg);
+				position: relative;
+				box-shadow: var(--shadow-sm);
+			}
+
+			.message-received {
+				margin-right: auto;
+				background: white;
+				color: var(--text-primary);
+				border-radius: 18px 18px 18px 0;
+				padding: var(--spacing-md) var(--spacing-lg);
+				position: relative;
+				box-shadow: var(--shadow-sm);
+				border: 1px solid var(--border-color);
+			}
+
+			.message-content {
+				font-size: 0.95rem;
+				line-height: 1.5;
+			}
+
+			.message-info {
+				font-size: 0.75rem;
+				margin-top: var(--spacing-xs);
+				opacity: 0.8;
+			}
+
+			.chat-input-container {
+				padding: var(--spacing-md);
+				border-top: 1px solid var(--border-color);
+				display: flex;
+				align-items: center;
+				background-color: white;
+			}
+
+			.chat-input {
+				flex: 1;
+				padding: 0.75rem 1rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--border-radius-full);
+				font-size: 1rem;
+				transition: all var(--transition-fast);
+			}
+
+			.chat-input:focus {
+				outline: none;
+				border-color: var(--primary-color);
+				box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+			}
+
+			.chat-actions {
+				display: flex;
+			}
+
+			.chat-action {
+				background-color: white;
+				border: 1px solid var(--border-color);
+				border-left: none;
+				width: 40px;
+				height: 40px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: var(--text-secondary);
+				cursor: pointer;
+				transition: all var(--transition-fast);
+			}
+
+			.chat-action:hover {
+				color: var(--primary-color);
+			}
+
+			.chat-send {
+				margin-left: var(--spacing-sm);
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				border: none;
+				width: 40px;
+				height: 40px;
+				border-radius: var(--border-radius-full);
+				font-weight: 500;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				cursor: pointer;
+				transition: all var(--transition-fast);
+			}
+
+			.chat-send:hover {
+				transform: translateY(-2px);
+				box-shadow: var(--shadow);
+			}
+
+			.analytics-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				border: 1px solid var(--border-color);
+			}
+
+			.tabs-header {
+				position: relative;
+			}
+
+			.tabs-header::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				height: 3px;
+				width: 0;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				transition: all var(--transition-normal);
+			}
+
+			.tab-button {
+				border-bottom: none;
+			}
+
+			.tab-indicator {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				height: 3px;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				transition: all var(--transition-normal);
+			}
+			.tabs-container {
+				margin-bottom: var(--spacing-xl);
+			}
+
+			.tabs-header {
+				display: flex;
+				overflow-x: auto;
+				border-bottom: 1px solid var(--border-color);
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.tab-button {
+				padding: var(--spacing-md) var(--spacing-lg);
+				background: none;
+				border: none;
+				border-bottom: 3px solid transparent;
+				font-size: 0.95rem;
+				font-weight: 500;
+				color: var(--text-secondary);
+				cursor: pointer;
+				white-space: nowrap;
+				transition: all var(--transition-fast);
+			}
+
+			.tab-button:hover {
+				color: var(--primary-color);
+			}
+
+			.tab-button.active {
+				border-bottom-color: var(--primary-color);
+				color: var(--primary-color);
+			}
+
+			.tab-content {
+				display: none;
+				animation: fadeIn 0.5s ease;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			.tab-content.active {
+				display: block;
+			}
+
+			.chart-container {
+				height: 350px;
+				background: var(--background-alt);
+				border-radius: var(--border-radius);
+				margin: var(--spacing-lg) 0;
+				position: relative;
+				overflow: hidden;
+				border: 1px solid var(--border-color);
+			}
+
+			.chart-placeholder {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				color: var(--text-secondary);
+				text-align: center;
+				font-weight: 500;
+			}
+
+			.loading-spinner {
+				border: 3px solid rgba(67, 97, 238, 0.2);
+				border-top: 3px solid var(--primary-color);
+				border-radius: 50%;
+				width: 24px;
+				height: 24px;
+				animation: spin 1s linear infinite;
+				margin: 0 auto var(--spacing-sm);
+			}
+
+			@keyframes spin {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.analytics-metrics {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+				gap: var(--spacing-lg);
+				margin-top: var(--spacing-xl);
+			}
+
+			.metric-card {
+				background: white;
+				padding: var(--spacing-lg);
+				border-radius: var(--border-radius);
+				text-align: center;
+				box-shadow: var(--shadow-sm);
+				transition: all var(--transition-normal);
+				border: 1px solid var(--border-color);
+			}
+
+			.metric-card:hover {
+				transform: translateY(-5px);
+				box-shadow: var(--shadow);
+				border-color: rgba(67, 97, 238, 0.3);
+			}
+
+			.metric-icon {
+				width: 40px;
+				height: 40px;
+				border-radius: var(--border-radius-full);
+				background: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1.25rem;
+				margin: 0 auto var(--spacing-md);
+			}
+
+			.metric-value {
+				font-size: 1.8rem;
+				font-weight: 700;
+				color: var(--text-primary);
+				margin: var(--spacing-sm) 0;
+				line-height: 1;
+			}
+
+			.metric-label {
+				color: var(--text-secondary);
+				font-size: 0.85rem;
+				font-weight: 500;
+			}
+
+			.attendee-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				overflow-x: auto;
+				border: 1px solid var(--border-color);
+			}
+
+			.attendee-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.attendee-title {
+				font-size: 1.2rem;
+				font-weight: 600;
+			}
+
+			.attendee-actions {
+				display: flex;
+				gap: var(--spacing-sm);
+			}
+
+			.attendee-search {
+				position: relative;
+			}
+
+			.search-input {
+				padding: 0.5rem 1rem 0.5rem 2.5rem;
+				border: 1px solid var(--border-color);
+				border-radius: var(--border-radius-full);
+				font-size: 0.9rem;
+				transition: all var(--transition-fast);
+			}
+
+			.search-input:focus {
+				outline: none;
+				border-color: var(--primary-color);
+				box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+			}
+
+			.search-icon {
+				position: absolute;
+				left: 0.75rem;
+				top: 50%;
+				transform: translateY(-50%);
+				color: var(--text-muted);
+				font-size: 0.9rem;
+			}
+
+			.attendee-list {
+				width: 100%;
+				border-collapse: separate;
+				border-spacing: 0;
+			}
+
+			.attendee-list th {
+				text-align: left;
+				padding: var(--spacing-md);
+				font-weight: 600;
+				color: var(--text-primary);
+				border-bottom: 2px solid var(--border-color);
+				position: sticky;
+				top: 0;
+				background-color: white;
+				z-index: 10;
+			}
+
+			.attendee-list th:first-child {
+				padding-left: var(--spacing-lg);
+				border-top-left-radius: var(--border-radius);
+			}
+
+			.attendee-list th:last-child {
+				padding-right: var(--spacing-lg);
+				border-top-right-radius: var(--border-radius);
+			}
+
+			.attendee-list td {
+				padding: var(--spacing-md);
+				border-bottom: 1px solid var(--border-color);
+				color: var(--text-secondary);
+				font-size: 0.95rem;
+			}
+
+			.attendee-list td:first-child {
+				padding-left: var(--spacing-lg);
+				font-weight: 500;
+				color: var(--text-primary);
+			}
+
+			.attendee-list td:last-child {
+				padding-right: var(--spacing-lg);
+			}
+
+			.attendee-list tr:hover td {
+				background-color: var(--primary-light);
+			}
+
+			.attendee-list tr:last-child td {
+				border-bottom: none;
+			}
+
+			.attendee-list tr:last-child td:first-child {
+				border-bottom-left-radius: var(--border-radius);
+			}
+
+			.attendee-list tr:last-child td:last-child {
+				border-bottom-right-radius: var(--border-radius);
+			}
+
+			.status-badge {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.25rem 0.75rem;
+				border-radius: var(--border-radius-full);
+				font-size: 0.75rem;
+				font-weight: 600;
+			}
+
+			.status-confirmed {
+				background-color: rgba(52, 211, 153, 0.1);
+				color: var(--success-color);
+			}
+
+			.status-pending {
+				background-color: rgba(251, 191, 36, 0.1);
+				color: var(--warning-color);
+			}
+
+			.status-cancelled {
+				background-color: rgba(248, 113, 113, 0.1);
+				color: var(--danger-color);
+			}
+
+			.table-action {
+				color: var(--text-muted);
+				background: none;
+				border: none;
+				cursor: pointer;
+				transition: color var(--transition-fast);
+				font-size: 1.1rem;
+			}
+
+			.table-action:hover {
+				color: var(--primary-color);
+			}
+
+			.feedback-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				border: 1px solid var(--border-color);
+			}
+
+			.rating-title {
+				font-weight: 500;
+				margin-bottom: var(--spacing-md);
+			}
+
+			.rating-stars {
+				display: flex;
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.star {
+				font-size: 1.75rem;
+				cursor: pointer;
+				color: var(--border-color);
+				margin-right: var(--spacing-xs);
+				transition: all var(--transition-fast);
+			}
+
+			.star:hover {
+				transform: scale(1.2);
+			}
+
+			.star.active {
+				color: #ffc107;
+			}
+
+			.feedback-categories {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+				gap: var(--spacing-md);
+				margin-bottom: var(--spacing-lg);
+			}
+
+			.feedback-category {
+				padding: var(--spacing-md);
+				border-radius: var(--border-radius);
+				border: 1px solid var(--border-color);
+				cursor: pointer;
+				transition: all var(--transition-fast);
+				text-align: center;
+			}
+
+			.feedback-category:hover {
+				border-color: var(--primary-color);
+				transform: translateY(-3px);
+			}
+
+			.feedback-category.selected {
+				border-color: var(--primary-color);
+				background-color: var(--primary-light);
+			}
+
+			.category-icon {
+				font-size: 1.5rem;
+				color: var(--text-secondary);
+				margin-bottom: var(--spacing-sm);
+			}
+
+			.feedback-category.selected .category-icon {
+				color: var(--primary-color);
+			}
+
+			.category-label {
+				font-size: 0.9rem;
+				font-weight: 500;
+			}
+
+			.networking-container {
+				background: var(--card-color);
+				border-radius: var(--border-radius-lg);
+				box-shadow: var(--shadow);
+				padding: var(--spacing-xl);
+				margin-bottom: var(--spacing-2xl);
+				border: 1px solid var(--border-color);
+			}
+
+			.contact-cards {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+				gap: var(--spacing-lg);
+				margin-top: var(--spacing-lg);
+			}
+
+			.contact-card {
+				background: white;
+				border-radius: var(--border-radius);
+				padding: var(--spacing-lg);
+				text-align: center;
+				box-shadow: var(--shadow-sm);
+				transition: all var(--transition-normal);
+				border: 1px solid var(--border-color);
+			}
+
+			.contact-card:hover {
+				transform: translateY(-5px);
+				box-shadow: var(--shadow-md);
+				border-color: rgba(67, 97, 238, 0.3);
+			}
+
+			.contact-avatar {
+				width: 70px;
+				height: 70px;
+				border-radius: 50%;
+				background: linear-gradient(
+					135deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				margin: 0 auto var(--spacing-md);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+				font-weight: 600;
+				font-size: 1.5rem;
+			}
+
+			.contact-name {
+				font-weight: 600;
+				font-size: 1.1rem;
+				margin-bottom: var(--spacing-xs);
+			}
+
+			.contact-title {
+				font-size: 0.85rem;
+				color: var(--text-secondary);
+				margin-bottom: var(--spacing-md);
+			}
+
+			.contact-connect {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.5rem 1rem;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				color: white;
+				border-radius: var(--border-radius-full);
+				font-size: 0.85rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all var(--transition-normal);
+				text-decoration: none;
+			}
+
+			.contact-connect:hover {
+				background: linear-gradient(
+					90deg,
+					var(--primary-hover),
+					var(--primary-color)
+				);
+				transform: translateY(-2px);
+				box-shadow: var(--shadow);
+			}
+
+			.connect-icon {
+				margin-right: var(--spacing-xs);
+			}
+
+			.modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(15, 23, 42, 0.5);
+				backdrop-filter: blur(3px);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				opacity: 0;
+				visibility: hidden;
+				transition: all var(--transition-normal);
+			}
+
+			.modal-overlay.active {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-container {
+				background: white;
+				border-radius: var(--border-radius-lg);
+				width: 90%;
+				max-width: 500px;
+				max-height: 90vh;
+				overflow-y: auto;
+				box-shadow: var(--shadow-lg);
+				transform: translateY(20px);
+				transition: transform var(--transition-normal);
+				border: 1px solid var(--border-color);
+			}
+
+			.modal-overlay.active .modal-container {
+				transform: translateY(0);
+			}
+
+			.modal-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: var(--spacing-lg);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.modal-title {
+				font-size: 1.2rem;
+				font-weight: 600;
+				margin: 0;
+			}
+
+			.modal-close {
+				background: none;
+				border: none;
+				font-size: 1.5rem;
+				cursor: pointer;
+				color: var(--text-secondary);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 32px;
+				height: 32px;
+				border-radius: var(--border-radius-full);
+				transition: all var(--transition-fast);
+			}
+
+			.modal-close:hover {
+				background-color: var(--background-alt);
+				color: var(--text-primary);
+			}
+
+			.modal-body {
+				padding: var(--spacing-lg);
+			}
+
+			.modal-footer {
+				padding: var(--spacing-md) var(--spacing-lg);
+				border-top: 1px solid var(--border-color);
+				display: flex;
+				justify-content: flex-end;
+				gap: var(--spacing-md);
+			}
+
+			.toast-container {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				z-index: 1010;
+				display: flex;
+				flex-direction: column;
+				gap: var(--spacing-sm);
+				max-width: 350px;
+			}
+
+			.toast {
+				background: white;
+				border-radius: var(--border-radius);
+				padding: var(--spacing-md) var(--spacing-lg);
+				box-shadow: var(--shadow-lg);
+				display: flex;
+				align-items: center;
+				transform: translateX(120%);
+				animation: slideIn 0.3s forwards, fadeOut 0.3s forwards 5s;
+				position: relative;
+				border-left: 4px solid var(--primary-color);
+			}
+
+			@keyframes slideIn {
+				to {
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes fadeOut {
+				to {
+					transform: translateX(120%);
+					opacity: 0;
+				}
+			}
+
+			.toast-success {
+				border-left-color: var(--success-color);
+			}
+
+			.toast-warning {
+				border-left-color: var(--warning-color);
+			}
+
+			.toast-error {
+				border-left-color: var(--danger-color);
+			}
+
+			.toast-info {
+				border-left-color: var(--accent-color);
+			}
+
+			.toast-icon {
+				margin-right: var(--spacing-md);
+				font-size: 1.25rem;
+			}
+
+			.toast-success .toast-icon {
+				color: var(--success-color);
+			}
+
+			.toast-warning .toast-icon {
+				color: var(--warning-color);
+			}
+
+			.toast-error .toast-icon {
+				color: var(--danger-color);
+			}
+
+			.toast-info .toast-icon {
+				color: var(--accent-color);
+			}
+
+			.toast-content {
+				flex: 1;
+			}
+
+			.toast-title {
+				font-weight: 600;
+				font-size: 0.95rem;
+				margin-bottom: var(--spacing-xs);
+			}
+
+			.toast-message {
+				font-size: 0.85rem;
+				color: var(--text-secondary);
+			}
+
+			.toast-close {
+				background: none;
+				border: none;
+				color: var(--text-muted);
+				cursor: pointer;
+				padding: var(--spacing-xs);
+				font-size: 1rem;
+				margin-left: var(--spacing-md);
+			}
+
+			.toast-progress {
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				height: 3px;
+				background: rgba(67, 97, 238, 0.1);
+				width: 100%;
+			}
+
+			.toast-progress::before {
+				content: "";
+				position: absolute;
+				height: 100%;
+				width: 100%;
+				background: var(--primary-color);
+				animation: progress 5s linear forwards;
+			}
+
+			.toast-success .toast-progress::before {
+				background: var(--success-color);
+			}
+
+			.toast-warning .toast-progress::before {
+				background: var(--warning-color);
+			}
+
+			.toast-error .toast-progress::before {
+				background: var(--danger-color);
+			}
+
+			.toast-info .toast-progress::before {
+				background: var(--accent-color);
+			}
+
+			@keyframes progress {
+				to {
+					width: 0%;
+				}
+			}
+
+			footer {
+				background: linear-gradient(
+					135deg,
+					var(--text-primary),
+					var(--secondary-color)
+				);
+				color: white;
+				padding: var(--spacing-2xl) 0;
+				margin-top: var(--spacing-2xl);
+				position: relative;
+			}
+
+			footer::before {
+				content: "";
+				position: absolute;
+				top: -2px;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+			}
+
+			.footer-content {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: var(--spacing-2xl);
+			}
+
+			.footer-section {
+				margin-bottom: var(--spacing-xl);
+			}
+
+			.footer-title {
+				font-size: 1.2rem;
+				margin-bottom: var(--spacing-lg);
+				position: relative;
+				padding-bottom: var(--spacing-sm);
+				color: white;
+			}
+
+			.footer-title::after {
+				content: "";
+				position: absolute;
+				width: 40px;
+				height: 3px;
+				background: var(--accent-color);
+				bottom: 0;
+				left: 0;
+				border-radius: var(--border-radius-full);
+			}
+
+			.footer-links {
+				list-style: none;
+				padding: 0;
+			}
+
+			.footer-links li {
+				margin-bottom: var(--spacing-sm);
+			}
+
+			.footer-links a {
+				color: rgba(255, 255, 255, 0.8);
+				text-decoration: none;
+				transition: color var(--transition-fast);
+				display: flex;
+				align-items: center;
+			}
+
+			.footer-links a:hover {
+				color: white;
+			}
+
+			.footer-link-icon {
+				margin-right: var(--spacing-sm);
+			}
+
+			.footer-contact-item {
+				display: flex;
+				align-items: center;
+				margin-bottom: var(--spacing-sm);
+				color: rgba(255, 255, 255, 0.8);
+			}
+
+			.footer-contact-icon {
+				margin-right: var(--spacing-sm);
+			}
+
+			.footer-social {
+				display: flex;
+				gap: var(--spacing-md);
+				margin-top: var(--spacing-md);
+			}
+
+			.social-icon {
+				width: 36px;
+				height: 36px;
+				border-radius: var(--border-radius-full);
+				background: rgba(255, 255, 255, 0.1);
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all var(--transition-fast);
+			}
+
+			.social-icon:hover {
+				background: var(--accent-color);
+				transform: translateY(-3px);
+			}
+
+			.footer-bottom {
+				text-align: center;
+				padding-top: var(--spacing-xl);
+				margin-top: var(--spacing-xl);
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				font-size: 0.9rem;
+				color: rgba(255, 255, 255, 0.7);
+			}
+
+			@media (max-width: 992px) {
+				:root {
+					--spacing-xl: 1.5rem;
+					--spacing-2xl: 2rem;
+				}
+
+				.dashboard {
+					grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				}
+
+				.contact-cards {
+					grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+				}
+			}
+
+			@media (max-width: 768px) {
+				:root {
+					--spacing-lg: 1rem;
+					--spacing-xl: 1.25rem;
+				}
+
+				.nav-toggle {
+					display: block;
+				}
+
+				.nav-menu {
+					position: fixed;
+					top: var(--header-height);
+					left: -100%;
+					flex-direction: column;
+					background-color: var(--card-color);
+					width: 250px;
+					height: calc(100vh - var(--header-height));
+					padding: var(--spacing-md) 0;
+					transition: left var(--transition-normal);
+					box-shadow: var(--shadow);
+					z-index: 99;
+					align-items: flex-start;
+				}
+
+				.nav-menu.active {
+					left: 0;
+				}
+
+				.nav-menu li {
+					margin: 0;
+					width: 100%;
+					height: auto;
+				}
+
+				.nav-menu a {
+					padding: var(--spacing-md) var(--spacing-xl);
+					width: 100%;
+					height: auto;
+				}
+
+				.nav-menu a.active::after {
+					display: none;
+				}
+
+				.nav-menu a.active {
+					background-color: var(--primary-light);
+				}
+
+				.nav-link-icon {
+					margin-right: var(--spacing-md);
+					width: 24px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+
+				.dashboard {
+					grid-template-columns: 1fr;
+				}
+
+				.analytics-metrics {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				.form-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.form-actions {
+					flex-direction: column;
+				}
+
+				.button {
+					width: 100%;
+				}
+
+				.footer-content {
+					grid-template-columns: 1fr;
+				}
+
+				.footer-title::after {
+					left: 0;
+				}
+			}
+
+			@media (max-width: 576px) {
+				:root {
+					--spacing-md: 0.75rem;
+					--spacing-lg: 0.9rem;
+				}
+
+				.header-button {
+					width: 36px;
+					height: 36px;
+				}
+
+				.section-title {
+					font-size: 1.5rem;
+				}
+
+				.analytics-metrics {
+					grid-template-columns: 1fr;
+				}
+
+				.contact-cards {
+					grid-template-columns: 1fr;
+				}
+
+				.modal-container {
+					width: 95%;
+				}
+			}
+
+			.fade-in {
+				animation: fadeIn 0.5s ease;
+			}
+
+			.slide-in-right {
+				animation: slideInRight 0.5s ease;
+			}
+
+			@keyframes slideInRight {
+				from {
+					transform: translateX(100px);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			.slide-in-left {
+				animation: slideInLeft 0.5s ease;
+			}
+
+			@keyframes slideInLeft {
+				from {
+					transform: translateX(-100px);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			.slide-in-up {
+				animation: slideInUp 0.5s ease;
+			}
+
+			@keyframes slideInUp {
+				from {
+					transform: translateY(50px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			.pulse-animation {
+				animation: pulse 2s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			.shake {
+				animation: shake 0.5s ease;
+			}
+
+			@keyframes shake {
+				0%,
+				100% {
+					transform: translateX(0);
+				}
+				10%,
+				30%,
+				50%,
+				70%,
+				90% {
+					transform: translateX(-5px);
+				}
+				20%,
+				40%,
+				60%,
+				80% {
+					transform: translateX(5px);
+				}
+			}
+
+			.text-primary {
+				color: var(--primary-color);
+			}
+			.text-secondary {
+				color: var(--secondary-color);
+			}
+			.text-success {
+				color: var(--success-color);
+			}
+			.text-warning {
+				color: var(--warning-color);
+			}
+			.text-danger {
+				color: var(--danger-color);
+			}
+			.text-muted {
+				color: var(--text-muted);
+			}
+
+			.bg-primary {
+				background-color: var(--primary-color);
+			}
+			.bg-secondary {
+				background-color: var(--secondary-color);
+			}
+			.bg-success {
+				background-color: var(--success-color);
+			}
+			.bg-warning {
+				background-color: var(--warning-color);
+			}
+			.bg-danger {
+				background-color: var(--danger-color);
+			}
+			.bg-light {
+				background-color: var(--background-alt);
+			}
+			.bg-gradient {
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+			}
+
+			.fw-bold {
+				font-weight: 700;
+			}
+			.fw-semibold {
+				font-weight: 600;
+			}
+			.fw-medium {
+				font-weight: 500;
+			}
+
+			.fs-sm {
+				font-size: 0.85rem;
+			}
+			.fs-md {
+				font-size: 1rem;
+			}
+			.fs-lg {
+				font-size: 1.25rem;
+			}
+			.fs-xl {
+				font-size: 1.5rem;
+			}
+
+			.d-flex {
+				display: flex;
+			}
+			.align-items-center {
+				align-items: center;
+			}
+			.justify-content-between {
+				justify-content: space-between;
+			}
+			.justify-content-center {
+				justify-content: center;
+			}
+			.flex-column {
+				flex-direction: column;
+			}
+			.flex-grow-1 {
+				flex-grow: 1;
+			}
+
+			.mt-1 {
+				margin-top: var(--spacing-sm);
+			}
+			.mt-2 {
+				margin-top: var(--spacing-md);
+			}
+			.mt-3 {
+				margin-top: var(--spacing-lg);
+			}
+			.mt-4 {
+				margin-top: var(--spacing-xl);
+			}
+
+			.mb-1 {
+				margin-bottom: var(--spacing-sm);
+			}
+			.mb-2 {
+				margin-bottom: var(--spacing-md);
+			}
+			.mb-3 {
+				margin-bottom: var(--spacing-lg);
+			}
+			.mb-4 {
+				margin-bottom: var(--spacing-xl);
+			}
+
+			.ml-1 {
+				margin-left: var(--spacing-sm);
+			}
+			.ml-2 {
+				margin-left: var(--spacing-md);
+			}
+			.ml-3 {
+				margin-left: var(--spacing-lg);
+			}
+			.ml-4 {
+				margin-left: var(--spacing-xl);
+			}
+
+			.mr-1 {
+				margin-right: var(--spacing-sm);
+			}
+			.mr-2 {
+				margin-right: var(--spacing-md);
+			}
+			.mr-3 {
+				margin-right: var(--spacing-lg);
+			}
+			.mr-4 {
+				margin-right: var(--spacing-xl);
+			}
+
+			.p-1 {
+				padding: var(--spacing-sm);
+			}
+			.p-2 {
+				padding: var(--spacing-md);
+			}
+			.p-3 {
+				padding: var(--spacing-lg);
+			}
+			.p-4 {
+				padding: var(--spacing-xl);
+			}
+
+			.rounded {
+				border-radius: var(--border-radius);
+			}
+			.rounded-sm {
+				border-radius: var(--border-radius-sm);
+			}
+			.rounded-lg {
+				border-radius: var(--border-radius-lg);
+			}
+			.rounded-full {
+				border-radius: var(--border-radius-full);
+			}
+
+			.shadow-sm {
+				box-shadow: var(--shadow-sm);
+			}
+			.shadow {
+				box-shadow: var(--shadow);
+			}
+			.shadow-md {
+				box-shadow: var(--shadow-md);
+			}
+			.shadow-lg {
+				box-shadow: var(--shadow-lg);
+			}
+
+			.text-center {
+				text-align: center;
+			}
+			.text-right {
+				text-align: right;
+			}
+			.text-left {
+				text-align: left;
+			}
+
+			.hidden {
+				display: none;
+			}
+			.visible {
+				display: block;
+			}
+
+			.focus-visible:focus {
+				outline: 3px solid rgba(67, 97, 238, 0.3);
+				outline-offset: 2px;
+			}
+
+			.elevation-hover {
+				transition: all var(--transition-normal);
+			}
+
+			.elevation-hover:hover {
+				transform: translateY(-5px);
+				box-shadow: var(--shadow-md);
+			}
+
+			.gradient-text {
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				text-fill-color: transparent;
+			}
+
+			.gradient-border {
+				position: relative;
+				border-radius: var(--border-radius);
+			}
+
+			.gradient-border::before {
+				content: "";
+				position: absolute;
+				top: -1px;
+				left: -1px;
+				right: -1px;
+				bottom: -1px;
+				background: linear-gradient(
+					90deg,
+					var(--primary-color),
+					var(--accent-color)
+				);
+				border-radius: calc(var(--border-radius) + 1px);
+				z-index: -1;
+			}
+
+			.gradient-border::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: white;
+				border-radius: var(--border-radius);
+				z-index: -1;
+			}
+
+			.soft-pill {
+				display: inline-flex;
+				align-items: center;
+				padding: 0.35rem 0.8rem;
+				border-radius: var(--border-radius-full);
+				font-size: 0.8rem;
+				font-weight: 500;
+			}
+
+			.soft-pill-primary {
+				background-color: var(--primary-light);
+				color: var(--primary-color);
+			}
+
+			.soft-pill-success {
+				background-color: rgba(52, 211, 153, 0.1);
+				color: var(--success-color);
+			}
+
+			.soft-pill-warning {
+				background-color: rgba(251, 191, 36, 0.1);
+				color: var(--warning-color);
+			}
+
+			.soft-pill-danger {
+				background-color: rgba(248, 113, 113, 0.1);
+				color: var(--danger-color);
+			}
+
+			.soft-pill-icon {
+				margin-right: 0.4rem;
+			}
+
+			.glass-card {
+				background: rgba(255, 255, 255, 0.7);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			}
+
+			.float {
+				animation: float 3s ease-in-out infinite;
+			}
+
+			@keyframes float {
+				0% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(-10px);
+				}
+				100% {
+					transform: translateY(0);
+				}
+			}
+
+			.button-emphasis {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.button-emphasis::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: -100%;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.2),
+					transparent
+				);
+				animation: shimmer 2s infinite;
+			}
+
+			@keyframes shimmer {
+				100% {
+					left: 100%;
+				}
+			}
+
+			.notification-dot {
+				position: relative;
+			}
+
+			.notification-dot::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 8px;
+				height: 8px;
+				background-color: var(--danger-color);
+				border-radius: 50%;
+				border: 2px solid white;
+			}
+
+			.hover-scale {
+				transition: transform var(--transition-normal);
+			}
+
+			.hover-scale:hover {
+				transform: scale(1.05);
+			}
+
+			.hover-rotate {
+				transition: transform var(--transition-normal);
+			}
+
+			.hover-rotate:hover {
+				transform: rotate(5deg);
+			}
+
+			.skeleton {
+				background: linear-gradient(
+					90deg,
+					#f0f0f0 25%,
+					#e0e0e0 50%,
+					#f0f0f0 75%
+				);
+				background-size: 200% 100%;
+				animation: skeleton-loading 1.5s infinite;
+			}
+
+			@keyframes skeleton-loading {
+				0% {
+					background-position: 200% 0;
+				}
+				100% {
+					background-position: -200% 0;
+				}
+			}
+
+			.skeleton-text {
+				height: 1em;
+				margin-bottom: 0.5em;
+				border-radius: 4px;
+			}
+
+			.skeleton-circle {
+				width: 50px;
+				height: 50px;
+				border-radius: 50%;
+			}
+
+			.skeleton-rect {
+				width: 100%;
+				height: 100px;
+				border-radius: var(--border-radius);
+			}
+
+			.interactive-card {
+				transition: all var(--transition-normal);
+				cursor: pointer;
+			}
+
+			.interactive-card:hover {
+				transform: translateY(-5px) scale(1.02);
+				box-shadow: var(--shadow-lg);
+			}
+
+			.highlight-container {
+				border-left: 4px solid var(--primary-color);
+				padding: var(--spacing-md) var(--spacing-lg);
+				background-color: var(--primary-light);
+				border-radius: 0 var(--border-radius) var(--border-radius) 0;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: var(--background-alt);
+				border-radius: 10px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: rgba(67, 97, 238, 0.3);
+				border-radius: 10px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: rgba(67, 97, 238, 0.5);
+			}
+
+			.sr-only {
+				position: absolute;
+				width: 1px;
+				height: 1px;
+				padding: 0;
+				margin: -1px;
+				overflow: hidden;
+				clip: rect(0, 0, 0, 0);
+				white-space: nowrap;
+				border-width: 0;
+			}
+
+			.chart-container {
+				position: relative;
+				height: 400px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: #f9fafb;
+				border-radius: 10px;
+				margin: 20px 0;
+			}
+
+			.bar-chart {
+				display: flex;
+				justify-content: space-around;
+				align-items: flex-end;
+				height: 250px;
+				width: 100%;
+				padding: 20px;
+				background-color: #f0f0f0;
+			}
+
+			.bar-wrapper {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.bar {
+				width: 50px;
+				background-color: #4361ee;
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-weight: bold;
+				border-radius: 5px 5px 0 0;
+			}
+
+			.bar-label {
+				margin-top: 10px;
+				font-size: 0.8rem;
+				color: #4b5563;
+			}
+
+			.pie-chart {
+				width: 200px;
+				height: 200px;
+				border-radius: 50%;
+				margin: 0 auto 20px;
+			}
+
+			.pie-legend {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.legend-item {
+				display: flex;
+				align-items: center;
+				margin-bottom: 5px;
+			}
+
+			.legend-color {
+				width: 12px;
+				height: 12px;
+				margin-right: 5px;
+				border-radius: 2px;
+			}
+
+			.demographics-charts {
+				display: flex;
+				justify-content: space-around;
+
+				flex-grow: inherit;
+			}
+
+			.pie-chart-wrapper {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				margin: 10px;
+			}
+
+			.pie-title {
+				font-size: 1rem;
+				font-weight: 600;
+				margin-bottom: 10px;
+			}
+
+			.user-dropdown {
+				display: none;
+			}
+			.user-dropdown.show {
+				display: block;
+			}
+		</style>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+		/>
+	</head>
+
+	<body>
+		<div class="app-wrapper">
+
+			<header>
+				<div class="container">
+					<div class="header-content">
+
+						<div class="logo">
+							<div class="logo-icon">
+								<i class="fas fa-calendar-check"></i>
+							</div>
+							EventFlow
+						</div>
+
+
+						<button
+							class="nav-toggle"
+							id="navToggle"
+							aria-label="Toggle navigation"
+						>
+							<i class="fas fa-bars"></i>
+						</button>
+
+
+						<ul class="nav-menu" id="navMenu">
+							<li>
+								<a href="#dashboard">
+									<i class="fas fa-th-large nav-link-icon"></i>
+									Dashboard
+								</a>
+							</li>
+							<li>
+								<a href="#timeline">
+									<i class="fas fa-stream nav-link-icon"></i>
+									Timeline
+								</a>
+							</li>
+							<li>
+								<a href="#registration">
+									<i class="fas fa-user-plus nav-link-icon"></i>
+									Registration
+								</a>
+							</li>
+							<li>
+								<a href="#chat">
+									<i class="fas fa-comments nav-link-icon"></i>
+									Support
+								</a>
+							</li>
+							<li>
+								<a href="#analytics">
+									<i class="fas fa-chart-line nav-link-icon"></i>
+									Analytics
+								</a>
+							</li>
+							<li>
+								<a href="#networking">
+									<i class="fas fa-network-wired nav-link-icon"></i>
+									Networking
+								</a>
+							</li>
+						</ul>
+
+
+						<div class="header-actions">
+							<button class="header-button" aria-label="Search">
+								<i class="fas fa-search"></i>
+							</button>
+
+							<button
+								class="header-button has-badge"
+								aria-label="Notifications"
+							>
+								<i class="fas fa-bell"></i>
+								<span class="badge">3</span>
+							</button>
+
+
+							<div class="user-profile" id="userProfile">
+								<div class="user-avatar">JS</div>
+								<div class="user-info">
+									<div class="user-name">John Smith</div>
+								</div>
+								<i class="fas fa-chevron-down user-dropdown-icon"></i>
+
+
+								<div class="user-dropdown" id="userDropdown">
+									<div class="dropdown-header">
+										<div class="dropdown-header-avatar">JS</div>
+										<div class="dropdown-header-info">
+											<h4>John Smith</h4>
+											<p>john.smith@example.com</p>
+										</div>
+									</div>
+
+									<div class="dropdown-tabs">
+										<div class="dropdown-tab active" data-tab="profile">
+											Profile
+										</div>
+										<div class="dropdown-tab" data-tab="upcoming">Upcoming</div>
+										<div class="dropdown-tab" data-tab="settings">Settings</div>
+									</div>
+
+									<div class="dropdown-content">
+
+										<div class="dropdown-tab-content active" id="profile-tab">
+											<div class="profile-section">
+												<ul class="profile-links">
+													<li>
+														<a href="#" class="profile-link">
+															<i class="fas fa-user profile-link-icon"></i>
+															View Profile
+														</a>
+													</li>
+													<li>
+														<a href="#" class="profile-link">
+															<i class="fas fa-edit profile-link-icon"></i>
+															Edit Profile
+														</a>
+													</li>
+													<li>
+														<a href="#" class="profile-link">
+															<i
+																class="fas fa-calendar-alt profile-link-icon"
+															></i>
+															My Events
+														</a>
+													</li>
+													<li>
+														<a href="#" class="profile-link">
+															<i class="fas fa-bookmark profile-link-icon"></i>
+															Saved Events
+														</a>
+													</li>
+												</ul>
+											</div>
+										</div>
+
+
+										<div class="dropdown-tab-content" id="upcoming-tab">
+											<div class="upcoming-event">
+												<div class="upcoming-event-date">May 15, 2025</div>
+												<div class="upcoming-event-title">
+													Tech Conference 2025
+												</div>
+												<div class="upcoming-event-meta">
+													<div class="meta-item">
+														<i class="fas fa-map-marker-alt meta-icon"></i>
+														San Francisco
+													</div>
+													<div class="meta-item">
+														<i class="fas fa-users meta-icon"></i>
+														247 Attendees
+													</div>
+												</div>
+											</div>
+											<div class="upcoming-event">
+												<div class="upcoming-event-date">June 3, 2025</div>
+												<div class="upcoming-event-title">Product Launch</div>
+												<div class="upcoming-event-meta">
+													<div class="meta-item">
+														<i class="fas fa-map-marker-alt meta-icon"></i>
+														New York
+													</div>
+													<div class="meta-item">
+														<i class="fas fa-users meta-icon"></i>
+														128 Attendees
+													</div>
+												</div>
+											</div>
+										</div>
+
+
+										<div class="dropdown-tab-content" id="settings-tab">
+											<div class="settings-section">
+												<ul class="settings-list">
+													<li class="settings-item">
+														<div class="settings-item-label">
+															<i class="fas fa-bell settings-item-icon"></i>
+															Notifications
+														</div>
+														<label class="toggle-switch">
+															<input type="checkbox" checked />
+															<span class="toggle-slider"></span>
+														</label>
+													</li>
+													<li class="settings-item">
+														<div class="settings-item-label">
+															<i class="fas fa-envelope settings-item-icon"></i>
+															Email Updates
+														</div>
+														<label class="toggle-switch">
+															<input type="checkbox" checked />
+															<span class="toggle-slider"></span>
+														</label>
+													</li>
+													<li class="settings-item">
+														<div class="settings-item-label">
+															<i class="fas fa-moon settings-item-icon"></i>
+															Dark Mode
+														</div>
+														<label class="toggle-switch">
+															<input type="checkbox" />
+															<span class="toggle-slider"></span>
+														</label>
+													</li>
+													<li class="settings-item">
+														<div class="settings-item-label">
+															<i class="fas fa-globe settings-item-icon"></i>
+															Language
+														</div>
+														<span>English</span>
+													</li>
+												</ul>
+											</div>
+										</div>
+									</div>
+
+
+									<div class="logout-section">
+										<button class="logout-button">
+											<i class="fas fa-sign-out-alt logout-icon"></i>
+											Logout
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<main class="container">
+
+				<section id="dashboard" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Dashboard</h2>
+						<div class="section-actions">
+							<button class="button button-sm">
+								<i class="fas fa-plus button-icon"></i>
+								New Event
+							</button>
+						</div>
+					</div>
+
+					<div class="dashboard">
+						<div class="dashboard-card">
+							<div class="card-header">
+								<h3 class="card-title">Total Attendees</h3>
+								<div class="card-icon">
+									<i class="fas fa-users"></i>
+								</div>
+							</div>
+							<div class="card-content">
+								<div class="stat-number">247</div>
+								<div class="stat-change stat-change-positive">
+									<i class="fas fa-arrow-up change-icon"></i>
+									12% from last event
+								</div>
+							</div>
+						</div>
+
+						<div class="dashboard-card">
+							<div class="card-header">
+								<h3 class="card-title">Sessions</h3>
+								<div class="card-icon">
+									<i class="fas fa-calendar-day"></i>
+								</div>
+							</div>
+							<div class="card-content">
+								<div class="stat-number">12</div>
+								<div class="stat-change">3 concurrent tracks</div>
+							</div>
+						</div>
+
+						<div class="dashboard-card">
+							<div class="card-header">
+								<h3 class="card-title">Days Until Event</h3>
+								<div class="card-icon">
+									<i class="fas fa-hourglass-half"></i>
+								</div>
+							</div>
+							<div class="card-content">
+								<div class="stat-number" id="countdownDays">14</div>
+								<div class="stat-change">Starting May 15, 2025</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+
+				<section id="timeline" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Event Timeline</h2>
+						<div class="section-actions">
+							<button class="button button-outline button-sm">
+								<i class="fas fa-print button-icon"></i>
+								Print Schedule
+							</button>
+						</div>
+					</div>
+
+					<div class="timeline-container">
+						<div class="timeline">
+							<div class="timeline-event">
+								<div class="timeline-date">
+									<i class="fas fa-clock timeline-date-icon"></i>
+									May 15, 9:00 AM
+								</div>
+								<h3 class="timeline-title">Registration & Welcome Coffee</h3>
+								<p class="timeline-desc">
+									Pick up your badges and enjoy networking over coffee
+								</p>
+								<div class="timeline-tags">
+									<span class="timeline-tag">Registration</span>
+									<span class="timeline-tag">Networking</span>
+								</div>
+							</div>
+
+							<div class="timeline-event">
+								<div class="timeline-date">
+									<i class="fas fa-clock timeline-date-icon"></i>
+									May 15, 10:00 AM
+								</div>
+								<h3 class="timeline-title">Opening Keynote</h3>
+								<p class="timeline-desc">
+									Join us for the official opening and keynote presentation
+								</p>
+								<div class="timeline-tags">
+									<span class="timeline-tag">Keynote</span>
+									<span class="timeline-tag">Main Hall</span>
+								</div>
+							</div>
+
+							<div class="timeline-event">
+								<div class="timeline-date">
+									<i class="fas fa-clock timeline-date-icon"></i>
+									May 15, 11:30 AM
+								</div>
+								<h3 class="timeline-title">Breakout Sessions</h3>
+								<p class="timeline-desc">
+									Choose from 3 parallel tracks focusing on different aspects
+								</p>
+								<div class="timeline-tags">
+									<span class="timeline-tag">Sessions</span>
+									<span class="timeline-tag">Multiple Rooms</span>
+								</div>
+							</div>
+
+							<div class="timeline-event">
+								<div class="timeline-date">
+									<i class="fas fa-clock timeline-date-icon"></i>
+									May 15, 1:00 PM
+								</div>
+								<h3 class="timeline-title">Networking Lunch</h3>
+								<p class="timeline-desc">
+									Enjoy a delicious meal while networking with peers
+								</p>
+								<div class="timeline-tags">
+									<span class="timeline-tag">Lunch</span>
+									<span class="timeline-tag">Networking</span>
+								</div>
+							</div>
+
+							<div class="timeline-event">
+								<div class="timeline-date">
+									<i class="fas fa-clock timeline-date-icon"></i>
+									May 15, 2:30 PM
+								</div>
+								<h3 class="timeline-title">Panel Discussion</h3>
+								<p class="timeline-desc">
+									Industry experts share insights on current trends
+								</p>
+								<div class="timeline-tags">
+									<span class="timeline-tag">Panel</span>
+									<span class="timeline-tag">Main Hall</span>
+								</div>
+							</div>
+
+							<div class="timeline-event">
+								<div class="timeline-date">
+									<i class="fas fa-clock timeline-date-icon"></i>
+									May 15, 4:00 PM
+								</div>
+								<h3 class="timeline-title">
+									Closing Remarks & Networking Reception
+								</h3>
+								<p class="timeline-desc">
+									Wrap-up and continued networking opportunities
+								</p>
+								<div class="timeline-tags">
+									<span class="timeline-tag">Closing</span>
+									<span class="timeline-tag">Reception</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+
+				<section id="registration" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Attendee Registration</h2>
+					</div>
+
+					<div class="registration-container">
+						<form id="registrationForm">
+							<div class="form-grid">
+								<div class="form-row">
+									<label class="form-label required" for="fullName"
+										>Full Name</label
+									>
+									<div class="form-input-icon">
+										<i class="fas fa-user input-icon"></i>
+										<input
+											class="form-input"
+											type="text"
+											id="fullName"
+											name="fullName"
+											placeholder="Enter your full name"
+											required
+										/>
+									</div>
+								</div>
+
+								<div class="form-row">
+									<label class="form-label required" for="email"
+										>Email Address</label
+									>
+									<div class="form-input-icon">
+										<i class="fas fa-envelope input-icon"></i>
+										<input
+											class="form-input"
+											type="email"
+											id="email"
+											name="email"
+											placeholder="Enter your email address"
+											required
+										/>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-grid">
+								<div class="form-row">
+									<label class="form-label" for="phone">Phone Number</label>
+									<div class="form-input-icon">
+										<i class="fas fa-phone input-icon"></i>
+										<input
+											class="form-input"
+											type="tel"
+											id="phone"
+											name="phone"
+											placeholder="Enter your phone number"
+										/>
+									</div>
+								</div>
+
+								<div class="form-row">
+									<label class="form-label" for="company"
+										>Company/Organization</label
+									>
+									<div class="form-input-icon">
+										<i class="fas fa-building input-icon"></i>
+										<input
+											class="form-input"
+											type="text"
+											id="company"
+											name="company"
+											placeholder="Enter your company name"
+										/>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-grid">
+								<div class="form-row">
+									<label class="form-label" for="role">Job Title/Role</label>
+									<div class="form-input-icon">
+										<i class="fas fa-briefcase input-icon"></i>
+										<input
+											class="form-input"
+											type="text"
+											id="role"
+											name="role"
+											placeholder="Enter your job title"
+										/>
+									</div>
+								</div>
+
+								<div class="form-row">
+									<label class="form-label required" for="ticketType"
+										>Ticket Type</label
+									>
+									<select
+										class="form-select"
+										id="ticketType"
+										name="ticketType"
+										required
+									>
+										<option value="">Select a ticket type</option>
+										<option value="standard">Standard ($199)</option>
+										<option value="premium">Premium ($299)</option>
+										<option value="vip">VIP ($499)</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-grid">
+								<div class="form-row">
+									<label class="form-label" for="dietary"
+										>Dietary Requirements</label
+									>
+									<select class="form-select" id="dietary" name="dietary">
+										<option value="none">None</option>
+										<option value="vegetarian">Vegetarian</option>
+										<option value="vegan">Vegan</option>
+										<option value="gluten-free">Gluten-Free</option>
+										<option value="other">Other (Please specify)</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<label class="form-label" for="specialRequirements"
+									>Special Requirements or Notes</label
+								>
+								<textarea
+									class="form-textarea"
+									id="specialRequirements"
+									name="specialRequirements"
+									rows="3"
+									placeholder="Let us know if you have any special requirements or notes"
+								></textarea>
+							</div>
+
+							<div class="form-actions">
+								<button type="reset" class="button button-outline">
+									<i class="fas fa-redo button-icon"></i>
+									Reset Form
+								</button>
+								<button type="submit" class="button" id="registerButton">
+									<i class="fas fa-check button-icon"></i>
+									Register Now
+								</button>
+							</div>
+						</form>
+					</div>
+				</section>
+
+
+				<section id="chat" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Live Support Chat</h2>
+					</div>
+
+					<div class="chat-container">
+						<div class="chat-header">
+							<div class="chat-title">
+								<i class="fas fa-headset chat-title-icon"></i>
+								EventFlow Support
+							</div>
+							<div class="chat-status">
+								<span class="status-indicator"></span>
+								Online
+							</div>
+						</div>
+
+						<div class="chat-messages" id="chatMessages">
+							<div class="message message-received">
+								<div class="message-content">
+									Hello! How can I help you with the event today?
+								</div>
+								<div class="message-info">Support Team, 10:15 AM</div>
+							</div>
+						</div>
+
+						<div class="chat-input-container">
+							<input
+								type="text"
+								class="chat-input"
+								id="chatInput"
+								placeholder="Type your message here..."
+							/>
+							<button class="chat-send" id="chatSend">
+								<i class="fas fa-paper-plane"></i>
+							</button>
+						</div>
+					</div>
+				</section>
+
+
+				<section id="analytics" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Event Analytics</h2>
+						<div class="section-actions">
+							<button class="button button-outline button-sm">
+								<i class="fas fa-download button-icon"></i>
+								Export Data
+							</button>
+						</div>
+					</div>
+
+					<div class="analytics-container">
+						<div class="tabs-container">
+							<div class="tabs-header">
+								<button class="tab-button active" data-tab="attendance">
+									<i class="fas fa-user-check"></i>
+									Attendance
+								</button>
+								<button class="tab-button" data-tab="engagement">
+									<i class="fas fa-chart-bar"></i>
+									Engagement
+								</button>
+								<button class="tab-button" data-tab="feedback">
+									<i class="fas fa-comment-alt"></i>
+									Feedback
+								</button>
+								<button class="tab-button" data-tab="demographics">
+									<i class="fas fa-users"></i>
+									Demographics
+								</button>
+							</div>
+
+							<div class="tab-content active" id="attendance">
+								<h3>Attendance Analysis</h3>
+								<div class="chart-container">
+									<div class="chart-placeholder" id="attendanceChart">
+										<div class="loading-spinner"></div>
+										<div>Loading attendance data...</div>
+									</div>
+								</div>
+
+								<div class="analytics-metrics">
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-percentage"></i>
+										</div>
+										<div class="metric-value">87%</div>
+										<div class="metric-label">Show Rate</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-user-plus"></i>
+										</div>
+										<div class="metric-value">143</div>
+										<div class="metric-label">New Attendees</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-redo"></i>
+										</div>
+										<div class="metric-value">104</div>
+										<div class="metric-label">Returning Attendees</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-content" id="engagement">
+								<h3>Engagement Metrics</h3>
+								<div class="chart-container">
+									<div class="chart-placeholder" id="engagementChart">
+										<div class="loading-spinner"></div>
+										<div>Loading engagement data...</div>
+									</div>
+								</div>
+
+								<div class="analytics-metrics">
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-question-circle"></i>
+										</div>
+										<div class="metric-value">35</div>
+										<div class="metric-label">Questions Asked</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-sign-in-alt"></i>
+										</div>
+										<div class="metric-value">67</div>
+										<div class="metric-label">Session Check-ins</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-mobile-alt"></i>
+										</div>
+										<div class="metric-value">128</div>
+										<div class="metric-label">App Logins</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-content" id="feedback">
+								<h3>Attendee Feedback</h3>
+								<div class="chart-container">
+									<div class="chart-placeholder" id="feedbackChart">
+										<div class="loading-spinner"></div>
+										<div>Loading feedback data...</div>
+									</div>
+								</div>
+
+								<div class="analytics-metrics">
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-star"></i>
+										</div>
+										<div class="metric-value">4.7/5</div>
+										<div class="metric-label">Overall Rating</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-thumbs-up"></i>
+										</div>
+										<div class="metric-value">92%</div>
+										<div class="metric-label">Would Recommend</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-calendar-check"></i>
+										</div>
+										<div class="metric-value">89%</div>
+										<div class="metric-label">Will Return Next Year</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-content" id="demographics">
+								<h3>Attendee Demographics</h3>
+								<div class="chart-container">
+									<div class="chart-placeholder" id="demographicsChart">
+										<div class="loading-spinner"></div>
+										<div>Loading demographics data...</div>
+									</div>
+								</div>
+
+								<div class="analytics-metrics">
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-venus"></i>
+										</div>
+										<div class="metric-value">48%</div>
+										<div class="metric-label">Female Attendees</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-building"></i>
+										</div>
+										<div class="metric-value">27</div>
+										<div class="metric-label">Industries Represented</div>
+									</div>
+
+									<div class="metric-card">
+										<div class="metric-icon">
+											<i class="fas fa-globe"></i>
+										</div>
+										<div class="metric-value">14</div>
+										<div class="metric-label">Countries Represented</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+
+				<section id="attendees" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Registered Attendees</h2>
+						<div class="section-actions">
+							<div class="attendee-search">
+								<i class="fas fa-search search-icon"></i>
+								<input
+									type="text"
+									class="search-input"
+									placeholder="Search attendees..."
+									id="attendeeSearch"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<div class="attendee-container">
+						<div class="attendee-header">
+							<div class="attendee-title">
+								<i class="fas fa-users mr-2"></i>
+								Total Attendees: 5
+							</div>
+							<div class="attendee-actions">
+								<button class="button button-outline button-sm">
+									<i class="fas fa-filter button-icon"></i>
+									Filter
+								</button>
+								<button class="button button-sm">
+									<i class="fas fa-plus button-icon"></i>
+									Add
+								</button>
+							</div>
+						</div>
+
+						<table class="attendee-list">
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Company</th>
+									<th>Ticket Type</th>
+									<th>Status</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody id="attendeeList">
+								<tr>
+									<td>John Smith</td>
+									<td>Tech Solutions Inc.</td>
+									<td>VIP</td>
+									<td>
+										<span class="status-badge status-confirmed">
+											<i class="fas fa-check-circle mr-1"></i>
+											Confirmed
+										</span>
+									</td>
+									<td>
+										<button class="table-action" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+										<button class="table-action" title="Delete">
+											<i
+												class="fas fa-trash-alt"
+												style="font-size: 20px; color: red"
+											></i>
+										</button>
+									</td>
+								</tr>
+								<tr>
+									<td>Sarah Johnson</td>
+									<td>Digital Marketing Pro</td>
+									<td>Premium</td>
+									<td>
+										<span class="status-badge status-confirmed">
+											<i class="fas fa-check-circle mr-1"></i>
+											Confirmed
+										</span>
+									</td>
+									<td>
+										<button class="table-action" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+										<button class="table-action" title="Delete">
+											<i
+												class="fas fa-trash-alt"
+												style="font-size: 20px; color: red"
+											></i>
+										</button>
+									</td>
+								</tr>
+								<tr>
+									<td>Michael Chen</td>
+									<td>Innovative Systems</td>
+									<td>Standard</td>
+									<td>
+										<span class="status-badge status-pending">
+											<i class="fas fa-clock mr-1"></i>
+											Pending
+										</span>
+									</td>
+									<td>
+										<button class="table-action" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+										<button class="table-action" title="Delete">
+											<i
+												class="fas fa-trash-alt"
+												style="font-size: 20px; color: red"
+											></i>
+										</button>
+									</td>
+								</tr>
+								<tr>
+									<td>Emma Williams</td>
+									<td>Creative Design Co.</td>
+									<td>Premium</td>
+									<td>
+										<span class="status-badge status-confirmed">
+											<i class="fas fa-check-circle mr-1"></i>
+											Confirmed
+										</span>
+									</td>
+									<td>
+										<button class="table-action" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+										<button class="table-action" title="Delete">
+											<i
+												class="fas fa-trash-alt"
+												style="font-size: 20px; color: red"
+											></i>
+										</button>
+									</td>
+								</tr>
+								<tr>
+									<td>Robert Garcia</td>
+									<td>Future Technologies</td>
+									<td>VIP</td>
+									<td>
+										<span class="status-badge status-confirmed">
+											<i class="fas fa-check-circle mr-1"></i>
+											Confirmed
+										</span>
+									</td>
+									<td>
+										<button class="table-action" title="Edit">
+											<i class="fas fa-edit"></i>
+										</button>
+										<button class="table-action" title="Delete">
+											<i
+												class="fas fa-trash-alt"
+												style="font-size: 20px; color: red"
+											></i>
+										</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+
+
+				<section id="feedback" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Feedback Form</h2>
+					</div>
+
+					<div class="feedback-container">
+						<form id="feedbackForm">
+							<div class="form-row">
+								<label class="rating-title"
+									>How would you rate the event?</label
+								>
+								<div class="rating-stars" id="ratingStars">
+									<span class="star" data-value="1">★</span>
+									<span class="star" data-value="2">★</span>
+									<span class="star" data-value="3">★</span>
+									<span class="star" data-value="4">★</span>
+									<span class="star" data-value="5">★</span>
+								</div>
+							</div>
+
+							<div class="feedback-categories">
+								<div class="feedback-category" data-value="content">
+									<div class="category-icon">
+										<i class="fas fa-file-alt"></i>
+									</div>
+									<div class="category-label">Content Quality</div>
+								</div>
+
+								<div class="feedback-category" data-value="speakers">
+									<div class="category-icon">
+										<i class="fas fa-microphone"></i>
+									</div>
+									<div class="category-label">Speakers</div>
+								</div>
+
+								<div class="feedback-category" data-value="venue">
+									<div class="category-icon">
+										<i class="fas fa-map-marker-alt"></i>
+									</div>
+									<div class="category-label">Venue</div>
+								</div>
+
+								<div class="feedback-category" data-value="organization">
+									<div class="category-icon">
+										<i class="fas fa-tasks"></i>
+									</div>
+									<div class="category-label">Organization</div>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<label class="form-label" for="feedbackComments"
+									>Additional Comments</label
+								>
+								<textarea
+									class="form-textarea"
+									id="feedbackComments"
+									rows="4"
+									placeholder="Share your thoughts about the event..."
+								></textarea>
+							</div>
+
+							<div class="form-actions">
+								<button type="submit" class="button" id="submitFeedback">
+									<i class="fas fa-paper-plane button-icon"></i>
+									Submit Feedback
+								</button>
+							</div>
+						</form>
+					</div>
+				</section>
+
+
+				<section id="networking" class="section">
+					<div class="section-header">
+						<h2 class="section-title">Networking Opportunities</h2>
+						<div class="section-actions">
+							<button class="button button-outline button-sm">
+								<i class="fas fa-filter button-icon"></i>
+								Filter
+							</button>
+						</div>
+					</div>
+
+					<div class="networking-container">
+						<p class="mb-3">
+							Connect with other attendees and expand your professional network.
+						</p>
+
+						<div class="contact-cards">
+							<div class="contact-card">
+								<div class="contact-avatar">JS</div>
+								<div class="contact-name">Jennifer Scott</div>
+								<div class="contact-title">Marketing Director</div>
+								<a href="#" class="contact-connect">
+									<i class="fas fa-user-plus connect-icon"></i>
+									Connect
+								</a>
+							</div>
+
+							<div class="contact-card">
+								<div class="contact-avatar">DK</div>
+								<div class="contact-name">David Kim</div>
+								<div class="contact-title">Product Manager</div>
+								<a href="#" class="contact-connect">
+									<i class="fas fa-user-plus connect-icon"></i>
+									Connect
+								</a>
+							</div>
+
+							<div class="contact-card">
+								<div class="contact-avatar">AJ</div>
+								<div class="contact-name">Amanda Jones</div>
+								<div class="contact-title">CTO</div>
+								<a href="#" class="contact-connect">
+									<i class="fas fa-user-plus connect-icon"></i>
+									Connect
+								</a>
+							</div>
+
+							<div class="contact-card">
+								<div class="contact-avatar">RL</div>
+								<div class="contact-name">Ryan Lee</div>
+								<div class="contact-title">Business Analyst</div>
+								<a href="#" class="contact-connect">
+									<i class="fas fa-user-plus connect-icon"></i>
+									Connect
+								</a>
+							</div>
+						</div>
+					</div>
+				</section>
+			</main>
+
+
+			<footer>
+				<div class="container">
+					<div class="footer-content">
+						<div class="footer-section">
+							<h3 class="footer-title">EventFlow</h3>
+							<p>
+								Streamlining event management for organizers and creating
+								memorable experiences for attendees.
+							</p>
+							<div class="footer-social">
+								<a href="#" class="social-icon">
+									<i class="fab fa-facebook-f"></i>
+								</a>
+								<a href="#" class="social-icon">
+									<i class="fab fa-twitter"></i>
+								</a>
+								<a href="#" class="social-icon">
+									<i class="fab fa-linkedin-in"></i>
+								</a>
+								<a href="#" class="social-icon">
+									<i class="fab fa-instagram"></i>
+								</a>
+							</div>
+						</div>
+
+						<div class="footer-section">
+							<h3 class="footer-title">Quick Links</h3>
+							<ul class="footer-links">
+								<li>
+									<a href="#dashboard">
+										<i class="fas fa-angle-right footer-link-icon"></i>
+										Dashboard
+									</a>
+								</li>
+								<li>
+									<a href="#timeline">
+										<i class="fas fa-angle-right footer-link-icon"></i>
+										Timeline
+									</a>
+								</li>
+								<li>
+									<a href="#registration">
+										<i class="fas fa-angle-right footer-link-icon"></i>
+										Registration
+									</a>
+								</li>
+								<li>
+									<a href="#analytics">
+										<i class="fas fa-angle-right footer-link-icon"></i>
+										Analytics
+									</a>
+								</li>
+							</ul>
+						</div>
+
+						<div class="footer-section">
+							<h3 class="footer-title">Contact Us</h3>
+							<div class="footer-contact-item">
+								<i class="fas fa-envelope footer-contact-icon"></i>
+								support@eventflow.com
+							</div>
+							<div class="footer-contact-item">
+								<i class="fas fa-phone footer-contact-icon"></i>
+								+1 (555) 123-4567
+							</div>
+							<div class="footer-contact-item">
+								<i class="fas fa-map-marker-alt footer-contact-icon"></i>
+								123 Event Street, Suite 200, San Francisco, CA 94103
+							</div>
+						</div>
+					</div>
+
+					<div class="footer-bottom">
+						<p>&copy; 2025 EventFlow. All rights reserved.</p>
+					</div>
+				</div>
+			</footer>
+
+
+			<div class="modal-overlay" id="registrationSuccessModal">
+				<div class="modal-container">
+					<div class="modal-header">
+						<h3 class="modal-title">Registration Successful</h3>
+						<button class="modal-close" id="closeRegistrationModal">
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div class="text-center mb-3">
+							<i class="fas fa-check-circle text-success fs-xl"></i>
+						</div>
+						<p>
+							Thank you for registering for our event! We've sent a confirmation
+							email with all the details.
+						</p>
+						<p>
+							Your registration ID:
+							<strong id="registrationId">EF-2025-1234</strong>
+						</p>
+					</div>
+					<div class="modal-footer">
+						<button class="button" id="confirmRegistrationModal">OK</button>
+					</div>
+				</div>
+			</div>
+
+
+			<div class="toast-container" id="toastContainer">
+
+			</div>
+		</div>
+
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				initNavigation();
+				initCountdown();
+				initRegistrationForm();
+				initChat();
+				initAnalyticsTabs();
+				initStarRating();
+				initFeedbackCategories();
+				initFeedbackForm();
+				initNetworking();
+				initModals();
+				initUserProfile();
+				initAttendeeSearch();
+				initPlaceholderButtons();
+				initSectionAnimations();
+			});
+			const userProfile = document.getElementById("userProfile");
+			const userDropdown = document.getElementById("userDropdown");
+
+			userProfile.addEventListener("click", function (event) {
+				event.stopPropagation();
+				userDropdown.classList.toggle("show");
+			});
+
+			document.addEventListener("click", function (event) {
+				if (!userDropdown.contains(event.target)) {
+					userDropdown.classList.remove("show");
+				}
+			});
+
+			userDropdown.addEventListener("click", function (event) {
+				event.stopPropagation();
+			});
+
+			function initNavigation() {
+				const navToggle = document.getElementById("navToggle");
+				const navMenu = document.getElementById("navMenu");
+
+				if (navToggle && navMenu) {
+					navToggle.addEventListener("click", function () {
+						navMenu.classList.toggle("active");
+					});
+
+					const navLinks = navMenu.querySelectorAll("a");
+					navLinks.forEach((link) => {
+						link.addEventListener("click", function (e) {
+							e.preventDefault();
+							navMenu.classList.remove("active");
+							const targetId = this.getAttribute("href");
+							const targetElement = document.querySelector(targetId);
+							if (targetElement) {
+								window.scrollTo({
+									top: targetElement.offsetTop - 80,
+									behavior: "smooth",
+								});
+							}
+						});
+					});
+
+					document.addEventListener("click", function (event) {
+						if (
+							!navMenu.contains(event.target) &&
+							!navToggle.contains(event.target)
+						) {
+							navMenu.classList.remove("active");
+						}
+					});
+				}
+			}
+
+			function initCountdown() {
+				const countdownElement = document.getElementById("countdownDays");
+				if (countdownElement) {
+					const eventDate = new Date("May 15, 2025 09:00:00").getTime();
+
+					function updateCountdown() {
+						const now = new Date().getTime();
+						const distance = eventDate - now;
+						const days = Math.ceil(distance / (1000 * 60 * 60 * 24));
+						countdownElement.textContent = days > 0 ? days : "Today!";
+					}
+
+					updateCountdown();
+					setInterval(updateCountdown, 86400000);
+				}
+			}
+
+			function initRegistrationForm() {
+				const registrationForm = document.getElementById("registrationForm");
+				const registrationSuccessModal = document.getElementById(
+					"registrationSuccessModal"
+				);
+				const registrationId = document.getElementById("registrationId");
+
+				if (registrationForm) {
+					registrationForm.addEventListener("submit", function (e) {
+						e.preventDefault();
+						if (validateRegistrationForm()) {
+							const randomId =
+								"EF-" +
+								new Date().getFullYear() +
+								"-" +
+								Math.floor(1000 + Math.random() * 9000);
+							if (registrationId) registrationId.textContent = randomId;
+							if (registrationSuccessModal)
+								registrationSuccessModal.classList.add("active");
+							addAttendeeToList();
+							showToast(
+								"success",
+								"Registration Successful",
+								"You have been registered for the event!"
+							);
+							registrationForm.reset();
+						}
+					});
+				}
+			}
+
+			function validateRegistrationForm() {
+				const fullName = document.getElementById("fullName").value.trim();
+				const email = document.getElementById("email").value.trim();
+				const ticketType = document.getElementById("ticketType").value;
+
+				if (!fullName) {
+					showToast(
+						"error",
+						"Validation Error",
+						"Please enter your full name."
+					);
+					return false;
+				}
+				if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+					showToast(
+						"error",
+						"Validation Error",
+						"Please enter a valid email address."
+					);
+					return false;
+				}
+				if (!ticketType) {
+					showToast(
+						"error",
+						"Validation Error",
+						"Please select a ticket type."
+					);
+					return false;
+				}
+				return true;
+			}
+
+			function addAttendeeToList() {
+				const attendeeList = document.getElementById("attendeeList");
+				if (attendeeList) {
+					const fullName = document.getElementById("fullName").value.trim();
+					const company =
+						document.getElementById("company").value.trim() || "Not specified";
+					const ticketTypeText = document
+						.getElementById("ticketType")
+						.options[
+							document.getElementById("ticketType").selectedIndex
+						].text.split("(")[0]
+						.trim();
+
+					const newRow = document.createElement("tr");
+					newRow.innerHTML = `
+            <td>${fullName}</td>
+            <td>${company}</td>
+            <td>${ticketTypeText}</td>
+            <td><span class="status-badge status-pending"><i class="fas fa-clock mr-1"></i>Pending</span></td>
+            <td>
+                <button class="table-action" title="Edit"><i class="fas fa-edit"></i></button>
+                <button class="table-action" title="Delete"><i class="fas fa-trash-alt" style="font-size: 20px; color: red"></i></button>
+            </td>
+        `;
+					newRow.classList.add("fade-in");
+					attendeeList.prepend(newRow);
+				}
+			}
+
+			function initAttendeeSearch() {
+				const attendeeSearch = document.getElementById("attendeeSearch");
+				const attendeeList = document.getElementById("attendeeList");
+
+				if (attendeeSearch && attendeeList) {
+					attendeeSearch.addEventListener("input", function () {
+						const searchTerm = this.value.toLowerCase();
+						const rows = attendeeList.querySelectorAll("tr");
+
+						rows.forEach((row) => {
+							const name = row
+								.querySelector("td:first-child")
+								.textContent.toLowerCase();
+							row.style.display = name.includes(searchTerm) ? "" : "none";
+						});
+					});
+				}
+			}
+
+			function initChat() {
+				const chatInput = document.getElementById("chatInput");
+				const chatSend = document.getElementById("chatSend");
+				const chatMessages = document.getElementById("chatMessages");
+
+				if (chatInput && chatSend && chatMessages) {
+					function sendMessage() {
+						const message = chatInput.value.trim();
+						if (message) {
+							const currentTime = new Date().toLocaleTimeString([], {
+								hour: "2-digit",
+								minute: "2-digit",
+							});
+							const messageElement = document.createElement("div");
+							messageElement.className = "message message-sent";
+							messageElement.innerHTML = `<div class="message-content">${message}</div><div class="message-info">You, ${currentTime}</div>`;
+							chatMessages.appendChild(messageElement);
+							chatInput.value = "";
+							chatMessages.scrollTop = chatMessages.scrollHeight;
+							setTimeout(simulateResponse, 1000);
+						}
+					}
+
+					chatSend.addEventListener("click", sendMessage);
+					chatInput.addEventListener(
+						"keypress",
+						(e) => e.key === "Enter" && sendMessage()
+					);
+
+					function simulateResponse() {
+						const responses = [
+							"Thanks for your message! How can I assist you?",
+							"I'll check that for you right away.",
+							"Great question! Let me find the answer.",
+							"Check the timeline section for more details.",
+							"Anything else I can help with?",
+							"Noted! The team will handle it.",
+						];
+						const randomResponse =
+							responses[Math.floor(Math.random() * responses.length)];
+						const currentTime = new Date().toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						});
+						const responseElement = document.createElement("div");
+						responseElement.className = "message message-received";
+						responseElement.innerHTML = `<div class="message-content">${randomResponse}</div><div class="message-info">Support Team, ${currentTime}</div>`;
+						chatMessages.appendChild(responseElement);
+						chatMessages.scrollTop = chatMessages.scrollHeight;
+					}
+				}
+			}
+
+			function initAnalyticsTabs() {
+				const tabButtons = document.querySelectorAll(".tab-button");
+				const tabContents = document.querySelectorAll(".tab-content");
+
+				if (tabButtons.length && tabContents.length) {
+					tabButtons.forEach((button) => {
+						button.addEventListener("click", function () {
+							const tabId = this.getAttribute("data-tab");
+							tabButtons.forEach((btn) => btn.classList.remove("active"));
+							tabContents.forEach((content) =>
+								content.classList.remove("active")
+							);
+							this.classList.add("active");
+							document.getElementById(tabId).classList.add("active");
+							simulateChartLoading(tabId);
+						});
+					});
+					simulateChartLoading("attendance");
+				}
+			}
+
+			function simulateChartLoading(tabId) {
+				const chartElement = document.getElementById(`${tabId}Chart`);
+				if (chartElement) {
+					chartElement.innerHTML = `<div class="loading-spinner"></div><div>Loading ${tabId} data...</div>`;
+					setTimeout(() => {
+						let chartHTML = "";
+						switch (tabId) {
+							case "attendance":
+								chartHTML = `
+                        <div class="bar-chart">
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 100px;">100</div>
+                                <div class="bar-label">Event 1</div>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 150px;">150</div>
+                                <div class="bar-label">Event 2</div>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 200px;">200</div>
+                                <div class="bar-label">Event 3</div>
+                            </div>
+                        </div>
+                    `;
+								break;
+							case "engagement":
+								chartHTML = `
+                        <div class="pie-chart" style="background: conic-gradient(#4CAF50 0% 15.2%, #2196F3 15.2% 44.3%, #FFC107 44.3% 100%);"></div>
+                        <div class="pie-legend">
+                            <div class="legend-item"><span class="legend-color" style="background-color: #4CAF50;"></span>Questions Asked (15.2%)</div>
+                            <div class="legend-item"><span class="legend-color" style="background-color: #2196F3;"></span>Session Check-ins (29.1%)</div>
+                            <div class="legend-item"><span class="legend-color" style="background-color: #FFC107;"></span>App Logins (55.7%)</div>
+                        </div>
+                    `;
+								break;
+							case "feedback":
+								chartHTML = `
+                        <div class="bar-chart">
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 180px;">4.5</div>
+                                <div class="bar-label">Content</div>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 188px;">4.7</div>
+                                <div class="bar-label">Speakers</div>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 168px;">4.2</div>
+                                <div class="bar-label">Venue</div>
+                            </div>
+                            <div class="bar-wrapper">
+                                <div class="bar" style="height: 192px;">4.8</div>
+                                <div class="bar-label">Organization</div>
+                            </div>
+                        </div>
+                    `;
+								break;
+							case "demographics":
+								chartHTML = `
+                        <div class="demographics-charts">
+                            <div class="pie-chart-wrapper">
+                                <div class="pie-chart" style="background: conic-gradient(#4361ee 0% 48%, #4CC9F0 48% 100%);"></div>
+                                <div class="pie-title">Gender Distribution</div>
+                                <div class="pie-legend">
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #4361ee;"></span>Female (48%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #4CC9F0;"></span>Male (52%)</div>
+                                </div>
+                            </div>
+                            <div class="pie-chart-wrapper">
+                                <div class="pie-chart" style="background: conic-gradient(#FF6384 0% 40%, #36A2EB 40% 70%, #FFCE56 70% 90%, #4BC0C0 90% 100%);"></div>
+                                <div class="pie-title">Industry Distribution</div>
+                                <div class="pie-legend">
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #FF6384;"></span>Tech (40%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #36A2EB;"></span>Finance (30%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #FFCE56;"></span>Healthcare (20%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #4BC0C0;"></span>Other (10%)</div>
+                                </div>
+                            </div>
+                            <div class="pie-chart-wrapper">
+                                <div class="pie-chart" style="background: conic-gradient(#FF9F40 0% 50%, #FFCD56 50% 70%, #4BC0C0 70% 85%, #36A2EB 85% 100%);"></div>
+                                <div class="pie-title">Country Distribution</div>
+                                <div class="pie-legend">
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #FF9F40;"></span>US (50%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #FFCD56;"></span>Canada (20%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #4BC0C0;"></span>UK (15%)</div>
+                                    <div class="legend-item"><span class="legend-color" style="background-color: #36A2EB;"></span>Other (15%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+								break;
+						}
+						chartElement.innerHTML = chartHTML;
+					}, 1500);
+				}
+			}
+
+			function initStarRating() {
+				const stars = document.querySelectorAll(".star");
+				let selectedRating = 0;
+
+				if (stars.length) {
+					stars.forEach((star) => {
+						star.addEventListener("mouseover", function () {
+							highlightStars(parseInt(this.getAttribute("data-value")));
+						});
+						star.addEventListener("mouseout", () =>
+							highlightStars(selectedRating)
+						);
+						star.addEventListener("click", function () {
+							selectedRating = parseInt(this.getAttribute("data-value"));
+							highlightStars(selectedRating);
+							showToast(
+								"info",
+								"Rating Selected",
+								`You've selected a ${selectedRating}-star rating.`
+							);
+						});
+					});
+
+					function highlightStars(rating) {
+						stars.forEach((star) => {
+							star.classList.toggle(
+								"active",
+								parseInt(star.getAttribute("data-value")) <= rating
+							);
+						});
+					}
+				}
+			}
+
+			function initFeedbackCategories() {
+				const categories = document.querySelectorAll(".feedback-category");
+				if (categories.length) {
+					categories.forEach((category) => {
+						category.addEventListener("click", () =>
+							category.classList.toggle("selected")
+						);
+					});
+				}
+			}
+
+			function initFeedbackForm() {
+				const feedbackForm = document.getElementById("feedbackForm");
+				if (feedbackForm) {
+					feedbackForm.addEventListener("submit", function (e) {
+						e.preventDefault();
+						const selectedRating =
+							document.querySelectorAll(".star.active").length;
+						const selectedCategories = document.querySelectorAll(
+							".feedback-category.selected"
+						);
+
+						if (!selectedRating) {
+							showToast(
+								"warning",
+								"Feedback Submission",
+								"Please select a star rating."
+							);
+							return;
+						}
+						if (!selectedCategories.length) {
+							showToast(
+								"warning",
+								"Feedback Submission",
+								"Please select at least one category."
+							);
+							return;
+						}
+
+						showToast(
+							"success",
+							"Feedback Submitted",
+							`Thank you! You rated the event ${selectedRating}/5 stars.`
+						);
+						feedbackForm.reset();
+						document
+							.querySelectorAll(".star")
+							.forEach((star) => star.classList.remove("active"));
+						document
+							.querySelectorAll(".feedback-category")
+							.forEach((category) => category.classList.remove("selected"));
+					});
+				}
+			}
+
+			function initNetworking() {
+				const connectButtons = document.querySelectorAll(".contact-connect");
+				if (connectButtons.length) {
+					connectButtons.forEach((button) => {
+						button.addEventListener("click", function (e) {
+							e.preventDefault();
+							const contactName =
+								this.closest(".contact-card").querySelector(
+									".contact-name"
+								).textContent;
+							showToast(
+								"success",
+								"Connection Request",
+								`Connection request sent to ${contactName}.`
+							);
+							this.innerHTML = `<i class="fas fa-clock connect-icon"></i> Pending`;
+							this.style.backgroundColor = "#94a3b8";
+							this.style.pointerEvents = "none";
+						});
+					});
+				}
+			}
+
+			function initModals() {
+				const modals = document.querySelectorAll(".modal-overlay");
+				if (modals.length) {
+					modals.forEach((modal) => {
+						const closeButtons = modal.querySelectorAll(
+							".modal-close, .modal-footer .button"
+						);
+						closeButtons.forEach((button) => {
+							button.addEventListener("click", () =>
+								modal.classList.remove("active")
+							);
+						});
+						modal.addEventListener(
+							"click",
+							(e) => e.target === modal && modal.classList.remove("active")
+						);
+					});
+				}
+			}
+
+			function initUserProfile() {
+				const userProfile = document.getElementById("userProfile");
+				const dropdownTabs = document.querySelectorAll(".dropdown-tab");
+				const dropdownContents = document.querySelectorAll(
+					".dropdown-tab-content"
+				);
+
+				if (userProfile) {
+					userProfile.addEventListener("click", (e) => {
+						e.stopPropagation();
+						userProfile.classList.toggle("active");
+					});
+					document.addEventListener("click", (e) => {
+						if (!userProfile.contains(e.target))
+							userProfile.classList.remove("active");
+					});
+
+					if (dropdownTabs.length) {
+						dropdownTabs.forEach((tab) => {
+							tab.addEventListener("click", function () {
+								const tabId = this.getAttribute("data-tab");
+								dropdownTabs.forEach((t) => t.classList.remove("active"));
+								dropdownContents.forEach((c) => c.classList.remove("active"));
+								this.classList.add("active");
+								document.getElementById(`${tabId}-tab`).classList.add("active");
+							});
+						});
+					}
+				}
+			}
+
+			function initPlaceholderButtons() {
+				document
+					.querySelector("#dashboard .button.button-sm")
+					?.addEventListener("click", () => {
+						showToast(
+							"info",
+							"New Event",
+							"Creating a new event - feature coming soon!"
+						);
+					});
+
+				document
+					.querySelector("#timeline .button-outline.button-sm")
+					?.addEventListener("click", () => {
+						window.print();
+					});
+
+				document
+					.querySelector("#analytics .button-outline.button-sm")
+					?.addEventListener("click", () => {
+						showToast(
+							"info",
+							"Export Data",
+							"Exporting analytics data - feature coming soon!"
+						);
+					});
+
+				document
+					.querySelectorAll(".button-outline.button-sm i.fas.fa-filter")
+					.forEach((btn) => {
+						btn.closest("button").addEventListener("click", () => {
+							showToast(
+								"info",
+								"Filter",
+								"Filtering options - feature coming soon!"
+							);
+						});
+					});
+
+				const attendeeList = document.getElementById("attendeeList");
+				if (attendeeList) {
+					attendeeList.addEventListener("click", (e) => {
+						const actionBtn = e.target.closest(".table-action");
+						if (actionBtn) {
+							const action = actionBtn.title;
+							const name = actionBtn
+								.closest("tr")
+								.querySelector("td:first-child").textContent;
+							if (action === "Edit") {
+								showToast(
+									"info",
+									"Edit Attendee",
+									`Editing ${name} - feature coming soon!`
+								);
+							} else if (action === "Delete") {
+								showToast("warning", "Delete Attendee", `${name} deleted.`);
+								actionBtn.closest("tr").remove();
+							}
+						}
+					});
+				}
+			}
+
+			function initSectionAnimations() {
+				const sections = document.querySelectorAll(".section");
+				const observer = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) {
+								entry.target.classList.add("fade-in");
+							}
+						});
+					},
+					{ threshold: 0.1 }
+				);
+				sections.forEach((section) => observer.observe(section));
+			}
+
+			function showToast(type, title, message) {
+				const toastContainer = document.getElementById("toastContainer");
+				if (toastContainer) {
+					const toast = document.createElement("div");
+					toast.className = `toast toast-${type}`;
+					const icon =
+						{
+							success: "fa-check-circle",
+							warning: "fa-exclamation-triangle",
+							error: "fa-times-circle",
+							info: "fa-info-circle",
+						}[type] || "fa-info-circle";
+					toast.innerHTML = `
+            <div class="toast-icon"><i class="fas ${icon}"></i></div>
+            <div class="toast-content">
+                <div class="toast-title">${title}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close"><i class="fas fa-times"></i></button>
+            <div class="toast-progress"></div>
+        `;
+					toastContainer.appendChild(toast);
+					toast
+						.querySelector(".toast-close")
+						.addEventListener("click", () => toast.remove());
+					setTimeout(() => toast.remove(), 5300);
+				}
+			}
+		</script>
+	</body>
+</html>
+
+
+Design a social media platform for organizing tours together.
+* A user will be able to create an initial tour plan with the following information: date range, location, estimated budget, description of plan, image, etc
+* This tour plan will come to the feed of other users. If they are interested, they can click a button or an icon to say that they are interested.
+* Interested people will automatically be added to a group chat for the tour plan. On the right side of the screen they will be able to see which tour chats they have joined and they will be able to chat there.
+* Users will be able to search for tours based on location and date.
+
+Code Quality
+
+Step 1 - Make sure you use Typescript
+The most common way contributors mess up is by using JavaScript instead of TypeScript.
+Although JavaScript still works with Next.js, you will fail the assignment if you don't use Typescript.
+Step 2 - Make sure you use Tailwind CSS
+Projects that use Tailwind produces code that is easier to read and edit in a single file. This makes it easier to score a 5.
+Step 3 - Use Component Libraries, Icon Libraries, and Other Useful Packages
+It is easier to design visually impressive UIs by leveraging existing libraries.
+We recommend using the following packages to enhance your UI:
+* react-icons
+* lucide-react
+* motion
+* recharts
+Step 4 - Check for logic errors
+If your app has logic errors, for example negative birthdays, we will give you a lower score. Make sure to check for edge cases to prevent getting a bad score.
+
+Design Quality
+
+Step 1 - Use a good looking font other than the default font
+Using the default font automatically looks bad and reduces your score. If you use the default font, we have to fix it.
+If you use Tailwind CSS, you can change the font very easily.
+Step 2 - Use a good font hierarchy
+Font hierarchy allows users to visually separate out which elements are more important. Use a combination of font weight and font size to create a good font hierarchy. Lack of font hierarchy will reduce your score.
+Step 3 - Choose a color palette
+If you pick random colors without thought, your design will look unprofessional. Choose a matching color palette using a tool like: https://coolors.co/generate
+Step 4 - Make sure your app isn't too dull
+Even if you have a nice color palette, if you don't use them on enough elements your design will look dull.
+Try adding color to titles, subtitles, borders, on hovers or try adding dots for accents.
+Step 5 - Make sure your elements have enough contrast
+If it is hard to read text or distinguish elements from each other because there isn't enough contrast, you will receive a lower score. Make sure your app has decent contrast.
+Step 6 - Make sure spacing is consistent and well spaced
+If elements are too close to each other, it looks cluttered and you will get a lower score. If elements are too far away and there is too much empty space you will also get a lower score. Make sure to carefully choose how you space your elements and also make sure its consistent.
+Step 7 - Make sure your layout looks complete
+Websites look better when they look complete. Even if you're creating a small widget, try to center it in the whole page and give the package a colorful background. This will make your design look more complete and professional, making it easier to get a higher scorel
+
+
+The website should be able to compare to fortune 500 company sites. 
+Make a modern site with smooth animations and appropriate icons. CHoose a nice color palette and use varieties of colors.  The site must be fully functional even if there are some demo things to show different features.
+You have to give me the whole code only one file tsx
