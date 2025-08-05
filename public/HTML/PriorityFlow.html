@@ -1,0 +1,2630 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Eisenhower Priority Matrix</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+			rel="stylesheet"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+		<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+		<style>
+			body {
+				font-family: "Outfit", sans-serif;
+			}
+
+			.task {
+				cursor: grab;
+				touch-action: none;
+				user-select: none;
+				-webkit-user-select: none;
+				transition: all 0.3s ease;
+				border-radius: 12px;
+				overflow: hidden;
+				background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+				border-left: 5px solid transparent;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+			}
+
+			.task.dragging {
+				opacity: 0.8;
+				cursor: grabbing;
+				position: relative;
+				z-index: 10;
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+				transform: scale(1.03) rotate(1deg);
+			}
+
+			.task.completed {
+				opacity: 0.7;
+				background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+			}
+
+			.task.completed .task-text {
+				text-decoration: line-through;
+				color: #64748b;
+			}
+
+			.task:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.priority-high {
+				border-left-color: #ef4444;
+			}
+			.priority-medium {
+				border-left-color: #f97316;
+			}
+			.priority-low {
+				border-left-color: #84cc16;
+			}
+
+			.category-work {
+				background-color: #dbeafe;
+				color: #1e40af;
+			}
+			.category-personal {
+				background-color: #dcfce7;
+				color: #166534;
+			}
+			.category-health {
+				background-color: #fef3c7;
+				color: #92400e;
+			}
+			.category-finance {
+				background-color: #fce7f3;
+				color: #be185d;
+			}
+			.category-learning {
+				background-color: #f3e8ff;
+				color: #7c3aed;
+			}
+			.category-other {
+				background-color: #f1f5f9;
+				color: #475569;
+			}
+
+			.quadrant {
+				transition: all 0.5s ease;
+				display: flex;
+				flex-direction: column;
+				border-radius: 16px;
+				overflow: hidden;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+			}
+
+			.quadrant:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+			}
+
+			.quadrant-header {
+				position: relative;
+				overflow: hidden;
+				padding: 20px;
+			}
+
+			.quadrant-header::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					135deg,
+					rgba(255, 255, 255, 0.2) 0%,
+					rgba(255, 255, 255, 0) 100%
+				);
+				pointer-events: none;
+			}
+
+			.task-category {
+				font-size: 0.75rem;
+				padding: 3px 10px;
+				border-radius: 20px;
+				font-weight: 600;
+			}
+
+			.task-container {
+				transition: min-height 0.5s ease;
+				min-height: 150px;
+				height: auto;
+				flex-grow: 1;
+				overflow-y: auto;
+			}
+
+			.task-container.empty {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: #94a3b8;
+				font-style: italic;
+			}
+
+			.hide-scrollbar::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.hide-scrollbar::-webkit-scrollbar-track {
+				background: rgba(0, 0, 0, 0.03);
+				border-radius: 3px;
+			}
+
+			.hide-scrollbar::-webkit-scrollbar-thumb {
+				background: rgba(0, 0, 0, 0.1);
+				border-radius: 3px;
+			}
+
+			.hide-scrollbar::-webkit-scrollbar-thumb:hover {
+				background: rgba(0, 0, 0, 0.2);
+			}
+
+			.modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.6);
+				z-index: 100;
+				overflow-y: auto;
+				backdrop-filter: blur(5px);
+			}
+
+			.modal.active {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.modal-content {
+				max-height: 90vh;
+				overflow-y: auto;
+				border-radius: 20px;
+				animation: modalAppear 0.3s ease forwards;
+			}
+
+			@keyframes modalAppear {
+				from {
+					opacity: 0;
+					transform: translateY(30px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.pulse-animation {
+				animation: pulse 2s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+				}
+				70% {
+					box-shadow: 0 0 0 15px rgba(99, 102, 241, 0);
+				}
+				100% {
+					box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+				}
+			}
+
+			.task-shake {
+				animation: shake 0.5s;
+			}
+
+			@keyframes shake {
+				0% {
+					transform: translateX(0);
+				}
+				20% {
+					transform: translateX(-5px);
+				}
+				40% {
+					transform: translateX(5px);
+				}
+				60% {
+					transform: translateX(-5px);
+				}
+				80% {
+					transform: translateX(5px);
+				}
+				100% {
+					transform: translateX(0);
+				}
+			}
+
+			.task-badge {
+				position: absolute;
+				bottom: 8px;
+				right: 8px;
+				background: #ef4444;
+				color: white;
+				border-radius: 20px;
+				padding: 2px 8px;
+				z-index: 10;
+				font-size: 0.7rem;
+				font-weight: bold;
+				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+				animation: pulse 1.5s infinite;
+			}
+
+			.task-progress {
+				height: 4px;
+				background-color: rgba(255, 255, 255, 0.3);
+				border-radius: 2px;
+				overflow: hidden;
+				margin-top: 8px;
+			}
+
+			.task-progress-bar {
+				height: 100%;
+				background-color: rgba(255, 255, 255, 0.8);
+				transition: width 0.5s ease;
+				border-radius: 2px;
+			}
+
+			.matrix-container {
+				max-width: 1400px;
+				margin: 0 auto;
+				width: 100%;
+				padding: 0 20px;
+			}
+
+			@media (max-width: 640px) {
+				.matrix-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.quadrant {
+					margin-bottom: 20px;
+				}
+
+				.quadrant-header h2 {
+					font-size: 1.25rem;
+				}
+
+				.task {
+					padding: 12px;
+				}
+
+				.modal-content {
+					width: 90%;
+					margin: 0 auto;
+				}
+			}
+
+			@media (min-width: 641px) and (max-width: 1023px) {
+				.matrix-grid {
+					grid-template-columns: 1fr 1fr;
+				}
+			}
+
+			@media (max-width: 375px) {
+				.task {
+					padding: 10px;
+				}
+
+				.task-text {
+					font-size: 0.9rem;
+				}
+
+				.task-category {
+					font-size: 0.65rem;
+					padding: 2px 6px;
+				}
+
+				.quadrant-header {
+					padding: 15px;
+				}
+			}
+
+			@media (max-width: 320px) {
+				.quadrant-header h2 {
+					font-size: 1.1rem;
+				}
+
+				.quadrant-header p {
+					font-size: 0.7rem;
+				}
+
+				.task {
+					padding: 8px;
+				}
+
+				.task-text {
+					font-size: 0.85rem;
+				}
+
+				.matrix-container {
+					padding: 0 10px;
+				}
+
+				.custom-select-button {
+					padding: 0.5rem;
+					font-size: 0.8rem;
+				}
+			}
+
+			.loader {
+				width: 48px;
+				height: 48px;
+				border: 5px solid #fff;
+				border-bottom-color: #4f46e5;
+				border-radius: 50%;
+				display: inline-block;
+				box-sizing: border-box;
+				animation: rotation 1s linear infinite;
+			}
+
+			@keyframes rotation {
+				0% {
+					transform: rotate(0deg);
+				}
+				100% {
+					transform: rotate(360deg);
+				}
+			}
+
+			.toast {
+				position: fixed;
+				bottom: 30px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #4f46e5;
+				color: white;
+				padding: 10px 20px;
+				border-radius: 10px;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s ease, transform 0.3s ease;
+				pointer-events: none;
+			}
+
+			.toast.show {
+				opacity: 1;
+				transform: translate(-50%, -10px);
+			}
+
+			.confetti {
+				position: fixed;
+				width: 10px;
+				height: 10px;
+				background-color: #f00;
+				top: -10px;
+				z-index: 99;
+				animation: confetti 5s ease-in-out -2s infinite;
+				transform-origin: center;
+			}
+
+			.confetti:nth-child(2n) {
+				background-color: #0f0;
+				animation-delay: -2.5s;
+			}
+
+			.confetti:nth-child(3n) {
+				background-color: #00f;
+				animation-delay: -3s;
+			}
+
+			.confetti:nth-child(4n) {
+				background-color: #ff0;
+				animation-delay: -3.5s;
+			}
+
+			.confetti:nth-child(5n) {
+				background-color: #f0f;
+				animation-delay: -4s;
+			}
+			.drop-highlight {
+				background-color: rgba(99, 102, 241, 0.1) !important;
+				border: 2px dashed #6366f1 !important;
+				transform: scale(1.02);
+				transition: all 0.2s ease;
+			}
+
+			.task-container.drag-active {
+				overflow: hidden;
+				-webkit-overflow-scrolling: auto;
+			}
+
+			.task {
+				min-height: 60px;
+			}
+
+			.task.dragging {
+				will-change: transform;
+			}
+			@keyframes confetti {
+				0% {
+					transform: translateY(0) rotateZ(0);
+					opacity: 1;
+				}
+				100% {
+					transform: translateY(1000px) rotateZ(720deg);
+					opacity: 0;
+				}
+			}
+
+			.alert-modal,
+			.confirm-modal {
+				display: none;
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.6);
+				z-index: 200;
+				backdrop-filter: blur(5px);
+			}
+
+			.alert-modal.active,
+			.confirm-modal.active {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.alert-content,
+			.confirm-content {
+				max-width: 400px;
+				width: 90%;
+				max-height: 90vh;
+				overflow-y: auto;
+				border-radius: 20px;
+				animation: modalAppear 0.3s ease forwards;
+				background: white;
+				padding: 2rem;
+				text-align: center;
+				box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+					0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			}
+
+			.alert-icon,
+			.confirm-icon {
+				width: 4rem;
+				height: 4rem;
+				margin: 0 auto 1rem;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.alert-icon {
+				background-color: #fef3c7;
+				color: #d97706;
+			}
+
+			.confirm-icon {
+				background-color: #fee2e2;
+				color: #dc2626;
+			}
+
+			.alert-title,
+			.confirm-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+				color: #1f2937;
+				margin-bottom: 0.5rem;
+			}
+
+			.alert-message,
+			.confirm-message {
+				color: #6b7280;
+				margin-bottom: 1.5rem;
+				line-height: 1.5;
+			}
+
+			.alert-buttons,
+			.confirm-buttons {
+				display: flex;
+				gap: 0.75rem;
+				justify-content: center;
+			}
+
+			.alert-button,
+			.confirm-button {
+				padding: 0.75rem 1.5rem;
+				border-radius: 0.75rem;
+				font-weight: 500;
+				border: none;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.alert-button-primary {
+				background-color: #4f46e5;
+				color: white;
+			}
+
+			.alert-button-primary:hover {
+				background-color: #4338ca;
+			}
+
+			.confirm-button-danger {
+				background-color: #dc2626;
+				color: white;
+			}
+
+			.confirm-button-danger:hover {
+				background-color: #b91c1c;
+			}
+
+			.confirm-button-cancel {
+				background-color: #f3f4f6;
+				color: #374151;
+			}
+
+			.confirm-button-cancel:hover {
+				background-color: #e5e7eb;
+			}
+		</style>
+	</head>
+	<body class="min-h-screen bg-gray-50 text-gray-800">
+		<header class="bg-white shadow-sm sticky top-0 z-50">
+			<div class="matrix-container">
+				<nav class="flex items-center justify-between py-4">
+					<a
+						href="#home"
+						class="text-2xl font-bold text-indigo-600 flex items-center cursor-pointer"
+					>
+						<i data-lucide="layout-grid" class="h-7 w-7 mr-2"></i>
+						PriorityFlow
+					</a>
+					<div class="hidden md:flex space-x-6">
+						<a
+							href="#home"
+							class="text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+							>Home</a
+						>
+						<a
+							href="#matrix"
+							class="text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+							>Matrix</a
+						>
+						<a
+							href="#about"
+							class="text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+							>About</a
+						>
+					</div>
+					<button
+						id="mobile-menu-button"
+						class="md:hidden text-gray-700 focus:outline-none cursor-pointer"
+					>
+						<i data-lucide="menu" class="h-6 w-6"></i>
+					</button>
+				</nav>
+
+				<div id="mobile-menu" class="md:hidden hidden pb-4">
+					<a
+						href="#home"
+						class="block py-2 text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+						>Home</a
+					>
+					<a
+						href="#matrix"
+						class="block py-2 text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+						>Matrix</a
+					>
+					<a
+						href="#about"
+						class="block py-2 text-gray-700 hover:text-indigo-600 font-medium cursor-pointer"
+						>About</a
+					>
+				</div>
+			</div>
+		</header>
+
+		<div
+			id="home"
+			class="bg-gradient-to-br from-indigo-50 to-blue-100 py-16 mb-8"
+		>
+			<div class="matrix-container">
+				<div
+					class="flex flex-col lg:flex-row items-center justify-between gap-8"
+				>
+					<div class="lg:w-1/2 text-center lg:text-left">
+						<h1
+							class="text-4xl lg:text-5xl font-bold text-indigo-800 mb-4 leading-tight"
+						>
+							Master Your Time, <br />Boost Your Productivity
+						</h1>
+						<p class="text-lg text-gray-700 mb-6 max-w-lg mx-auto lg:mx-0">
+							Organize your tasks by importance and urgency using the powerful
+							Eisenhower Matrix. Start prioritizing what truly matters.
+						</p>
+						<a
+							href="#matrix"
+							class="inline-block bg-indigo-600 text-white px-8 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 duration-200 cursor-pointer"
+							>Get Started Now</a
+						>
+					</div>
+
+					<div class="lg:w-1/2 mt-8 lg:mt-0 relative">
+						<div
+							class="relative w-full h-64 lg:h-96 overflow-hidden rounded-2xl shadow-xl transform -rotate-2 hover:rotate-0 transition-transform duration-300"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&h=600&q=80"
+								alt="Productivity and time management"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="matrix-container">
+			<h1
+				id="matrix"
+				class="text-3xl font-bold mb-6 text-center text-indigo-600"
+			>
+				Eisenhower Priority Matrix
+			</h1>
+
+			<div class="mb-8 bg-white p-6 rounded-2xl shadow-md">
+				<div class="flex flex-col gap-4">
+					<div class="flex flex-col md:flex-row gap-3">
+						<button
+							type="button"
+							id="create-task-btn"
+							class="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 transition-all duration-200 font-medium cursor-pointer flex items-center justify-center gap-2 shadow-md hover:shadow-lg pulse-animation"
+						>
+							<i data-lucide="plus" class="h-5 w-5"></i>
+							Add New Task
+						</button>
+
+						<div class="flex-grow relative">
+							<input
+								type="text"
+								id="search-tasks"
+								placeholder="Search tasks..."
+								class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+							/>
+							<button
+								id="clear-search"
+								class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors duration-200"
+								style="display: none"
+							>
+								<i data-lucide="x" class="h-5 w-5"></i>
+							</button>
+						</div>
+					</div>
+
+					<div class="flex flex-wrap gap-3 items-center">
+						<div class="flex h-10 bg-gray-100 rounded-lg overflow-hidden">
+							<button
+								id="filter-all"
+								class="px-4 h-full bg-indigo-600 text-white font-medium"
+							>
+								All
+							</button>
+							<button
+								id="filter-active"
+								class="px-4 h-full text-gray-700 hover:bg-gray-200 transition-colors"
+							>
+								Active
+							</button>
+							<button
+								id="filter-completed"
+								class="px-4 h-full text-gray-700 hover:bg-gray-200 transition-colors"
+							>
+								Completed
+							</button>
+						</div>
+
+						<div class="relative group">
+							<button
+								id="filter-category"
+								class="flex items-center h-10 px-4 bg-gray-100 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors"
+							>
+								<i data-lucide="tag" class="h-4 w-4 mr-2"></i>
+								Categories
+								<i data-lucide="chevron-down" class="h-4 w-4 ml-2"></i>
+							</button>
+							<div
+								id="category-dropdown"
+								class="absolute left-0 mt-2 bg-white shadow-lg rounded-lg overflow-hidden z-10 hidden"
+							>
+								<div class="py-1">
+									<button
+										data-category=""
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										All Categories
+									</button>
+									<button
+										data-category="work"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										Work
+									</button>
+									<button
+										data-category="personal"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										Personal
+									</button>
+									<button
+										data-category="health"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										Health
+									</button>
+									<button
+										data-category="finance"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										Finance
+									</button>
+									<button
+										data-category="learning"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										Learning
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<div class="relative group ml-auto">
+							<button
+								id="sort-tasks"
+								class="flex items-center h-10 px-4 bg-gray-100 rounded-lg text-gray-700 hover:bg-gray-200 transition-colors"
+							>
+								<i data-lucide="arrow-up-down" class="h-4 w-4 mr-2"></i>
+								Sort
+								<i data-lucide="chevron-down" class="h-4 w-4 ml-2"></i>
+							</button>
+							<div
+								id="sort-dropdown"
+								class="absolute right-0 mt-2 bg-white shadow-lg rounded-lg overflow-hidden z-10 hidden"
+							>
+								<div class="py-1">
+									<button
+										data-sort="priority"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										By Priority
+									</button>
+									<button
+										data-sort="alphabetical"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										Alphabetical
+									</button>
+									<button
+										data-sort="date"
+										class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-indigo-100 transition-colors"
+									>
+										By Date Added
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 matrix-grid">
+				<div
+					class="quadrant bg-white overflow-hidden transform hover:scale-[1.01] transition-all duration-200"
+				>
+					<div
+						class="quadrant-header bg-gradient-to-r from-red-500 to-red-600 text-white"
+					>
+						<div class="flex justify-between items-start">
+							<div>
+								<h2 class="font-bold text-xl">Important & Urgent</h2>
+								<p class="text-sm opacity-90">Do immediately</p>
+							</div>
+							<div class="text-right">
+								<div class="quadrant-stats" id="q1-stats">0 tasks</div>
+								<div class="task-progress">
+									<div
+										class="task-progress-bar"
+										id="q1-progress"
+										style="width: 0%"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						id="q1"
+						data-quadrant="1"
+						class="task-container p-4 overflow-y-auto hide-scrollbar empty"
+					>
+						<p class="empty-message">Drag tasks here or add a new task</p>
+					</div>
+				</div>
+
+				<div
+					class="quadrant bg-white overflow-hidden transform hover:scale-[1.01] transition-all duration-200"
+				>
+					<div
+						class="quadrant-header bg-gradient-to-r from-blue-500 to-blue-600 text-white"
+					>
+						<div class="flex justify-between items-start">
+							<div>
+								<h2 class="font-bold text-xl">Important & Not Urgent</h2>
+								<p class="text-sm opacity-90">Schedule for later</p>
+							</div>
+							<div class="text-right">
+								<div class="quadrant-stats" id="q2-stats">0 tasks</div>
+								<div class="task-progress">
+									<div
+										class="task-progress-bar"
+										id="q2-progress"
+										style="width: 0%"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						id="q2"
+						data-quadrant="2"
+						class="task-container p-4 overflow-y-auto hide-scrollbar empty"
+					>
+						<p class="empty-message">Drag tasks here or add a new task</p>
+					</div>
+				</div>
+
+				<div
+					class="quadrant bg-white overflow-hidden transform hover:scale-[1.01] transition-all duration-200"
+				>
+					<div
+						class="quadrant-header bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+					>
+						<div class="flex justify-between items-start">
+							<div>
+								<h2 class="font-bold text-xl">Not Important & Urgent</h2>
+								<p class="text-sm opacity-90">Delegate if possible</p>
+							</div>
+							<div class="text-right">
+								<div class="quadrant-stats" id="q3-stats">0 tasks</div>
+								<div class="task-progress">
+									<div
+										class="task-progress-bar"
+										id="q3-progress"
+										style="width: 0%"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						id="q3"
+						data-quadrant="3"
+						class="task-container p-4 overflow-y-auto hide-scrollbar empty"
+					>
+						<p class="empty-message">Drag tasks here or add a new task</p>
+					</div>
+				</div>
+
+				<div
+					class="quadrant bg-white overflow-hidden transform hover:scale-[1.01] transition-all duration-200"
+				>
+					<div
+						class="quadrant-header bg-gradient-to-r from-green-500 to-emerald-600 text-white"
+					>
+						<div class="flex justify-between items-start">
+							<div>
+								<h2 class="font-bold text-xl">Not Important & Not Urgent</h2>
+								<p class="text-sm opacity-90">Eliminate or do later</p>
+							</div>
+							<div class="text-right">
+								<div class="quadrant-stats" id="q4-stats">0 tasks</div>
+								<div class="task-progress">
+									<div
+										class="task-progress-bar"
+										id="q4-progress"
+										style="width: 0%"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div
+						id="q4"
+						data-quadrant="4"
+						class="task-container p-4 overflow-y-auto hide-scrollbar empty"
+					>
+						<p class="empty-message">Drag tasks here or add a new task</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="flex flex-wrap justify-center gap-4 mb-12">
+				<button
+					id="clear-completed"
+					class="bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition-colors duration-200 font-medium cursor-pointer flex items-center gap-2 shadow-md"
+				>
+					<i data-lucide="check-circle-2" class="h-5 w-5"></i>
+					Clear Completed
+				</button>
+				<button
+					id="export-tasks"
+					class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-colors duration-200 font-medium cursor-pointer flex items-center gap-2 shadow-md"
+				>
+					<i data-lucide="download" class="h-5 w-5"></i>
+					Export Tasks
+				</button>
+				<button
+					id="clear-all"
+					class="bg-red-600 text-white px-6 py-3 rounded-xl hover:bg-red-700 transition-colors duration-200 font-medium cursor-pointer flex items-center gap-2 shadow-md"
+				>
+					<i data-lucide="trash-2" class="h-5 w-5"></i>
+					Clear All Tasks
+				</button>
+			</div>
+
+			<div class="bg-white p-6 rounded-2xl shadow-md text-gray-600 mb-12">
+				<h3
+					class="font-bold text-lg text-gray-800 mb-3 flex items-center gap-2"
+				>
+					<i data-lucide="info" class="h-5 w-5 text-indigo-600"></i>
+					How to use the Eisenhower Matrix:
+				</h3>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<ul class="list-disc pl-5 space-y-2">
+						<li>Click the "Add New Task" button to create tasks</li>
+						<li>Drag and drop tasks between quadrants to prioritize</li>
+						<li>Click the checkbox to mark tasks as completed</li>
+						<li>Use search and filters to find specific tasks</li>
+					</ul>
+					<ul class="list-disc pl-5 space-y-2">
+						<li>Edit tasks by clicking the pencil icon</li>
+						<li>Each quadrant adjusts in size based on content</li>
+						<li>All tasks are saved automatically in your browser</li>
+						<li>Works perfectly on mobile devices with touch support</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<section id="about" class="py-16 bg-gray-50">
+			<div class="matrix-container">
+				<h2 class="text-3xl font-bold text-center text-indigo-600 mb-12">
+					Why Use PriorityFlow
+				</h2>
+
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+					<div
+						class="bg-white rounded-2xl shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:transform hover:-translate-y-1"
+					>
+						<div
+							class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4 mx-auto"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6 text-indigo-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+						</div>
+						<h3 class="text-xl font-bold text-center text-gray-800 mb-2">
+							Save Time
+						</h3>
+						<p class="text-gray-600 text-center">
+							Focus on what truly matters by categorizing tasks based on their
+							importance and urgency. Stop wasting time on non-essential
+							activities.
+						</p>
+					</div>
+
+					<div
+						class="bg-white rounded-2xl shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:transform hover:-translate-y-1"
+					>
+						<div
+							class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4 mx-auto"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6 text-indigo-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+						</div>
+						<h3 class="text-xl font-bold text-center text-gray-800 mb-2">
+							Reduce Stress
+						</h3>
+						<p class="text-gray-600 text-center">
+							Gain clarity and peace of mind by having a visual organization
+							system. Know exactly what needs your attention now and what can
+							wait.
+						</p>
+					</div>
+
+					<div
+						class="bg-white rounded-2xl shadow-md p-6 transition-all duration-300 hover:shadow-lg hover:transform hover:-translate-y-1"
+					>
+						<div
+							class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mb-4 mx-auto"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6 text-indigo-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
+								/>
+							</svg>
+						</div>
+						<h3 class="text-xl font-bold text-center text-gray-800 mb-2">
+							Boost Productivity
+						</h3>
+						<p class="text-gray-600 text-center">
+							Accomplish more meaningful work by prioritizing tasks effectively.
+							Make progress on your most important goals every day.
+						</p>
+					</div>
+				</div>
+
+				<div class="bg-white rounded-2xl shadow-md p-8 max-w-3xl mx-auto">
+					<div class="flex flex-col items-center justify-center mb-6">
+						<div
+							class="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-indigo-100 shadow-md"
+						>
+							<img
+								src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80"
+								alt="Sarah Johnson"
+								class="w-full h-full object-cover"
+							/>
+						</div>
+						<div class="flex text-yellow-400">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+								/>
+							</svg>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+								/>
+							</svg>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+								/>
+							</svg>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+								/>
+							</svg>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+								/>
+							</svg>
+						</div>
+					</div>
+					<blockquote class="text-gray-700 text-center text-lg italic mb-4">
+						"Using the Eisenhower Matrix has completely transformed how I manage
+						my workload. I'm now able to focus on what truly matters and have
+						reduced my stress levels significantly. I can't imagine working
+						without it now!"
+					</blockquote>
+					<div class="text-center">
+						<p class="font-semibold text-gray-800">Sarah Johnson</p>
+						<p class="text-gray-500 text-sm">Product Manager at TechCorp</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<footer class="bg-gray-800 text-white py-12">
+			<div class="matrix-container">
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<div>
+						<div class="flex items-center mb-4">
+							<i
+								data-lucide="layout-grid"
+								class="h-6 w-6 mr-2 text-indigo-400"
+							></i>
+							<h3 class="text-xl font-bold text-indigo-400">PriorityFlow</h3>
+						</div>
+						<p class="text-gray-300 mb-4">
+							PriorityFlow helps you organize tasks using the Eisenhower Matrix
+							method, prioritizing what truly matters. Boost productivity and
+							reduce stress by effectively managing your time.
+						</p>
+					</div>
+
+					<div class="md:pl-20">
+						<h3 class="text-lg font-semibold mb-4 text-indigo-400">
+							Quick Links
+						</h3>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#home"
+									class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"
+									>Home</a
+								>
+							</li>
+							<li>
+								<a
+									href="#matrix"
+									class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"
+									>Matrix</a
+								>
+							</li>
+							<li>
+								<a
+									href="#about"
+									class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"
+									>About</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4 text-indigo-400">
+							Connect With Us
+						</h3>
+						<div class="flex space-x-4">
+							<a
+								href="https://instagram.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"
+							>
+								<i data-lucide="instagram" class="h-6 w-6"></i>
+							</a>
+							<a
+								href="https://twitter.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"
+							>
+								<i data-lucide="twitter" class="h-6 w-6"></i>
+							</a>
+							<a
+								href="https://github.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-gray-300 hover:text-white transition-colors duration-200 cursor-pointer"
+							>
+								<i data-lucide="github" class="h-6 w-6"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<div id="task-modal" class="modal">
+			<div
+				class="modal-content bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 p-6"
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h3 class="text-xl font-bold text-gray-800">Task Details</h3>
+					<button
+						id="close-modal"
+						class="text-gray-500 hover:text-gray-700 transition-colors"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+
+				<div class="space-y-5">
+					<div>
+						<label
+							for="modal-task-text"
+							class="block text-sm font-medium text-gray-700 mb-2"
+							>Task Title *</label
+						>
+						<input
+							type="text"
+							id="modal-task-text"
+							class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+							required
+						/>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div>
+							<label
+								for="modal-quadrant"
+								class="block text-sm font-medium text-gray-700 mb-2"
+								>Quadrant</label
+							>
+							<select
+								id="modal-quadrant"
+								class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+							>
+								<option value="1">Important & Urgent</option>
+								<option value="2">Important & Not Urgent</option>
+								<option value="3">Not Important & Urgent</option>
+								<option value="4">Not Important & Not Urgent</option>
+							</select>
+						</div>
+
+						<div>
+							<label
+								for="modal-task-category"
+								class="block text-sm font-medium text-gray-700 mb-2"
+								>Category</label
+							>
+							<select
+								id="modal-task-category"
+								class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+							>
+								<option value="">Select category</option>
+								<option value="work">Work</option>
+								<option value="personal">Personal</option>
+								<option value="health">Health</option>
+								<option value="finance">Finance</option>
+								<option value="learning">Learning</option>
+								<option value="other">Other</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 gap-4">
+						<div>
+							<label
+								for="modal-task-priority"
+								class="block text-sm font-medium text-gray-700 mb-2"
+								>Priority</label
+							>
+							<select
+								id="modal-task-priority"
+								class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+							>
+								<option value="medium">Medium Priority</option>
+								<option value="high">High Priority</option>
+								<option value="low">Low Priority</option>
+							</select>
+						</div>
+					</div>
+
+					<div>
+						<label
+							for="modal-task-description"
+							class="block text-sm font-medium text-gray-700 mb-2"
+							>Description</label
+						>
+						<textarea
+							id="modal-task-description"
+							class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+							rows="3"
+							placeholder="Add task details..."
+						></textarea>
+					</div>
+
+					<div>
+						<label
+							for="modal-task-people"
+							class="block text-sm font-medium text-gray-700 mb-2"
+							>People Involved</label
+						>
+						<input
+							type="text"
+							id="modal-task-people"
+							class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+							placeholder="e.g. John, Sarah, Team Alpha"
+						/>
+					</div>
+
+					<div class="flex items-center">
+						<input
+							type="checkbox"
+							id="modal-task-completed"
+							class="mr-3 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+						/>
+						<label
+							for="modal-task-completed"
+							class="text-sm font-medium text-gray-700"
+							>Mark as completed</label
+						>
+					</div>
+				</div>
+
+				<div class="mt-8 flex gap-3">
+					<button
+						id="save-task"
+						class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-colors duration-200 font-medium shadow-md hover:shadow-lg"
+					>
+						Save Task
+					</button>
+					<button
+						id="cancel-task"
+						class="px-6 py-3 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors duration-200 font-medium"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="alert-modal" class="alert-modal">
+			<div class="alert-content">
+				<div class="alert-icon">
+					<i data-lucide="alert-triangle" class="h-6 w-6"></i>
+				</div>
+				<h3 id="alert-title" class="alert-title">Alert</h3>
+				<p id="alert-message" class="alert-message">
+					This is an alert message.
+				</p>
+				<div class="alert-buttons">
+					<button id="alert-ok" class="alert-button alert-button-primary">
+						OK
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="confirm-modal" class="confirm-modal">
+			<div class="confirm-content">
+				<div class="confirm-icon">
+					<i data-lucide="alert-circle" class="h-6 w-6"></i>
+				</div>
+				<h3 id="confirm-title" class="confirm-title">Confirm Action</h3>
+				<p id="confirm-message" class="confirm-message">
+					Are you sure you want to proceed?
+				</p>
+				<div class="confirm-buttons">
+					<button
+						id="confirm-cancel"
+						class="confirm-button confirm-button-cancel"
+					>
+						Cancel
+					</button>
+					<button id="confirm-ok" class="confirm-button confirm-button-danger">
+						Confirm
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="toast" class="toast">Task saved successfully!</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				lucide.createIcons();
+
+				const showAlert = (title, message, type = "warning") => {
+					return new Promise((resolve) => {
+						const modal = document.getElementById("alert-modal");
+						const titleEl = document.getElementById("alert-title");
+						const messageEl = document.getElementById("alert-message");
+						const okBtn = document.getElementById("alert-ok");
+						const iconEl = modal.querySelector(".alert-icon i");
+
+						titleEl.textContent = title;
+						messageEl.textContent = message;
+
+						if (type === "error") {
+							iconEl.setAttribute("data-lucide", "x-circle");
+							modal.querySelector(".alert-icon").className = "alert-icon";
+							modal.querySelector(".alert-icon").style.backgroundColor =
+								"#fee2e2";
+							modal.querySelector(".alert-icon").style.color = "#dc2626";
+						} else {
+							iconEl.setAttribute("data-lucide", "alert-triangle");
+							modal.querySelector(".alert-icon").className = "alert-icon";
+							modal.querySelector(".alert-icon").style.backgroundColor =
+								"#fef3c7";
+							modal.querySelector(".alert-icon").style.color = "#d97706";
+						}
+
+						modal.classList.add("active");
+						lucide.createIcons({ node: modal });
+
+						const handleOk = () => {
+							modal.classList.remove("active");
+							okBtn.removeEventListener("click", handleOk);
+							resolve(true);
+						};
+
+						const handleKeydown = (e) => {
+							if (e.key === "Enter" || e.key === "Escape") {
+								handleOk();
+								document.removeEventListener("keydown", handleKeydown);
+							}
+						};
+
+						okBtn.addEventListener("click", handleOk);
+						document.addEventListener("keydown", handleKeydown);
+
+						setTimeout(() => okBtn.focus(), 100);
+					});
+				};
+
+				const showConfirm = (
+					title,
+					message,
+					confirmText = "Confirm",
+					cancelText = "Cancel"
+				) => {
+					return new Promise((resolve) => {
+						const modal = document.getElementById("confirm-modal");
+						const titleEl = document.getElementById("confirm-title");
+						const messageEl = document.getElementById("confirm-message");
+						const confirmBtn = document.getElementById("confirm-ok");
+						const cancelBtn = document.getElementById("confirm-cancel");
+
+						titleEl.textContent = title;
+						messageEl.textContent = message;
+						confirmBtn.textContent = confirmText;
+						cancelBtn.textContent = cancelText;
+
+						modal.classList.add("active");
+						lucide.createIcons({ node: modal });
+
+						const handleConfirm = () => {
+							modal.classList.remove("active");
+							cleanup();
+							resolve(true);
+						};
+
+						const handleCancel = () => {
+							modal.classList.remove("active");
+							cleanup();
+							resolve(false);
+						};
+
+						const handleKeydown = (e) => {
+							if (e.key === "Enter") {
+								handleConfirm();
+							} else if (e.key === "Escape") {
+								handleCancel();
+							}
+						};
+
+						const cleanup = () => {
+							confirmBtn.removeEventListener("click", handleConfirm);
+							cancelBtn.removeEventListener("click", handleCancel);
+							document.removeEventListener("keydown", handleKeydown);
+						};
+
+						confirmBtn.addEventListener("click", handleConfirm);
+						cancelBtn.addEventListener("click", handleCancel);
+						document.addEventListener("keydown", handleKeydown);
+
+						setTimeout(() => cancelBtn.focus(), 100);
+					});
+				};
+
+				const mobileMenuButton = document.getElementById("mobile-menu-button");
+				const mobileMenu = document.getElementById("mobile-menu");
+
+				mobileMenuButton.addEventListener("click", () => {
+					mobileMenu.classList.toggle("hidden");
+				});
+
+				const setupSmoothScrolling = () => {
+					const navLinks = document.querySelectorAll(
+						'a[href^="#"]:not([href="#"])'
+					);
+
+					navLinks.forEach((link) => {
+						link.addEventListener("click", (e) => {
+							e.preventDefault();
+
+							const targetId = link.getAttribute("href");
+							const targetElement = document.querySelector(targetId);
+
+							if (targetElement) {
+								if (mobileMenu) {
+									mobileMenu.classList.add("hidden");
+								}
+
+								window.scrollTo({
+									top: targetElement.offsetTop - 80,
+									behavior: "smooth",
+								});
+							}
+						});
+					});
+				};
+
+				setupSmoothScrolling();
+
+				const searchInput = document.getElementById("search-tasks");
+				const clearSearchBtn = document.getElementById("clear-search");
+				const filterAllBtn = document.getElementById("filter-all");
+				const filterActiveBtn = document.getElementById("filter-active");
+				const filterCompletedBtn = document.getElementById("filter-completed");
+				const filterCategoryBtn = document.getElementById("filter-category");
+				const categoryDropdown = document.getElementById("category-dropdown");
+				const sortTasksBtn = document.getElementById("sort-tasks");
+				const sortDropdown = document.getElementById("sort-dropdown");
+				const clearAllBtn = document.getElementById("clear-all");
+				const clearCompletedBtn = document.getElementById("clear-completed");
+				const exportTasksBtn = document.getElementById("export-tasks");
+				const quadrants = document.querySelectorAll(".task-container");
+				const createTaskBtn = document.getElementById("create-task-btn");
+				const toast = document.getElementById("toast");
+
+				let taskCounter = 0;
+				let tasks = [];
+				let currentEditingTaskId = null;
+				let filterState = "all";
+				let selectedCategory = "";
+				let sortOrder = "priority";
+
+				const showToast = (message) => {
+					toast.textContent = message;
+					toast.classList.add("show");
+
+					setTimeout(() => {
+						toast.classList.remove("show");
+					}, 3000);
+				};
+
+				const generateConfetti = (count = 50) => {
+					const confettiContainer = document.createElement("div");
+					confettiContainer.className = "confetti-container";
+					document.body.appendChild(confettiContainer);
+
+					for (let i = 0; i < count; i++) {
+						const confetti = document.createElement("div");
+						confetti.className = "confetti";
+						confetti.style.left = Math.random() * 100 + "vw";
+						confetti.style.animationDuration = Math.random() * 3 + 2 + "s";
+						confettiContainer.appendChild(confetti);
+					}
+
+					setTimeout(() => {
+						document.body.removeChild(confettiContainer);
+					}, 5000);
+				};
+
+				const defaultTasks = [
+					{
+						id: "task-1",
+						text: "Submit quarterly report",
+						description: "The Q2 financial report is due by end of day.",
+						category: "work",
+						priority: "high",
+						quadrant: 1,
+						completed: false,
+						people: "Finance Team",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-2",
+						text: "Research new marketing strategies",
+						description: "Look into social media trends for next campaign",
+						category: "work",
+						priority: "medium",
+						quadrant: 2,
+						completed: false,
+						people: "Marketing Team",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-3",
+						text: "Call back client about project changes",
+						description: "They requested timeline updates",
+						category: "work",
+						priority: "high",
+						quadrant: 3,
+						completed: false,
+						people: "John Smith",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-4",
+						text: "Research vacation destinations",
+						description: "Look into beach resorts for summer trip",
+						category: "personal",
+						priority: "low",
+						quadrant: 4,
+						completed: false,
+						people: "Family",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-5",
+						text: "Schedule dentist appointment",
+						description: "Need to book a cleaning for next month",
+						category: "health",
+						priority: "medium",
+						quadrant: 2,
+						completed: false,
+						people: "",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-6",
+						text: "Fix website bug",
+						description: "Homepage contact form not submitting properly",
+						category: "work",
+						priority: "high",
+						quadrant: 1,
+						completed: false,
+						people: "Dev Team",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-7",
+						text: "Review monthly budget",
+						description: "Update spreadsheet with recent expenses",
+						category: "finance",
+						priority: "medium",
+						quadrant: 2,
+						completed: false,
+						people: "",
+						createdAt: new Date().toISOString(),
+					},
+					{
+						id: "task-8",
+						text: "Buy groceries",
+						description: "Need milk, eggs, bread, and vegetables",
+						category: "personal",
+						priority: "medium",
+						quadrant: 3,
+						completed: false,
+						people: "",
+						createdAt: new Date().toISOString(),
+					},
+				];
+
+				const loadTasks = () => {
+					const storedTasks = localStorage.getItem("eisenhowerTasks");
+					if (storedTasks) {
+						try {
+							tasks = JSON.parse(storedTasks);
+							if (tasks.length > 0) {
+								const highestId = Math.max(
+									...tasks.map((task) => parseInt(task.id.replace("task-", "")))
+								);
+								taskCounter = highestId + 1;
+							}
+						} catch (e) {
+							console.error("Error loading tasks:", e);
+							tasks = [...defaultTasks];
+							taskCounter = defaultTasks.length + 1;
+						}
+					} else {
+						tasks = [...defaultTasks];
+						taskCounter = defaultTasks.length + 1;
+					}
+					renderAllTasks();
+				};
+
+				const saveTasks = () => {
+					localStorage.setItem("eisenhowerTasks", JSON.stringify(tasks));
+					updateQuadrantStats();
+				};
+
+				const updateQuadrantStats = () => {
+					for (let i = 1; i <= 4; i++) {
+						const quadrantTasks = tasks.filter((task) => task.quadrant === i);
+						const completedTasks = quadrantTasks.filter(
+							(task) => task.completed
+						);
+						const totalTasks = quadrantTasks.length;
+						const completedCount = completedTasks.length;
+
+						const statsElement = document.getElementById(`q${i}-stats`);
+						const progressElement = document.getElementById(`q${i}-progress`);
+
+						if (statsElement) {
+							statsElement.textContent = `${totalTasks} task${
+								totalTasks !== 1 ? "s" : ""
+							}`;
+						}
+
+						if (progressElement) {
+							const progressPercentage =
+								totalTasks > 0 ? (completedCount / totalTasks) * 100 : 0;
+							progressElement.style.width = `${progressPercentage}%`;
+						}
+
+						const container = document.getElementById(`q${i}`);
+						if (container) {
+							if (totalTasks > 0) {
+								container.classList.remove("empty");
+								container.querySelector(".empty-message")?.remove();
+							} else {
+								if (!container.classList.contains("empty")) {
+									container.classList.add("empty");
+									const emptyMessage = document.createElement("p");
+									emptyMessage.className = "empty-message";
+									emptyMessage.textContent =
+										"Drag tasks here or add a new task";
+									container.appendChild(emptyMessage);
+								}
+							}
+
+							const baseHeight = 150;
+							const taskHeight = 90;
+							const maxHeight = 400;
+
+							const calculatedHeight = baseHeight + totalTasks * taskHeight;
+							const finalHeight = Math.min(calculatedHeight, maxHeight);
+
+							container.style.minHeight = `${finalHeight}px`;
+						}
+					}
+				};
+
+				const getFilteredTasks = () => {
+					let filteredTasks = [...tasks];
+
+					const searchTerm = searchInput.value.toLowerCase().trim();
+					if (searchTerm) {
+						filteredTasks = filteredTasks.filter(
+							(task) =>
+								task.text.toLowerCase().includes(searchTerm) ||
+								(task.description &&
+									task.description.toLowerCase().includes(searchTerm)) ||
+								(task.people && task.people.toLowerCase().includes(searchTerm))
+						);
+					}
+
+					if (filterState === "active") {
+						filteredTasks = filteredTasks.filter((task) => !task.completed);
+					} else if (filterState === "completed") {
+						filteredTasks = filteredTasks.filter((task) => task.completed);
+					}
+
+					if (selectedCategory) {
+						filteredTasks = filteredTasks.filter(
+							(task) => task.category === selectedCategory
+						);
+					}
+
+					filteredTasks.sort((a, b) => {
+						switch (sortOrder) {
+							case "priority":
+								const priorityOrder = { high: 3, medium: 2, low: 1 };
+								return (
+									(priorityOrder[b.priority] || 2) -
+									(priorityOrder[a.priority] || 2)
+								);
+							case "alphabetical":
+								return a.text.localeCompare(b.text);
+							case "date":
+							default:
+								return new Date(b.createdAt) - new Date(a.createdAt);
+						}
+					});
+
+					return filteredTasks;
+				};
+
+				const renderAllTasks = () => {
+					quadrants.forEach((quadrant) => {
+						quadrant.innerHTML = "";
+						quadrant.classList.add("empty");
+
+						const emptyMessage = document.createElement("p");
+						emptyMessage.className = "empty-message";
+						emptyMessage.textContent = "Drag tasks here or add a new task";
+						quadrant.appendChild(emptyMessage);
+					});
+
+					const filteredTasks = getFilteredTasks();
+
+					if (filteredTasks.length > 0) {
+						filteredTasks.forEach((task) => {
+							renderTask(task);
+						});
+					}
+
+					updateQuadrantStats();
+					lucide.createIcons();
+				};
+
+				const renderTask = (task) => {
+					const quadrant = document.getElementById(`q${task.quadrant}`);
+					if (!quadrant) return;
+
+					if (quadrant.classList.contains("empty")) {
+						quadrant.classList.remove("empty");
+						quadrant.innerHTML = "";
+					}
+
+					const taskElement = document.createElement("div");
+					taskElement.id = task.id;
+					taskElement.className = `task mb-3 p-4 relative ${
+						task.completed ? "completed" : ""
+					}`;
+					taskElement.className += ` priority-${task.priority || "medium"}`;
+					taskElement.setAttribute("draggable", "true");
+					taskElement.setAttribute("data-quadrant", task.quadrant);
+
+					const categoryClass = task.category
+						? `category-${task.category}`
+						: "";
+
+					const deadlineText = task.deadline
+						? `<div class="text-xs text-gray-500 mt-2">
+                        <i data-lucide="calendar" class="h-3 w-3 inline mr-1"></i>
+                        Due: ${new Date(task.deadline).toLocaleDateString()}
+                    </div>`
+						: "";
+
+					const peopleText = task.people
+						? `<div class="text-xs text-gray-500 mt-1">
+                        <i data-lucide="users" class="h-3 w-3 inline mr-1"></i>
+                        ${task.people}
+                    </div>`
+						: "";
+
+					const categoryBadge = task.category
+						? `<span class="task-category ${categoryClass} text-xs">${task.category}</span>`
+						: "";
+
+					const taskBadge =
+						task.priority === "high" && !task.completed
+							? `<span class="task-badge">HIGH</span>`
+							: "";
+
+					taskElement.innerHTML = `
+                    ${taskBadge}
+                    <div class="flex items-start gap-3">
+                        <button class="complete-task mt-1 text-gray-400 hover:text-green-500 transition-colors duration-200">
+                            <i data-lucide="${
+															task.completed ? "check-circle-2" : "circle"
+														}" class="h-4 w-4"></i>
+                        </button>
+                        <div class="flex-grow min-w-0">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <span class="task-text text-gray-800 font-medium leading-tight">${
+																	task.text
+																}</span>
+                                ${categoryBadge}
+                            </div>
+                            ${
+															task.description
+																? `<p class="text-sm text-gray-600 mb-2 leading-relaxed">${task.description}</p>`
+																: ""
+														}
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                ${deadlineText}
+                                ${peopleText}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button class="edit-task text-gray-400 hover:text-indigo-500 transition-colors duration-200">
+                                <i data-lucide="pencil" class="h-4 w-4"></i>
+                            </button>
+                            <button class="delete-task text-gray-400 hover:text-red-500 transition-colors duration-200">
+                                <i data-lucide="trash-2" class="h-4 w-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+					setupDragListeners(taskElement);
+
+					taskElement
+						.querySelector(".delete-task")
+						.addEventListener("click", () => {
+							deleteTask(task.id);
+						});
+
+					taskElement
+						.querySelector(".edit-task")
+						.addEventListener("click", () => {
+							editTask(task.id);
+						});
+
+					taskElement
+						.querySelector(".complete-task")
+						.addEventListener("click", () => {
+							toggleTaskCompletion(task.id);
+						});
+
+					quadrant.appendChild(taskElement);
+					lucide.createIcons({ node: taskElement });
+				};
+
+				const toggleTaskCompletion = (taskId) => {
+					const taskIndex = tasks.findIndex((task) => task.id === taskId);
+					if (taskIndex !== -1) {
+						const wasCompleted = tasks[taskIndex].completed;
+						tasks[taskIndex].completed = !wasCompleted;
+
+						if (!wasCompleted) {
+							generateConfetti(20);
+							showToast("Task completed! 🎉");
+						}
+
+						saveTasks();
+						renderAllTasks();
+					}
+				};
+
+				const deleteTask = async (taskId) => {
+					const confirmed = await showConfirm(
+						"Delete Task",
+						"Are you sure you want to delete this task? This action cannot be undone.",
+						"Delete",
+						"Cancel"
+					);
+
+					if (confirmed) {
+						tasks = tasks.filter((task) => task.id !== taskId);
+						saveTasks();
+						renderAllTasks();
+						showToast("Task deleted");
+					}
+				};
+
+				const addTask = (taskData) => {
+					const newTask = {
+						id: `task-${taskCounter++}`,
+						text: taskData.text,
+						description: taskData.description || "",
+						people: taskData.people || "",
+						category: taskData.category || "",
+						priority: taskData.priority || "medium",
+						quadrant: taskData.quadrant || 1,
+						completed: taskData.completed || false,
+						createdAt: new Date().toISOString(),
+					};
+
+					tasks.push(newTask);
+					saveTasks();
+					renderAllTasks();
+					showToast("Task added successfully");
+				};
+
+				const editTask = (taskId) => {
+					const task = tasks.find((t) => t.id === taskId);
+					if (!task) return;
+
+					currentEditingTaskId = taskId;
+
+					document.getElementById("modal-task-text").value = task.text;
+					document.getElementById("modal-task-description").value =
+						task.description || "";
+					document.getElementById("modal-task-people").value =
+						task.people || "";
+					document.getElementById("modal-task-category").value =
+						task.category || "";
+					document.getElementById("modal-task-priority").value =
+						task.priority || "medium";
+					document.getElementById("modal-quadrant").value =
+						task.quadrant.toString();
+					document.getElementById("modal-task-completed").checked =
+						task.completed || false;
+
+					document.getElementById("task-modal").classList.add("active");
+				};
+
+				const setupDragListeners = (taskElement) => {
+					taskElement.addEventListener("dragstart", (e) => {
+						e.dataTransfer.setData("text/plain", taskElement.id);
+						setTimeout(() => {
+							taskElement.classList.add("dragging");
+						}, 0);
+					});
+
+					taskElement.addEventListener("dragend", () => {
+						taskElement.classList.remove("dragging");
+					});
+
+					let touchData = {
+						startX: 0,
+						startY: 0,
+						currentX: 0,
+						currentY: 0,
+						isDragging: false,
+						threshold: 10,
+						ghostElement: null,
+						originalParent: null,
+						dragStarted: false,
+					};
+
+					taskElement.addEventListener("contextmenu", (e) => {
+						if (touchData.isDragging) {
+							e.preventDefault();
+						}
+					});
+
+					taskElement.addEventListener(
+						"touchstart",
+						(e) => {
+							if (e.touches.length !== 1) return;
+
+							const touch = e.touches[0];
+							touchData.startX = touch.clientX;
+							touchData.startY = touch.clientY;
+							touchData.currentX = touch.clientX;
+							touchData.currentY = touch.clientY;
+							touchData.isDragging = false;
+							touchData.dragStarted = false;
+							touchData.originalParent = taskElement.parentElement;
+
+							if (navigator.vibrate) {
+								navigator.vibrate(50);
+							}
+
+							e.preventDefault();
+						},
+						{ passive: false }
+					);
+
+					taskElement.addEventListener(
+						"touchmove",
+						(e) => {
+							if (e.touches.length !== 1) return;
+
+							const touch = e.touches[0];
+							const deltaX = touch.clientX - touchData.startX;
+							const deltaY = touch.clientY - touchData.startY;
+							const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+							touchData.currentX = touch.clientX;
+							touchData.currentY = touch.clientY;
+
+							if (!touchData.dragStarted && distance > touchData.threshold) {
+								touchData.dragStarted = true;
+								touchData.isDragging = true;
+
+								createGhostElement(taskElement, touchData);
+
+								taskElement.classList.add("dragging");
+
+								document
+									.querySelectorAll(".task-container")
+									.forEach((container) => {
+										container.classList.add("drag-active");
+									});
+
+								if (navigator.vibrate) {
+									navigator.vibrate(30);
+								}
+							}
+
+							if (touchData.isDragging && touchData.ghostElement) {
+								e.preventDefault();
+
+								updateGhostPosition(touchData);
+
+								highlightDropZone(touch.clientX, touch.clientY);
+							}
+						},
+						{ passive: false }
+					);
+
+					taskElement.addEventListener("touchend", (e) => {
+						if (!touchData.isDragging) return;
+
+						e.preventDefault();
+
+						const touch = e.changedTouches[0];
+						const dropTarget = findDropTarget(touch.clientX, touch.clientY);
+
+						if (dropTarget) {
+							const newQuadrant = parseInt(dropTarget.dataset.quadrant);
+							if (newQuadrant) {
+								moveTaskToQuadrant(taskElement.id, newQuadrant);
+
+								if (navigator.vibrate) {
+									navigator.vibrate([50, 50, 50]);
+								}
+							}
+						}
+
+						cleanupDrag(taskElement, touchData);
+					});
+
+					taskElement.addEventListener("touchcancel", () => {
+						cleanupDrag(taskElement, touchData);
+					});
+				};
+
+				function createGhostElement(taskElement, touchData) {
+					const rect = taskElement.getBoundingClientRect();
+					const ghost = taskElement.cloneNode(true);
+
+					ghost.style.position = "fixed";
+					ghost.style.left = `${rect.left}px`;
+					ghost.style.top = `${rect.top}px`;
+					ghost.style.width = `${rect.width}px`;
+					ghost.style.height = `${rect.height}px`;
+					ghost.style.zIndex = "9999";
+					ghost.style.opacity = "0.9";
+					ghost.style.pointerEvents = "none";
+					ghost.style.transform = "rotate(3deg) scale(1.05)";
+					ghost.style.transition = "transform 0.2s ease";
+					ghost.style.boxShadow = "0 10px 30px rgba(0,0,0,0.3)";
+					ghost.style.borderRadius = "12px";
+
+					ghost.querySelectorAll("button").forEach((btn) => {
+						btn.style.pointerEvents = "none";
+					});
+
+					document.body.appendChild(ghost);
+					touchData.ghostElement = ghost;
+
+					touchData.offsetX = touchData.startX - rect.left;
+					touchData.offsetY = touchData.startY - rect.top;
+				}
+
+				function updateGhostPosition(touchData) {
+					if (!touchData.ghostElement) return;
+
+					const x = touchData.currentX - touchData.offsetX;
+					const y = touchData.currentY - touchData.offsetY;
+
+					touchData.ghostElement.style.transform = `translate(${x}px, ${y}px) rotate(3deg) scale(1.05)`;
+				}
+
+				function highlightDropZone(x, y) {
+					document.querySelectorAll(".drop-highlight").forEach((el) => {
+						el.classList.remove("drop-highlight");
+					});
+
+					const element = document.elementFromPoint(x, y);
+					if (!element) return;
+
+					let quadrant = element.closest(".task-container");
+					if (quadrant) {
+						quadrant.classList.add("drop-highlight");
+					}
+				}
+
+				function findDropTarget(x, y) {
+					const element = document.elementFromPoint(x, y);
+					return element ? element.closest(".task-container") : null;
+				}
+
+				function cleanupDrag(taskElement, touchData) {
+					if (touchData.ghostElement) {
+						touchData.ghostElement.style.transition = "all 0.3s ease";
+						touchData.ghostElement.style.opacity = "0";
+						touchData.ghostElement.style.transform = "scale(0.8)";
+
+						setTimeout(() => {
+							if (
+								touchData.ghostElement &&
+								touchData.ghostElement.parentElement
+							) {
+								document.body.removeChild(touchData.ghostElement);
+							}
+						}, 300);
+
+						touchData.ghostElement = null;
+					}
+
+					taskElement.classList.remove("dragging");
+
+					document.querySelectorAll(".task-container").forEach((container) => {
+						container.classList.remove("drag-active");
+					});
+
+					document.querySelectorAll(".drop-highlight").forEach((el) => {
+						el.classList.remove("drop-highlight");
+					});
+
+					touchData.isDragging = false;
+					touchData.dragStarted = false;
+				}
+
+				const moveTaskToQuadrant = (taskId, newQuadrant) => {
+					const taskIndex = tasks.findIndex((task) => task.id === taskId);
+					if (taskIndex !== -1) {
+						const oldQuadrant = tasks[taskIndex].quadrant;
+
+						if (oldQuadrant !== newQuadrant) {
+							tasks[taskIndex].quadrant = newQuadrant;
+							saveTasks();
+							renderAllTasks();
+							showToast(`Task moved to quadrant ${newQuadrant}`);
+						}
+					}
+				};
+
+				quadrants.forEach((quadrant) => {
+					quadrant.addEventListener("dragover", (e) => {
+						e.preventDefault();
+						quadrant.classList.add("bg-gray-100");
+					});
+
+					quadrant.addEventListener("dragleave", () => {
+						quadrant.classList.remove("bg-gray-100");
+					});
+
+					quadrant.addEventListener("drop", (e) => {
+						e.preventDefault();
+						quadrant.classList.remove("bg-gray-100");
+
+						const taskId = e.dataTransfer.getData("text/plain");
+						const newQuadrant = parseInt(quadrant.dataset.quadrant);
+						moveTaskToQuadrant(taskId, newQuadrant);
+					});
+				});
+
+				const exportTasks = () => {
+					const dataStr = JSON.stringify(tasks, null, 2);
+					const dataBlob = new Blob([dataStr], { type: "application/json" });
+					const url = URL.createObjectURL(dataBlob);
+					const link = document.createElement("a");
+					link.href = url;
+					link.download = `eisenhower-matrix-${
+						new Date().toISOString().split("T")[0]
+					}.json`;
+					link.click();
+					URL.revokeObjectURL(url);
+
+					showToast("Tasks exported successfully");
+				};
+
+				searchInput.addEventListener("input", () => {
+					clearSearchBtn.style.display = searchInput.value ? "block" : "none";
+					renderAllTasks();
+				});
+
+				clearSearchBtn.addEventListener("click", () => {
+					searchInput.value = "";
+					clearSearchBtn.style.display = "none";
+					renderAllTasks();
+				});
+
+				filterAllBtn.addEventListener("click", () => {
+					filterState = "all";
+					filterAllBtn.classList.add("bg-indigo-600", "text-white");
+					filterAllBtn.classList.remove("text-gray-700", "hover:bg-gray-200");
+
+					filterActiveBtn.classList.remove("bg-indigo-600", "text-white");
+					filterActiveBtn.classList.add("text-gray-700", "hover:bg-gray-200");
+
+					filterCompletedBtn.classList.remove("bg-indigo-600", "text-white");
+					filterCompletedBtn.classList.add(
+						"text-gray-700",
+						"hover:bg-gray-200"
+					);
+
+					renderAllTasks();
+				});
+
+				filterActiveBtn.addEventListener("click", () => {
+					filterState = "active";
+					filterActiveBtn.classList.add("bg-indigo-600", "text-white");
+					filterActiveBtn.classList.remove(
+						"text-gray-700",
+						"hover:bg-gray-200"
+					);
+
+					filterAllBtn.classList.remove("bg-indigo-600", "text-white");
+					filterAllBtn.classList.add("text-gray-700", "hover:bg-gray-200");
+
+					filterCompletedBtn.classList.remove("bg-indigo-600", "text-white");
+					filterCompletedBtn.classList.add(
+						"text-gray-700",
+						"hover:bg-gray-200"
+					);
+
+					renderAllTasks();
+				});
+
+				filterCompletedBtn.addEventListener("click", () => {
+					filterState = "completed";
+					filterCompletedBtn.classList.add("bg-indigo-600", "text-white");
+					filterCompletedBtn.classList.remove(
+						"text-gray-700",
+						"hover:bg-gray-200"
+					);
+
+					filterAllBtn.classList.remove("bg-indigo-600", "text-white");
+					filterAllBtn.classList.add("text-gray-700", "hover:bg-gray-200");
+
+					filterActiveBtn.classList.remove("bg-indigo-600", "text-white");
+					filterActiveBtn.classList.add("text-gray-700", "hover:bg-gray-200");
+
+					renderAllTasks();
+				});
+
+				filterCategoryBtn.addEventListener("click", (e) => {
+					e.stopPropagation();
+					categoryDropdown.classList.toggle("hidden");
+				});
+
+				document
+					.querySelectorAll("#category-dropdown button")
+					.forEach((button) => {
+						button.addEventListener("click", () => {
+							selectedCategory = button.dataset.category;
+							categoryDropdown.classList.add("hidden");
+
+							const buttonText = selectedCategory
+								? `Category: ${
+										selectedCategory.charAt(0).toUpperCase() +
+										selectedCategory.slice(1)
+								  }`
+								: "Categories";
+
+							filterCategoryBtn.innerHTML = `
+                        <i data-lucide="tag" class="h-4 w-4 mr-2"></i>
+                        ${buttonText}
+                        <i data-lucide="chevron-down" class="h-4 w-4 ml-2"></i>
+                    `;
+
+							lucide.createIcons({ node: filterCategoryBtn });
+							renderAllTasks();
+						});
+					});
+
+				sortTasksBtn.addEventListener("click", (e) => {
+					e.stopPropagation();
+					sortDropdown.classList.toggle("hidden");
+				});
+
+				document.querySelectorAll("#sort-dropdown button").forEach((button) => {
+					button.addEventListener("click", () => {
+						sortOrder = button.dataset.sort;
+						sortDropdown.classList.add("hidden");
+
+						let sortIcon, sortText;
+
+						switch (sortOrder) {
+							case "priority":
+								sortIcon = "trending-up";
+								sortText = "By Priority";
+								break;
+							case "alphabetical":
+								sortIcon = "a-z";
+								sortText = "Alphabetical";
+								break;
+							case "date":
+							default:
+								sortIcon = "calendar";
+								sortText = "By Date Added";
+						}
+
+						sortTasksBtn.innerHTML = `
+                        <i data-lucide="${sortIcon}" class="h-4 w-4 mr-2"></i>
+                        ${sortText}
+                        <i data-lucide="chevron-down" class="h-4 w-4 ml-2"></i>
+                    `;
+
+						lucide.createIcons({ node: sortTasksBtn });
+						renderAllTasks();
+					});
+				});
+
+				document.addEventListener("click", () => {
+					categoryDropdown.classList.add("hidden");
+					sortDropdown.classList.add("hidden");
+				});
+
+				clearCompletedBtn.addEventListener("click", async () => {
+					const confirmed = await showConfirm(
+						"Clear Completed Tasks",
+						"Are you sure you want to clear all completed tasks? This action cannot be undone.",
+						"Clear All",
+						"Cancel"
+					);
+
+					if (confirmed) {
+						tasks = tasks.filter((task) => !task.completed);
+						saveTasks();
+						renderAllTasks();
+						showToast("Completed tasks cleared");
+					}
+				});
+
+				exportTasksBtn.addEventListener("click", exportTasks);
+
+				clearAllBtn.addEventListener("click", async () => {
+					const confirmed = await showConfirm(
+						"Clear All Tasks",
+						"Are you sure you want to clear ALL tasks? This action cannot be undone!",
+						"Clear All",
+						"Cancel"
+					);
+
+					if (confirmed) {
+						tasks = [];
+						saveTasks();
+						renderAllTasks();
+						showToast("All tasks cleared");
+					}
+				});
+
+				createTaskBtn.addEventListener("click", () => {
+					document.getElementById("modal-task-text").value = "";
+					document.getElementById("modal-task-description").value = "";
+					document.getElementById("modal-task-people").value = "";
+					document.getElementById("modal-task-category").value = "";
+					document.getElementById("modal-task-priority").value = "medium";
+					document.getElementById("modal-quadrant").value = "1";
+					document.getElementById("modal-task-completed").checked = false;
+
+					currentEditingTaskId = null;
+					document.getElementById("task-modal").classList.add("active");
+
+					setTimeout(() => {
+						document.getElementById("modal-task-text").focus();
+					}, 100);
+				});
+
+				const taskModal = document.getElementById("task-modal");
+				const closeModalBtn = document.getElementById("close-modal");
+				const saveTaskBtn = document.getElementById("save-task");
+				const cancelTaskBtn = document.getElementById("cancel-task");
+
+				const closeModal = () => {
+					taskModal.classList.remove("active");
+					currentEditingTaskId = null;
+				};
+
+				closeModalBtn.addEventListener("click", closeModal);
+				cancelTaskBtn.addEventListener("click", closeModal);
+
+				taskModal.addEventListener("click", (e) => {
+					if (e.target === taskModal) {
+						closeModal();
+					}
+				});
+
+				saveTaskBtn.addEventListener("click", () => {
+					const taskText = document
+						.getElementById("modal-task-text")
+						.value.trim();
+					if (!taskText) {
+						showAlert(
+							"Missing Task Title",
+							"Please enter a task title before saving."
+						);
+						return;
+					}
+
+					const taskData = {
+						text: taskText,
+						description: document
+							.getElementById("modal-task-description")
+							.value.trim(),
+						people: document.getElementById("modal-task-people").value.trim(),
+						category: document.getElementById("modal-task-category").value,
+						priority: document.getElementById("modal-task-priority").value,
+						quadrant: parseInt(document.getElementById("modal-quadrant").value),
+						completed: document.getElementById("modal-task-completed").checked,
+					};
+
+					if (currentEditingTaskId) {
+						const taskIndex = tasks.findIndex(
+							(t) => t.id === currentEditingTaskId
+						);
+						if (taskIndex !== -1) {
+							tasks[taskIndex] = { ...tasks[taskIndex], ...taskData };
+							saveTasks();
+							renderAllTasks();
+							showToast("Task updated successfully");
+						}
+					} else {
+						addTask(taskData);
+					}
+
+					closeModal();
+				});
+
+				document
+					.getElementById("modal-task-text")
+					.addEventListener("keydown", (e) => {
+						if (e.key === "Enter") {
+							saveTaskBtn.click();
+						}
+					});
+
+				document.addEventListener("keydown", (e) => {
+					if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+						return;
+					}
+
+					if (e.ctrlKey || e.metaKey) {
+						switch (e.key) {
+							case "n":
+								e.preventDefault();
+								createTaskBtn.click();
+								break;
+							case "f":
+								e.preventDefault();
+								searchInput.focus();
+								break;
+							case "s":
+								e.preventDefault();
+								exportTasks();
+								break;
+						}
+					}
+
+					if (e.key === "Escape" && taskModal.classList.contains("active")) {
+						closeModal();
+					}
+
+					if (e.key === "a" && !taskModal.classList.contains("active")) {
+						e.preventDefault();
+						createTaskBtn.click();
+					}
+				});
+
+				loadTasks();
+
+				window.addEventListener("resize", updateQuadrantStats);
+
+				setTimeout(() => {
+					createTaskBtn.classList.remove("pulse-animation");
+				}, 5000);
+			});
+		</script>
+	</body>
+</html>

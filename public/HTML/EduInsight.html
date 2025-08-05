@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>EduInsight Dashboard</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+		/>
+		<style>
+			/* Custom scrollbar */
+			.peer:checked + div {
+				background-color: #4f46e5;
+				transition: background-color 0.3s ease;
+			}
+
+			.peer:checked + div:after {
+				transform: translate(100%, -50%);
+				background-color: white;
+			}
+
+			.peer + div:after {
+				transition: transform 0.3s ease;
+			}
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+			}
+			::-webkit-scrollbar-thumb {
+				background: #94a3b8;
+				border-radius: 3px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: #64748b;
+			}
+
+			/* Transitions */
+			.transition-sidebar {
+				transition: width 0.3s ease, transform 0.3s ease;
+			}
+
+			/* Custom animations */
+			@keyframes pulse-light {
+				0%,
+				100% {
+					opacity: 0.8;
+				}
+				50% {
+					opacity: 1;
+				}
+			}
+			.animate-pulse-light {
+				animation: pulse-light 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+			}
+
+			/* Responsive adjustments */
+			@media (max-width: 640px) {
+				.sm-hidden {
+					display: none;
+				}
+				.sm-text-xs {
+					font-size: 0.75rem;
+				}
+				.sm-p-1 {
+					padding: 0.25rem;
+				}
+			}
+
+			/* Core styling to ensure basic structure works */
+			#sidebar {
+				position: fixed;
+				height: 100%;
+				background-color: #312e81;
+				color: white;
+				width: 16rem;
+				z-index: 30;
+			}
+
+			@media (min-width: 768px) {
+				#sidebar {
+					position: static;
+				}
+			}
+
+			#sidebar.translate-x-0 {
+				transform: translateX(0);
+			}
+
+			#sidebar.-translate-x-full {
+				transform: translateX(-100%);
+			}
+
+			.flex {
+				display: flex;
+			}
+
+			.flex-1 {
+				flex: 1 1 0%;
+			}
+
+			.h-screen {
+				height: 100vh;
+			}
+
+			.bg-gray-50 {
+				background-color: #f9fafb;
+			}
+
+			.overflow-hidden {
+				overflow: hidden;
+			}
+
+			.bg-white {
+				background-color: white;
+			}
+
+			.shadow {
+				box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+					0 1px 2px 0 rgba(0, 0, 0, 0.06);
+			}
+
+			.rounded-lg {
+				border-radius: 0.5rem;
+			}
+
+			.p-4 {
+				padding: 1rem;
+			}
+
+			.grid {
+				display: grid;
+			}
+
+			.gap-4 {
+				gap: 1rem;
+			}
+
+			.gap-6 {
+				gap: 1.5rem;
+			}
+
+			@media (min-width: 1024px) {
+				.lg\\:grid-cols-4 {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+				}
+
+				.lg\\:grid-cols-3 {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+
+				.lg\\:col-span-2 {
+					grid-column: span 2 / span 2;
+				}
+			}
+
+			@media (min-width: 768px) {
+				.md\\:grid-cols-2 {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+			}
+		</style>
+	</head>
+	<body class="bg-gray-50 font-sans">
+		<div class="flex h-screen bg-gray-50 overflow-hidden">
+			<!-- Sidebar -->
+			<aside
+				id="sidebar"
+				class="transition-sidebar bg-indigo-900 text-white w-64 min-h-screen overflow-y-auto fixed md:static z-30"
+			>
+				<div
+					class="flex items-center justify-between p-4 border-b border-indigo-800"
+				>
+					<div class="flex items-center space-x-2">
+						<svg
+							class="h-8 w-8 text-indigo-300"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+							<path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5" />
+						</svg>
+						<span class="text-xl font-bold">EduInsight</span>
+					</div>
+					<button
+						id="sidebarToggle"
+						class="md:hidden text-indigo-200 hover:text-white"
+					>
+						<svg
+							class="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+				<nav class="p-4">
+					<ul class="space-y-2">
+						<li>
+							<a
+								href="#"
+								class="flex items-center space-x-3 p-2 rounded-lg bg-indigo-800 text-indigo-100"
+							>
+								<svg
+									class="h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<rect x="3" y="3" width="7" height="7"></rect>
+									<rect x="14" y="3" width="7" height="7"></rect>
+									<rect x="14" y="14" width="7" height="7"></rect>
+									<rect x="3" y="14" width="7" height="7"></rect>
+								</svg>
+								<span>Dashboard</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center space-x-3 p-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-indigo-100"
+							>
+								<svg
+									class="h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+									<circle cx="9" cy="7" r="4"></circle>
+									<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+									<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+								</svg>
+								<span>Students</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center space-x-3 p-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-indigo-100"
+							>
+								<svg
+									class="h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path
+										d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+									></path>
+									<rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+								</svg>
+								<span>Courses</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center space-x-3 p-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-indigo-100"
+							>
+								<svg
+									class="h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+									<polyline points="22 4 12 14.01 9 11.01"></polyline>
+								</svg>
+								<span>Assessments</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center space-x-3 p-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-indigo-100"
+							>
+								<svg
+									class="h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+								</svg>
+								<span>Analytics</span>
+							</a>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center space-x-3 p-2 rounded-lg text-indigo-200 hover:bg-indigo-800 hover:text-indigo-100"
+							>
+								<svg
+									class="h-5 w-5"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="12" cy="12" r="3"></circle>
+									<path
+										d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+									></path>
+								</svg>
+								<span>Settings</span>
+							</a>
+						</li>
+					</ul>
+
+					<!-- Alert Settings Section -->
+					<div class="mt-8 p-3 bg-indigo-800 rounded-lg">
+						<h5 class="text-sm font-medium text-indigo-100 mb-2">
+							Alert Settings
+						</h5>
+						<div class="space-y-3">
+							<div>
+								<label
+									class="flex items-center space-x-2 text-indigo-200 text-sm cursor-pointer"
+								>
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-indigo-500 rounded border-indigo-300"
+										checked
+									/>
+									<span>Grade Improvements</span>
+								</label>
+							</div>
+							<div>
+								<label
+									class="flex items-center space-x-2 text-indigo-200 text-sm cursor-pointer"
+								>
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-indigo-500 rounded border-indigo-300"
+										checked
+									/>
+									<span>Completion Milestones</span>
+								</label>
+							</div>
+							<div>
+								<label
+									class="flex items-center space-x-2 text-indigo-200 text-sm cursor-pointer"
+								>
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-indigo-500 rounded border-indigo-300"
+									/>
+									<span>Attendance Alerts</span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</nav>
+			</aside>
+
+			<!-- Main Content -->
+			<div class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+				<header class="bg-white shadow-sm">
+					<div class="flex items-center justify-between p-4">
+						<div class="flex items-center">
+							<button
+								id="mobileMenuBtn"
+								class="md:hidden mr-4 text-gray-500 hover:text-gray-700"
+							>
+								<svg
+									class="h-6 w-6"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 6h16M4 12h16M4 18h16"
+									/>
+								</svg>
+							</button>
+							<h1 class="text-xl font-semibold text-gray-800 sm-text-xs">
+								Performance Dashboard
+							</h1>
+						</div>
+						<div class="flex items-center space-x-4">
+							<div class="relative">
+								<button
+									id="notificationBtn"
+									class="text-gray-500 hover:text-gray-700"
+								>
+									<span
+										class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"
+									></span>
+									<svg
+										class="h-6 w-6"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+										/>
+									</svg>
+								</button>
+								<div
+									id="notificationDropdown"
+									class="hidden absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-20"
+								>
+									<div class="py-2">
+										<div class="px-4 py-2 border-b border-gray-100">
+											<h3 class="text-sm font-semibold text-gray-800">
+												Notifications
+											</h3>
+										</div>
+										<div class="max-h-60 overflow-y-auto">
+											<a
+												href="#"
+												class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
+											>
+												<div class="flex items-start">
+													<div
+														class="flex-shrink-0 bg-green-500 rounded-full h-2 w-2 mt-1.5 mr-2"
+													></div>
+													<div class="flex-1">
+														<p class="text-sm font-medium text-gray-800">
+															Emma Johnson achieved 95% in Mathematics
+														</p>
+														<p class="text-xs text-gray-500 mt-1">
+															Today at 10:30 AM
+														</p>
+													</div>
+												</div>
+											</a>
+											<a
+												href="#"
+												class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
+											>
+												<div class="flex items-start">
+													<div
+														class="flex-shrink-0 bg-yellow-500 rounded-full h-2 w-2 mt-1.5 mr-2"
+													></div>
+													<div class="flex-1">
+														<p class="text-sm font-medium text-gray-800">
+															Michael Brown completed Biology module
+														</p>
+														<p class="text-xs text-gray-500 mt-1">
+															Yesterday at 3:45 PM
+														</p>
+													</div>
+												</div>
+											</a>
+											<a
+												href="#"
+												class="block px-4 py-3 hover:bg-gray-50 border-b border-gray-100"
+											>
+												<div class="flex items-start">
+													<div
+														class="flex-shrink-0 bg-red-500 rounded-full h-2 w-2 mt-1.5 mr-2"
+													></div>
+													<div class="flex-1">
+														<p class="text-sm font-medium text-gray-800">
+															Attendance alert: Alex Wong missed 3 classes
+														</p>
+														<p class="text-xs text-gray-500 mt-1">
+															Yesterday at 1:20 PM
+														</p>
+													</div>
+												</div>
+											</a>
+										</div>
+										<div class="px-4 py-2 border-t border-gray-100 text-center">
+											<a
+												href="#"
+												class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+												>View all notifications</a
+											>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="relative">
+								<button
+									id="profileBtn"
+									class="flex items-center space-x-2 text-gray-700 hover:text-gray-900"
+								>
+									<img
+										class="h-8 w-8 rounded-full object-cover"
+										src="https://plus.unsplash.com/premium_photo-1658527049634-15142565537a?q=80&w=3088&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+										alt="User avatar"
+									/>
+									<span class="font-medium text-sm sm-hidden"
+										>Dr. Sarah Williams</span
+									>
+								</button>
+								<div
+									id="profileDropdown"
+									class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-20"
+								>
+									<div class="py-1">
+										<a
+											href="#"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											>Your Profile</a
+										>
+										<a
+											href="#"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											>Settings</a
+										>
+										<a
+											href="#"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											>Help</a
+										>
+										<div class="border-t border-gray-100"></div>
+										<a
+											href="#"
+											class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+											>Sign out</a
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="px-4 py-2 bg-gray-50 border-b">
+						<div class="flex flex-wrap items-center justify-between gap-2">
+							<div class="flex flex-wrap items-center gap-2">
+								<select
+									id="timeRange"
+									class="block py-1.5 px-3 text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm-text-xs sm-p-1"
+								>
+									<option value="week">Last Week</option>
+									<option value="month" selected>Last Month</option>
+									<option value="quarter">Last Quarter</option>
+									<option value="year">Last Year</option>
+								</select>
+								<select
+									id="courseFilter"
+									class="block py-1.5 px-3 text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm-text-xs sm-p-1"
+								>
+									<option value="all">All Courses</option>
+									<option value="math">Mathematics</option>
+									<option value="science">Science</option>
+									<option value="english">English</option>
+									<option value="history">History</option>
+								</select>
+								<select
+									id="cohortFilter"
+									class="block py-1.5 px-3 text-sm bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm-text-xs sm-p-1"
+								>
+									<option value="all">All Cohorts</option>
+									<option value="2023">2023 Cohort</option>
+									<option value="2024">2024 Cohort</option>
+								</select>
+							</div>
+							<button
+								id="downloadBtn"
+								class="flex items-center space-x-1 py-1.5 px-3 text-sm bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm-text-xs sm-p-1"
+							>
+								<svg
+									class="h-4 w-4 text-gray-500"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+								<span>Export</span>
+							</button>
+						</div>
+					</div>
+				</header>
+
+				<main class="p-4 md:p-6">
+					<!-- Overview Cards -->
+					<div
+						class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+					>
+						<div class="bg-white rounded-lg shadow p-4">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-sm font-medium text-gray-500">Average Grade</p>
+									<h3 class="text-2xl font-bold text-gray-800">82%</h3>
+								</div>
+								<div class="p-3 bg-green-100 rounded-full">
+									<svg
+										class="h-5 w-5 text-green-600"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<polyline points="18 15 12 9 6 15"></polyline>
+									</svg>
+								</div>
+							</div>
+							<div class="mt-2">
+								<span class="text-xs font-medium text-green-600">+2.5%</span>
+								<span class="text-xs text-gray-500 ml-1">from last period</span>
+							</div>
+						</div>
+
+						<div class="bg-white rounded-lg shadow p-4">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-sm font-medium text-gray-500">
+										Course Completion
+									</p>
+									<h3 class="text-2xl font-bold text-gray-800">68%</h3>
+								</div>
+								<div class="p-3 bg-yellow-100 rounded-full">
+									<svg
+										class="h-5 w-5 text-yellow-600"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<circle cx="12" cy="12" r="10"></circle>
+										<polyline points="12 6 12 12 16 14"></polyline>
+									</svg>
+								</div>
+							</div>
+							<div class="mt-2">
+								<span class="text-xs font-medium text-yellow-600">+5.3%</span>
+								<span class="text-xs text-gray-500 ml-1">from last period</span>
+							</div>
+						</div>
+
+						<div class="bg-white rounded-lg shadow p-4">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-sm font-medium text-gray-500">
+										Active Students
+									</p>
+									<h3 class="text-2xl font-bold text-gray-800">245</h3>
+								</div>
+								<div class="p-3 bg-blue-100 rounded-full">
+									<svg
+										class="h-5 w-5 text-blue-600"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+										<circle cx="9" cy="7" r="4"></circle>
+										<path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+										<path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+									</svg>
+								</div>
+							</div>
+							<div class="mt-2">
+								<span class="text-xs font-medium text-blue-600">+12</span>
+								<span class="text-xs text-gray-500 ml-1">from last period</span>
+							</div>
+						</div>
+
+						<div class="bg-white rounded-lg shadow p-4">
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-sm font-medium text-gray-500">
+										Engagement Rate
+									</p>
+									<h3 class="text-2xl font-bold text-gray-800">73%</h3>
+								</div>
+								<div class="p-3 bg-purple-100 rounded-full">
+									<svg
+										class="h-5 w-5 text-purple-600"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="2"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									>
+										<path d="M12 20v-6M6 20V10M18 20V4"></path>
+									</svg>
+								</div>
+							</div>
+							<div class="mt-2">
+								<span class="text-xs font-medium text-purple-600">+4.2%</span>
+								<span class="text-xs text-gray-500 ml-1">from last period</span>
+							</div>
+						</div>
+					</div>
+
+					<!-- Main Content Area -->
+					<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+						<!-- Performance Trends Chart -->
+						<div class="lg:col-span-2 bg-white rounded-lg shadow">
+							<div class="p-4 border-b border-gray-100">
+								<div class="flex justify-between items-center">
+									<h2 class="text-lg font-semibold text-gray-800">
+										Performance Trends
+									</h2>
+									<div class="flex space-x-2">
+										<button
+											class="chart-tab px-3 py-1 text-sm font-medium rounded-md bg-indigo-100 text-indigo-700"
+											data-tab="performance"
+										>
+											Performance
+										</button>
+										<button
+											class="chart-tab px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-100"
+											data-tab="attendance"
+										>
+											Attendance
+										</button>
+										<button
+											class="chart-tab px-3 py-1 text-sm font-medium rounded-md text-gray-500 hover:bg-gray-100"
+											data-tab="engagement"
+										>
+											Engagement
+										</button>
+									</div>
+								</div>
+							</div>
+							<div class="p-4">
+								<div class="h-64 md:h-80">
+									<canvas id="performanceChart"></canvas>
+								</div>
+							</div>
+						</div>
+
+						<!-- Recent Activity -->
+						<div class="bg-white rounded-lg shadow overflow-hidden">
+							<div class="p-4 border-b border-gray-100">
+								<h2 class="text-lg font-semibold text-gray-800">
+									Recent Activity
+								</h2>
+							</div>
+							<div
+								class="px-4 py-2 h-64 md:h-80 overflow-y-auto"
+								id="activityFeed"
+							>
+								<div class="space-y-4">
+									<div
+										class="flex items-start space-x-3 pb-4 border-b border-gray-100"
+									>
+										<div class="flex-shrink-0 pt-1">
+											<div
+												class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center"
+											>
+												<svg
+													class="h-4 w-4 text-white"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<polyline points="20 6 9 17 4 12"></polyline>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-gray-800">
+												Emma Johnson completed
+												<span class="font-semibold"
+													>Module 3: Advanced Equations</span
+												>
+											</p>
+											<p class="text-xs text-gray-500 mt-1">30 minutes ago</p>
+										</div>
+									</div>
+
+									<div
+										class="flex items-start space-x-3 pb-4 border-b border-gray-100"
+									>
+										<div class="flex-shrink-0 pt-1">
+											<div
+												class="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center"
+											>
+												<svg
+													class="h-4 w-4 text-white"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path
+														d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"
+													></path>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-gray-800">
+												Michael Brown achieved
+												<span class="font-semibold">90% in Biology Quiz</span>
+											</p>
+											<p class="text-xs text-gray-500 mt-1">1 hour ago</p>
+										</div>
+									</div>
+
+									<div
+										class="flex items-start space-x-3 pb-4 border-b border-gray-100"
+									>
+										<div class="flex-shrink-0 pt-1">
+											<div
+												class="h-8 w-8 rounded-full bg-yellow-500 flex items-center justify-center"
+											>
+												<svg
+													class="h-4 w-4 text-white"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+													<polyline points="22 4 12 14.01 9 11.01"></polyline>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-gray-800">
+												Alex Wong reached
+												<span class="font-semibold">50% course completion</span>
+											</p>
+											<p class="text-xs text-gray-500 mt-1">2 hours ago</p>
+										</div>
+									</div>
+
+									<div
+										class="flex items-start space-x-3 pb-4 border-b border-gray-100"
+									>
+										<div class="flex-shrink-0 pt-1">
+											<div
+												class="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center"
+											>
+												<svg
+													class="h-4 w-4 text-white"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path
+														d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"
+													></path>
+													<line x1="4" y1="22" x2="4" y2="15"></line>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-gray-800">
+												New
+												<span class="font-semibold">History curriculum</span>
+												has been published
+											</p>
+											<p class="text-xs text-gray-500 mt-1">3 hours ago</p>
+										</div>
+									</div>
+
+									<div
+										class="flex items-start space-x-3 pb-4 border-b border-gray-100"
+									>
+										<div class="flex-shrink-0 pt-1">
+											<div
+												class="h-8 w-8 rounded-full bg-red-500 flex items-center justify-center"
+											>
+												<svg
+													class="h-4 w-4 text-white"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path
+														d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+													></path>
+													<line x1="12" y1="9" x2="12" y2="13"></line>
+													<line x1="12" y1="17" x2="12.01" y2="17"></line>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-gray-800">
+												Attendance alert:
+												<span class="font-semibold"
+													>Sophie Chen missed class</span
+												>
+											</p>
+											<p class="text-xs text-gray-500 mt-1">5 hours ago</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="p-3 bg-gray-50 border-t border-gray-100">
+								<button
+									class="w-full py-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 text-center"
+								>
+									View All Activity
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Bottom Section -->
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+						<!-- Course Performance -->
+						<div class="bg-white rounded-lg shadow overflow-hidden">
+							<div class="p-4 border-b border-gray-100">
+								<h2 class="text-lg font-semibold text-gray-800">
+									Course Performance
+								</h2>
+							</div>
+							<div class="p-4">
+								<div class="space-y-4">
+									<div>
+										<div class="flex justify-between mb-1">
+											<span class="text-sm font-medium text-gray-700"
+												>Mathematics</span
+											>
+											<span class="text-sm font-medium text-gray-700">85%</span>
+										</div>
+										<div class="w-full bg-gray-200 rounded-full h-2.5">
+											<div
+												class="bg-blue-600 h-2.5 rounded-full"
+												style="width: 85%"
+											></div>
+										</div>
+									</div>
+
+									<div>
+										<div class="flex justify-between mb-1">
+											<span class="text-sm font-medium text-gray-700"
+												>Science</span
+											>
+											<span class="text-sm font-medium text-gray-700">92%</span>
+										</div>
+										<div class="w-full bg-gray-200 rounded-full h-2.5">
+											<div
+												class="bg-green-600 h-2.5 rounded-full"
+												style="width: 92%"
+											></div>
+										</div>
+									</div>
+
+									<div>
+										<div class="flex justify-between mb-1">
+											<span class="text-sm font-medium text-gray-700"
+												>English</span
+											>
+											<span class="text-sm font-medium text-gray-700">78%</span>
+										</div>
+										<div class="w-full bg-gray-200 rounded-full h-2.5">
+											<div
+												class="bg-yellow-600 h-2.5 rounded-full"
+												style="width: 78%"
+											></div>
+										</div>
+									</div>
+
+									<div>
+										<div class="flex justify-between mb-1">
+											<span class="text-sm font-medium text-gray-700"
+												>History</span
+											>
+											<span class="text-sm font-medium text-gray-700">65%</span>
+										</div>
+										<div class="w-full bg-gray-200 rounded-full h-2.5">
+											<div
+												class="bg-orange-600 h-2.5 rounded-full"
+												style="width: 65%"
+											></div>
+										</div>
+									</div>
+
+									<div>
+										<div class="flex justify-between mb-1">
+											<span class="text-sm font-medium text-gray-700"
+												>Computer Science</span
+											>
+											<span class="text-sm font-medium text-gray-700">88%</span>
+										</div>
+										<div class="w-full bg-gray-200 rounded-full h-2.5">
+											<div
+												class="bg-indigo-600 h-2.5 rounded-full"
+												style="width: 88%"
+											></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Student Milestones -->
+						<div class="bg-white rounded-lg shadow overflow-hidden">
+							<div class="p-4 border-b border-gray-100">
+								<div class="flex justify-between items-center">
+									<h2 class="text-lg font-semibold text-gray-800">
+										Student Milestones
+									</h2>
+									<button
+										class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+										title="Configure Alerts"
+										id="openAlertModalBtn"
+									>
+										Configure Alerts
+									</button>
+								</div>
+							</div>
+							<div class="p-4">
+								<div class="space-y-4">
+									<div
+										class="flex items-center p-3 bg-green-50 rounded-lg border border-green-100"
+									>
+										<div class="flex-shrink-0 mr-3">
+											<div
+												class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center"
+											>
+												<svg
+													class="h-5 w-5 text-green-600"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+													<polyline points="22 4 12 14.01 9 11.01"></polyline>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<h4 class="text-sm font-medium text-gray-800">
+												Emma Johnson - 100% Course Completion
+											</h4>
+											<p class="text-xs text-gray-500 mt-1">
+												Mathematics - Advanced Calculus
+											</p>
+										</div>
+										<div class="ml-auto">
+											<button
+												class="text-xs text-indigo-600 hover:text-indigo-500 font-medium"
+											>
+												Review
+											</button>
+										</div>
+									</div>
+
+									<div
+										class="flex items-center p-3 bg-blue-50 rounded-lg border border-blue-100"
+									>
+										<div class="flex-shrink-0 mr-3">
+											<div
+												class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center"
+											>
+												<svg
+													class="h-5 w-5 text-blue-600"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<circle cx="12" cy="8" r="7"></circle>
+													<polyline
+														points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"
+													></polyline>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<h4 class="text-sm font-medium text-gray-800">
+												Michael Brown - 95% Test Score
+											</h4>
+											<p class="text-xs text-gray-500 mt-1">
+												Science - Molecular Biology
+											</p>
+										</div>
+										<div class="ml-auto">
+											<button
+												class="text-xs text-indigo-600 hover:text-indigo-500 font-medium"
+											>
+												Review
+											</button>
+										</div>
+									</div>
+
+									<div
+										class="flex items-center p-3 bg-yellow-50 rounded-lg border border-yellow-100"
+									>
+										<div class="flex-shrink-0 mr-3">
+											<div
+												class="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center"
+											>
+												<svg
+													class="h-5 w-5 text-yellow-600"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path
+														d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"
+													></path>
+													<line x1="4" y1="22" x2="4" y2="15"></line>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<h4 class="text-sm font-medium text-gray-800">
+												Alex Wong - 50% Course Milestone
+											</h4>
+											<p class="text-xs text-gray-500 mt-1">
+												Computer Science - Web Development
+											</p>
+										</div>
+										<div class="ml-auto">
+											<button
+												class="text-xs text-indigo-600 hover:text-indigo-500 font-medium"
+											>
+												Review
+											</button>
+										</div>
+									</div>
+
+									<div
+										class="flex items-center p-3 bg-red-50 rounded-lg border border-red-100 animate-pulse-light"
+									>
+										<div class="flex-shrink-0 mr-3">
+											<div
+												class="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center"
+											>
+												<svg
+													class="h-5 w-5 text-red-600"
+													viewBox="0 0 24 24"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												>
+													<path
+														d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"
+													></path>
+													<line x1="12" y1="9" x2="12" y2="13"></line>
+													<line x1="12" y1="17" x2="12.01" y2="17"></line>
+												</svg>
+											</div>
+										</div>
+										<div>
+											<h4 class="text-sm font-medium text-gray-800">
+												Sophie Chen - Attendance Alert
+											</h4>
+											<p class="text-xs text-gray-500 mt-1">
+												English Literature - 3 classes missed
+											</p>
+										</div>
+										<div class="ml-auto">
+											<button
+												class="text-xs text-indigo-600 hover:text-indigo-500 font-medium"
+											>
+												Action
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</main>
+			</div>
+		</div>
+
+		<!-- Modals -->
+		<div
+			id="configureAlertModal"
+			class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+			style="display: none"
+		>
+			<div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+				<div class="p-4 border-b border-gray-100">
+					<div class="flex items-center justify-between">
+						<h3 class="text-lg font-semibold text-gray-800">
+							Configure Alerts
+						</h3>
+						<button
+							id="closeAlertModal"
+							class="text-gray-400 hover:text-gray-500"
+						>
+							<svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+								<path
+									fill-rule="evenodd"
+									d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						</button>
+					</div>
+				</div>
+				<div class="p-4">
+					<div class="space-y-4">
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-1"
+								>Performance Alerts</label
+							>
+							<div
+								class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+							>
+								<div>
+									<span class="text-sm font-medium text-gray-800"
+										>Grade Improvements</span
+									>
+									<p class="text-xs text-gray-500 mt-1">
+										Alert when grades improve by 10% or more
+									</p>
+								</div>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer" checked />
+									<div
+										class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
+									></div>
+								</label>
+							</div>
+						</div>
+
+						<div>
+							<div
+								class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+							>
+								<div>
+									<span class="text-sm font-medium text-gray-800"
+										>Grade Decline</span
+									>
+									<p class="text-xs text-gray-500 mt-1">
+										Alert when grades decline by 10% or more
+									</p>
+								</div>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer" checked />
+									<div
+										class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
+									></div>
+								</label>
+							</div>
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-1"
+								>Milestone Alerts</label
+							>
+							<div
+								class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+							>
+								<div>
+									<span class="text-sm font-medium text-gray-800"
+										>Course Completion</span
+									>
+									<p class="text-xs text-gray-500 mt-1">
+										Alert at 25%, 50%, 75%, and 100% completion
+									</p>
+								</div>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer" checked />
+									<div
+										class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
+									></div>
+								</label>
+							</div>
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-1"
+								>Attendance Alerts</label
+							>
+							<div
+								class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+							>
+								<div>
+									<span class="text-sm font-medium text-gray-800"
+										>Missed Classes</span
+									>
+									<p class="text-xs text-gray-500 mt-1">
+										Alert after 2+ consecutive missed classes
+									</p>
+								</div>
+								<label class="relative inline-flex items-center cursor-pointer">
+									<input type="checkbox" class="sr-only peer" />
+									<div
+										class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"
+									></div>
+								</label>
+							</div>
+						</div>
+
+						<div>
+							<label class="block text-sm font-medium text-gray-700 mb-1"
+								>Alert Delivery</label
+							>
+							<div class="space-y-2">
+								<label class="flex items-center space-x-2">
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300"
+										checked
+									/>
+									<span class="text-sm text-gray-700"
+										>Dashboard Notifications</span
+									>
+								</label>
+								<label class="flex items-center space-x-2">
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300"
+										checked
+									/>
+									<span class="text-sm text-gray-700">Email Notifications</span>
+								</label>
+								<label class="flex items-center space-x-2">
+									<input
+										type="checkbox"
+										class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300"
+									/>
+									<span class="text-sm text-gray-700">SMS Notifications</span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="p-4 border-t border-gray-100 flex justify-end space-x-3">
+					<button
+						class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+					>
+						Cancel
+					</button>
+					<button
+						class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+					>
+						Save Changes
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Mobile menu toggle
+			const sidebar = document.getElementById("sidebar");
+			const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+			const sidebarToggle = document.getElementById("sidebarToggle");
+
+			mobileMenuBtn.addEventListener("click", () => {
+				sidebar.classList.toggle("-translate-x-full");
+				sidebar.classList.toggle("translate-x-0");
+			});
+
+			sidebarToggle.addEventListener("click", () => {
+				sidebar.classList.add("-translate-x-full");
+			});
+
+			// Dropdown toggles
+			const notificationBtn = document.getElementById("notificationBtn");
+			const notificationDropdown = document.getElementById(
+				"notificationDropdown"
+			);
+			const profileBtn = document.getElementById("profileBtn");
+			const profileDropdown = document.getElementById("profileDropdown");
+
+			notificationBtn.addEventListener("click", () => {
+				notificationDropdown.classList.toggle("hidden");
+				profileDropdown.classList.add("hidden");
+			});
+
+			profileBtn.addEventListener("click", () => {
+				profileDropdown.classList.toggle("hidden");
+				notificationDropdown.classList.add("hidden");
+			});
+
+			// Close dropdowns when clicking outside
+			document.addEventListener("click", (e) => {
+				if (
+					!notificationBtn.contains(e.target) &&
+					!notificationDropdown.contains(e.target)
+				) {
+					notificationDropdown.classList.add("hidden");
+				}
+
+				if (
+					!profileBtn.contains(e.target) &&
+					!profileDropdown.contains(e.target)
+				) {
+					profileDropdown.classList.add("hidden");
+				}
+			});
+
+			// Modals
+			document.addEventListener("DOMContentLoaded", function () {
+				const configureAlertModal = document.getElementById(
+					"configureAlertModal"
+				);
+				const closeAlertModal = document.getElementById("closeAlertModal");
+
+				// Make sure modal is hidden on page load
+				if (configureAlertModal) {
+					configureAlertModal.style.display = "none";
+					configureAlertModal.classList.add("hidden");
+				}
+
+				// Set up the event listener for the "Configure Alerts" button
+				const openAlertModalBtn = document.getElementById("openAlertModalBtn");
+
+				if (openAlertModalBtn) {
+					openAlertModalBtn.addEventListener("click", function () {
+						if (configureAlertModal) {
+							configureAlertModal.style.display = "flex";
+							configureAlertModal.classList.remove("hidden");
+						}
+					});
+				}
+
+				// Set up close button event listener
+				if (closeAlertModal) {
+					closeAlertModal.addEventListener("click", function () {
+						if (configureAlertModal) {
+							configureAlertModal.style.display = "none";
+							configureAlertModal.classList.add("hidden");
+						}
+					});
+				}
+
+				// Close when clicking outside the modal
+				if (configureAlertModal) {
+					configureAlertModal.addEventListener("click", function (e) {
+						if (e.target === configureAlertModal) {
+							configureAlertModal.style.display = "none";
+							configureAlertModal.classList.add("hidden");
+						}
+					});
+				}
+
+				// Add event listeners for the modal footer buttons
+				const modalCancelBtn = configureAlertModal.querySelector(
+					"button.text-gray-700"
+				);
+				const modalSaveBtn =
+					configureAlertModal.querySelector("button.text-white");
+
+				if (modalCancelBtn) {
+					modalCancelBtn.addEventListener("click", function () {
+						configureAlertModal.style.display = "none";
+						configureAlertModal.classList.add("hidden");
+					});
+				}
+
+				if (modalSaveBtn) {
+					modalSaveBtn.addEventListener("click", function () {
+						// In a real app, we would save settings here
+						configureAlertModal.style.display = "none";
+						configureAlertModal.classList.add("hidden");
+					});
+				}
+			});
+
+			// Chart tabs
+			const chartTabs = document.querySelectorAll(".chart-tab");
+
+			chartTabs.forEach((tab) => {
+				tab.addEventListener("click", () => {
+					chartTabs.forEach((t) => {
+						t.classList.remove("bg-indigo-100", "text-indigo-700");
+						t.classList.add("text-gray-500", "hover:bg-gray-100");
+					});
+
+					tab.classList.add("bg-indigo-100", "text-indigo-700");
+					tab.classList.remove("text-gray-500", "hover:bg-gray-100");
+
+					updateChart(tab.dataset.tab);
+				});
+			});
+
+			// Create performance chart
+			function createPerformanceChart() {
+				const ctx = document
+					.getElementById("performanceChart")
+					.getContext("2d");
+
+				return new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: [
+							"Jan",
+							"Feb",
+							"Mar",
+							"Apr",
+							"May",
+							"Jun",
+							"Jul",
+							"Aug",
+							"Sep",
+						],
+						datasets: [
+							{
+								label: "Mathematics",
+								data: [75, 78, 76, 79, 85, 82, 80, 84, 87],
+								borderColor: "rgb(59, 130, 246)",
+								backgroundColor: "rgba(59, 130, 246, 0.1)",
+								borderWidth: 2,
+								tension: 0.3,
+								fill: true,
+							},
+							{
+								label: "Science",
+								data: [70, 75, 85, 81, 83, 90, 86, 89, 92],
+								borderColor: "rgb(16, 185, 129)",
+								backgroundColor: "rgba(16, 185, 129, 0.1)",
+								borderWidth: 2,
+								tension: 0.3,
+								fill: true,
+							},
+							{
+								label: "English",
+								data: [65, 70, 68, 72, 75, 76, 73, 77, 78],
+								borderColor: "rgb(245, 158, 11)",
+								backgroundColor: "rgba(245, 158, 11, 0.1)",
+								borderWidth: 2,
+								tension: 0.3,
+								fill: true,
+							},
+						],
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						plugins: {
+							legend: {
+								position: "top",
+								labels: {
+									boxWidth: 10,
+									usePointStyle: true,
+									pointStyle: "circle",
+								},
+							},
+							tooltip: {
+								mode: "index",
+								intersect: false,
+								backgroundColor: "rgba(17, 24, 39, 0.8)",
+								padding: 10,
+								cornerRadius: 4,
+								caretSize: 6,
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								max: 100,
+								ticks: {
+									stepSize: 20,
+									callback: function (value) {
+										return value + "%";
+									},
+								},
+							},
+							x: {
+								grid: {
+									display: false,
+								},
+							},
+						},
+						interaction: {
+							mode: "nearest",
+							axis: "x",
+							intersect: false,
+						},
+					},
+				});
+			}
+
+			// Update chart based on selected tab
+			let performanceChart;
+
+			function updateChart(tab) {
+				if (performanceChart) {
+					performanceChart.destroy();
+				}
+
+				if (tab === "performance") {
+					performanceChart = createPerformanceChart();
+				} else if (tab === "attendance") {
+					const ctx = document
+						.getElementById("performanceChart")
+						.getContext("2d");
+					performanceChart = new Chart(ctx, {
+						type: "line",
+						data: {
+							labels: [
+								"Jan",
+								"Feb",
+								"Mar",
+								"Apr",
+								"May",
+								"Jun",
+								"Jul",
+								"Aug",
+								"Sep",
+							],
+							datasets: [
+								{
+									label: "Average Attendance",
+									data: [95, 92, 88, 90, 93, 91, 89, 92, 94],
+									borderColor: "rgb(124, 58, 237)",
+									backgroundColor: "rgba(124, 58, 237, 0.1)",
+									borderWidth: 2,
+									tension: 0.3,
+									fill: true,
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									position: "top",
+									labels: {
+										boxWidth: 10,
+										usePointStyle: true,
+										pointStyle: "circle",
+									},
+								},
+							},
+							scales: {
+								y: {
+									beginAtZero: true,
+									max: 100,
+									ticks: {
+										stepSize: 20,
+										callback: function (value) {
+											return value + "%";
+										},
+									},
+								},
+								x: {
+									grid: {
+										display: false,
+									},
+								},
+							},
+						},
+					});
+				} else if (tab === "engagement") {
+					const ctx = document
+						.getElementById("performanceChart")
+						.getContext("2d");
+					performanceChart = new Chart(ctx, {
+						type: "bar",
+						data: {
+							labels: [
+								"Jan",
+								"Feb",
+								"Mar",
+								"Apr",
+								"May",
+								"Jun",
+								"Jul",
+								"Aug",
+								"Sep",
+							],
+							datasets: [
+								{
+									label: "Active Participation",
+									data: [65, 70, 68, 72, 77, 75, 80, 82, 85],
+									backgroundColor: "rgba(79, 70, 229, 0.8)",
+								},
+								{
+									label: "Content Completion",
+									data: [55, 60, 65, 70, 72, 75, 78, 80, 82],
+									backgroundColor: "rgba(16, 185, 129, 0.8)",
+								},
+							],
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									position: "top",
+									labels: {
+										boxWidth: 10,
+										usePointStyle: true,
+										pointStyle: "square",
+									},
+								},
+							},
+							scales: {
+								y: {
+									beginAtZero: true,
+									max: 100,
+									ticks: {
+										callback: function (value) {
+											return value + "%";
+										},
+									},
+								},
+								x: {
+									grid: {
+										display: false,
+									},
+								},
+							},
+						},
+					});
+				}
+			}
+
+			// Initialize the chart
+			document.addEventListener("DOMContentLoaded", () => {
+				performanceChart = createPerformanceChart();
+				setupToggleSwitches();
+				// Add new activity items dynamically
+				const activityFeed = document.getElementById("activityFeed");
+
+				setTimeout(() => {
+					const newActivity = document.createElement("div");
+					newActivity.classList.add(
+						"flex",
+						"items-start",
+						"space-x-3",
+						"pb-4",
+						"border-b",
+						"border-gray-100",
+						"animate-pulse-light"
+					);
+					newActivity.innerHTML = `
+                    <div class="flex-shrink-0 pt-1">
+                        <div class="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center">
+                            <svg class="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">New update: <span class="font-semibold">Jessica Thompson just logged in</span></p>
+                        <p class="text-xs text-gray-500 mt-1">Just now</p>
+                    </div>
+                `;
+
+					activityFeed.insertBefore(newActivity, activityFeed.firstChild);
+
+					setTimeout(() => {
+						newActivity.classList.remove("animate-pulse-light");
+					}, 3000);
+				}, 5000);
+
+				// Setup responsiveness
+				function adjustForScreenSize() {
+					const isMobile = window.innerWidth < 640;
+
+					if (isMobile) {
+						sidebar.classList.add("-translate-x-full");
+					} else {
+						sidebar.classList.remove("-translate-x-full");
+					}
+				}
+
+				adjustForScreenSize();
+				window.addEventListener("resize", adjustForScreenSize);
+			});
+
+			// Time range filter functionality
+			const timeRange = document.getElementById("timeRange");
+			timeRange.addEventListener("change", () => {
+				// In a real application, this would trigger data reload
+				console.log(`Selected time range: ${timeRange.value}`);
+			});
+
+			// Course filter functionality
+			const courseFilter = document.getElementById("courseFilter");
+			courseFilter.addEventListener("change", () => {
+				// In a real application, this would filter data
+				console.log(`Selected course filter: ${courseFilter.value}`);
+			});
+			function setupToggleSwitches() {
+				// Get all toggle switches
+				const toggleSwitches = document.querySelectorAll(".sr-only.peer");
+
+				// Add event listeners to each toggle
+				toggleSwitches.forEach((toggle) => {
+					toggle.addEventListener("change", function () {
+						// Find the toggle background div (sibling after the input)
+						const toggleBg = this.nextElementSibling;
+
+						if (this.checked) {
+							// If checked, add the "on" styling
+							toggleBg.classList.add("bg-indigo-600");
+							toggleBg.classList.remove("bg-gray-200");
+						} else {
+							// If unchecked, add the "off" styling
+							toggleBg.classList.remove("bg-indigo-600");
+							toggleBg.classList.add("bg-gray-200");
+						}
+					});
+
+					// Initialize the toggle to match its initial state
+					const toggleBg = toggle.nextElementSibling;
+					if (toggle.checked) {
+						toggleBg.classList.add("bg-indigo-600");
+						toggleBg.classList.remove("bg-gray-200");
+					} else {
+						toggleBg.classList.remove("bg-indigo-600");
+						toggleBg.classList.add("bg-gray-200");
+					}
+				});
+			}
+			// Export button functionality
+			const downloadBtn = document.getElementById("downloadBtn");
+			downloadBtn.addEventListener("click", () => {
+				alert("Report export functionality would be triggered here");
+			});
+		</script>
+	</body>
+</html>
