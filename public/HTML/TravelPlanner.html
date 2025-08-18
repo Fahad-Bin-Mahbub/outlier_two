@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Travel Itinerary Planner</title>
+		<link
+			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+			rel="stylesheet"
+		/>
+		<!-- Satoshi Font -->
+		<link
+			href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--background-start: #f3e7ff;
+				--background-end: #fdf0ff;
+				--primary: #6941c6;
+				--secondary-text: #667085;
+				--highlight: #12b76a;
+				--light-purple: #d6bbfb;
+				--border: #e4e7ec;
+				--text: #101828;
+				--indigo: #6366f1;
+			}
+			body {
+				font-family: "Satoshi", sans-serif;
+				background: linear-gradient(
+					135deg,
+					var(--background-start),
+					var(--background-end)
+				);
+				color: var(--text);
+				min-height: 100vh;
+			}
+			.neumorphic {
+				box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.05),
+					-5px -5px 10px rgba(255, 255, 255, 0.7);
+				border-radius: 12px;
+				background: rgba(255, 255, 255, 0.7);
+			}
+			.neumorphic-inset {
+				box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.05),
+					inset -2px -2px 5px rgba(255, 255, 255, 0.7);
+				border-radius: 12px;
+				background: rgba(245, 240, 250, 0.8);
+			}
+			.btn-primary {
+				background-color: var(--primary);
+				color: white;
+				border-radius: 8px;
+				font-weight: 500;
+				padding: 0.5rem 1rem;
+				transition: all 0.2s;
+			}
+			.btn-primary:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 4px 12px rgba(105, 65, 198, 0.2);
+			}
+			.btn-success {
+				background-color: var(--highlight);
+				color: white;
+				border-radius: 8px;
+				font-weight: 500;
+				padding: 0.5rem 1rem;
+				transition: all 0.2s;
+			}
+			.btn-success:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 4px 12px rgba(18, 183, 106, 0.2);
+			}
+			.dropzone {
+				border: 2px dashed var(--border);
+				border-radius: 12px;
+				background: rgba(255, 255, 255, 0.5);
+				transition: all 0.2s;
+			}
+			.dropzone:hover {
+				border-color: var(--primary);
+			}
+			input,
+			select {
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				padding: 0.5rem;
+				background: white;
+				color: var(--text);
+			}
+			input:focus,
+			select:focus {
+				border-color: var(--primary);
+				outline: none;
+				box-shadow: 0 0 0 3px rgba(105, 65, 198, 0.1);
+			}
+			.scrollbar-hide::-webkit-scrollbar {
+				display: none;
+			}
+			.scrollbar-hide {
+				-ms-overflow-style: none;
+				scrollbar-width: none;
+			}
+
+			.custom-checkbox {
+				position: relative;
+				display: flex;
+				align-items: center;
+			}
+
+			.custom-checkbox input[type="checkbox"] {
+				position: absolute;
+				opacity: 0;
+				cursor: pointer;
+				height: 0;
+				width: 0;
+			}
+
+			.checkmark {
+				position: relative;
+				display: inline-block;
+				height: 18px;
+				width: 18px;
+				margin-right: 10px;
+				border-radius: 4px;
+				background-color: #fff;
+				border: 2px solid var(--border);
+				transition: all 0.2s;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+			}
+
+			.custom-checkbox:hover .checkmark {
+				border-color: var(--indigo);
+			}
+
+			.custom-checkbox input:checked ~ .checkmark {
+				background-color: var(--indigo);
+				border-color: var(--indigo);
+			}
+
+			.checkmark:after {
+				content: "";
+				position: absolute;
+				display: none;
+				left: 4px;
+				top: 1px;
+				width: 5px;
+				height: 10px;
+				border: solid white;
+				border-width: 0 2px 2px 0;
+				transform: rotate(45deg);
+			}
+
+			.custom-checkbox input:checked ~ .checkmark:after {
+				display: block;
+			}
+		</style>
+	</head>
+	<body class="flex flex-col min-h-screen">
+		<header
+			class="py-4 px-6 shadow-sm bg-white bg-opacity-70 backdrop-filter backdrop-blur-sm"
+		>
+			<div class="flex justify-between items-center max-w-7xl mx-auto">
+				<h1 class="text-2xl font-bold text-primary">✨ Travel Planner</h1>
+				<nav class="hidden md:block">
+					<ul class="flex space-x-6 text-base">
+						<li>
+							<a
+								href="#"
+								class="hover:text-primary font-medium transition-colors"
+								id="home-link"
+								>Home</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								id="summary-link"
+								class="hover:text-primary transition-colors"
+								>Summary</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								id="timeline-link"
+								class="hover:text-primary transition-colors"
+								>Timeline</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								id="activities-link"
+								class="hover:text-primary transition-colors"
+								>Activities</a
+							>
+						</li>
+					</ul>
+				</nav>
+				<button
+					id="mobile-menu-button"
+					class="md:hidden text-primary"
+					aria-label="Open menu"
+				>
+					<svg
+						class="w-6 h-6"
+						fill="none"
+						stroke="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M4 6h16M4 12h16M4 18h16"
+						></path>
+					</svg>
+				</button>
+			</div>
+			<div
+				id="mobile-menu"
+				class="hidden md:hidden mt-4 bg-white rounded-lg shadow-md"
+			>
+				<ul class="flex flex-col p-3">
+					<li>
+						<a
+							href="#"
+							class="block px-4 py-2 hover:bg-gray-100 rounded-md"
+							id="mobile-home-link"
+							>Home</a
+						>
+					</li>
+					<li>
+						<a
+							href="#"
+							class="block px-4 py-2 hover:bg-gray-100 rounded-md"
+							id="mobile-summary-link"
+							>Summary</a
+						>
+					</li>
+					<li>
+						<a
+							href="#"
+							class="block px-4 py-2 hover:bg-gray-100 rounded-md"
+							id="mobile-timeline-link"
+							>Timeline</a
+						>
+					</li>
+					<li>
+						<a
+							href="#"
+							class="block px-4 py-2 hover:bg-gray-100 rounded-md"
+							id="mobile-activities-link"
+							>Activities</a
+						>
+					</li>
+				</ul>
+			</div>
+		</header>
+
+		<main class="p-6 w-full max-w-7xl mx-auto flex-grow">
+			<div id="home-section" class="flex flex-col md:flex-row gap-6">
+				<aside class="md:w-1/3 lg:w-80 xl:w-96 space-y-6">
+					<div class="neumorphic p-6">
+						<h2 class="text-xl font-semibold text-primary mb-4">Preferences</h2>
+						<p class="text-sm text-secondary-text mb-4">
+							Select categories to highlight matching activities.
+						</p>
+						<div id="preference-tiles" class="grid grid-cols-2 gap-3">
+							<label
+								class="preference-tile custom-checkbox p-3 rounded-lg cursor-pointer border border-border hover:border-indigo-500 transition-colors"
+								data-category="Sightseeing"
+							>
+								<input
+									type="checkbox"
+									class="preference-check"
+									title="Select Sightseeing preference"
+								/>
+								<span class="checkmark"></span>
+								<span class="text-sm">Sightseeing</span>
+							</label>
+							<label
+								class="preference-tile custom-checkbox p-3 rounded-lg cursor-pointer border border-border hover:border-indigo-500 transition-colors"
+								data-category="Food"
+							>
+								<input
+									type="checkbox"
+									class="preference-check"
+									title="Select Food preference"
+								/>
+								<span class="checkmark"></span>
+								<span class="text-sm">Food</span>
+							</label>
+							<label
+								class="preference-tile custom-checkbox p-3 rounded-lg cursor-pointer border border-border hover:border-indigo-500 transition-colors"
+								data-category="Culture"
+							>
+								<input
+									type="checkbox"
+									class="preference-check"
+									title="Select Culture preference"
+								/>
+								<span class="checkmark"></span>
+								<span class="text-sm">Culture</span>
+							</label>
+							<label
+								class="preference-tile custom-checkbox p-3 rounded-lg cursor-pointer border border-border hover:border-indigo-500 transition-colors"
+								data-category="Adventure"
+							>
+								<input
+									type="checkbox"
+									class="preference-check"
+									title="Select Adventure preference"
+								/>
+								<span class="checkmark"></span>
+								<span class="text-sm">Adventure</span>
+							</label>
+							<label
+								class="preference-tile custom-checkbox p-3 rounded-lg cursor-pointer border border-border hover:border-indigo-500 transition-colors"
+								data-category="Relaxation"
+							>
+								<input
+									type="checkbox"
+									class="preference-check"
+									title="Select Relaxation preference"
+								/>
+								<span class="checkmark"></span>
+								<span class="text-sm">Relaxation</span>
+							</label>
+						</div>
+					</div>
+					<div class="neumorphic p-6">
+						<h2 class="text-xl font-semibold text-primary mb-4">
+							Available Activities
+						</h2>
+						<div
+							id="available"
+							class="dropzone max-h-96 overflow-y-auto p-4 space-y-3"
+						></div>
+						<button id="add-activity-btn" class="mt-4 btn-primary w-full">
+							+ Add Activity
+						</button>
+					</div>
+				</aside>
+				<section class="flex-1 overflow-hidden">
+					<div class="mb-6 border-b border-border pb-4 relative">
+						<div class="flex items-center mb-3">
+							<button
+								id="scroll-left"
+								class="p-2 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
+								aria-label="Scroll left"
+							>
+								<svg
+									class="w-4 h-4 text-primary"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M15 19l-7-7 7-7"
+									></path>
+								</svg>
+							</button>
+							<div
+								class="overflow-x-auto flex-grow scrollbar-hide mx-2"
+								id="tabs-container"
+							>
+								<nav class="flex space-x-2 py-1 min-w-max" id="tabs"></nav>
+							</div>
+							<button
+								id="scroll-right"
+								class="p-2 bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
+								aria-label="Scroll right"
+							>
+								<svg
+									class="w-4 h-4 text-primary"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 5l7 7-7 7"
+									></path>
+								</svg>
+							</button>
+						</div>
+						<div class="flex justify-between items-center">
+							<div class="text-sm text-secondary-text">
+								Scroll to see all days →
+							</div>
+							<button
+								id="add-day-btn"
+								class="btn-primary text-sm flex items-center"
+							>
+								<svg
+									class="w-4 h-4 mr-1"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 4v16m8-8H4"
+									></path>
+								</svg>
+								Add Day
+							</button>
+						</div>
+					</div>
+					<div id="day-containers" class="space-y-6"></div>
+					<div class="mt-8 flex flex-wrap gap-3">
+						<button id="print-itinerary" class="btn-success flex items-center">
+							<svg
+								class="w-4 h-4 mr-2"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v9m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+								></path>
+							</svg>
+							Print Itinerary
+						</button>
+						<button id="save-data" class="btn-primary flex items-center">
+							<svg
+								class="w-4 h-4 mr-2"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"
+								></path>
+							</svg>
+							Save Data
+						</button>
+					</div>
+				</section>
+			</div>
+
+			<div id="activities-section" class="hidden">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-2xl font-bold text-primary">Manage Activities</h2>
+					<button
+						id="add-activity-manage"
+						class="btn-primary flex items-center"
+					>
+						<svg
+							class="w-4 h-4 mr-2"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 4v16m8-8H4"
+							></path>
+						</svg>
+						Add Activity
+					</button>
+				</div>
+				<div class="neumorphic overflow-hidden">
+					<div class="p-4 border-b border-border bg-white bg-opacity-50">
+						<input
+							type="text"
+							id="activity-search"
+							placeholder="Search activities..."
+							class="w-full p-3 border border-border rounded-lg"
+						/>
+					</div>
+					<div id="activities-table-container" class="overflow-x-auto">
+						<table class="min-w-full">
+							<thead class="bg-white bg-opacity-80">
+								<tr>
+									<th
+										scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-secondary-text uppercase tracking-wider"
+									>
+										Name
+									</th>
+									<th
+										scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-secondary-text uppercase tracking-wider"
+									>
+										Duration
+									</th>
+									<th
+										scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-secondary-text uppercase tracking-wider"
+									>
+										Categories
+									</th>
+									<th
+										scope="col"
+										class="px-6 py-3 text-left text-xs font-medium text-secondary-text uppercase tracking-wider"
+									>
+										Status
+									</th>
+									<th
+										scope="col"
+										class="px-6 py-3 text-right text-xs font-medium text-secondary-text uppercase tracking-wider"
+									>
+										Actions
+									</th>
+								</tr>
+							</thead>
+							<tbody
+								id="activities-table"
+								class="bg-white bg-opacity-60 divide-y divide-border"
+							></tbody>
+						</table>
+						<div id="activities-empty-state" class="hidden text-center py-12">
+							<div
+								class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-light-purple bg-opacity-20 mb-4"
+							>
+								<svg
+									class="w-8 h-8 text-primary"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-medium text-text mb-1">
+								No activities found
+							</h3>
+							<p class="text-secondary-text">
+								Try adjusting your search or add a new activity.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="summary-section" class="hidden">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-2xl font-bold text-primary">Days Summary</h2>
+					<button id="print-summary" class="btn-success flex items-center">
+						<svg
+							class="w-4 h-4 mr-2"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v9m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+							></path>
+						</svg>
+						Print Summary
+					</button>
+				</div>
+				<div class="neumorphic p-6">
+					<p class="text-secondary-text mb-6">
+						This page shows a summary of all your planned days with their
+						activities.
+					</p>
+					<div
+						id="days-summary-content"
+						class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+					></div>
+				</div>
+			</div>
+
+			<div id="timeline-section" class="hidden">
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-2xl font-bold text-primary">Trip Timeline</h2>
+					<button id="print-timeline-tab" class="btn-success flex items-center">
+						<svg
+							class="w-4 h-4 mr-2"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v9m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+							></path>
+						</svg>
+						Print Timeline
+					</button>
+				</div>
+				<div class="neumorphic p-6">
+					<p class="text-secondary-text mb-6">
+						This page shows a chronological timeline of all activities scheduled
+						for your trip.
+					</p>
+					<div id="timeline-tab-content" class="space-y-6"></div>
+				</div>
+			</div>
+
+			<div
+				id="timeline-modal"
+				class="hidden fixed inset-0 bg-black bg-opacity-20 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50 p-4"
+			>
+				<div
+					class="bg-white rounded-2xl shadow-lg relative flex flex-col max-h-[85vh] max-w-3xl w-full"
+				>
+					<div
+						class="flex items-center justify-between p-5 border-b border-border"
+					>
+						<h2 class="text-xl font-bold text-primary">🕒 Timeline</h2>
+						<div>
+							<button id="print-timeline" class="btn-success text-sm mr-2">
+								Print Timeline
+							</button>
+							<button
+								id="close-timeline"
+								class="bg-white text-secondary-text px-3 py-1 rounded-lg border border-border hover:border-red-500 hover:text-red-500 text-sm transition-colors"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+					<div
+						id="timeline-content"
+						class="text-sm p-6 overflow-y-auto flex-grow"
+					></div>
+				</div>
+			</div>
+
+			<div
+				id="confirm-delete-day-modal"
+				class="hidden fixed inset-0 bg-black bg-opacity-20 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50"
+			>
+				<div class="bg-white rounded-2xl shadow-lg p-6 max-w-md w-full">
+					<div class="text-center mb-4">
+						<div
+							class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mb-4"
+						>
+							<svg
+								class="w-6 h-6 text-red-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+								></path>
+							</svg>
+						</div>
+						<h2 class="text-xl font-bold text-text mb-2">Delete Day</h2>
+						<p class="mb-6 text-secondary-text">
+							Are you sure you want to delete this day and move all its
+							activities to the available list? This action cannot be undone.
+						</p>
+					</div>
+					<input type="hidden" id="delete-day-id" value="" />
+					<div class="flex justify-end space-x-3">
+						<button
+							id="cancel-delete-day"
+							class="bg-white text-secondary-text px-4 py-2 rounded-lg border border-border hover:border-primary"
+						>
+							Cancel
+						</button>
+						<button
+							id="confirm-delete-day"
+							class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+						>
+							Delete Day
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div
+				id="activity-modal"
+				class="hidden fixed inset-0 bg-black bg-opacity-20 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50"
+			>
+				<div class="bg-white rounded-2xl shadow-lg p-6 max-w-md w-full">
+					<h2
+						class="text-xl font-bold mb-6 text-primary"
+						id="activity-modal-title"
+					>
+						Add New Activity
+					</h2>
+					<form id="activity-form">
+						<input type="hidden" id="edit-activity-id" value="" />
+						<div class="mb-5">
+							<label
+								for="activity-name"
+								class="block text-text font-medium mb-2"
+								>Activity Name</label
+							>
+							<input
+								type="text"
+								id="activity-name"
+								placeholder="Enter activity name"
+								class="w-full p-3 border border-border rounded-lg"
+								required
+							/>
+						</div>
+						<div class="mb-5">
+							<label
+								for="activity-duration"
+								class="block text-text font-medium mb-2"
+								>Duration (hours)</label
+							>
+							<input
+								type="number"
+								id="activity-duration"
+								placeholder="Enter duration"
+								min="0.5"
+								max="24"
+								step="0.5"
+								class="w-full p-3 border border-border rounded-lg"
+								required
+							/>
+							<p class="text-xs text-secondary-text mt-1">
+								Duration cannot exceed 24 hours
+							</p>
+						</div>
+						<div class="mb-5">
+							<label class="block text-text font-medium mb-3">Categories</label>
+							<div
+								id="activity-categories-container"
+								class="grid grid-cols-2 gap-3"
+							>
+								<label
+									class="bg-white p-3 rounded-lg border border-border cursor-pointer custom-checkbox hover:border-indigo-500 transition-colors"
+								>
+									<input
+										type="checkbox"
+										name="activity-category"
+										value="Sightseeing"
+										title="Sightseeing category"
+									/>
+									<span class="checkmark"></span>
+									<span>Sightseeing</span>
+								</label>
+								<label
+									class="bg-white p-3 rounded-lg border border-border cursor-pointer custom-checkbox hover:border-indigo-500 transition-colors"
+								>
+									<input
+										type="checkbox"
+										name="activity-category"
+										value="Food"
+										title="Food category"
+									/>
+									<span class="checkmark"></span>
+									<span>Food</span>
+								</label>
+								<label
+									class="bg-white p-3 rounded-lg border border-border cursor-pointer custom-checkbox hover:border-indigo-500 transition-colors"
+								>
+									<input
+										type="checkbox"
+										name="activity-category"
+										value="Culture"
+										title="Culture category"
+									/>
+									<span class="checkmark"></span>
+									<span>Culture</span>
+								</label>
+								<label
+									class="bg-white p-3 rounded-lg border border-border cursor-pointer custom-checkbox hover:border-indigo-500 transition-colors"
+								>
+									<input
+										type="checkbox"
+										name="activity-category"
+										value="Adventure"
+										title="Adventure category"
+									/>
+									<span class="checkmark"></span>
+									<span>Adventure</span>
+								</label>
+								<label
+									class="bg-white p-3 rounded-lg border border-border cursor-pointer custom-checkbox hover:border-indigo-500 transition-colors"
+								>
+									<input
+										type="checkbox"
+										name="activity-category"
+										value="Relaxation"
+										title="Relaxation category"
+									/>
+									<span class="checkmark"></span>
+									<span>Relaxation</span>
+								</label>
+							</div>
+						</div>
+						<div class="flex justify-end space-x-3">
+							<button
+								type="button"
+								id="cancel-activity"
+								class="bg-white text-secondary-text px-4 py-2 rounded-lg border border-border hover:border-primary"
+							>
+								Cancel
+							</button>
+							<button type="submit" class="btn-primary px-6">
+								Save Activity
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div
+				id="confirm-delete-modal"
+				class="hidden fixed inset-0 bg-black bg-opacity-20 backdrop-filter backdrop-blur-sm flex items-center justify-center z-50"
+			>
+				<div class="bg-white rounded-2xl shadow-lg p-6 max-w-md w-full">
+					<div class="text-center mb-4">
+						<div
+							class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 mb-4"
+						>
+							<svg
+								class="w-6 h-6 text-red-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+								></path>
+							</svg>
+						</div>
+						<h2 class="text-xl font-bold text-text mb-2">Delete Activity</h2>
+						<p class="mb-6 text-secondary-text">
+							Are you sure you want to delete this activity? This action cannot
+							be undone.
+						</p>
+					</div>
+					<input type="hidden" id="delete-activity-id" value="" />
+					<div class="flex justify-end space-x-3">
+						<button
+							id="cancel-delete"
+							class="bg-white text-secondary-text px-4 py-2 rounded-lg border border-border hover:border-primary"
+						>
+							Cancel
+						</button>
+						<button
+							id="confirm-delete"
+							class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+						>
+							Delete
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div id="print-content" class="hidden print:block p-4"></div>
+
+			<div
+				id="notification"
+				class="fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50"
+			></div>
+		</main>
+
+		<footer class="py-6 text-center text-sm mt-auto text-secondary-text">
+			© 2025 Travel Planner Inc. | Made with 💜 for your journey
+		</footer>
+
+		<script>
+			let activities = [
+				{
+					id: 1,
+					name: "Visit Louvre",
+					duration: 2,
+					categories: ["Sightseeing", "Culture"],
+				},
+				{
+					id: 2,
+					name: "Eiffel Tower Tour",
+					duration: 1,
+					categories: ["Sightseeing"],
+				},
+				{
+					id: 3,
+					name: "French Cooking Class",
+					duration: 3,
+					categories: ["Food", "Culture"],
+				},
+				{
+					id: 4,
+					name: "Seine River Cruise",
+					duration: 1.5,
+					categories: ["Sightseeing", "Relaxation"],
+				},
+			];
+			let dayNames = ["Day 1", "Day 2", "Day 3"];
+			let activityOrder = { available: activities.map((a) => a.id) };
+			let activeTabId = "day1";
+			let dayStartTimes = { day1: "08:00", day2: "08:00", day3: "08:00" };
+			let selectedPreferences = [];
+			let activitySearchQuery = "";
+
+			function getRandomColor() {
+				const colors = [
+					{
+						bg: "bg-blue-100",
+						border: "border-blue-200",
+						text: "text-blue-900",
+					},
+					{
+						bg: "bg-yellow-100",
+						border: "border-yellow-200",
+						text: "text-yellow-900",
+					},
+					{
+						bg: "bg-purple-100",
+						border: "border-purple-200",
+						text: "text-purple-900",
+					},
+					{
+						bg: "bg-teal-100",
+						border: "border-teal-200",
+						text: "text-teal-900",
+					},
+					{
+						bg: "bg-pink-100",
+						border: "border-pink-200",
+						text: "text-pink-900",
+					},
+					{
+						bg: "bg-orange-100",
+						border: "border-orange-200",
+						text: "text-orange-900",
+					},
+					{
+						bg: "bg-gray-100",
+						border: "border-gray-200",
+						text: "text-gray-900",
+					},
+				];
+				return colors[Math.floor(Math.random() * colors.length)];
+			}
+
+			function loadFromLocalStorage() {
+				const savedActivities = localStorage.getItem("travel_activities");
+				const savedActivityOrder = localStorage.getItem("travel_activityOrder");
+				const savedDayNames = localStorage.getItem("travel_dayNames");
+				const savedDayStartTimes = localStorage.getItem("travel_dayStartTimes");
+				const savedPreferences = localStorage.getItem("travel_preferences");
+				const savedActiveTab = localStorage.getItem("travel_activeTab");
+				if (savedActivities) activities = JSON.parse(savedActivities);
+				if (savedActivityOrder) activityOrder = JSON.parse(savedActivityOrder);
+				if (savedDayNames) dayNames = JSON.parse(savedDayNames);
+				if (savedDayStartTimes) dayStartTimes = JSON.parse(savedDayStartTimes);
+				if (savedPreferences)
+					selectedPreferences = JSON.parse(savedPreferences);
+				if (savedActiveTab) activeTabId = savedActiveTab;
+			}
+
+			function saveToLocalStorage() {
+				localStorage.setItem("travel_activities", JSON.stringify(activities));
+				localStorage.setItem(
+					"travel_activityOrder",
+					JSON.stringify(activityOrder)
+				);
+				localStorage.setItem("travel_dayNames", JSON.stringify(dayNames));
+				localStorage.setItem(
+					"travel_dayStartTimes",
+					JSON.stringify(dayStartTimes)
+				);
+				localStorage.setItem(
+					"travel_preferences",
+					JSON.stringify(selectedPreferences)
+				);
+				localStorage.setItem("travel_activeTab", activeTabId);
+			}
+
+			function manualSaveToLocalStorage() {
+				const validationResult = validateDayDurations();
+				if (!validationResult.valid) {
+					showNotification(`Warning: ${validationResult.message}`, "warning");
+				}
+
+				saveToLocalStorage();
+				showNotification("Data saved successfully!", "success");
+
+				if (
+					!document
+						.getElementById("summary-section")
+						.classList.contains("hidden")
+				) {
+					renderDaysSummary();
+				}
+				if (
+					!document
+						.getElementById("timeline-section")
+						.classList.contains("hidden")
+				) {
+					renderTimelineTab();
+				}
+			}
+
+			function validateDayDurations() {
+				let valid = true;
+				let message = "";
+
+				dayNames.forEach((dayName, i) => {
+					const dayId = `day${i + 1}`;
+					const dayActivities = activityOrder[dayId]
+						.map((id) => activities.find((a) => a.id === id))
+						.filter(Boolean);
+
+					if (dayActivities.length > 0) {
+						const totalDuration = dayActivities.reduce(
+							(sum, act) => sum + act.duration,
+							0
+						);
+
+						const startTimeStr = dayStartTimes[dayId] || "08:00";
+						const [startHours, startMinutes] = startTimeStr
+							.split(":")
+							.map(Number);
+						const startTimeInMinutes = startHours * 60 + startMinutes;
+
+						const endTimeInMinutes = startTimeInMinutes + totalDuration * 60;
+
+						if (endTimeInMinutes - startTimeInMinutes > 1440) {
+							valid = false;
+							message += `${dayName} exceeds 24 hours of activities. `;
+						}
+					}
+				});
+
+				return { valid, message };
+			}
+
+			function showNotification(message, type = "success") {
+				const notification = document.getElementById("notification");
+				notification.textContent = message;
+				notification.className =
+					"fixed top-4 right-4 px-4 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50";
+				switch (type) {
+					case "success":
+						notification.classList.add(
+							"bg-green-50",
+							"text-green-800",
+							"border",
+							"border-green-200"
+						);
+						break;
+					case "error":
+						notification.classList.add(
+							"bg-red-50",
+							"text-red-800",
+							"border",
+							"border-red-200"
+						);
+						break;
+					case "warning":
+						notification.classList.add(
+							"bg-yellow-50",
+							"text-yellow-800",
+							"border",
+							"border-yellow-200"
+						);
+						break;
+					case "info":
+						notification.classList.add(
+							"bg-blue-50",
+							"text-blue-800",
+							"border",
+							"border-blue-200"
+						);
+						break;
+					default:
+						notification.classList.add(
+							"bg-white",
+							"text-gray-800",
+							"border",
+							"border-gray-200"
+						);
+				}
+				notification.classList.remove("opacity-0");
+				notification.classList.add("opacity-100");
+				setTimeout(() => {
+					notification.classList.remove("opacity-100");
+					notification.classList.add("opacity-0");
+				}, 3000);
+			}
+
+			function initializeActivityOrder() {
+				dayNames.forEach((_, index) => {
+					const dayId = `day${index + 1}`;
+					if (!activityOrder[dayId]) activityOrder[dayId] = [];
+				});
+			}
+
+			function getCategoryColor(categories, activityColor) {
+				if (activityColor) {
+					return `${activityColor.bg} ${activityColor.border} ${activityColor.text}`;
+				}
+
+				if (categories.includes("Adventure"))
+					return "bg-teal-100 border-teal-200 text-teal-900";
+				if (categories.includes("Culture"))
+					return "bg-pink-100 border-pink-200 text-pink-900";
+				if (categories.includes("Food"))
+					return "bg-yellow-100 border-yellow-200 text-yellow-900";
+				if (categories.includes("Relaxation"))
+					return "bg-purple-100 border-purple-200 text-purple-900";
+				if (categories.includes("Sightseeing"))
+					return "bg-blue-100 border-blue-200 text-blue-900";
+
+				const randomColor = getRandomColor();
+				return `${randomColor.bg} ${randomColor.border} ${randomColor.text}`;
+			}
+
+			function generateDayStructure() {
+				const tabsContainer = document.getElementById("tabs");
+				const dayContainers = document.getElementById("day-containers");
+				tabsContainer.innerHTML = "";
+				dayContainers.innerHTML = "";
+				dayNames.forEach((dayName, index) => {
+					const dayId = `day${index + 1}`;
+					if (!dayStartTimes[dayId]) dayStartTimes[dayId] = "08:00";
+					const tab = document.createElement("div");
+					tab.className = "relative";
+					const tabBtn = document.createElement("button");
+					tabBtn.className =
+						dayId === activeTabId
+							? "tab-btn text-indigo-700 bg-indigo-50 px-4 py-2 rounded-lg font-medium"
+							: "tab-btn text-secondary-text bg-white hover:bg-gray-100 px-4 py-2 rounded-lg transition-colors";
+					tabBtn.dataset.tab = dayId;
+					tabBtn.textContent = dayName;
+					tab.appendChild(tabBtn);
+					if (dayNames.length > 1) {
+						const deleteBtn = document.createElement("button");
+						deleteBtn.className =
+							"absolute -top-1 -right-1 text-red-500 rounded-full w-5 h-5 flex items-center justify-center bg-white shadow-sm hover:bg-red-100 hover:text-red-600";
+						deleteBtn.innerHTML = "✕";
+						deleteBtn.title = "Delete day";
+						deleteBtn.dataset.dayId = dayId;
+						deleteBtn.onclick = (e) => {
+							e.stopPropagation();
+							document.getElementById("delete-day-id").value = dayId;
+							document
+								.getElementById("confirm-delete-day-modal")
+								.classList.remove("hidden");
+						};
+						tab.appendChild(deleteBtn);
+					}
+					tabsContainer.appendChild(tab);
+					const container = document.createElement("div");
+					container.id = dayId;
+					container.className =
+						dayId === activeTabId ? "day-tab" : "day-tab hidden";
+					const headingClass =
+						dayId === activeTabId ? "text-indigo-700" : "text-primary";
+					container.innerHTML = `
+						<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+							<h3 class="text-lg font-semibold ${headingClass} mb-2 sm:mb-0">Activities for
+								<span class="day-display">${dayName}</span>
+								<input type="text" class="day-name-edit hidden border border-border px-2 py-1 rounded-lg bg-white" value="${dayName}">
+								<button class="edit-day-name ml-2 text-primary p-1 rounded-full hover:bg-gray-100" title="Edit day name">✏️</button>
+							</h3>
+							<div>
+								<label class="text-sm text-secondary-text flex items-center">
+									<span class="mr-2">Day starts at:</span>
+									<input type="time" class="day-start-time border border-border rounded-lg px-2 py-1 bg-white" value="${dayStartTimes[dayId]}" data-day="${dayId}">
+								</label>
+							</div>
+						</div>
+						<div class="activities dropzone neumorphic-inset min-h-[200px] p-4 space-y-3" data-day="${dayId}"></div>
+					`;
+					dayContainers.appendChild(container);
+				});
+				document.querySelectorAll(".tab-btn").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						document.querySelectorAll(".tab-btn").forEach((b) => {
+							b.classList.remove("text-indigo-700", "bg-indigo-50");
+							b.classList.add(
+								"text-secondary-text",
+								"bg-white",
+								"hover:bg-gray-100"
+							);
+						});
+						btn.classList.remove(
+							"text-secondary-text",
+							"bg-white",
+							"hover:bg-gray-100"
+						);
+						btn.classList.add("text-indigo-700", "bg-indigo-50");
+						const tab = btn.dataset.tab;
+						activeTabId = tab;
+
+						document
+							.querySelectorAll(".day-tab")
+							.forEach((tabEl) => tabEl.classList.add("hidden"));
+
+						const selectedTab = document.getElementById(tab);
+						selectedTab.classList.remove("hidden");
+
+						const heading = selectedTab.querySelector("h3");
+						if (heading) {
+							heading.classList.remove(
+								"text-primary",
+								"text-blue-400",
+								"text-secondary-text"
+							);
+
+							heading.classList.add("text-indigo-700");
+						}
+					});
+				});
+				setupHorizontalScroll();
+				document.querySelectorAll(".day-start-time").forEach((input) => {
+					input.addEventListener("change", (e) => {
+						const dayId = e.target.dataset.day;
+						dayStartTimes[dayId] = e.target.value;
+						render();
+						saveToLocalStorage();
+					});
+				});
+				document.querySelectorAll(".edit-day-name").forEach((btn, index) => {
+					btn.addEventListener("click", () => {
+						const container = btn.closest(".day-tab");
+						const display = container.querySelector(".day-display");
+						const input = container.querySelector(".day-name-edit");
+						display.classList.add("hidden");
+						input.classList.remove("hidden");
+						input.focus();
+						const saveDayName = () => {
+							const newName = input.value.trim();
+							if (newName) {
+								dayNames[index] = newName;
+								display.textContent = newName;
+								document.querySelectorAll(".tab-btn")[index].textContent =
+									newName;
+								saveToLocalStorage();
+							}
+							display.classList.remove("hidden");
+							input.classList.add("hidden");
+							input.removeEventListener("blur", saveDayName);
+							input.removeEventListener("keypress", handleKeyPress);
+						};
+						const handleKeyPress = (e) => {
+							if (e.key === "Enter") saveDayName();
+						};
+						input.addEventListener("blur", saveDayName);
+						input.addEventListener("keypress", handleKeyPress);
+					});
+				});
+				document.querySelectorAll(".dropzone").forEach((el) => {
+					el.addEventListener("dragover", (e) => e.preventDefault());
+					el.addEventListener("drop", drop);
+				});
+			}
+
+			function setupHorizontalScroll() {
+				const container = document.getElementById("tabs-container");
+				const leftBtn = document.getElementById("scroll-left");
+				const rightBtn = document.getElementById("scroll-right");
+				const checkScroll = () => {
+					const hasOverflow = container.scrollWidth > container.clientWidth;
+					if (hasOverflow) {
+						leftBtn.classList.remove("opacity-50", "cursor-not-allowed");
+						rightBtn.classList.remove("opacity-50", "cursor-not-allowed");
+					} else {
+						leftBtn.classList.add("opacity-50", "cursor-not-allowed");
+						rightBtn.classList.add("opacity-50", "cursor-not-allowed");
+					}
+					if (container.scrollLeft <= 0) leftBtn.classList.add("opacity-50");
+					else leftBtn.classList.remove("opacity-50");
+					if (
+						container.scrollLeft + container.clientWidth >=
+						container.scrollWidth - 5
+					)
+						rightBtn.classList.add("opacity-50");
+					else rightBtn.classList.remove("opacity-50");
+				};
+				checkScroll();
+				leftBtn.addEventListener("click", () => {
+					container.scrollBy({ left: -200, behavior: "smooth" });
+					setTimeout(checkScroll, 300);
+				});
+				rightBtn.addEventListener("click", () => {
+					container.scrollBy({ left: 200, behavior: "smooth" });
+					setTimeout(checkScroll, 300);
+				});
+				container.addEventListener("scroll", checkScroll);
+				window.addEventListener("resize", checkScroll);
+				const scrollToActiveTab = () => {
+					const activeTab = document.querySelector(".tab-btn.text-blue-600");
+					if (activeTab)
+						activeTab.closest("div").scrollIntoView({
+							behavior: "smooth",
+							block: "nearest",
+							inline: "center",
+						});
+				};
+				setTimeout(scrollToActiveTab, 100);
+			}
+
+			function render() {
+				generateDayStructure();
+				renderAvailableActivities();
+				renderDayActivities();
+				applyPreferences();
+			}
+
+			function renderAvailableActivities() {
+				const availableDiv = document.getElementById("available");
+				availableDiv.innerHTML = "";
+				activityOrder["available"].forEach((id) => {
+					const activity = activities.find((a) => a.id === id);
+					if (!activity) return;
+					const categoryColor = getCategoryColor(
+						activity.categories,
+						activity.color
+					);
+					const isHighlighted =
+						selectedPreferences.length === 0 ||
+						activity.categories.some((cat) =>
+							selectedPreferences.includes(cat)
+						);
+					const div = document.createElement("div");
+					div.className = `activity p-3 rounded-lg shadow-sm border ${categoryColor} hover:shadow transition-all cursor-move`;
+					if (isHighlighted)
+						div.classList.add("ring-2", "ring-indigo-500", "ring-opacity-50");
+					div.draggable = true;
+					div.dataset.id = id;
+					div.innerHTML = `
+						<div class="flex justify-between items-center">
+							<span class="truncate mr-2 font-medium">${activity.name} (${
+						activity.duration
+					}h)</span>
+							<div class="flex shrink-0">
+								<button class="edit-activity text-primary text-sm p-1 rounded-full hover:bg-white hover:bg-opacity-50" title="Edit activity">✏️</button>
+								<button class="delete-activity text-red-500 text-sm p-1 rounded-full hover:bg-white hover:bg-opacity-50 ml-1" title="Delete activity">✕</button>
+							</div>
+						</div>
+						<div class="text-xs mt-1 truncate">${activity.categories.join(", ")}</div>
+					`;
+					availableDiv.appendChild(div);
+					div.addEventListener("dragstart", dragStart);
+					div
+						.querySelector(".edit-activity")
+						.addEventListener("click", () => editActivity(id));
+					div
+						.querySelector(".delete-activity")
+						.addEventListener("click", () => confirmDeleteActivity(id));
+				});
+			}
+
+			function renderDayActivities() {
+				dayNames.forEach((dayName, index) => {
+					const dayId = `day${index + 1}`;
+					if (!activityOrder[dayId]) activityOrder[dayId] = [];
+					const dayDiv = document.querySelector(`#${dayId} .activities`);
+					if (!dayDiv) return;
+					dayDiv.innerHTML = "";
+					let currentTime = dayStartTimes[dayId] || "08:00";
+					activityOrder[dayId].forEach((id, idx) => {
+						const activity = activities.find((a) => a.id === id);
+						if (!activity) return;
+						const categoryColor = getCategoryColor(
+							activity.categories,
+							activity.color
+						);
+						const startTime = currentTime;
+						const [hours, minutes] = startTime.split(":").map(Number);
+						const totalMinutes = hours * 60 + minutes + activity.duration * 60;
+						const endHours = Math.floor(totalMinutes / 60);
+						const endMinutes = totalMinutes % 60;
+						const endTime = `${endHours
+							.toString()
+							.padStart(2, "0")}:${endMinutes.toString().padStart(2, "0")}`;
+						currentTime = endTime;
+						const div = document.createElement("div");
+						div.className = `activity p-3 rounded-lg shadow-sm border ${categoryColor} hover:shadow transition-all flex justify-between items-center cursor-move`;
+						div.draggable = true;
+						div.dataset.id = id;
+						div.innerHTML = `
+							<div class="mr-2 overflow-hidden">
+								<div class="text-sm font-medium">${startTime} - ${endTime}</div>
+								<div class="truncate font-medium">${activity.name} (${activity.duration}h)</div>
+								<div class="text-xs truncate">${activity.categories.join(", ")}</div>
+							</div>
+							<div class="flex space-x-1 shrink-0">
+								<button class="edit-activity flex items-center justify-center w-8 h-8 rounded-full bg-white bg-opacity-50 hover:bg-opacity-80 text-primary" title="Edit">✏️</button>
+								<button class="up flex items-center justify-center w-8 h-8 rounded-full bg-white bg-opacity-50 hover:bg-opacity-80 text-gray-600" title="Move Up">↑</button>
+								<button class="down flex items-center justify-center w-8 h-8 rounded-full bg-white bg-opacity-50 hover:bg-opacity-80 text-gray-600" title="Move Down">↓</button>
+								<button class="remove flex items-center justify-center w-8 h-8 rounded-full bg-white bg-opacity-50 hover:bg-opacity-80 text-red-500" title="Remove">✕</button>
+							</div>`;
+						dayDiv.appendChild(div);
+						div.addEventListener("dragstart", dragStart);
+						div
+							.querySelector(".edit-activity")
+							.addEventListener("click", () => editActivity(id));
+						div
+							.querySelector(".up")
+							.addEventListener("click", () => moveUp(dayId, idx));
+						div
+							.querySelector(".down")
+							.addEventListener("click", () => moveDown(dayId, idx));
+						div
+							.querySelector(".remove")
+							.addEventListener("click", () => removeActivity(dayId, id));
+					});
+				});
+			}
+
+			function applyPreferences() {
+				document.querySelectorAll(".preference-tile").forEach((tile) => {
+					const category = tile.dataset.category;
+					const checkbox = tile.querySelector("input[type=checkbox]");
+					const checkmark = tile.querySelector(".checkmark");
+					checkbox.checked = selectedPreferences.includes(category);
+					if (checkbox.checked) {
+						tile.classList.add("bg-indigo-100", "border-indigo-500");
+					} else {
+						tile.classList.remove("bg-indigo-100", "border-indigo-500");
+					}
+				});
+			}
+
+			function renderActivitiesTable() {
+				const tableBody = document.getElementById("activities-table");
+				const emptyState = document.getElementById("activities-empty-state");
+				const tableContainer = document
+					.getElementById("activities-table-container")
+					.querySelector("table");
+				tableBody.innerHTML = "";
+				const filteredActivities = activities.filter((activity) => {
+					if (!activitySearchQuery) return true;
+					const searchLower = activitySearchQuery.toLowerCase();
+					return (
+						activity.name.toLowerCase().includes(searchLower) ||
+						activity.categories.some((cat) =>
+							cat.toLowerCase().includes(searchLower)
+						)
+					);
+				});
+				if (filteredActivities.length === 0) {
+					emptyState.classList.remove("hidden");
+					tableContainer.classList.add("hidden");
+					return;
+				} else {
+					emptyState.classList.add("hidden");
+					tableContainer.classList.remove("hidden");
+				}
+				filteredActivities.forEach((activity) => {
+					let status = "Available";
+					let assignedTo = [];
+					for (const [key, ids] of Object.entries(activityOrder)) {
+						if (key === "available") continue;
+						if (ids.includes(activity.id)) {
+							const dayIndex = parseInt(key.replace("day", "")) - 1;
+							assignedTo.push(dayNames[dayIndex]);
+						}
+					}
+					if (assignedTo.length > 0)
+						status = `Assigned to ${assignedTo.join(", ")}`;
+					const row = document.createElement("tr");
+					row.className =
+						"hover:bg-white hover:bg-opacity-80 transition-colors";
+					row.innerHTML = `
+						<td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium">${
+							activity.name
+						}</div></td>
+						<td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-secondary-text">${
+							activity.duration
+						} hours</div></td>
+						<td class="px-6 py-4 whitespace-nowrap"><div class="flex flex-wrap gap-1">${activity.categories
+							.map(
+								(cat) =>
+									`<span class="px-2 py-1 text-xs rounded-full ${getCategoryBadgeColor(
+										cat
+									)}">${cat}</span>`
+							)
+							.join("")}</div></td>
+						<td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-secondary-text">${status}</div></td>
+						<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+							<button class="edit-activity-manage text-primary hover:text-blue-700 transition-colors mr-3">Edit</button>
+							<button class="delete-activity-manage text-red-500 hover:text-red-600 transition-colors">Delete</button>
+						</td>
+					`;
+					tableBody.appendChild(row);
+					row
+						.querySelector(".edit-activity-manage")
+						.addEventListener("click", () => editActivity(activity.id));
+					row
+						.querySelector(".delete-activity-manage")
+						.addEventListener("click", () =>
+							confirmDeleteActivity(activity.id)
+						);
+				});
+			}
+
+			function getCategoryBadgeColor(category) {
+				switch (category) {
+					case "Sightseeing":
+						return "bg-blue-100 text-blue-900 border border-blue-200";
+					case "Food":
+						return "bg-yellow-100 text-yellow-900 border border-yellow-200";
+					case "Culture":
+						return "bg-pink-100 text-pink-900 border border-pink-200";
+					case "Adventure":
+						return "bg-teal-100 text-teal-900 border border-teal-200";
+					case "Relaxation":
+						return "bg-purple-100 text-purple-900 border border-purple-200";
+					default:
+						return "bg-gray-100 text-gray-800 border border-gray-200";
+				}
+			}
+
+			function editActivity(id) {
+				const activity = activities.find((a) => a.id === id);
+				if (!activity) return;
+				document.getElementById("activity-modal-title").textContent =
+					"✏️ Edit Activity";
+				document.getElementById("edit-activity-id").value = id;
+				document.getElementById("activity-name").value = activity.name;
+				document.getElementById("activity-duration").value = activity.duration;
+				document
+					.querySelectorAll('[name="activity-category"]')
+					.forEach((checkbox) => {
+						checkbox.checked = activity.categories.includes(checkbox.value);
+					});
+				document.getElementById("activity-modal").classList.remove("hidden");
+			}
+
+			function confirmDeleteActivity(id) {
+				document.getElementById("delete-activity-id").value = id;
+				document
+					.getElementById("confirm-delete-modal")
+					.classList.remove("hidden");
+			}
+
+			function deleteActivity(id) {
+				id = parseInt(id);
+				activities = activities.filter((a) => a.id !== id);
+				for (const day in activityOrder) {
+					activityOrder[day] = activityOrder[day].filter(
+						(actId) => actId !== id
+					);
+				}
+				render();
+				if (
+					!document
+						.getElementById("activities-section")
+						.classList.contains("hidden")
+				)
+					renderActivitiesTable();
+				saveToLocalStorage();
+				showNotification("Activity deleted successfully");
+			}
+
+			function dragStart(e) {
+				const activity = e.target;
+				const container = activity.closest(".dropzone");
+				const source =
+					container.id === "available" ? "available" : container.dataset.day;
+				e.dataTransfer.setData("text", activity.dataset.id + "," + source);
+			}
+
+			function drop(e) {
+				e.preventDefault();
+				const [idStr, source] = e.dataTransfer.getData("text").split(",");
+				const id = parseInt(idStr);
+				const target =
+					e.currentTarget.id === "available"
+						? "available"
+						: e.currentTarget.dataset.day;
+
+				if (target !== "available" && target !== source) {
+					const activity = activities.find((a) => a.id === id);
+					if (activity) {
+						const dayId = target;
+						const existingActivities = activityOrder[dayId]
+							.map((id) => activities.find((a) => a.id === id))
+							.filter(Boolean);
+						const totalDuration =
+							existingActivities.reduce((sum, act) => sum + act.duration, 0) +
+							activity.duration;
+
+						const startTimeStr = dayStartTimes[dayId] || "08:00";
+						const [startHours, startMinutes] = startTimeStr
+							.split(":")
+							.map(Number);
+						const startTimeInMinutes = startHours * 60 + startMinutes;
+
+						const endTimeInMinutes = startTimeInMinutes + totalDuration * 60;
+
+						if (endTimeInMinutes - startTimeInMinutes > 1440) {
+							showNotification(
+								"Adding this activity would exceed 24 hours for this day!",
+								"warning"
+							);
+							return;
+						}
+					}
+				}
+
+				if (source !== target) {
+					activityOrder[source] = activityOrder[source].filter((x) => x !== id);
+					activityOrder[target].push(id);
+					render();
+					saveToLocalStorage();
+				}
+			}
+
+			function moveUp(day, idx) {
+				if (idx > 0) {
+					[activityOrder[day][idx - 1], activityOrder[day][idx]] = [
+						activityOrder[day][idx],
+						activityOrder[day][idx - 1],
+					];
+					render();
+					saveToLocalStorage();
+				}
+			}
+
+			function moveDown(day, idx) {
+				if (idx < activityOrder[day].length - 1) {
+					[activityOrder[day][idx], activityOrder[day][idx + 1]] = [
+						activityOrder[day][idx + 1],
+						activityOrder[day][idx],
+					];
+					render();
+					saveToLocalStorage();
+				}
+			}
+
+			function removeActivity(day, id) {
+				activityOrder[day] = activityOrder[day].filter((x) => x !== id);
+				activityOrder["available"].push(id);
+				render();
+				saveToLocalStorage();
+				showNotification("Activity moved to available list");
+			}
+
+			function deleteDay(dayId) {
+				const dayIndex = parseInt(dayId.replace("day", "")) - 1;
+				if (activityOrder[dayId])
+					activityOrder["available"].push(...activityOrder[dayId]);
+				delete activityOrder[dayId];
+				dayNames.splice(dayIndex, 1);
+				delete dayStartTimes[dayId];
+				const newActivityOrder = { available: activityOrder["available"] };
+				const newDayStartTimes = {};
+				dayNames.forEach((name, index) => {
+					const newDayId = `day${index + 1}`;
+					const oldDayId = `day${index + 2}`;
+					if (index >= dayIndex) {
+						if (activityOrder[oldDayId])
+							newActivityOrder[newDayId] = activityOrder[oldDayId];
+						else newActivityOrder[newDayId] = [];
+						if (dayStartTimes[oldDayId])
+							newDayStartTimes[newDayId] = dayStartTimes[oldDayId];
+						else newDayStartTimes[newDayId] = "08:00";
+					} else {
+						newActivityOrder[newDayId] = activityOrder[newDayId];
+						newDayStartTimes[newDayId] = dayStartTimes[newDayId];
+					}
+				});
+				activityOrder = newActivityOrder;
+				dayStartTimes = newDayStartTimes;
+				if (activeTabId === dayId) {
+					if (dayNames.length > 0) activeTabId = "day1";
+				} else if (
+					parseInt(activeTabId.replace("day", "")) >
+					parseInt(dayId.replace("day", ""))
+				) {
+					const activeTabNumber = parseInt(activeTabId.replace("day", ""));
+					activeTabId = `day${activeTabNumber - 1}`;
+				}
+				saveToLocalStorage();
+				render();
+				showNotification("Day deleted", "info");
+			}
+
+			function generateTimeline() {
+				let html = `<div class="space-y-6">`;
+				dayNames.forEach((dayName, i) => {
+					const dayId = `day${i + 1}`;
+					const dayStartTime = dayStartTimes[dayId] || "08:00";
+					const activitiesList = activityOrder[dayId]
+						.map((id) => activities.find((a) => a.id === id))
+						.filter(Boolean);
+					let [hours, minutes] = dayStartTime.split(":").map(Number);
+					let currentTime = hours * 60 + minutes;
+					html += `
+						<div class="neumorphic p-5 rounded-xl">
+							<h3 class="font-bold text-lg text-primary mb-4 flex justify-between items-center">
+								<span>${dayName}</span>
+								<span class="text-sm font-normal bg-light-purple bg-opacity-20 px-3 py-1 rounded-full text-primary">Starts at ${dayStartTime}</span>
+							</h3>
+							<div class="space-y-3">
+					`;
+					if (activitiesList.length === 0) {
+						html += `<p class="text-secondary-text italic text-center py-6">No activities planned for this day.</p>`;
+					} else {
+						activitiesList.forEach((act) => {
+							const startHours = Math.floor(currentTime / 60);
+							const startMinutes = currentTime % 60;
+							const startTimeStr = `${startHours
+								.toString()
+								.padStart(2, "0")}:${startMinutes.toString().padStart(2, "0")}`;
+							currentTime += act.duration * 60;
+							const endHours = Math.floor(currentTime / 60);
+							const endMinutes = currentTime % 60;
+							const endTimeStr = `${endHours
+								.toString()
+								.padStart(2, "0")}:${endMinutes.toString().padStart(2, "0")}`;
+							const categoryBg = getCategoryColor(act.categories);
+							html += `
+								<div class="flex items-start p-3 ${categoryBg} rounded-lg border">
+									<div class="font-medium w-24 shrink-0">${startTimeStr} - ${endTimeStr}</div>
+									<div class="ml-3">
+										<div class="font-medium">${act.name}</div>
+										<div class="text-xs">${act.duration}h • ${act.categories.join(", ")}</div>
+									</div>
+								</div>
+							`;
+						});
+					}
+					html += `</div></div>`;
+				});
+				html += `</div>`;
+				return html;
+			}
+
+			function renderDaysSummary() {
+				const summaryContent = document.getElementById("days-summary-content");
+				summaryContent.innerHTML = "";
+				dayNames.forEach((dayName, i) => {
+					const dayId = `day${i + 1}`;
+					const dayActivities = activityOrder[dayId]
+						.map((id) => activities.find((a) => a.id === id))
+						.filter(Boolean);
+					const categoryCount = {};
+					dayActivities.forEach((act) => {
+						act.categories.forEach((cat) => {
+							categoryCount[cat] = (categoryCount[cat] || 0) + 1;
+						});
+					});
+					let dominantCategory = "Mixed";
+					let maxCount = 0;
+					for (const [category, count] of Object.entries(categoryCount)) {
+						if (count > maxCount) {
+							maxCount = count;
+							dominantCategory = category;
+						}
+					}
+					let bgColor = "bg-indigo-50";
+					let borderColor = "border-indigo-100";
+					let textColor = "text-indigo-700";
+					switch (dominantCategory) {
+						case "Sightseeing":
+							bgColor = "bg-blue-50";
+							borderColor = "border-blue-100";
+							textColor = "text-blue-800";
+							break;
+						case "Food":
+							bgColor = "bg-yellow-50";
+							borderColor = "border-yellow-100";
+							textColor = "text-yellow-800";
+							break;
+						case "Culture":
+							bgColor = "bg-pink-50";
+							borderColor = "border-pink-100";
+							textColor = "text-pink-800";
+							break;
+						case "Adventure":
+							bgColor = "bg-teal-50";
+							borderColor = "border-teal-100";
+							textColor = "text-teal-800";
+							break;
+						case "Relaxation":
+							bgColor = "bg-purple-50";
+							borderColor = "border-purple-100";
+							textColor = "text-purple-800";
+							break;
+					}
+					const totalDuration = dayActivities.reduce(
+						(sum, act) => sum + act.duration,
+						0
+					);
+					const card = document.createElement("div");
+					card.className = `neumorphic p-5 h-full ${bgColor} ${borderColor} border`;
+					let activityList = "";
+					dayActivities.forEach((act) => {
+						const catColor = getCategoryColor(act.categories);
+						activityList += `<li class="${catColor} rounded-lg px-3 py-2 my-2">${act.name} (${act.duration}h)</li>`;
+					});
+					card.innerHTML = `
+						<div class="flex justify-between items-start">
+							<h3 class="font-bold text-lg ${textColor} mb-3">${dayName}</h3>
+							<span class="text-sm bg-white bg-opacity-50 px-3 py-1 rounded-full ${textColor}">${
+						dayStartTimes[dayId] || "08:00"
+					}</span>
+						</div>
+						<div class="flex justify-between mb-3">
+							<span class="text-sm text-secondary-text">${
+								dayActivities.length
+							} activities</span>
+							<span class="text-sm text-secondary-text">${totalDuration} hours total</span>
+						</div>
+						<div class="text-sm mb-4">
+							<span class="font-medium">Primary focus:</span>
+							<span class="px-2 py-1 ml-2 rounded-full ${getCategoryBadgeColor(
+								dominantCategory
+							)}">${dominantCategory}</span>
+						</div>
+						<ul class="text-sm max-h-60 overflow-y-auto">
+							${
+								activityList ||
+								'<li class="text-secondary-text py-4 text-center">No activities planned</li>'
+							}
+						</ul>
+					`;
+					summaryContent.appendChild(card);
+				});
+			}
+
+			function showHomeSection() {
+				document.getElementById("home-section").classList.remove("hidden");
+				document.getElementById("activities-section").classList.add("hidden");
+				document.getElementById("timeline-section").classList.add("hidden");
+				document.getElementById("summary-section").classList.add("hidden");
+				updateActiveNavState("home-link");
+			}
+
+			function showActivitiesSection() {
+				document.getElementById("home-section").classList.add("hidden");
+				document
+					.getElementById("activities-section")
+					.classList.remove("hidden");
+				document.getElementById("timeline-section").classList.add("hidden");
+				document.getElementById("summary-section").classList.add("hidden");
+				renderActivitiesTable();
+				updateActiveNavState("activities-link");
+			}
+
+			function showSummarySection() {
+				document.getElementById("home-section").classList.add("hidden");
+				document.getElementById("activities-section").classList.add("hidden");
+				document.getElementById("timeline-section").classList.add("hidden");
+				document.getElementById("summary-section").classList.remove("hidden");
+				renderDaysSummary();
+				updateActiveNavState("summary-link");
+			}
+
+			function showTimelineSection() {
+				document.getElementById("home-section").classList.add("hidden");
+				document.getElementById("activities-section").classList.add("hidden");
+				document.getElementById("timeline-section").classList.remove("hidden");
+				document.getElementById("summary-section").classList.add("hidden");
+				renderTimelineTab();
+				updateActiveNavState("timeline-link");
+			}
+
+			function updateActiveNavState(activeId) {
+				document.querySelectorAll("nav a").forEach((link) => {
+					link.classList.remove("text-primary", "font-medium");
+				});
+				const activeLink = document.getElementById(activeId);
+				if (activeLink) activeLink.classList.add("text-primary", "font-medium");
+				document.querySelectorAll("#mobile-menu a").forEach((link) => {
+					link.classList.remove("bg-light-purple", "bg-opacity-20");
+				});
+				const mobileActiveLink = document.getElementById("mobile-" + activeId);
+				if (mobileActiveLink)
+					mobileActiveLink.classList.add("bg-light-purple", "bg-opacity-20");
+			}
+
+			function renderTimelineTab() {
+				const timelineContent = document.getElementById("timeline-tab-content");
+				if (dayNames.length === 0) {
+					timelineContent.innerHTML = `
+						<div class="flex flex-col items-center justify-center p-12 bg-white bg-opacity-50 border-2 border-dashed border-border rounded-lg text-center">
+							<div class="w-16 h-16 rounded-full bg-light-purple bg-opacity-30 flex items-center justify-center mb-4">
+								<svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+								</svg>
+							</div>
+							<h3 class="text-lg font-medium text-text mb-2">No timeline available</h3>
+							<p class="text-secondary-text">Add days and activities to see your trip timeline</p>
+						</div>`;
+				} else {
+					timelineContent.innerHTML = generateTimeline();
+				}
+			}
+
+			function printItinerary() {
+				const printContent = document.getElementById("print-content");
+				let printHTML = `
+					<style>
+						@media print {
+							body { font-family: 'Satoshi', sans-serif; color: #101828; background: white; }
+							h1 { color: #6941C6; font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+							h3 { color: #6941C6; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+							.day-card { border: 1px solid #E4E7EC; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+							.time-slot { padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #E4E7EC; }
+						}
+					</style>
+					<h1 class="text-primary">✨ Travel Itinerary</h1>
+					<div class="space-y-4">
+				`;
+				dayNames.forEach((dayName, i) => {
+					const dayId = `day${i + 1}`;
+					const startTime = dayStartTimes[dayId] || "08:00";
+					const dayActivities = activityOrder[dayId]
+						.map((id) => activities.find((a) => a.id === id))
+						.filter(Boolean);
+					const totalDuration = dayActivities.reduce(
+						(sum, act) => sum + act.duration,
+						0
+					);
+					printHTML += `
+						<div class="day-card">
+							<h3 class="text-primary">${dayName} <span class="text-sm font-normal">(starts at ${startTime})</span></h3>
+							<div class="flex justify-between mb-2">
+								<span>${dayActivities.length} activities</span>
+								<span>${totalDuration} hours total</span>
+							</div>
+							<ul class="list-disc pl-4">
+					`;
+					let currentTime = startTime;
+					dayActivities.forEach((act) => {
+						const [hours, minutes] = currentTime.split(":").map(Number);
+						const totalMinutes = hours * 60 + minutes + act.duration * 60;
+						const endHours = Math.floor(totalMinutes / 60);
+						const endMinutes = totalMinutes % 60;
+						const endTime = `${endHours
+							.toString()
+							.padStart(2, "0")}:${endMinutes.toString().padStart(2, "0")}`;
+						printHTML += `<li class="time-slot">${currentTime} - ${endTime} ${act.name} (${act.duration}h)</li>`;
+						currentTime = endTime;
+					});
+					printHTML += `</ul></div>`;
+				});
+				printHTML += `</div>`;
+				printContent.innerHTML = printHTML;
+				window.print();
+			}
+
+			function printTimeline() {
+				const printContent = document.getElementById("print-content");
+				printContent.innerHTML = `
+					<style>
+						@media print {
+							body { font-family: 'Satoshi', sans-serif; color: #101828; background: white; }
+							h1 { color: #6941C6; font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+							h3 { color: #6941C6; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+							.day-card { border: 1px solid #E4E7EC; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+							.time-block { padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #E4E7EC; display: flex; }
+							.time-slot { width: 100px; font-weight: 500; }
+						}
+					</style>
+					<h1 class="text-primary">✨ Travel Itinerary Timeline</h1>
+					${generateTimeline()}
+				`;
+				window.print();
+			}
+
+			function printSummary() {
+				const printContent = document.getElementById("print-content");
+				let printHTML = `
+					<style>
+						@media print {
+							body { font-family: 'Satoshi', sans-serif; color: #101828; background: white; }
+							h1 { color: #6941C6; font-size: 24px; font-weight: 700; margin-bottom: 16px; }
+							h3 { color: #6941C6; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+							.summary-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+							.day-card { border: 1px solid #E4E7EC; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+							.activity-item { padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #E4E7EC; }
+						}
+					</style>
+					<h1 class="text-primary">✨ Travel Itinerary Summary</h1>
+					<div class="summary-grid">
+				`;
+				dayNames.forEach((dayName, i) => {
+					const dayId = `day${i + 1}`;
+					const startTime = dayStartTimes[dayId] || "08:00";
+					const dayActivities = activityOrder[dayId]
+						.map((id) => activities.find((a) => a.id === id))
+						.filter(Boolean);
+					const totalDuration = dayActivities.reduce(
+						(sum, act) => sum + act.duration,
+						0
+					);
+					printHTML += `
+						<div class="day-card">
+							<h3 class="text-primary">${dayName} <span class="text-sm font-normal">(starts at ${startTime})</span></h3>
+							<div class="flex justify-between mb-2">
+								<span>${dayActivities.length} activities</span>
+								<span>${totalDuration} hours total</span>
+							</div>
+							<ul class="list-none space-y-2">
+					`;
+					let currentTime = startTime;
+					dayActivities.forEach((act) => {
+						const [hours, minutes] = currentTime.split(":").map(Number);
+						const totalMinutes = hours * 60 + minutes + act.duration * 60;
+						const endHours = Math.floor(totalMinutes / 60);
+						const endMinutes = totalMinutes % 60;
+						const endTime = `${endHours
+							.toString()
+							.padStart(2, "0")}:${endMinutes.toString().padStart(2, "0")}`;
+						printHTML += `<li class="activity-item">${currentTime} - ${endTime} ${act.name} (${act.duration}h)</li>`;
+						currentTime = endTime;
+					});
+					printHTML += `</ul></div>`;
+				});
+				printHTML += `</div>`;
+				printContent.innerHTML = printHTML;
+				window.print();
+			}
+
+			function initEventListeners() {
+				const mobileMenuButton = document.getElementById("mobile-menu-button");
+				if (mobileMenuButton) {
+					mobileMenuButton.addEventListener("click", () => {
+						console.log("Mobile menu button clicked");
+						document.getElementById("mobile-menu").classList.toggle("hidden");
+					});
+				} else console.error("Mobile menu button not found");
+
+				["home", "summary", "activities", "timeline"].forEach((section) => {
+					const mobileLink = document.getElementById(`mobile-${section}-link`);
+					if (mobileLink) {
+						mobileLink.addEventListener("click", (e) => {
+							e.preventDefault();
+							console.log(`${section} mobile link clicked`);
+							if (section === "home") showHomeSection();
+							else if (section === "summary") showSummarySection();
+							else if (section === "activities") showActivitiesSection();
+							else if (section === "timeline") showTimelineSection();
+							document.getElementById("mobile-menu").classList.add("hidden");
+						});
+					}
+					const desktopLink = document.getElementById(`${section}-link`);
+					if (desktopLink) {
+						desktopLink.addEventListener("click", (e) => {
+							e.preventDefault();
+							console.log(`${section} desktop link clicked`);
+							if (section === "home") showHomeSection();
+							else if (section === "summary") showSummarySection();
+							else if (section === "activities") showActivitiesSection();
+							else if (section === "timeline") showTimelineSection();
+						});
+					}
+				});
+
+				const addActivityBtn = document.getElementById("add-activity-btn");
+				if (addActivityBtn) {
+					addActivityBtn.addEventListener("click", () => {
+						console.log("Add Activity button clicked (sidebar)");
+						document.getElementById("activity-modal-title").textContent =
+							"Add New Activity";
+						document.getElementById("edit-activity-id").value = "";
+						document.getElementById("activity-form").reset();
+						document
+							.getElementById("activity-modal")
+							.classList.remove("hidden");
+					});
+				} else console.error("Add Activity button (sidebar) not found");
+
+				const addActivityManage = document.getElementById(
+					"add-activity-manage"
+				);
+				if (addActivityManage) {
+					addActivityManage.addEventListener("click", () => {
+						console.log("Add Activity button clicked (manage section)");
+						document.getElementById("activity-modal-title").textContent =
+							"Add New Activity";
+						document.getElementById("edit-activity-id").value = "";
+						document.getElementById("activity-form").reset();
+						document
+							.getElementById("activity-modal")
+							.classList.remove("hidden");
+					});
+				} else console.error("Add Activity button (manage) not found");
+
+				const printItineraryBtn = document.getElementById("print-itinerary");
+				if (printItineraryBtn) {
+					printItineraryBtn.addEventListener("click", printItinerary);
+				} else console.error("Print Itinerary button not found");
+
+				const activityForm = document.getElementById("activity-form");
+				if (activityForm) {
+					activityForm.addEventListener("submit", (e) => {
+						e.preventDefault();
+						console.log("Activity form submitted");
+						const name = document.getElementById("activity-name").value;
+						const duration = parseFloat(
+							document.getElementById("activity-duration").value
+						);
+
+						if (duration > 24) {
+							showNotification(
+								"Activity duration cannot exceed 24 hours!",
+								"error"
+							);
+							return;
+						}
+
+						const categories = Array.from(
+							document.querySelectorAll('[name="activity-category"]:checked')
+						).map((cb) => cb.value);
+						const editId = document.getElementById("edit-activity-id").value;
+						if (editId) {
+							const activityIndex = activities.findIndex(
+								(a) => a.id === parseInt(editId)
+							);
+							if (activityIndex !== -1) {
+								activities[activityIndex].name = name;
+								activities[activityIndex].duration = duration;
+								activities[activityIndex].categories = categories;
+								showNotification("Activity updated successfully");
+							}
+						} else {
+							const newId =
+								activities.length > 0
+									? Math.max(...activities.map((a) => a.id)) + 1
+									: 1;
+							const randomColor = getRandomColor();
+							activities.push({
+								id: newId,
+								name,
+								duration,
+								categories,
+								color: randomColor,
+							});
+							activityOrder.available.push(newId);
+							showNotification("New activity added");
+						}
+						document.getElementById("activity-modal").classList.add("hidden");
+						saveToLocalStorage();
+						render();
+						if (
+							!document
+								.getElementById("activities-section")
+								.classList.contains("hidden")
+						)
+							renderActivitiesTable();
+					});
+				} else console.error("Activity form not found");
+
+				const cancelActivity = document.getElementById("cancel-activity");
+				if (cancelActivity) {
+					cancelActivity.addEventListener("click", () => {
+						console.log("Cancel activity clicked");
+						document.getElementById("activity-modal").classList.add("hidden");
+					});
+				}
+
+				const confirmDelete = document.getElementById("confirm-delete");
+				if (confirmDelete) {
+					confirmDelete.addEventListener("click", () => {
+						const id = document.getElementById("delete-activity-id").value;
+						deleteActivity(id);
+						document
+							.getElementById("confirm-delete-modal")
+							.classList.add("hidden");
+					});
+				}
+
+				const cancelDelete = document.getElementById("cancel-delete");
+				if (cancelDelete) {
+					cancelDelete.addEventListener("click", () => {
+						document
+							.getElementById("confirm-delete-modal")
+							.classList.add("hidden");
+					});
+				}
+
+				const confirmDeleteDay = document.getElementById("confirm-delete-day");
+				if (confirmDeleteDay) {
+					confirmDeleteDay.addEventListener("click", () => {
+						const dayId = document.getElementById("delete-day-id").value;
+						deleteDay(dayId);
+						document
+							.getElementById("confirm-delete-day-modal")
+							.classList.add("hidden");
+					});
+				}
+
+				const cancelDeleteDay = document.getElementById("cancel-delete-day");
+				if (cancelDeleteDay) {
+					cancelDeleteDay.addEventListener("click", () => {
+						document
+							.getElementById("confirm-delete-day-modal")
+							.classList.add("hidden");
+					});
+				}
+
+				const addDayBtn = document.getElementById("add-day-btn");
+				if (addDayBtn) {
+					addDayBtn.addEventListener("click", () => {
+						const newDayNumber = dayNames.length + 1;
+						const newDayName = `Day ${newDayNumber}`;
+						const newDayId = `day${newDayNumber}`;
+						dayNames.push(newDayName);
+						activityOrder[newDayId] = [];
+						dayStartTimes[newDayId] = "08:00";
+						render();
+						saveToLocalStorage();
+						showNotification("New day added");
+					});
+				}
+
+				const printTimelineBtn = document.getElementById("print-timeline");
+				if (printTimelineBtn) {
+					printTimelineBtn.addEventListener("click", printTimeline);
+				}
+
+				const closeTimeline = document.getElementById("close-timeline");
+				if (closeTimeline) {
+					closeTimeline.addEventListener("click", () => {
+						document.getElementById("timeline-modal").classList.add("hidden");
+					});
+				}
+
+				const printTimelineTabBtn =
+					document.getElementById("print-timeline-tab");
+				if (printTimelineTabBtn) {
+					printTimelineTabBtn.addEventListener("click", printTimeline);
+				}
+
+				const printSummaryBtn = document.getElementById("print-summary");
+				if (printSummaryBtn) {
+					printSummaryBtn.addEventListener("click", printSummary);
+				}
+
+				const saveDataBtn = document.getElementById("save-data");
+				if (saveDataBtn) {
+					saveDataBtn.addEventListener("click", manualSaveToLocalStorage);
+				}
+
+				document.querySelectorAll(".preference-tile").forEach((tile) => {
+					tile.addEventListener("click", () => {
+						const checkbox = tile.querySelector("input[type=checkbox]");
+						checkbox.checked = !checkbox.checked;
+						const category = tile.dataset.category;
+						if (checkbox.checked) selectedPreferences.push(category);
+						else
+							selectedPreferences = selectedPreferences.filter(
+								(p) => p !== category
+							);
+						applyPreferences();
+						renderAvailableActivities();
+						saveToLocalStorage();
+					});
+				});
+
+				const activitySearch = document.getElementById("activity-search");
+				if (activitySearch) {
+					activitySearch.addEventListener("input", (e) => {
+						activitySearchQuery = e.target.value.trim();
+						renderActivitiesTable();
+					});
+				}
+
+				window.addEventListener("error", (e) => {
+					showNotification("Error: " + e.message, "error");
+				});
+			}
+
+			function initApp() {
+				loadFromLocalStorage();
+				initializeActivityOrder();
+				initEventListeners();
+				render();
+				const homeLink = document.getElementById("home-link");
+				if (homeLink) homeLink.classList.add("text-primary", "font-medium");
+			}
+
+			document.addEventListener("DOMContentLoaded", initApp);
+		</script>
+	</body>
+</html>

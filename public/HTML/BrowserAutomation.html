@@ -1,0 +1,2885 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Browser Automation Recorder</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<style>
+			/* Modern UI Variables */
+			:root {
+				--bg-dark: #1e1e2e;
+				--surface-dark: #2e2e3e;
+				--surface-light: #3e3e4e;
+				--text-primary: #f0f0f5;
+				--text-secondary: #a0a0b0;
+				--accent: #7c90ff;
+				--accent-light: #8c9fff;
+				--accent-dark: #6c80ef;
+				--success: #52de97;
+				--error: #ff5f7a;
+				--warning: #ffb86c;
+				--shadow-dark: rgba(0, 0, 0, 0.4);
+				--shadow-darker: rgba(0, 0, 0, 0.6);
+				--shadow-light: rgba(255, 255, 255, 0.05);
+				--shadow-lighter: rgba(255, 255, 255, 0.02);
+				--gradient-top: linear-gradient(145deg, #2a2a3a, #252535);
+				--gradient-pressed: linear-gradient(145deg, #232333, #2a2a3a);
+				--gradient-accent: linear-gradient(145deg, #7c90ff, #6c80ef);
+				--radius-sm: 8px;
+				--radius-md: 12px;
+				--radius-lg: 16px;
+				--transition-fast: 0.15s ease;
+				--transition-normal: 0.25s ease;
+
+				/* Scrollbar Variables */
+				--scrollbar-size: 8px;
+				--scrollbar-minsize: 40px;
+				/* Minimum thumb size */
+				--scrollbar-ff-width: thin;
+				/* FF specific thin scrollbar */
+				--scrollbar-track-color: var(--surface-dark);
+				--scrollbar-thumb-color: #4e4e5e;
+				--scrollbar-thumb-hover-color: #5e5e6e;
+				--scrollbar-thumb-active-color: var(--accent);
+				font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+					"Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+			}
+
+			/* Mobile-first base styles */
+			body {
+				background-color: var(--bg-dark);
+				color: var(--text-primary);
+				font-family: system-ui, -apple-system, sans-serif;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+				overflow-x: hidden;
+
+				/* Firefox scrollbar styling */
+				scrollbar-width: var(--scrollbar-ff-width);
+				scrollbar-color: var(--scrollbar-thumb-color)
+					var(--scrollbar-track-color);
+				font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
+					"Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+			}
+
+			/* Modern scrollbar styling for WebKit browsers (Chrome, Safari, Edge) */
+			::-webkit-scrollbar {
+				width: var(--scrollbar-size);
+				height: var(--scrollbar-size);
+			}
+
+			::-webkit-scrollbar-track {
+				background-color: var(--scrollbar-track-color);
+				border-radius: var(--radius-sm);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background-color: var(--scrollbar-thumb-color);
+				border-radius: var(--radius-sm);
+				min-height: var(--scrollbar-minsize);
+				transition: background-color var(--transition-fast);
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background-color: var(--scrollbar-thumb-hover-color);
+			}
+
+			::-webkit-scrollbar-thumb:active {
+				background-color: var(--scrollbar-thumb-active-color);
+			}
+
+			/* Hide scrollbar buttons */
+			::-webkit-scrollbar-button {
+				display: none;
+			}
+
+			/* Customize specific scrollable areas */
+			.actions-list,
+			.modal-content,
+			#stepEditor,
+			pre#codeOutput {
+				scrollbar-width: var(--scrollbar-ff-width);
+				scrollbar-color: var(--scrollbar-thumb-color)
+					var(--scrollbar-track-color);
+			}
+
+			/* Smaller scrollbars for pre code blocks */
+			pre#codeOutput::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+
+			/* Touch-friendly scrollbars on mobile */
+			@media (max-width: 767px) {
+				:root {
+					--scrollbar-size: 5px;
+					/* Slightly smaller on mobile */
+				}
+
+				/* Make touch scrolling smooth without showing scrollbars on mobile */
+				.actions-list,
+				#stepEditor {
+					-webkit-overflow-scrolling: touch;
+				}
+			}
+
+			/* Improved mobile panel system */
+			.app-container {
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+			}
+
+			.main-content {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.panel {
+				background: var(--surface-dark);
+				border-radius: var(--radius-md);
+				margin: 0.25rem;
+				padding: 0.75rem;
+			}
+
+			/* Make panels fixed height on mobile to maximize browser space */
+			.side-panel {
+				height: 100%;
+				width: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				transform: translateX(-100%);
+				transition: transform var(--transition-normal);
+				z-index: 20;
+			}
+
+			.side-panel.right-panel {
+				left: auto;
+				right: 0;
+				transform: translateX(100%);
+			}
+
+			.side-panel.active {
+				transform: translateX(0);
+			}
+
+			/* Center panel (browser) is the main mobile view */
+			.center-panel {
+				flex: 1;
+				z-index: 10;
+			}
+
+			/* Mobile panel indicators */
+			.panel-indicators {
+				position: fixed;
+				bottom: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				display: flex;
+				gap: 8px;
+				z-index: 30;
+			}
+
+			.panel-indicator {
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				background: var(--surface-light);
+				opacity: 0.5;
+				transition: all 0.3s ease;
+				position: relative;
+				cursor: pointer;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+			}
+
+			.panel-indicator.active {
+				background: var(--accent);
+				opacity: 1;
+				width: 12px;
+				height: 12px;
+				box-shadow: 0 0 0 2px rgba(124, 144, 255, 0.3),
+					0 0 10px rgba(124, 144, 255, 0.5);
+			}
+
+			.panel-indicator:hover:not(.active) {
+				opacity: 0.8;
+				transform: scale(1.2);
+			}
+
+			/* Mobile navigation buttons */
+			.mobile-nav-buttons {
+				position: fixed;
+				bottom: 20px;
+				width: 100%;
+				display: flex;
+				justify-content: space-between;
+				padding: 0 20px;
+				z-index: 30;
+			}
+
+			.mobile-nav-button {
+				width: 48px;
+				height: 48px;
+				border-radius: 50%;
+				background: linear-gradient(145deg, #8095ff, #6d87ff);
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3),
+					0 2px 4px rgba(124, 144, 255, 0.4),
+					inset 0 1px 0 rgba(255, 255, 255, 0.15);
+				border: none;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				position: relative;
+				z-index: 2;
+			}
+
+			.mobile-nav-button::after {
+				content: "";
+				position: absolute;
+				inset: 0;
+				border-radius: 50%;
+				background: radial-gradient(
+					circle at 30% 30%,
+					rgba(255, 255, 255, 0.15),
+					transparent 70%
+				);
+				z-index: 1;
+				pointer-events: none;
+			}
+
+			.mobile-nav-button:active {
+				transform: translateY(2px) scale(0.95);
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3),
+					inset 0 1px 3px rgba(0, 0, 0, 0.2);
+			}
+
+			/* Improved browser frame for mobile */
+			.browser-frame {
+				display: flex;
+				flex-direction: column;
+				background: var(--surface-dark);
+				border-radius: var(--radius-md);
+				overflow: hidden;
+				height: 100%;
+				min-height: 400px;
+			}
+
+			.browser-viewport {
+				flex: 1;
+				position: relative;
+				min-height: 300px;
+			}
+
+			#browserIframe {
+				width: 100%;
+				height: 100%;
+				border: none;
+			}
+
+			/* Responsive toolbar */
+			.browser-toolbar {
+				padding: 0.75rem;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+				border-bottom: 1px solid var(--shadow-dark);
+			}
+
+			.url-control {
+				display: flex;
+				flex: 1;
+			}
+
+			.url-bar {
+				background: var(--surface-light);
+				border: none;
+				border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+				color: var(--text-primary);
+				padding: 8px 12px;
+				flex: 1;
+				min-width: 0;
+			}
+
+			.url-bar:focus {
+				outline: 1px solid var(--accent);
+			}
+
+			/* URL button */
+			.url-button {
+				border: none;
+				background: linear-gradient(145deg, #8095ff, #6d87ff);
+				color: white;
+				padding: 0 14px;
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+				cursor: pointer;
+				font-weight: 600;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+					inset 0 1px 0 rgba(255, 255, 255, 0.15);
+				transition: all 0.2s ease;
+				min-width: 48px;
+				position: relative;
+			}
+
+			.url-button::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 50%;
+				background: linear-gradient(
+					to bottom,
+					rgba(255, 255, 255, 0.1),
+					rgba(255, 255, 255, 0)
+				);
+				pointer-events: none;
+			}
+
+			.url-button:hover {
+				background: linear-gradient(145deg, #8c9fff, #778dff);
+				box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+			}
+
+			.url-button:active {
+				background: linear-gradient(145deg, #6c80ef, #7c90ff);
+				box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+				transform: translateY(1px);
+			}
+
+			.toolbar-controls {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.browser-dots {
+				display: flex;
+				gap: 6px;
+			}
+
+			.browser-dot {
+				width: 12px;
+				height: 12px;
+				border-radius: 50%;
+			}
+
+			/* Enhanced buttons for touch */
+			.neumorphic-button {
+				background: var(--gradient-top);
+				border: 1px solid var(--shadow-light);
+				border-radius: var(--radius-md);
+				padding: 0.6rem 1rem;
+				color: var(--text-primary);
+				font-weight: 500;
+				cursor: pointer;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+				min-height: 42px;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3),
+					inset 0 1px 0 rgba(255, 255, 255, 0.05);
+				transition: all 0.2s ease;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.neumorphic-button::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 50%;
+				background: linear-gradient(
+					to bottom,
+					rgba(255, 255, 255, 0.08),
+					rgba(255, 255, 255, 0)
+				);
+				border-radius: var(--radius-md) var(--radius-md) 0 0;
+				pointer-events: none;
+			}
+
+			.neumorphic-button:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25), 0 2px 4px rgba(0, 0, 0, 0.35),
+					inset 0 1px 0 rgba(255, 255, 255, 0.1);
+				background: linear-gradient(145deg, #2e2e3e, #28283a);
+			}
+
+			.neumorphic-button:active {
+				transform: translateY(1px);
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2),
+					inset 0 1px 2px rgba(0, 0, 0, 0.3);
+				background: linear-gradient(145deg, #232330, #2a2a3a);
+			}
+
+			.neumorphic-button.accent-button {
+				background: linear-gradient(145deg, #8095ff, #6d87ff);
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2),
+					0 1px 3px rgba(124, 144, 255, 0.3),
+					inset 0 1px 0 rgba(255, 255, 255, 0.15);
+				border: none;
+				color: white;
+				font-weight: 600;
+				letter-spacing: 0.01em;
+			}
+
+			.neumorphic-button.accent-button:hover {
+				background: linear-gradient(145deg, #8c9fff, #778dff);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3),
+					0 2px 4px rgba(124, 144, 255, 0.4),
+					inset 0 1px 0 rgba(255, 255, 255, 0.2);
+			}
+
+			.neumorphic-button.accent-button:active {
+				background: linear-gradient(145deg, #6c80ef, #7c90ff);
+				box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2),
+					inset 0 1px 2px rgba(0, 0, 0, 0.3);
+			}
+
+			/* Disabled button state */
+			.neumorphic-button:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+				transform: none;
+			}
+
+			.neumorphic-button:disabled:hover {
+				transform: none;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			/* Modals */
+			.modal {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.7);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 50;
+				padding: 1rem;
+			}
+
+			.modal.show {
+				display: flex;
+			}
+
+			.modal-content {
+				background: var(--surface-dark);
+				border-radius: var(--radius-lg);
+				padding: 1rem;
+				width: 100%;
+				max-width: 90%;
+				max-height: 80vh;
+				overflow-y: auto;
+			}
+
+			/* Improved actions list */
+			.actions-container {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+			}
+
+			.actions-header {
+				flex-shrink: 0;
+				margin-bottom: 0.5rem;
+			}
+
+			.actions-list {
+				overflow-y: auto;
+				min-height: 0;
+				padding-right: 4px;
+				max-height: 600px;
+			}
+
+			.actions-footer {
+				margin-top: 0.5rem;
+				position: absolute;
+				padding-top: 0.5rem;
+				bottom: 0;
+				width: 100%;
+				padding-right: 12px;
+				background-color: var(--surface-dark);
+			}
+
+			/* Responsive action items */
+			.action-item {
+				background: var(--surface-light);
+				border-radius: var(--radius-md);
+				padding: 0.75rem;
+				margin-bottom: 0.5rem;
+				cursor: pointer;
+				border-left: 3px solid transparent;
+			}
+
+			.action-item.selected {
+				border-left-color: var(--accent);
+			}
+
+			/* Form elements */
+			.input-field {
+				background: var(--surface-light);
+				border: 1px solid var(--shadow-dark);
+				border-radius: var(--radius-md);
+				padding: 0.5rem;
+				color: var(--text-primary);
+				width: 100%;
+			}
+
+			/* Demo sites grid */
+			.demo-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 0.5rem;
+			}
+
+			.demo-link {
+				border-radius: var(--radius-md);
+				padding: 0.5rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				background: linear-gradient(145deg, #2e2e3e, #262636);
+				color: var(--text-primary);
+				text-decoration: none;
+				border: 1px solid var(--shadow-light);
+				transition: all 0.2s ease;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15),
+					inset 0 1px 0 rgba(255, 255, 255, 0.05);
+				position: relative;
+			}
+
+			.demo-link::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 50%;
+				background: linear-gradient(
+					to bottom,
+					rgba(255, 255, 255, 0.05),
+					rgba(255, 255, 255, 0)
+				);
+				border-radius: var(--radius-md) var(--radius-md) 0 0;
+				pointer-events: none;
+			}
+
+			.demo-link:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2),
+					inset 0 1px 0 rgba(255, 255, 255, 0.1);
+				border-color: var(--accent);
+				background: linear-gradient(145deg, #32324a, #2a2a40);
+			}
+
+			.demo-link:active {
+				transform: translateY(0);
+				box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+				background: linear-gradient(145deg, #28283a, #2e2e3e);
+			}
+
+			/* Add these new styles for the mobile floating record button */
+			.mobile-record-button {
+				position: fixed;
+				bottom: 60px;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 35;
+				width: 160px;
+				height: 48px;
+				background: linear-gradient(145deg, #8095ff, #6d87ff);
+				color: white;
+				border: none;
+				border-radius: 24px;
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3),
+					0 2px 6px rgba(124, 144, 255, 0.4),
+					inset 0 1px 0 rgba(255, 255, 255, 0.15);
+				font-weight: 600;
+				display: none;
+				align-items: center;
+				justify-content: center;
+				gap: 0.5rem;
+				transition: all 0.2s ease;
+				letter-spacing: 0.01em;
+				position: relative;
+			}
+
+			::-webkit-scrollbar {
+				width: 10px;
+				background: var(--surface-dark);
+			}
+			::-webkit-scrollbar-thumb {
+				background: var(--accent);
+				border-radius: 8px;
+			}
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--accent-dark);
+			}
+
+			.mobile-record-button::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 50%;
+				background: linear-gradient(
+					to bottom,
+					rgba(255, 255, 255, 0.1),
+					rgba(255, 255, 255, 0)
+				);
+				border-radius: 24px 24px 0 0;
+				pointer-events: none;
+			}
+
+			.mobile-record-button.recording {
+				background: linear-gradient(145deg, #ff5f7a, #f24e68);
+				box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3),
+					0 2px 6px rgba(255, 95, 122, 0.5),
+					inset 0 1px 0 rgba(255, 255, 255, 0.15);
+			}
+
+			.mobile-record-button:active {
+				transform: translateX(-50%) translateY(2px);
+				box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25),
+					inset 0 1px 2px rgba(0, 0, 0, 0.2);
+			}
+
+			/* Pulse animation for recording state */
+			.pulse-dot {
+				width: 10px;
+				height: 10px;
+				background-color: white;
+				border-radius: 50%;
+				margin-right: 8px;
+			}
+
+			.recording .pulse-dot {
+				animation: pulse 1.5s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+					opacity: 1;
+				}
+
+				50% {
+					transform: scale(1.3);
+					opacity: 0.7;
+				}
+
+				100% {
+					transform: scale(1);
+					opacity: 1;
+				}
+			}
+
+			/* Show on mobile only */
+			@media (max-width: 767px) {
+				#demoSitesSection {
+					position: absolute;
+					top: 170px;
+					left: 0;
+					right: 0;
+					z-index: 20;
+					margin: 1.5rem;
+					border-radius: var(--radius-md);
+					box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+					max-height: 80vh;
+					overflow-y: auto;
+					background: linear-gradient(
+						to bottom,
+						rgba(46, 46, 62, 0.97),
+						rgba(42, 44, 64, 0.97)
+					);
+					backdrop-filter: blur(4px);
+					-webkit-backdrop-filter: blur(4px);
+					border: 1px solid var(--shadow-light);
+				}
+
+				/* Ensure browser viewport takes full space */
+				.browser-viewport {
+					position: relative;
+					height: 100%;
+					min-height: 520px;
+				}
+
+				/* Adjust browser frame structure to accommodate overlay */
+				.browser-frame {
+					display: flex;
+					flex-direction: column;
+				}
+
+				.browser-toolbar {
+					flex-shrink: 0;
+				}
+
+				/* Make the iframe fill the available space */
+				#browserIframe {
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+				}
+
+				/* Add animation for demo section */
+				#demoSitesSection {
+					animation: slideIn 0.3s ease-out;
+					transform-origin: top center;
+				}
+
+				@keyframes slideIn {
+					from {
+						transform: translateY(-10px);
+						opacity: 0;
+					}
+					to {
+						transform: translateY(0);
+						opacity: 1;
+					}
+				}
+
+				/* Add proper transition for hiding */
+				#demoSitesSection.hidden {
+					animation: slideOut 0.2s ease-out forwards;
+				}
+
+				@keyframes slideOut {
+					from {
+						transform: translateY(0);
+						opacity: 1;
+					}
+					to {
+						transform: translateY(-10px);
+						opacity: 0;
+					}
+				}
+
+				.mobile-record-button {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					gap: 0.5rem;
+				}
+
+				/* Fix spacing on mobile nav buttons */
+				.mobile-nav-buttons {
+					bottom: 20px;
+				}
+
+				.actions-footer #recordButton {
+					display: none;
+				}
+
+				.actions-footer {
+					margin-top: 0.25rem;
+					padding-top: 0.25rem;
+					padding-bottom: 80px;
+					/* Add space below the export button */
+					position: relative;
+					/* Required for proper padding */
+				}
+
+				/* Ensure the button stays in view but doesn't overlap with navigation elements */
+				#exportButton {
+					margin-bottom: 10px;
+					/* Add some space between buttons */
+				}
+
+				/* Ensure content doesn't get hidden behind bottom navigation */
+				.actions-container {
+					padding-bottom: 30px;
+					/* Additional padding at the bottom */
+				}
+
+				/* Add more bottom margin to the entire panel to avoid any overlap */
+				.side-panel {
+					margin-bottom: 60px;
+				}
+
+				/* Ensure the list of actions doesn't extend too far */
+				.actions-list {
+					padding-bottom: 10px;
+					max-height: calc(100% - 150px);
+					/* Limit height to avoid overflow */
+				}
+
+				#rightPanelBtn {
+					display: none;
+				}
+
+				/* Center the panel indicators now that we have one less button */
+				.panel-indicators {
+					justify-content: center;
+				}
+
+				.editor-back-button {
+					display: flex;
+					align-items: center;
+					gap: 0.75rem;
+					padding: 0.65rem 0.85rem;
+					margin-bottom: 1.25rem;
+					color: var(--text-primary);
+					font-size: 0.875rem;
+					font-weight: 500;
+					cursor: pointer;
+					background: linear-gradient(145deg, #2e2e3e, #292939);
+					border-radius: var(--radius-md);
+					transition: all 0.2s ease;
+					border: 1px solid rgba(255, 255, 255, 0.05);
+					box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+					width: fit-content;
+					position: relative;
+					padding-right: 1rem;
+					margin-left: 1rem;
+				}
+
+				.editor-back-button::before {
+					content: "";
+					position: absolute;
+					left: 0.85rem;
+					top: 50%;
+					width: 20px;
+					height: 2px;
+					background: var(--accent);
+					transform: translateY(-50%) scaleX(0.5);
+					transform-origin: left;
+					opacity: 0;
+					transition: all 0.2s ease;
+				}
+
+				.editor-back-button:hover {
+					padding-left: 1.25rem;
+					color: white;
+				}
+
+				.editor-back-button:hover::before {
+					transform: translateY(-50%) scaleX(1);
+					opacity: 1;
+				}
+
+				.editor-back-button svg {
+					width: 1.1rem;
+					height: 1.1rem;
+					color: var(--accent);
+					transition: transform 0.2s ease;
+				}
+
+				.editor-back-button:hover svg {
+					transform: translateX(-2px);
+				}
+
+				.editor-back-button span {
+					line-height: 1;
+				}
+			}
+
+			/* Responsive breakpoints */
+			@media (min-width: 640px) {
+				.browser-toolbar {
+					flex-direction: row;
+					align-items: center;
+				}
+
+				.toolbar-controls {
+					width: auto;
+				}
+
+				.demo-grid {
+					grid-template-columns: repeat(4, 1fr);
+				}
+			}
+
+			/* Enhanced desktop layout with better panel alignment */
+			@media (min-width: 768px) {
+				.main-content {
+					flex-direction: row;
+					padding: 1rem;
+					gap: 1rem;
+					height: calc(100vh - 100px);
+					align-items: stretch;
+				}
+
+				.panel {
+					margin: 0;
+					/* Remove default margin to control spacing with gap */
+				}
+
+				.side-panel {
+					position: relative;
+					transform: none !important;
+					/* Force no transform regardless of active state */
+					opacity: 1 !important;
+					visibility: visible !important;
+					width: 300px;
+					/* Fixed width for side panels */
+					flex-shrink: 0;
+					display: flex !important;
+					flex-direction: column;
+					height: auto;
+					max-height: none;
+				}
+
+				.center-panel {
+					flex: 1;
+					/* Center panel takes remaining space */
+					min-width: 0;
+					/* Allow center panel to shrink if needed */
+					height: auto;
+					display: flex;
+					flex-direction: column;
+				}
+
+				/* Ensure the browser frame fills available space */
+				.browser-frame {
+					flex: 1;
+					display: flex;
+					flex-direction: column;
+				}
+
+				/* Adjust height for better editor experience */
+				.actions-container {
+					position: relative;
+					height: 100%;
+					display: flex;
+					flex-direction: column;
+				}
+
+				.mobile-nav-buttons,
+				.panel-indicators,
+				.mobile-record-button {
+					display: none;
+				}
+
+				.editor-back-button {
+					display: none;
+				}
+			}
+
+			@media (min-width: 1280px) {
+				.side-panel {
+					width: 320px;
+				}
+
+				.main-content {
+					padding: 1.5rem;
+					gap: 1.5rem;
+				}
+			}
+
+			/* Add this CSS for the Cross-Origin Notification popup */
+			#crossOriginNotification {
+				position: fixed;
+				bottom: 4rem;
+				left: 50%;
+				transform: translateX(-50%);
+				width: min(90%, 400px);
+				background: var(--surface-dark);
+				color: var(--text-primary);
+				border-radius: var(--radius-md);
+				box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+				z-index: 1050; /* Higher than other UI elements */
+				transition: all 0.3s ease;
+				opacity: 0;
+				pointer-events: none;
+				border: 1px solid var(--accent-dark);
+				display: none;
+				transform-origin: bottom center;
+			}
+
+			#crossOriginNotification.show {
+				display: block;
+				opacity: 1;
+				pointer-events: auto;
+				animation: toastIn 0.3s ease forwards;
+			}
+
+			#crossOriginNotification.hide {
+				animation: toastOut 0.3s ease forwards;
+			}
+
+			@keyframes toastIn {
+				from {
+					transform: translate(-50%, 20px) scale(0.95);
+					opacity: 0;
+				}
+				to {
+					transform: translate(-50%, 0) scale(1);
+					opacity: 1;
+				}
+			}
+
+			@keyframes toastOut {
+				from {
+					transform: translate(-50%, 0) scale(1);
+					opacity: 1;
+				}
+				to {
+					transform: translate(-50%, 20px) scale(0.95);
+					opacity: 0;
+				}
+			}
+
+			/* Mobile-specific styling */
+			@media (max-width: 767px) {
+				#crossOriginNotification {
+					bottom: 10rem; /* Position above mobile navigation */
+					width: calc(100% - 32px);
+					max-width: none;
+					border-radius: var(--radius-sm);
+					transition: transform 0.3s ease, opacity 0.3s ease;
+				}
+
+				#crossOriginNotification .notification-content {
+					padding-right: 16px; /* Add space for close button */
+				}
+
+				/* Pill-style minimized state */
+				#crossOriginNotification.minimized {
+					width: auto;
+					padding: 0;
+					max-width: 50%;
+					transform: translateX(-50%) translateY(0);
+					border-radius: 50px;
+				}
+
+				#crossOriginNotification.minimized .notification-expanded {
+					display: none;
+				}
+
+				#crossOriginNotification.minimized .notification-pill {
+					display: flex;
+				}
+
+				/* Adjust text size on smaller screens */
+				#crossOriginNotification h3 {
+					font-size: 0.9rem;
+				}
+
+				#crossOriginNotification p {
+					font-size: 0.8rem;
+					line-height: 1.4;
+				}
+			}
+
+			/* Common notification styling */
+			#crossOriginNotification .notification-content {
+				padding: 12px 16px;
+			}
+
+			#crossOriginNotification .icon-container {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+				margin-right: 12px;
+			}
+
+			#crossOriginNotification h3 {
+				margin: 0;
+				font-size: 1rem;
+				font-weight: 500;
+				color: var(--text-primary);
+			}
+
+			#crossOriginNotification p {
+				margin: 0.25rem 0 0;
+				font-size: 0.875rem;
+				color: var(--text-secondary);
+			}
+
+			#crossOriginNotification .notification-header {
+				display: flex;
+				align-items: center;
+				margin-bottom: 8px;
+			}
+
+			#crossOriginNotification .notification-actions {
+				display: flex;
+				gap: 12px;
+				margin-top: 12px;
+				flex-wrap: wrap;
+			}
+
+			#crossOriginNotification .notification-pill {
+				display: none;
+				align-items: center;
+				padding: 8px 14px;
+				font-size: 0.8rem;
+				font-weight: 500;
+			}
+
+			/* Touch target improvements */
+			#crossOriginNotification button {
+				padding: 8px;
+				margin: -8px;
+				border-radius: 4px;
+			}
+
+			#crossOriginNotification button:hover {
+				color: white;
+			}
+
+			#crossOriginNotification svg {
+				width: 1.25rem;
+				height: 1.25rem;
+				color: var(--accent);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="app-container">
+			<!-- Header -->
+			<header
+				class="p-3 bg-[var(--surface-dark)] border-b border-[var(--shadow-dark)]"
+			>
+				<div
+					class="flex flex-col sm:flex-row sm:items-center sm:justify-between"
+				>
+					<div>
+						<h1
+							class="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] bg-clip-text text-transparent"
+						>
+							Browser Automation Recorder
+						</h1>
+						<p class="text-sm text-[var(--text-secondary)]">
+							Record, edit, and export browser automation workflows
+						</p>
+					</div>
+					<span
+						class="inline-flex px-2 py-1 text-xs mt-2 sm:mt-0 rounded bg-[var(--surface-light)] text-[var(--text-secondary)]"
+						>v1.0</span
+					>
+				</div>
+			</header>
+
+			<!-- Main Content -->
+			<main class="main-content">
+				<!-- Left Panel - Actions -->
+				<aside class="panel side-panel left-panel" id="leftPanel">
+					<div class="actions-container p-2">
+						<div class="actions-header">
+							<h2 class="text-lg font-medium mb-2 pl-1">Actions</h2>
+							<div class="flex gap-2 mb-4">
+								<button
+									id="undoButton"
+									class="neumorphic-button flex-1 text-sm"
+									disabled
+								>
+									Undo
+								</button>
+								<button
+									id="redoButton"
+									class="neumorphic-button flex-1 text-sm"
+									disabled
+								>
+									Redo
+								</button>
+								<button
+									id="clearActions"
+									class="neumorphic-button flex-1 text-sm"
+								>
+									Clear
+								</button>
+							</div>
+						</div>
+						<div class="actions-list" id="actionsList">
+							<!-- Actions will be dynamically added here -->
+						</div>
+						<div class="actions-footer">
+							<div class="space-y-2">
+								<button id="exportButton" class="neumorphic-button w-full">
+									<svg
+										class="w-4 h-4"
+										fill="none"
+										stroke="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+										></path>
+									</svg>
+									<span>Export as Puppeteer</span>
+								</button>
+								<button
+									id="recordButton"
+									class="neumorphic-button accent-button w-full"
+								>
+									<span class="w-3 h-3 bg-white rounded-full"></span>
+									<span>Start Recording</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</aside>
+
+				<!-- Center Panel - Browser Viewport -->
+				<section class="panel center-panel">
+					<div class="browser-frame">
+						<!-- Browser Toolbar -->
+						<div class="browser-toolbar">
+							<div class="toolbar-controls">
+								<div class="browser-dots">
+									<div class="browser-dot bg-red-500"></div>
+									<div class="browser-dot bg-yellow-500"></div>
+									<div class="browser-dot bg-green-500"></div>
+								</div>
+								<button
+									id="showDemoSitesBtn"
+									class="neumorphic-button text-sm"
+									type="button"
+									title="Show Demo Sites"
+								>
+									✨ Demo Sites
+								</button>
+								<button id="screenshotButton" class="neumorphic-button text-sm">
+									📸
+								</button>
+							</div>
+							<div class="url-control">
+								<input
+									type="text"
+									id="urlBar"
+									class="url-bar"
+									value="https://example.com"
+									placeholder="Enter URL..."
+								/>
+								<button id="navigateButton" class="url-button">Go</button>
+							</div>
+						</div>
+
+						<!-- Demo Sites Section -->
+						<div
+							id="demoSitesSection"
+							class="p-3 bg-gradient-to-b from-[var(--surface-dark)] to-[#2a2c40]"
+						>
+							<div class="flex justify-between items-center mb-2">
+								<div class="flex items-center gap-2">
+									<span class="text-lg">✨</span>
+									<h3 class="font-medium text-sm sm:text-base">
+										Demo Sites for Testing
+									</h3>
+								</div>
+								<button
+									id="closeDemoSites"
+									class="text-[var(--text-secondary)] hover:text-white p-1"
+								>
+									<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+										<path
+											fill-rule="evenodd"
+											d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+											clip-rule="evenodd"
+										/>
+									</svg>
+								</button>
+							</div>
+
+							<p
+								class="text-xs text-[var(--text-secondary)] mb-3 p-2 bg-[var(--surface-dark)] rounded border-l-2 border-[var(--accent)]"
+							>
+								These sites work best with the automation recorder due to
+								browser security restrictions.
+							</p>
+
+							<div class="demo-grid">
+								<!-- Example.com -->
+								<button class="demo-link" data-url="https://example.com">
+									<div
+										class="p-1 bg-[var(--surface-light)] rounded text-[var(--accent)]"
+									>
+										<svg
+											class="w-4 h-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M13 10V3L4 14h7v7l9-11h-7z"
+											/>
+										</svg>
+									</div>
+									<div class="text-left overflow-hidden">
+										<div class="font-medium text-xs truncate">example.com</div>
+									</div>
+								</button>
+
+								<!-- JSFiddle -->
+								<button class="demo-link" data-url="https://jsfiddle.net">
+									<div
+										class="p-1 bg-[var(--surface-light)] rounded text-[#5BC0EB]"
+									>
+										<svg
+											class="w-4 h-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
+											/>
+										</svg>
+									</div>
+									<div class="text-left overflow-hidden">
+										<div class="font-medium text-xs truncate">jsfiddle.net</div>
+									</div>
+								</button>
+
+								<!-- CanIUse -->
+								<button class="demo-link" data-url="https://caniuse.com">
+									<div
+										class="p-1 bg-[var(--surface-light)] rounded text-[#FFA62B]"
+									>
+										<svg
+											class="w-4 h-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+											/>
+										</svg>
+									</div>
+									<div class="text-left overflow-hidden">
+										<div class="font-medium text-xs truncate">caniuse.com</div>
+									</div>
+								</button>
+
+								<!-- HTML5 Test -->
+								<button class="demo-link" data-url="https://html5test.com">
+									<div
+										class="p-1 bg-[var(--surface-light)] rounded text-[#E35A57]"
+									>
+										<svg
+											class="w-4 h-4"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+											/>
+										</svg>
+									</div>
+									<div class="text-left overflow-hidden">
+										<div class="font-medium text-xs truncate">
+											html5test.com
+										</div>
+									</div>
+								</button>
+							</div>
+						</div>
+
+						<!-- Browser Viewport -->
+						<div class="browser-viewport">
+							<iframe
+								id="browserIframe"
+								class="w-full h-full transition-opacity duration-300"
+								allow="cross-origin-isolated"
+								sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-popups-to-escape-sandbox"
+								referrerpolicy="origin"
+							></iframe>
+
+							<!-- Fallback overlay -->
+							<div
+								id="iframeFallback"
+								class="absolute inset-0 flex flex-col items-center justify-center bg-[var(--surface-dark)] text-[var(--text-secondary)] p-4 hidden"
+							>
+								<div>⚠️ Could not load the page.</div>
+								<button
+									onclick="retryNavigation()"
+									class="neumorphic-button mt-2"
+								>
+									Retry
+								</button>
+							</div>
+
+							<!-- CORS error message -->
+							<div
+								id="corsErrorMsg"
+								class="absolute top-0 left-0 right-0 bg-[var(--surface-light)] text-white p-2 text-sm text-center hidden"
+							>
+								<div
+									class="flex items-center justify-between max-w-4xl mx-auto"
+								>
+									<div>
+										⚠️ This site has security restrictions limiting automation
+										features
+									</div>
+									<button
+										id="closeCorsMsg"
+										class="text-white hover:text-gray-200 ml-2"
+									>
+										<svg
+											class="w-4 h-4"
+											fill="currentColor"
+											viewBox="0 0 20 20"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</button>
+								</div>
+							</div>
+
+							<!-- Cross-origin notification -->
+							<div id="crossOriginNotification" class="hidden">
+								<div class="notification-content">
+									<!-- Expanded view -->
+									<div class="notification-expanded">
+										<div class="notification-header">
+											<div class="icon-container">
+												<div
+													class="h-8 w-8 rounded-full bg-[rgba(124,144,255,0.15)] flex items-center justify-center"
+												>
+													<svg
+														class="w-5 h-5 text-[var(--accent)]"
+														viewBox="0 0 416.979 416.979"
+														fill="currentColor"
+													>
+														<path
+															d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
+														/>
+													</svg>
+												</div>
+											</div>
+											<h3
+												class="flex-1 text-sm font-medium text-[var(--text-primary)]"
+											>
+												Cross-Origin Restrictions
+											</h3>
+										</div>
+										<p class="text-sm text-[var(--text-secondary)]">
+											Frame loaded but content cannot be modified due to
+											cross-origin restrictions.
+										</p>
+										<div class="notification-actions">
+											<button
+												id="crossOriginDismiss"
+												onclick="hideNotification();"
+												class="text-xs font-medium text-[var(--accent)]"
+											>
+												Dismiss
+											</button>
+											<a
+												href="https://developer.mozilla.org/en-US/docs/Web/Security/Mixed_content"
+												target="_blank"
+												rel="noopener"
+											>
+												<button
+													id="crossOriginLearnMore"
+													class="text-xs font-medium text-[var(--text-secondary)]"
+												>
+													Learn more
+												</button>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- Right Panel - Step Editor -->
+				<aside class="panel side-panel right-panel" id="rightPanel">
+					<div class="actions-container">
+						<h2 class="text-lg font-medium mb-4 pl-3">Step Editor</h2>
+						<div id="stepEditor" class="flex-1 overflow-y-auto">
+							<div
+								class="text-[var(--text-secondary)] text-center py-8 text-sm"
+							>
+								Select an action to edit
+							</div>
+						</div>
+					</div>
+				</aside>
+
+				<!-- Mobile Navigation -->
+				<div class="mobile-nav-buttons">
+					<button
+						id="leftPanelBtn"
+						class="mobile-nav-button"
+						aria-label="Show Actions Panel"
+					>
+						<svg
+							class="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M4 6h16M4 12h16m-7 6h7"
+							></path>
+						</svg>
+					</button>
+				</div>
+
+				<div class="panel-indicators">
+					<span class="panel-indicator" data-panel="left"></span>
+					<span class="panel-indicator active" data-panel="center"></span>
+				</div>
+
+				<!-- Mobile Floating Record Button -->
+				<button id="mobileRecordButton" class="mobile-record-button">
+					<div class="pulse-dot"></div>
+					<span id="mobileRecordText">Start Recording</span>
+				</button>
+			</main>
+
+			<!-- Export Modal -->
+			<div id="exportModal" class="modal">
+				<div class="modal-content">
+					<div class="flex justify-between items-center mb-4">
+						<h3 class="text-lg font-medium">Puppeteer Code</h3>
+						<button id="closeModal" class="neumorphic-button p-2">
+							<svg
+								class="w-5 h-5"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								></path>
+							</svg>
+						</button>
+					</div>
+					<pre
+						id="codeOutput"
+						class="bg-gray-900 p-3 rounded text-xs sm:text-sm overflow-x-auto mb-4 text-gray-300"
+					></pre>
+					<button id="copyCode" class="neumorphic-button w-full">
+						Copy to Clipboard
+					</button>
+				</div>
+			</div>
+
+			<!-- Security Modal -->
+			<div id="securityModal" class="modal">
+				<div class="modal-content">
+					<div class="flex justify-between items-center mb-3">
+						<h3 class="text-lg font-medium">Security Restriction</h3>
+						<button id="closeSecurityModal" class="neumorphic-button p-2">
+							<svg
+								class="w-4 h-4"
+								fill="none"
+								stroke="currentColor"
+								viewBox="0 0 24 24"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M6 18L18 6M6 6l12 12"
+								></path>
+							</svg>
+						</button>
+					</div>
+
+					<div
+						class="flex items-center gap-3 mb-3 p-3 bg-[var(--surface-dark)] rounded"
+					>
+						<div class="text-xl">🔒</div>
+						<div>
+							<p class="font-medium">Website cannot be accessed</p>
+							<p
+								class="text-xs text-[var(--text-secondary)]"
+								id="securityModalUrl"
+							></p>
+						</div>
+					</div>
+
+					<p class="text-[var(--text-secondary)] mb-4 text-sm">
+						This website cannot be loaded due to browser security restrictions.
+						Major websites typically implement protections that prevent their
+						content from being embedded.
+					</p>
+
+					<div class="flex flex-col sm:flex-row gap-3">
+						<button
+							id="tryDemoSitesBtn"
+							class="neumorphic-button accent-button flex-1"
+						>
+							Try Demo Sites
+						</button>
+						<button id="securityModalCloseBtn" class="neumorphic-button flex-1">
+							Close
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Enhanced mobile panel management
+			const panels = {
+				left: document.getElementById("leftPanel"),
+				center: document.querySelector(".center-panel"),
+				right: document.getElementById("rightPanel"),
+			};
+
+			const panelIndicators = document.querySelectorAll(".panel-indicator");
+			let activePanelName = "center";
+
+			function showPanel(panelName) {
+				// Only apply mobile-specific behavior under 768px
+				if (window.innerWidth >= 768) return;
+
+				// Update active panel
+				activePanelName = panelName;
+
+				// Handle side panels (left/right)
+				if (panelName === "left" || panelName === "right") {
+					Object.values(panels).forEach((panel) => {
+						panel.classList.remove("active");
+					});
+					panels[panelName].classList.add("active");
+				} else {
+					// For center panel, remove active class from side panels
+					Object.values(panels).forEach((panel) => {
+						if (panel !== panels.center) {
+							panel.classList.remove("active");
+						}
+					});
+				}
+
+				// Update indicators
+				panelIndicators.forEach((ind) => {
+					ind.classList.remove("active");
+					if (ind.dataset.panel === panelName) {
+						ind.classList.add("active");
+					}
+				});
+			}
+
+			// Set up panel navigation buttons
+			document.getElementById("leftPanelBtn").addEventListener("click", () => {
+				showPanel(activePanelName === "left" ? "center" : "left");
+			});
+
+			// Panel indicator clicks
+			panelIndicators.forEach((indicator) => {
+				indicator.addEventListener("click", () => {
+					showPanel(indicator.dataset.panel);
+				});
+			});
+
+			// Handle window resize
+			window.addEventListener("resize", () => {
+				if (window.innerWidth >= 768) {
+					// On desktop, don't remove active class which breaks the layout
+					// Just ensure all panels are visible through CSS
+					document.body.classList.add("desktop-layout");
+				} else {
+					// On mobile, maintain the active panel
+					document.body.classList.remove("desktop-layout");
+					showPanel(activePanelName);
+				}
+			});
+
+			// Initialize with center panel showing on mobile
+			if (window.innerWidth < 768) {
+				document.body.classList.add("desktop-layout");
+				showPanel("center");
+			}
+
+			// Message handler for communication from iframe
+			window.addEventListener("message", function (event) {
+				if (event.data && event.data.type === "linkClick") {
+					handleExternalNavigation(event.data.url);
+				}
+			});
+
+			// store last navigated URL for retry
+			let lastUrl = "";
+
+			// State management
+			let actions = [];
+			let selectedActionIndex = null;
+			let isRecording = false;
+			// Undo/Redo stacks
+			let historyStack = [];
+			let redoStack = [];
+
+			// DOM elements
+			const actionsList = document.getElementById("actionsList");
+			const stepEditor = document.getElementById("stepEditor");
+			const recordButton = document.getElementById("recordButton");
+			const exportButton = document.getElementById("exportButton");
+			const clearActions = document.getElementById("clearActions");
+			const undoButton = document.getElementById("undoButton");
+			const redoButton = document.getElementById("redoButton");
+			const exportModal = document.getElementById("exportModal");
+			const closeModal = document.getElementById("closeModal");
+			const codeOutput = document.getElementById("codeOutput");
+			const copyCode = document.getElementById("copyCode");
+			const urlBar = document.getElementById("urlBar");
+			const navigateButton = document.getElementById("navigateButton");
+			const screenshotButton = document.getElementById("screenshotButton");
+			const browserIframe = document.getElementById("browserIframe");
+
+			// Action types
+			const ActionType = {
+				NAVIGATE: "navigate",
+				CLICK: "click",
+				TYPE: "type",
+				WAIT: "wait",
+				VALIDATE: "validate",
+				SCREENSHOT: "screenshot",
+			};
+
+			// Push current state to history (for undo)
+			function pushHistory() {
+				historyStack.push(JSON.parse(JSON.stringify(actions)));
+				redoStack = [];
+				undoButton.disabled = historyStack.length === 0;
+				redoButton.disabled = redoStack.length === 0;
+			}
+
+			// Undo last action
+			undoButton.addEventListener("click", () => {
+				if (!historyStack.length) return;
+				redoStack.push(JSON.parse(JSON.stringify(actions)));
+				actions = historyStack.pop();
+				renderActions();
+				renderStepEditor(null);
+				undoButton.disabled = historyStack.length === 0;
+				redoButton.disabled = false;
+			});
+
+			// Redo last undone
+			redoButton.addEventListener("click", () => {
+				if (!redoStack.length) return;
+				historyStack.push(JSON.parse(JSON.stringify(actions)));
+				actions = redoStack.pop();
+				renderActions();
+				renderStepEditor(null);
+				redoButton.disabled = redoStack.length === 0;
+				undoButton.disabled = false;
+			});
+
+			// Initialize demo interactions
+			function initializeDemoInteractions() {
+				// screenshot action
+				screenshotButton.addEventListener("click", () => {
+					if (isRecording) {
+						pushHistory();
+						addAction({
+							type: ActionType.SCREENSHOT,
+							path: `screenshot-${actions.length + 1}.png`,
+							delay: 0,
+						});
+					}
+				});
+			}
+
+			// hide fallback overlay
+			function hideFallback() {
+				document.getElementById("iframeFallback").classList.add("hidden");
+			}
+
+			// retry loading the last URL
+			function retryNavigation() {
+				if (lastUrl) {
+					hideFallback();
+					browserIframe.src = lastUrl;
+				}
+			}
+
+			// Add action to list
+			function addAction(action) {
+				// Ensure every action has required properties
+				if (
+					["click", "type", "validate"].includes(action.type) &&
+					!action.selectorType
+				) {
+					action.selectorType = "css";
+				}
+
+				// Make sure all actions have a delay property
+				if (action.delay === undefined) {
+					action.delay = 0;
+				}
+
+				// Set default delay position (before or after)
+				if (action.delayBefore === undefined) {
+					action.delayBefore = true; // Default to delay before
+				}
+
+				actions.push(action);
+				renderActions();
+				updateLiveCode();
+			}
+
+			// Render actions list
+			function renderActions() {
+				actionsList.innerHTML = "";
+				actions.forEach((action, index) => {
+					const actionItem = document.createElement("div");
+					actionItem.className = `action-item ${
+						selectedActionIndex === index ? "selected" : ""
+					}`;
+					actionItem.onclick = () => selectAction(index);
+
+					let icon = "";
+					let description = "";
+					let validationBadge = "";
+					let delayBadge = "";
+
+					// Add delay badge when a delay is set
+					if (action.delay > 0) {
+						delayBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--surface-light)] text-white ml-2">
+        ${action.delayBefore ? "⏱️ Before" : "⏱️ After"} ${action.delay}ms
+      </span>`;
+					}
+
+					switch (action.type) {
+						case ActionType.NAVIGATE:
+							icon = "🌐";
+							description = `Navigate to ${action.url}`;
+							break;
+						case ActionType.CLICK:
+							icon = "👆";
+							description = `Click "${action.text}"`;
+							// Add validation badge if enabled
+							if (action.validate) {
+								validationBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--accent)] text-white ml-2">Validate</span>`;
+							}
+							break;
+						case ActionType.TYPE:
+							icon = "⌨️";
+							description = `Type in ${action.selector}`;
+							// Add validation badge if enabled
+							if (action.validate) {
+								validationBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--accent)] text-white ml-2">Validate</span>`;
+							}
+							break;
+						case ActionType.WAIT:
+							icon = "⏱️";
+							description = `Wait ${action.duration}ms`;
+							break;
+						case ActionType.VALIDATE:
+							icon = "✓";
+							description = `Validate ${action.selector}`;
+							// Validation is always enabled for validate steps
+							validationBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[var(--accent)] text-white ml-2">Validate</span>`;
+							break;
+						case ActionType.SCREENSHOT:
+							icon = "📸";
+							description = `Take screenshot ${action.path || ""}`;
+							break;
+					}
+
+					actionItem.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">${icon}</span>
+        <div class="flex-1">
+          <div class="font-medium flex items-center flex-wrap gap-1">
+            ${action.type.charAt(0).toUpperCase() + action.type.slice(1)}
+            ${validationBadge}
+            ${delayBadge}
+          </div>
+          <div class="text-sm text-gray-400">${description}</div>
+        </div>
+      </div>
+    `;
+
+					actionsList.appendChild(actionItem);
+				});
+			}
+
+			// Select action for editing
+			function selectAction(index) {
+				selectedActionIndex = index;
+				renderActions();
+				renderStepEditor(actions[index], index);
+
+				// On mobile, automatically show the editor panel when an action is selected
+				if (window.innerWidth < 768) {
+					showPanel("right");
+				}
+			}
+
+			// Render step editor
+			function renderStepEditor(action, index) {
+				// Show right panel on mobile when editing
+				if (window.innerWidth < 768 && action) {
+					showPanel("right");
+				}
+				if (!action) {
+					stepEditor.innerHTML =
+						'<div class="text-[var(--text-secondary)] text-center py-8 text-sm">Select an action to edit</div>';
+					return;
+				}
+
+				// Add back button for mobile
+				let mobileBackButton = "";
+				if (window.innerWidth < 768) {
+					mobileBackButton = `
+          <button class="editor-back-button" onclick="showPanel('center')">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            <span>Back to browser</span>
+          </button>
+        `;
+				}
+
+				let editorContent = `
+        ${mobileBackButton}
+        <div class="space-y-4">
+          <div class="mb-4">
+            <label class="block mb-1 text-[var(--text-secondary)] font-medium">Action Type</label>
+            <div class="relative">
+            <button id="actionTypeDropdownBtn-${index}" type="button"
+                class="neumorphic-button w-full flex justify-between items-center"
+                aria-haspopup="listbox" aria-expanded="false">
+                <span id="selectedActionType-${index}">${
+					action.type.charAt(0).toUpperCase() + action.type.slice(1)
+				}</span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div id="actionTypeDropdown-${index}" class="absolute left-0 right-0 mt-2 bg-[var(--surface-light)] rounded shadow-lg z-50 hidden">
+                <div class="py-1">
+                <button class="block w-full text-left px-4 py-2 hover:bg-[var(--accent)]" type="button"
+                    onclick="updateActionType(${index}, 'navigate')">Navigate</button>
+                <button class="block w-full text-left px-4 py-2 hover:bg-[var(--accent)]" type="button"
+                    onclick="updateActionType(${index}, 'click')">Click</button>
+                <button class="block w-full text-left px-4 py-2 hover:bg-[var(--accent)]" type="button"
+                    onclick="updateActionType(${index}, 'type')">Type</button>
+                <button class="block w-full text-left px-4 py-2 hover:bg-[var(--accent)]" type="button"
+                    onclick="updateActionType(${index}, 'wait')">Wait</button>
+                <button class="block w-full text-left px-4 py-2 hover:bg-[var(--accent)]" type="button"
+                    onclick="updateActionType(${index}, 'validate')">Validate</button>
+                <button class="block w-full text-left px-4 py-2 hover:bg-[var(--accent)]" type="button"
+                    onclick="updateActionType(${index}, 'screenshot')">Screenshot</button>
+                </div>
+            </div>
+            </div>
+        </div>
+      `;
+
+				switch (action.type) {
+					case ActionType.NAVIGATE:
+						editorContent += `
+            <div class="p-4">
+              <label class="block text-sm font-medium mb-2">URL</label>
+              <input type="text" class="input-field" value="${action.url}"
+                  onchange="updateAction(${index}, 'url', this.value)">
+            </div>
+          `;
+						break;
+
+					case ActionType.WAIT:
+						editorContent += `
+            <div>
+              <label class="block text-sm font-medium mb-2">Wait Duration (ms)</label>
+              <input type="number" class="input-field"
+                     min="0" step="100"
+                     value="${action.duration || 0}"
+                     onchange="updateAction(${index}, 'duration', this.value)">
+            </div>
+          `;
+						break;
+
+					case ActionType.CLICK:
+					case ActionType.TYPE:
+					case ActionType.VALIDATE:
+					case ActionType.SCREENSHOT:
+						editorContent += `
+            <div>
+              <label class="block text-sm font-medium mb-2">Selector Type</label>
+              <select class="input-field" onchange="updateAction(${index}, 'selectorType', this.value)">
+                <option value="css"${
+									action.selectorType === "css" ? " selected" : ""
+								}>CSS</option>
+                <option value="xpath"${
+									action.selectorType === "xpath" ? " selected" : ""
+								}>XPath</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Selector</label>
+              <input type="text" class="input-field" value="${
+								action.selector || ""
+							}"
+                     onchange="updateAction(${index}, 'selector', this.value)">
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button"
+                      class="neumorphic-button px-3 py-1 text-sm"
+                      onclick="testSelector(${index})">
+                Test Selector
+              </button>
+              <span id="selectorTestMsg-${index}" class="text-sm text-gray-400"></span>
+            </div>
+          `;
+						if (action.type === ActionType.TYPE) {
+							editorContent += `
+              <div>
+                <label class="block text-sm font-medium mb-2">Text</label>
+                <input type="text" class="input-field" value="${
+									action.text || ""
+								}"
+                       onchange="updateAction(${index}, 'text', this.value)">
+              </div>
+            `;
+						}
+						break;
+				}
+
+				// Replace the old delay section with a clearer UI showing when the delay is applied
+				editorContent += `
+    <div class="neumorphic-inset p-4 mt-4 bg-[var(--surface-dark)]">
+      <label class="block text-sm font-medium mb-2">Step Timing</label>
+      <div class="flex items-center gap-3 mb-3">
+        <div class="toggle-switch ${action.delayBefore ? "active" : ""}"
+            onclick="toggleDelayPosition(${index})">
+          <div class="toggle-switch-thumb"></div>
+        </div>
+        <span class="text-sm">${
+					action.delayBefore ? "Delay before step" : "Delay after step"
+				}</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <input type="number" class="input-field"
+             min="0" step="100"
+             value="${action.delay || 0}"
+             onchange="updateAction(${index}, 'delay', this.value)">
+        <span class="text-sm text-[var(--text-secondary)]">ms</span>
+      </div>
+
+      <div class="text-xs text-[var(--text-secondary)] mt-2">
+        ${
+					action.delayBefore
+						? "Pause for this many milliseconds BEFORE executing this step"
+						: "Pause for this many milliseconds AFTER executing this step"
+				}
+      </div>
+    </div>
+  `;
+
+				// Add validation option for selector-based actions
+				if (["click", "type", "validate"].includes(action.type)) {
+					editorContent += `
+          <div>
+            <label class="block text-sm font-medium mb-2">Validation</label>
+            <div class="flex items-center gap-3">
+              <div class="toggle-switch ${action.validate ? "active" : ""}" 
+                  onclick="toggleValidation(${index})">
+                <div class="toggle-switch-thumb"></div>
+              </div>
+              <span class="text-sm">Check element exists</span>
+            </div>
+          </div>
+        `;
+				}
+
+				editorContent += `
+      <div class="p-4 space-y-2">
+          <button onclick="addWaitAfter(${index})" class="neumorphic-button w-full py-2 text-sm">
+              Add Wait After
+          </button>
+          <button onclick="deleteAction(${index})" class="neumorphic-button w-full py-2 text-sm text-red-400">
+              Delete Action
+          </button>
+      </div>
+  </div>
+  `;
+
+				stepEditor.innerHTML = editorContent;
+			}
+
+			// Add a function to toggle delay position
+			function toggleDelayPosition(index) {
+				actions[index].delayBefore = !actions[index].delayBefore;
+				renderStepEditor(actions[index], index);
+				updateLiveCode();
+			}
+
+			// Add this function to handle links that would otherwise fail due to mixed content
+			function handleExternalNavigation(url) {
+				// Handle special case for example domains
+				if (url.includes("iana.org/help/example-domains")) {
+					// Use HTTPS version instead
+					window.open("https://www.iana.org/domains/reserved", "_blank");
+					return true;
+				}
+
+				// Convert HTTP to HTTPS when possible
+				if (url.startsWith("http:")) {
+					const httpsUrl = url.replace("http:", "https:");
+					window.open(httpsUrl, "_blank");
+					return true;
+				}
+
+				return false;
+			}
+
+			// Update action property
+			function updateAction(index, property, value) {
+				if (property === "delay" || property === "duration") {
+					let n = parseInt(value);
+					if (isNaN(n) || n < 0) n = 0;
+					actions[index][property] = n;
+				} else {
+					actions[index][property] = value;
+				}
+				renderActions();
+			}
+
+			// Toggle validation
+			function toggleValidation(index) {
+				actions[index].validate = !actions[index].validate;
+				renderStepEditor(actions[index], index);
+			}
+
+			// Add wait after action
+			function addWaitAfter(index) {
+				actions.splice(index + 1, 0, {
+					type: ActionType.WAIT,
+					duration: 2000,
+					delay: 0,
+				});
+				renderActions();
+			}
+
+			// Delete action
+			function deleteAction(index) {
+				pushHistory();
+				actions.splice(index, 1);
+				selectedActionIndex = null;
+				renderActions();
+				renderStepEditor(null);
+				updateLiveCode();
+			}
+
+			// Generate Puppeteer code
+			function generatePuppeteerCode() {
+				let code = `const puppeteer = require('puppeteer');
+        (async () => {
+          const browser = await puppeteer.launch({ headless: false });
+          const page = await browser.newPage();
+
+        `;
+
+				actions.forEach((action) => {
+					// Apply delay before the action if delayBefore is true
+					if (action.delayBefore && action.delay && action.delay > 0) {
+						code += `  // Delay before step\n  await page.waitForTimeout(${action.delay});\n`;
+					}
+
+					// Add specific action code
+					switch (action.type) {
+						case ActionType.NAVIGATE:
+							code += `  await page.goto('${action.url}');\n`;
+							break;
+
+						case ActionType.SCREENSHOT:
+							code += `  await page.screenshot({ path: '${
+								action.path || "screenshot.png"
+							}' });\n`;
+							break;
+
+						case ActionType.CLICK:
+							if (action.validate) {
+								if (action.selectorType === "css") {
+									code += `  await page.waitForSelector('${action.selector}');\n`;
+								} else {
+									code += `  await page.waitForXPath('${action.selector}');\n`;
+								}
+							}
+							if (action.selectorType === "css") {
+								code += `  await page.click('${action.selector}');\n`;
+							} else {
+								code += `  const [el] = await page.$x('${action.selector}');\n`;
+								code += `  await el.click();\n`;
+							}
+							break;
+
+						case ActionType.TYPE:
+							if (action.validate) {
+								if (action.selectorType === "css") {
+									code += `  await page.waitForSelector('${action.selector}');\n`;
+								} else {
+									code += `  await page.waitForXPath('${action.selector}');\n`;
+								}
+							}
+							if (action.selectorType === "css") {
+								code += `  await page.type('${action.selector}', '${
+									action.text || ""
+								}');\n`;
+							} else {
+								code += `  const [input] = await page.$x('${action.selector}');\n`;
+								code += `  await input.type('${action.text || ""}');\n`;
+							}
+							break;
+
+						case ActionType.VALIDATE:
+							if (action.selectorType === "css") {
+								code += `  await page.waitForSelector('${action.selector}');\n`;
+							} else {
+								code += `  await page.waitForXPath('${action.selector}');\n`;
+							}
+							break;
+
+						case ActionType.WAIT:
+							code += `  await page.waitForTimeout(${
+								action.duration || 1000
+							});\n`;
+							break;
+					}
+
+					// Apply delay after the action if delayBefore is false
+					if (!action.delayBefore && action.delay && action.delay > 0) {
+						code += `  // Delay after step\n  await page.waitForTimeout(${action.delay});\n`;
+					}
+
+					code += "\n";
+				});
+
+				code += `  await browser.close();
+})();`;
+				return code;
+			}
+
+			// Update live code preview in modal or console
+			function updateLiveCode() {
+				codeOutput.textContent = generatePuppeteerCode();
+			}
+
+			function updateActionType(index, newType) {
+				actions[index].type = newType;
+				renderStepEditor(actions[index], index);
+				renderActions();
+			}
+
+			document.addEventListener("click", function (e) {
+				// Support multiple editors by index
+				document
+					.querySelectorAll('[id^="actionTypeDropdownBtn-"]')
+					.forEach((btn, idx) => {
+						const dropdown = document.getElementById(
+							`actionTypeDropdown-${idx}`
+						);
+						if (!dropdown) return;
+						if (btn.contains(e.target)) {
+							dropdown.classList.toggle("hidden");
+						} else if (!dropdown.contains(e.target)) {
+							dropdown.classList.add("hidden");
+						}
+					});
+			});
+
+			// Event listeners
+			recordButton.addEventListener("click", () => {
+				pushHistory();
+				isRecording = !isRecording;
+				recordButton.innerHTML = isRecording
+					? '<span class="flex items-center justify-center gap-2"><span class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span> Stop Recording</span>'
+					: '<span class="flex items-center justify-center gap-2"><span class="w-3 h-3 bg-white rounded-full"></span> Start Recording</span>';
+				recordButton.classList.toggle("bg-red-600");
+			});
+
+			clearActions.addEventListener("click", () => {
+				pushHistory();
+				actions = [];
+				selectedActionIndex = null;
+				renderActions();
+				renderStepEditor(null);
+				updateLiveCode();
+			});
+
+			exportButton.addEventListener("click", () => {
+				const code = generatePuppeteerCode();
+				codeOutput.textContent = code;
+				exportModal.classList.add("show");
+			});
+
+			closeModal.addEventListener("click", () => {
+				exportModal.classList.remove("show");
+			});
+
+			copyCode.addEventListener("click", async () => {
+				try {
+					await navigator.clipboard.writeText(codeOutput.textContent);
+					copyCode.textContent = "Copied!";
+					copyCode.classList.add("copy-success");
+					setTimeout(() => {
+						copyCode.textContent = "Copy to Clipboard";
+						copyCode.classList.remove("copy-success");
+					}, 2000);
+				} catch (err) {
+					copyCode.textContent = "Failed to copy";
+					copyCode.classList.add("copy-error");
+					setTimeout(() => {
+						copyCode.textContent = "Copy to Clipboard";
+						copyCode.classList.remove("copy-error");
+					}, 2000);
+					console.error("Failed to copy:", err);
+				}
+			});
+
+			// Define the security modal function early to ensure it's available
+			function showSecurityModal(url) {
+				const securityModalUrl = document.getElementById("securityModalUrl");
+				const securityModal = document.getElementById("securityModal");
+
+				securityModalUrl.textContent = url;
+				securityModal.classList.remove("hidden");
+				securityModal.classList.add("flex");
+			}
+
+			// Modify the navigation function to prevent security modal for demo sites
+			navigateButton.addEventListener("click", () => {
+				let url = urlBar.value.trim();
+				if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+				lastUrl = url;
+
+				// Show loading state
+				document.getElementById("iframeFallback").classList.add("hidden");
+				document.getElementById("corsErrorMsg").classList.add("hidden");
+				browserIframe.classList.add("opacity-50");
+
+				// Create loading indicator
+				const loadingIndicator = document.createElement("div");
+				loadingIndicator.id = "loadingIndicator";
+				loadingIndicator.className =
+					"absolute inset-0 flex items-center justify-center";
+				loadingIndicator.innerHTML = `
+          <div class="flex flex-col items-center">
+            <div class="w-10 h-10 border-4 border-t-[var(--accent)] border-opacity-50 rounded-full animate-spin mb-4"></div>
+            <div class="text-[var(--text-secondary)]">Loading...</div>
+          </div>
+        `;
+				browserIframe.parentNode.appendChild(loadingIndicator);
+
+				// List of demo sites that should always work
+				const allowedDemoSites = [
+					"example.com",
+					"jsfiddle.net",
+					"caniuse.com",
+					"html5test.com",
+				];
+
+				// Check if current URL is a demo site
+				const isAllowedDemoSite = allowedDemoSites.some((site) =>
+					url.includes(site)
+				);
+
+				// Known problematic domains (these will show security modal but still attempt to load)
+				const knownRestrictedDomains = [
+					"google.com",
+					"mail.google.com",
+					"gmail.com",
+					"youtube.com",
+					"facebook.com",
+					"twitter.com",
+					"instagram.com",
+					"linkedin.com",
+					"github.com",
+					"netflix.com",
+					"amazon.com",
+					"microsoft.com",
+					"apple.com",
+				];
+
+				// Check if URL contains any of the known restricted domains
+				const lowerUrl = url.toLowerCase();
+				const isKnownRestricted = knownRestrictedDomains.some(
+					(domain) =>
+						lowerUrl.includes(domain) || lowerUrl.includes(`www.${domain}`)
+				);
+
+				// Always set the iframe src to attempt navigation
+				browserIframe.src = url;
+
+				// If recording, add the action
+				if (isRecording) {
+					const act = {
+						type: ActionType.NAVIGATE,
+						url,
+						delay: 1000,
+						delayBefore: true, // Default to delay before
+					};
+					pushHistory();
+					addAction(act);
+				}
+
+				// For known restricted sites, show the security modal after attempting navigation
+				if (isKnownRestricted) {
+					setTimeout(() => {
+						// Show security warning but don't remove the iframe content
+						const securityModalUrl =
+							document.getElementById("securityModalUrl");
+						const securityModal = document.getElementById("securityModal");
+						securityModalUrl.textContent = url;
+						securityModal.classList.remove("hidden");
+						securityModal.classList.add("show");
+
+						// Remove loading indicator
+						const loadingEl = document.getElementById("loadingIndicator");
+						if (loadingEl) loadingEl.remove();
+						browserIframe.classList.remove("opacity-50");
+					}, 500);
+				} else {
+					// For other sites, check if navigation succeeded after a delay
+					setTimeout(() => {
+						const loadingEl = document.getElementById("loadingIndicator");
+						if (loadingEl) loadingEl.remove();
+						browserIframe.classList.remove("opacity-50");
+
+						try {
+							// If this is a demo site, never show security modal
+							if (isAllowedDemoSite) return;
+
+							// Try to access document to check if loaded
+							const doc =
+								browserIframe.contentDocument ||
+								browserIframe.contentWindow.document;
+
+							// Check if we got an error page or empty response
+							if (
+								doc.body.textContent.trim() === "" ||
+								doc.title.includes("Error") ||
+								doc.body.textContent.includes("refused to connect")
+							) {
+								document
+									.getElementById("corsErrorMsg")
+									.classList.remove("hidden");
+							}
+						} catch (e) {
+							// Don't show security modal for demo sites even on error
+							if (isAllowedDemoSite) return;
+
+							// Show appropriate error based on the error type
+							if (e.name === "SecurityError") {
+								document
+									.getElementById("corsErrorMsg")
+									.classList.remove("hidden");
+							} else {
+								document
+									.getElementById("corsErrorMsg")
+									.classList.remove("hidden");
+							}
+						}
+					}, 1500);
+				}
+			});
+
+			function showCrossOriginNotification() {
+				const notification = document.getElementById("crossOriginNotification");
+				if (notification) {
+					notification.classList.remove("hidden", "minimized");
+					notification.classList.add("show");
+				}
+			}
+
+			function hideNotification() {
+				const notification = document.getElementById("crossOriginNotification");
+				if (notification) {
+					notification.classList.remove("show");
+					notification.classList.add("hide");
+
+					// Add hidden class after animation completes
+					setTimeout(() => {
+						notification.classList.add("hidden");
+						notification.classList.remove("hide", "minimized");
+					}, 300);
+				}
+			}
+
+			function minimizeNotification() {
+				const notification = document.getElementById("crossOriginNotification");
+				if (notification) {
+					notification.classList.add("minimized");
+				}
+			}
+			// update the iframe error handler to avoid showing security modal for demo sites
+			browserIframe.addEventListener("load", function () {
+				// Remove loading state
+				browserIframe.classList.remove("opacity-50");
+				const loadingIndicator = document.getElementById("loadingIndicator");
+				if (loadingIndicator) loadingIndicator.remove();
+
+				try {
+					// Try to access iframe content - this will throw error for cross-origin frames
+					const iframeDoc =
+						browserIframe.contentDocument ||
+						browserIframe.contentWindow.document;
+
+					// Find all links in the iframe and modify them
+					const links = iframeDoc.querySelectorAll("a");
+					links.forEach((link) => {
+						// Convert HTTP links to HTTPS
+						if (link.href.startsWith("http:")) {
+							link.href = link.href.replace("http:", "https:");
+						}
+
+						// Add target="_blank" to open in new tab
+						link.setAttribute("target", "_blank");
+
+						// Add event listener to handle click
+						link.addEventListener("click", function (e) {
+							e.preventDefault();
+							// Open in new tab
+							window.open(link.href, "_blank");
+
+							// Record this action if recording
+							if (isRecording) {
+								addAction({
+									type: ActionType.CLICK,
+									selector: generateSelector(link),
+									value: "",
+									delay: 1000,
+									delayBefore: false,
+									validation: false,
+								});
+								renderActions();
+							}
+						});
+					});
+				} catch (e) {
+					// If we hit a cross-origin error, show the notification
+					showCrossOriginNotification();
+				}
+			});
+
+			// Test the current selector against the iframe's document.
+			// Highlights the element if found, shows a message otherwise.
+			function testSelector(index) {
+				const action = actions[index];
+				const msgEl = document.getElementById(`selectorTestMsg-${index}`);
+				msgEl.textContent = "";
+
+				try {
+					const doc =
+						browserIframe.contentDocument ||
+						browserIframe.contentWindow.document;
+					let found = null;
+					if (action.selectorType === "css") {
+						found = doc.querySelector(action.selector);
+					} else {
+						const res = doc.evaluate(
+							action.selector,
+							doc,
+							null,
+							XPathResult.FIRST_ORDERED_NODE_TYPE,
+							null
+						);
+						found = res.singleNodeValue;
+					}
+
+					if (found) {
+						// Element found - highlight and notify
+						found.style.outline = "2px solid var(--accent)";
+						found.scrollIntoView({ behavior: "smooth", block: "center" });
+						msgEl.textContent = "Found!";
+						msgEl.style.color = "var(--success)";
+						setTimeout(() => {
+							found.style.outline = "";
+							msgEl.textContent = "";
+						}, 2000);
+					} else {
+						msgEl.textContent = "Not found";
+						msgEl.style.color = "var(--error)";
+					}
+				} catch (e) {
+					// Cross-origin error - show helpful message
+					msgEl.textContent = "Cross-origin: Cannot test selector";
+					msgEl.style.color = "var(--error)";
+
+					// Also show a more detailed message in the iframe area
+					document.getElementById("corsErrorMsg").textContent =
+						'⚠️ Cannot interact with this site due to browser security restrictions. Try with "example.com" instead.';
+					document.getElementById("corsErrorMsg").classList.remove("hidden");
+					document
+						.getElementById("corsErrorMsg")
+						.classList.add("bg-[var(--error)]");
+				}
+			}
+
+			// Helper to generate a CSS selector for an element
+
+			function generateSelector(el) {
+				// Try id first - most specific and reliable
+				if (el.id) return `#${el.id}`;
+
+				// Try unique classes
+				if (el.className) {
+					const classes = el.className.split(/\s+/).filter((c) => c);
+					for (const cls of classes) {
+						const elements = document.querySelectorAll(`.${cls}`);
+						if (elements.length === 1) return `.${cls}`;
+					}
+				}
+
+				// Use tag name and position as fallback
+				let selector = el.tagName.toLowerCase();
+
+				// Add nth-child for more specificity
+				let parent = el.parentNode;
+				if (parent && parent !== document.body) {
+					const siblings = Array.from(parent.children);
+					const index = siblings.indexOf(el) + 1;
+					selector += `:nth-child(${index})`;
+				}
+
+				return selector;
+			}
+
+			function addRippleEffect() {
+				// Find all buttons that should have ripple
+				const buttons = document.querySelectorAll(
+					".neumorphic-button, .url-button, .mobile-nav-button, .demo-link"
+				);
+
+				buttons.forEach((button) => {
+					button.addEventListener("click", function (e) {
+						const ripple = document.createElement("span");
+						const rect = this.getBoundingClientRect();
+
+						const size = Math.max(rect.width, rect.height);
+						const x = e.clientX - rect.left - size / 2;
+						const y = e.clientY - rect.top - size / 2;
+
+						ripple.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(${x}px, ${y}px) scale(0);
+            animation: ripple 0.6s ease-out;
+          `;
+
+						this.style.position = this.style.position || "relative";
+						this.style.overflow = "hidden";
+						this.appendChild(ripple);
+
+						setTimeout(() => {
+							ripple.remove();
+						}, 600);
+					});
+				});
+
+				// Add the ripple animation to the stylesheet
+				const style = document.createElement("style");
+				style.textContent = `
+        @keyframes ripple {
+          to {
+            transform: translate(${0}px, ${0}px) scale(3);
+            opacity: 0;
+          }
+        }
+      `;
+				document.head.appendChild(style);
+			}
+
+			// Initialize
+			initializeDemoInteractions();
+			renderActions();
+			renderStepEditor(null);
+			updateLiveCode();
+
+			// Wire up demo links
+			document.querySelectorAll(".demo-link").forEach((link) => {
+				link.addEventListener("click", () => {
+					const url = link.getAttribute("data-url");
+					urlBar.value = url;
+					navigateButton.click();
+				});
+			});
+
+			// Close CORS message
+			document.getElementById("closeCorsMsg").addEventListener("click", () => {
+				document.getElementById("corsErrorMsg").classList.add("hidden");
+			});
+
+			// Modal controls
+			document.getElementById("closeModal").addEventListener("click", () => {
+				document.getElementById("exportModal").classList.remove("show");
+			});
+
+			document
+				.getElementById("closeSecurityModal")
+				.addEventListener("click", () => {
+					document.getElementById("securityModal").classList.remove("show");
+					document.getElementById("securityModal").classList.add("hidden");
+				});
+
+			document
+				.getElementById("securityModalCloseBtn")
+				.addEventListener("click", () => {
+					document.getElementById("securityModal").classList.remove("show");
+					document.getElementById("securityModal").classList.add("hidden");
+				});
+
+			document
+				.getElementById("tryDemoSitesBtn")
+				.addEventListener("click", () => {
+					// Hide the security modal
+					const securityModal = document.getElementById("securityModal");
+					securityModal.classList.remove("show");
+
+					// Show the demo sites section - handling both possible hiding methods
+					const demoSection = document.getElementById("demoSitesSection");
+					demoSection.style.display = ""; // Remove inline style if it exists
+					demoSection.classList.remove("hidden"); // Remove hidden class if it exists
+					demoSection.classList.remove("hide-demo-section"); // Remove any custom hide class
+				});
+
+			document
+				.getElementById("closeDemoSites")
+				.addEventListener("click", () => {
+					const demoSection = document.getElementById("demoSitesSection");
+					demoSection.classList.add("hidden");
+				});
+
+			document
+				.getElementById("showDemoSitesBtn")
+				.addEventListener("click", () => {
+					const demoSection = document.getElementById("demoSitesSection");
+					demoSection.style.display = "";
+					demoSection.classList.remove("hidden");
+					demoSection.classList.remove("hide-demo-section");
+				});
+
+			// Mobile record button logic
+			const mobileRecordButton = document.getElementById("mobileRecordButton");
+
+			mobileRecordButton.addEventListener("click", () => {
+				isRecording = !isRecording;
+				mobileRecordButton.classList.toggle("recording", isRecording);
+				mobileRecordButton.querySelector("#mobileRecordText").textContent =
+					isRecording ? "Stop Recording" : "Start Recording";
+				recordButton.click(); // Trigger the main record button action
+			});
+
+			// Setup mobile record button sync
+			const mobileRecordText = document.getElementById("mobileRecordText");
+
+			if (mobileRecordButton) {
+				// Sync mobile record button with the main one
+				mobileRecordButton.addEventListener("click", () => {
+					recordButton.click(); // Trigger the original button's click handler
+				});
+
+				// Function to sync the state of both buttons
+				function syncRecordButtonState() {
+					if (isRecording) {
+						mobileRecordButton.classList.add("recording");
+						mobileRecordText.textContent = "Stop Recording";
+					} else {
+						mobileRecordButton.classList.remove("recording");
+						mobileRecordText.textContent = "Start Recording";
+					}
+				}
+
+				// Update the original record button click handler to sync both buttons
+				const originalClickHandler = recordButton.onclick;
+				recordButton.addEventListener("click", () => {
+					// This gets called after the isRecording state is toggled
+					setTimeout(syncRecordButtonState, 0);
+				});
+
+				// Initialize sync
+				syncRecordButtonState();
+			}
+
+			document.addEventListener("DOMContentLoaded", function () {
+				addRippleEffect();
+				// Hide the right panel toggle button on mobile
+				if (window.innerWidth < 768) {
+					const rightPanelBtn = document.getElementById("rightPanelBtn");
+					if (rightPanelBtn) {
+						rightPanelBtn.style.display = "none";
+					}
+
+					// Adjust panel indicators
+					const indicators = document.querySelectorAll(".panel-indicator");
+					indicators.forEach((indicator) => {
+						if (indicator.dataset.panel === "right") {
+							indicator.style.display = "none";
+						}
+					});
+
+					// Center the remaining indicator
+					const indicatorContainer =
+						document.querySelector(".panel-indicators");
+					if (indicatorContainer) {
+						indicatorContainer.style.justifyContent = "center";
+					}
+				}
+			});
+
+			browserIframe.addEventListener("load", function () {
+				const loadingEl = document.getElementById("loadingIndicator");
+				if (loadingEl) loadingEl.remove();
+				browserIframe.classList.remove("opacity-50");
+			});
+
+			// Add event listener for Enter key in URL bar
+			document
+				.getElementById("urlBar")
+				.addEventListener("keydown", function (event) {
+					if (event.key === "Enter") {
+						event.preventDefault(); // Prevent form submission if within a form
+
+						// Trigger the click on the navigate button
+						document.getElementById("navigateButton").click();
+					}
+				});
+		</script>
+	</body>
+</html>
