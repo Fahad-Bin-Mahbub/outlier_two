@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Global News Network - Stay Informed</title>
+		<meta
+			name="description"
+			content="Get the latest breaking news and in-depth reporting from around the world"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<script>
+			tailwind.config = {
+				darkMode: "class",
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								DEFAULT: "#3b82f6",
+								dark: "#2563eb",
+								light: "#93c5fd",
+							},
+							secondary: {
+								DEFAULT: "#f59e0b",
+								dark: "#d97706",
+							},
+							accent: {
+								DEFAULT: "#10b981",
+								dark: "#059669",
+							},
+							error: "#ef4444",
+							background: {
+								light: "#f8fafc",
+								dark: "#0f172a",
+							},
+						},
+						animation: {
+							ticker: "ticker 40s linear infinite",
+							shimmer: "shimmer 2s infinite",
+							"fade-in": "fadeIn 0.5s ease-in",
+							"slide-up": "slideUp 0.5s ease-out",
+							"scale-in": "scaleIn 0.3s ease-out",
+						},
+						keyframes: {
+							ticker: {
+								"0%": { transform: "translateX(0)" },
+								"100%": { transform: "translateX(-100%)" },
+							},
+							shimmer: {
+								"0%": { backgroundPosition: "-1000px 0" },
+								"100%": { backgroundPosition: "1000px 0" },
+							},
+							fadeIn: {
+								"0%": { opacity: "0" },
+								"100%": { opacity: "1" },
+							},
+							slideUp: {
+								"0%": { transform: "translateY(20px)", opacity: "0" },
+								"100%": { transform: "translateY(0)", opacity: "1" },
+							},
+							scaleIn: {
+								"0%": { transform: "scale(0.95)", opacity: "0" },
+								"100%": { transform: "scale(1)", opacity: "1" },
+							},
+						},
+						transitionDuration: {
+							400: "400ms",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap");
+
+			body {
+				font-family: "Inter", sans-serif;
+				-webkit-font-smoothing: antialiased;
+				background-color: #f8fafc;
+			}
+
+			.dark body {
+				background-color: #0f172a;
+			}
+
+			.headline-font {
+				font-family: "Playfair Display", serif;
+			}
+
+			.gradient-text {
+				background: linear-gradient(90deg, #3b82f6, #f59e0b);
+				-webkit-background-clip: text;
+				background-clip: text;
+				color: transparent;
+			}
+
+			.nav-link {
+				position: relative;
+				transition: all 0.3s ease;
+			}
+
+			.nav-link::after {
+				content: "";
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 0;
+				height: 2px;
+				background-color: #3b82f6;
+				transition: width 0.3s ease;
+			}
+
+			.nav-link:hover::after {
+				width: 100%;
+			}
+
+			.nav-link.active::after {
+				width: 100%;
+			}
+
+			.article-card {
+				transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+				transform-origin: center;
+			}
+
+			.article-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+					0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			}
+
+			.article-card:hover .article-img {
+				transform: scale(1.05);
+			}
+
+			.lazy {
+				opacity: 0;
+				transition: opacity 0.5s ease;
+			}
+
+			.lazy.loaded {
+				opacity: 1;
+			}
+
+			.skeleton {
+				background: linear-gradient(
+					90deg,
+					#f0f0f0 25%,
+					#e0e0e0 50%,
+					#f0f0f0 75%
+				);
+				background-size: 200% 100%;
+				animation: shimmer 2s infinite;
+			}
+
+			.dark .skeleton {
+				background: linear-gradient(
+					90deg,
+					#1e293b 25%,
+					#334155 50%,
+					#1e293b 75%
+				);
+			}
+
+			.carousel-item {
+				transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+			}
+
+			.modal-enter {
+				animation: fadeIn 0.3s forwards, scaleIn 0.3s forwards;
+			}
+
+			.modal-exit {
+				animation: fadeIn 0.3s reverse forwards, scaleIn 0.3s reverse forwards;
+			}
+
+			.shimmer-effect {
+				position: relative;
+				overflow: hidden;
+			}
+
+			.shimmer-effect::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					90deg,
+					transparent,
+					rgba(255, 255, 255, 0.2),
+					transparent
+				);
+				animation: shimmer 2s infinite;
+			}
+
+			.scrollbar-hide::-webkit-scrollbar {
+				display: none;
+			}
+
+			.scrollbar-hide {
+				-ms-overflow-style: none;
+				scrollbar-width: none;
+			}
+
+			/* Ensure modal content can scroll */
+			#articleModal {
+				overscroll-behavior: contain;
+			}
+
+			#articleModal .flex-grow {
+				min-height: 0; /* Crucial for flex children to scroll */
+			}
+
+			/* Better scrollbar styling */
+			.scrollbar-style::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.scrollbar-style::-webkit-scrollbar-thumb {
+				background-color: rgba(156, 163, 175, 0.5);
+				border-radius: 3px;
+			}
+
+			.dark .scrollbar-style::-webkit-scrollbar-thumb {
+				background-color: rgba(75, 85, 99, 0.5);
+			}
+
+			.keyboard-focus :focus {
+				outline: 2px solid #3b82f6;
+				outline-offset: 2px;
+			}
+
+			@media (max-width: 767px) {
+				.mobile-sticky-header {
+					position: sticky;
+					top: 0;
+					z-index: 50;
+					background-color: white;
+					box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				}
+
+				.dark .mobile-sticky-header {
+					background-color: #1e293b;
+				}
+			}
+		</style>
+	</head>
+
+	<body
+		class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 transition-colors duration-300"
+	>
+		<!-- Header -->
+		<header
+			class="sticky top-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm border-b border-slate-200 dark:border-slate-700 transition-colors duration-300"
+		>
+			<div class="container mx-auto px-4 sm:px-6 py-3">
+				<div class="flex flex-wrap items-center justify-between gap-4">
+					<div class="flex items-center gap-3">
+						<div class="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg">
+							<i class="fas fa-globe text-primary text-xl sm:text-2xl"></i>
+						</div>
+						<span class="text-xl sm:text-2xl font-bold text-primary"
+							>Global News</span
+						>
+					</div>
+
+					<button
+						class="md:hidden p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+						aria-label="Toggle navigation"
+						id="navToggle"
+					>
+						<i class="fas fa-bars text-xl"></i>
+					</button>
+
+					<nav class="w-full md:w-auto hidden md:block" id="mainNav">
+						<ul class="flex flex-col md:flex-row gap-1 md:gap-6">
+							<li>
+								<a
+									href="#"
+									class="nav-link active py-2 px-1 block text-sm font-medium text-primary transition-colors"
+									data-category="all"
+									>All News</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link py-2 px-1 block text-sm font-medium hover:text-primary transition-colors"
+									data-category="politics"
+									>Politics</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link py-2 px-1 block text-sm font-medium hover:text-primary transition-colors"
+									data-category="business"
+									>Business</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link py-2 px-1 block text-sm font-medium hover:text-primary transition-colors"
+									data-category="technology"
+									>Technology</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link py-2 px-1 block text-sm font-medium hover:text-primary transition-colors"
+									data-category="science"
+									>Science</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="nav-link py-2 px-1 block text-sm font-medium hover:text-primary transition-colors"
+									data-category="health"
+									>Health</a
+								>
+							</li>
+						</ul>
+					</nav>
+
+					<div class="flex items-center gap-3">
+						<div class="relative w-48 sm:w-56">
+							<i
+								class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+							></i>
+							<input
+								type="text"
+								id="searchInput"
+								placeholder="Search news..."
+								class="w-full pl-10 pr-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+							/>
+						</div>
+
+						<button
+							id="themeToggle"
+							class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+							aria-label="Toggle dark mode"
+						>
+							<i class="fas fa-moon text-lg"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<main class="container mx-auto px-4 sm:px-6 py-8">
+			<!-- Hero Section -->
+			<section class="text-center mb-12 animate-fade-in">
+				<h1
+					class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 gradient-text headline-font leading-tight"
+				>
+					Stay Informed with <span class="block">Global Perspectives</span>
+				</h1>
+				<p class="text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
+					Get real-time updates on global events, politics, technology, and more
+					from our team of award-winning journalists.
+				</p>
+				<div class="mt-8 flex justify-center gap-4">
+					<button
+						onclick="document.getElementById('subscribe-section').scrollIntoView({behavior: 'smooth'})"
+						class="bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-full font-medium transition-colors shadow-md hover:shadow-lg"
+					>
+						Subscribe Now
+					</button>
+				</div>
+			</section>
+
+			<!-- Breaking News Ticker -->
+			<div
+				class="relative bg-gradient-to-r from-primary to-secondary rounded-xl mb-10 overflow-hidden shadow-md"
+			>
+				<div
+					class="absolute left-0 top-0 h-full bg-error text-white px-4 flex items-center font-semibold text-sm z-10 shadow-md"
+				>
+					<span class="animate-pulse">BREAKING</span>
+				</div>
+				<div
+					class="py-3 pl-20 pr-4 overflow-hidden bg-white/10 dark:bg-black/20 backdrop-blur-sm"
+				>
+					<div class="inline-block whitespace-nowrap animate-ticker">
+						<span class="inline-block px-6 text-white font-medium"
+							>Stock markets reach all-time high amid economic recovery</span
+						>
+						<span class="inline-block px-6 text-white font-medium"
+							>New climate agreement signed by 50 nations to reduce emissions by
+							2030</span
+						>
+						<span class="inline-block px-6 text-white font-medium"
+							>Tech giant unveils revolutionary AI assistant that understands
+							human emotions</span
+						>
+						<span class="inline-block px-6 text-white font-medium"
+							>Scientists discover potential cure for rare genetic disease</span
+						>
+						<span class="inline-block px-6 text-white font-medium"
+							>Global summit addresses food security challenges in developing
+							nations</span
+						>
+					</div>
+				</div>
+			</div>
+
+			<!-- Featured Carousel -->
+			<div class="relative rounded-2xl overflow-hidden shadow-2xl mb-14 group">
+				<div
+					class="carousel-inner flex transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+				>
+					<div class="carousel-item min-w-full relative">
+						<div class="aspect-w-16 aspect-h-9 h-[400px] sm:h-[500px]">
+							<img
+								src="https://plus.unsplash.com/premium_photo-1664298311043-46b3814a511f?q=80&w=2550&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								data-src="https://source.unsplash.com/random/1600x900/?conference,1"
+								alt="Climate summit"
+								class="w-full h-full object-cover lazy"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+							></div>
+						</div>
+						<div
+							class="absolute bottom-0 left-0 right-0 p-6 sm:p-8 rounded-b-xl"
+						>
+							<span
+								class="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3"
+								>Environment</span
+							>
+							<h3
+								class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 leading-tight"
+							>
+								Global Leaders Gather for Climate Summit in Paris
+							</h3>
+							<p class="text-slate-200 max-w-2xl">
+								World leaders discuss urgent action to combat climate change at
+								annual conference with new commitments expected to be announced.
+							</p>
+							<button
+								class="mt-6 bg-white text-primary hover:bg-primary hover:text-white px-5 py-2 rounded-full font-medium transition-colors shadow-md"
+							>
+								Read Full Story
+							</button>
+						</div>
+					</div>
+					<div class="carousel-item min-w-full relative">
+						<div class="aspect-w-16 aspect-h-9 h-[400px] sm:h-[500px]">
+							<img
+								src="https://plus.unsplash.com/premium_photo-1687463804174-c74e82681ac9?q=80&w=3132&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								data-src="https://source.unsplash.com/random/1600x900/?technology,1"
+								alt="Quantum computer"
+								class="w-full h-full object-cover lazy"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+							></div>
+						</div>
+						<div
+							class="absolute bottom-0 left-0 right-0 p-6 sm:p-8 rounded-b-xl"
+						>
+							<span
+								class="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3"
+								>Technology</span
+							>
+							<h3
+								class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 leading-tight"
+							>
+								Breakthrough in Quantum Computing Announced
+							</h3>
+							<p class="text-slate-200 max-w-2xl">
+								Scientists achieve quantum supremacy with new 128-qubit
+								processor that could revolutionize industries from medicine to
+								finance.
+							</p>
+							<button
+								class="mt-6 bg-white text-primary hover:bg-primary hover:text-white px-5 py-2 rounded-full font-medium transition-colors shadow-md"
+							>
+								Read Full Story
+							</button>
+						</div>
+					</div>
+					<div class="carousel-item min-w-full relative">
+						<div class="aspect-w-16 aspect-h-9 h-[400px] sm:h-[500px]">
+							<img
+								src="https://plus.unsplash.com/premium_photo-1661286608962-039715bef0cb?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+								data-src="https://source.unsplash.com/random/1600x900/?business,1"
+								alt="Business merger"
+								class="w-full h-full object-cover lazy"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+							></div>
+						</div>
+						<div
+							class="absolute bottom-0 left-0 right-0 p-6 sm:p-8 rounded-b-xl"
+						>
+							<span
+								class="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3"
+								>Business</span
+							>
+							<h3
+								class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 leading-tight"
+							>
+								Major Tech Merger Creates Industry Giant
+							</h3>
+							<p class="text-slate-200 max-w-2xl">
+								Two industry leaders join forces in $50 billion deal that will
+								reshape the competitive landscape and create new opportunities.
+							</p>
+							<button
+								class="mt-6 bg-white text-primary hover:bg-primary hover:text-white px-5 py-2 rounded-full font-medium transition-colors shadow-md"
+							>
+								Read Full Story
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<button
+					class="carousel-control prev absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-black/80 shadow-lg"
+					aria-label="Previous slide"
+				>
+					<i class="fas fa-chevron-left"></i>
+				</button>
+				<button
+					class="carousel-control next absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 text-white p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-black/80 shadow-lg"
+					aria-label="Next slide"
+				>
+					<i class="fas fa-chevron-right"></i>
+				</button>
+
+				<div
+					class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2"
+				>
+					<button
+						class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-all active"
+						aria-label="Slide 1"
+					></button>
+					<button
+						class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-all"
+						aria-label="Slide 2"
+					></button>
+					<button
+						class="carousel-indicator w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-all"
+						aria-label="Slide 3"
+					></button>
+				</div>
+			</div>
+
+			<!-- Latest News Section -->
+			<div
+				class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4"
+			>
+				<div>
+					<h2
+						class="text-2xl sm:text-3xl font-bold mb-2 relative pb-2 after:absolute after:bottom-0 after:left-0 after:w-12 after:h-1 after:bg-primary after:rounded-full"
+					>
+						Latest News
+					</h2>
+					<p class="text-slate-500 dark:text-slate-400">
+						Stay updated with the most recent developments from around the world
+					</p>
+				</div>
+				<div class="flex gap-2">
+					<button
+						class="text-sm px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+						data-sort="newest"
+					>
+						Newest First
+					</button>
+					<button
+						class="text-sm px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+						data-sort="popular"
+					>
+						Most Popular
+					</button>
+				</div>
+			</div>
+
+			<div
+				class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+				id="articleGrid"
+			>
+				<!-- Article 1 -->
+				<article
+					class="article-card bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 flex flex-col animate-slide-up"
+					data-category="politics"
+					data-title="Election Polls Show Tight Race"
+					data-date="2023-06-15T10:30:00"
+					data-views="1245"
+				>
+					<div class="relative h-48 overflow-hidden">
+						<span
+							class="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full"
+							>Politics</span
+						>
+						<img
+							src="https://images.unsplash.com/photo-1667964267136-c0256d70b7a3?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+							data-src="https://source.unsplash.com/random/600x400/?election,1"
+							alt="Election polls"
+							class="w-full h-full object-cover lazy transition-transform duration-500 article-img"
+						/>
+					</div>
+					<div class="p-5 flex-grow flex flex-col">
+						<h3 class="text-xl font-bold mb-2">
+							Election Polls Show Tight Race
+						</h3>
+						<div
+							class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3"
+						>
+							<span>By Jane Smith</span>
+							<span><i class="far fa-clock mr-1"></i>3 hours ago</span>
+							<span><i class="far fa-eye mr-1"></i>1.2k</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-300 mb-4 flex-grow">
+							Latest polls indicate a dead heat between the leading candidates
+							as election day approaches, with undecided voters becoming the key
+							demographic.
+						</p>
+						<a
+							href="#"
+							class="text-primary font-semibold flex items-center gap-1 group read-more-btn"
+						>
+							Read more
+							<i
+								class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"
+							></i>
+						</a>
+						<div
+							class="flex gap-3 mt-5 pt-4 border-t border-slate-200 dark:border-slate-700"
+						>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on LinkedIn"
+							>
+								<i class="fab fa-linkedin-in text-sm"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Article 2 -->
+				<article
+					class="article-card bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 flex flex-col animate-slide-up"
+					data-category="health"
+					data-title="New Study Reveals Benefits of Mediterranean Diet"
+					data-date="2023-06-15T08:45:00"
+					data-views="1876"
+				>
+					<div class="relative h-48 overflow-hidden">
+						<span
+							class="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full"
+							>Health</span
+						>
+						<img
+							src="https://images.unsplash.com/photo-1648571237849-4c322fe7ac84?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+							data-src="https://source.unsplash.com/random/600x400/?food,healthy"
+							alt="Mediterranean diet"
+							class="w-full h-full object-cover lazy transition-transform duration-500 article-img"
+						/>
+					</div>
+					<div class="p-5 flex-grow flex flex-col">
+						<h3 class="text-xl font-bold mb-2">
+							New Study Reveals Benefits of Mediterranean Diet
+						</h3>
+						<div
+							class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3"
+						>
+							<span>By Dr. Michael Chen</span>
+							<span><i class="far fa-clock mr-1"></i>5 hours ago</span>
+							<span><i class="far fa-eye mr-1"></i>1.8k</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-300 mb-4 flex-grow">
+							Research confirms significant health improvements for participants
+							following Mediterranean eating patterns over a five-year period.
+						</p>
+						<a
+							href="#"
+							class="text-primary font-semibold flex items-center gap-1 group read-more-btn"
+						>
+							Read more
+							<i
+								class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"
+							></i>
+						</a>
+						<div
+							class="flex gap-3 mt-5 pt-4 border-t border-slate-200 dark:border-slate-700"
+						>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on WhatsApp"
+							>
+								<i class="fab fa-whatsapp text-sm"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Article 3 -->
+				<article
+					class="article-card bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 flex flex-col animate-slide-up"
+					data-category="science"
+					data-title="Mars Rover Discovers Evidence of Ancient Water"
+					data-date="2023-06-14T16:20:00"
+					data-views="2453"
+				>
+					<div class="relative h-48 overflow-hidden">
+						<span
+							class="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full"
+							>Science</span
+						>
+						<img
+							src="https://plus.unsplash.com/premium_photo-1689797430700-ebb98b385be4?q=80&w=2941&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+							data-src="https://source.unsplash.com/random/600x400/?mars,rover"
+							alt="Mars rover"
+							class="w-full h-full object-cover lazy transition-transform duration-500 article-img"
+						/>
+					</div>
+					<div class="p-5 flex-grow flex flex-col">
+						<h3 class="text-xl font-bold mb-2">
+							Mars Rover Discovers Evidence of Ancient Water
+						</h3>
+						<div
+							class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3"
+						>
+							<span>By Sarah Johnson</span>
+							<span><i class="far fa-clock mr-1"></i>8 hours ago</span>
+							<span><i class="far fa-eye mr-1"></i>2.4k</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-300 mb-4 flex-grow">
+							NASA scientists announce groundbreaking discovery that suggests
+							Mars once had conditions suitable for life.
+						</p>
+						<a
+							href="#"
+							class="text-primary font-semibold flex items-center gap-1 group read-more-btn"
+						>
+							Read more
+							<i
+								class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"
+							></i>
+						</a>
+						<div
+							class="flex gap-3 mt-5 pt-4 border-t border-slate-200 dark:border-slate-700"
+						>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on LinkedIn"
+							>
+								<i class="fab fa-linkedin-in text-sm"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Article 4 -->
+				<article
+					class="article-card bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 flex flex-col animate-slide-up"
+					data-category="technology"
+					data-title="Tech Giant Unveils New Smartphone with Foldable Display"
+					data-date="2023-06-14T14:10:00"
+					data-views="3210"
+				>
+					<div class="relative h-48 overflow-hidden">
+						<span
+							class="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full"
+							>Technology</span
+						>
+						<img
+							src="https://images.unsplash.com/photo-1687168593635-370120784edc?q=80&w=2969&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+							data-src="https://source.unsplash.com/random/600x400/?smartphone,foldable"
+							alt="Foldable smartphone"
+							class="w-full h-full object-cover lazy transition-transform duration-500 article-img"
+						/>
+					</div>
+					<div class="p-5 flex-grow flex flex-col">
+						<h3 class="text-xl font-bold mb-2">
+							Tech Giant Unveils New Smartphone with Foldable Display
+						</h3>
+						<div
+							class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3"
+						>
+							<span>By Alex Turner</span>
+							<span><i class="far fa-clock mr-1"></i>10 hours ago</span>
+							<span><i class="far fa-eye mr-1"></i>3.2k</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-300 mb-4 flex-grow">
+							The latest flagship device features a revolutionary foldable
+							screen that can withstand 200,000 folds and comes with advanced
+							multitasking capabilities.
+						</p>
+						<a
+							href="#"
+							class="text-primary font-semibold flex items-center gap-1 group read-more-btn"
+						>
+							Read more
+							<i
+								class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"
+							></i>
+						</a>
+						<div
+							class="flex gap-3 mt-5 pt-4 border-t border-slate-200 dark:border-slate-700"
+						>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on WhatsApp"
+							>
+								<i class="fab fa-whatsapp text-sm"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Article 5 -->
+				<article
+					class="article-card bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 flex flex-col animate-slide-up"
+					data-category="business"
+					data-title="Global Markets Rally After Central Bank Announcement"
+					data-date="2023-06-14T12:30:00"
+					data-views="2876"
+				>
+					<div class="relative h-48 overflow-hidden">
+						<span
+							class="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full"
+							>Business</span
+						>
+						<img
+							src="https://plus.unsplash.com/premium_photo-1681487769650-a0c3fbaed85a?q=80&w=3055&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+							data-src="https://source.unsplash.com/random/600x400/?stock,market"
+							alt="Stock market"
+							class="w-full h-full object-cover lazy transition-transform duration-500 article-img"
+						/>
+					</div>
+					<div class="p-5 flex-grow flex flex-col">
+						<h3 class="text-xl font-bold mb-2">
+							Global Markets Rally After Central Bank Announcement
+						</h3>
+						<div
+							class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3"
+						>
+							<span>By Robert Williams</span>
+							<span><i class="far fa-clock mr-1"></i>12 hours ago</span>
+							<span><i class="far fa-eye mr-1"></i>2.8k</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-300 mb-4 flex-grow">
+							Major indices surge as central banks signal a more dovish approach
+							to interest rates, providing relief to investors worldwide.
+						</p>
+						<a
+							href="#"
+							class="text-primary font-semibold flex items-center gap-1 group read-more-btn"
+						>
+							Read more
+							<i
+								class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"
+							></i>
+						</a>
+						<div
+							class="flex gap-3 mt-5 pt-4 border-t border-slate-200 dark:border-slate-700"
+						>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on LinkedIn"
+							>
+								<i class="fab fa-linkedin-in text-sm"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+
+				<!-- Article 6 -->
+				<article
+					class="article-card bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden border border-slate-200 dark:border-slate-700 hover:shadow-lg transition-all duration-300 flex flex-col animate-slide-up"
+					data-category="environment"
+					data-title="New Climate Initiative Aims to Plant 1 Billion Trees"
+					data-date="2023-06-13T09:15:00"
+					data-views="1987"
+				>
+					<div class="relative h-48 overflow-hidden">
+						<span
+							class="absolute top-3 left-3 bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full"
+							>Environment</span
+						>
+						<img
+							src="https://images.unsplash.com/photo-1591255199673-4e2b706645a2?q=80&w=2942&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+							data-src="https://source.unsplash.com/random/600x400/?tree,planting"
+							alt="Tree planting"
+							class="w-full h-full object-cover lazy transition-transform duration-500 article-img"
+						/>
+					</div>
+					<div class="p-5 flex-grow flex flex-col">
+						<h3 class="text-xl font-bold mb-2">
+							New Climate Initiative Aims to Plant 1 Billion Trees
+						</h3>
+						<div
+							class="flex gap-4 text-sm text-slate-500 dark:text-slate-400 mb-3"
+						>
+							<span>By Emma Green</span>
+							<span><i class="far fa-clock mr-1"></i>1 day ago</span>
+							<span><i class="far fa-eye mr-1"></i>1.9k</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-300 mb-4 flex-grow">
+							An international coalition launches ambitious reforestation
+							project to combat climate change, with participation from 50
+							countries.
+						</p>
+						<a
+							href="#"
+							class="text-primary font-semibold flex items-center gap-1 group read-more-btn"
+						>
+							Read more
+							<i
+								class="fas fa-arrow-right text-sm transition-transform group-hover:translate-x-1"
+							></i>
+						</a>
+						<div
+							class="flex gap-3 mt-5 pt-4 border-t border-slate-200 dark:border-slate-700"
+						>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter text-sm"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on WhatsApp"
+							>
+								<i class="fab fa-whatsapp text-sm"></i>
+							</a>
+						</div>
+					</div>
+				</article>
+			</div>
+
+			<!-- Newsletter Subscription -->
+			<div
+				id="subscribe-section"
+				class="bg-gradient-to-r from-primary to-secondary rounded-2xl p-8 md:p-10 my-12 text-white"
+			>
+				<div class="max-w-4xl mx-auto text-center">
+					<h2 class="text-2xl md:text-3xl font-bold mb-4">
+						Stay Updated with Our Newsletter
+					</h2>
+					<p class="text-white/90 mb-6 max-w-2xl mx-auto">
+						Get the latest news delivered directly to your inbox. No spam, just
+						quality journalism.
+					</p>
+					<form id="subscribe-form" class="space-y-6">
+						<div
+							class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto sm:max-w-xl"
+						>
+							<input
+								type="email"
+								id="subscribe-email"
+								placeholder="Your email address"
+								required
+								class="flex-grow px-4 py-3 rounded-full text-slate-900 focus:outline-none focus:ring-2 focus:ring-white"
+							/>
+							<button
+								type="submit"
+								class="bg-white text-primary hover:bg-slate-100 px-6 py-3 rounded-full font-medium transition-colors shadow-md whitespace-nowrap"
+							>
+								Subscribe Now
+							</button>
+						</div>
+					</form>
+					<p class="text-xs text-white/70 mt-3">
+						By subscribing, you agree to our Terms and Privacy Policy
+					</p>
+				</div>
+			</div>
+		</main>
+
+		<!-- Article Modal -->
+		<!-- Article Modal -->
+		<div
+			id="articleModal"
+			class="fixed inset-0 bg-black/50 z-[1000] hidden backdrop-blur-sm overflow-y-auto"
+		>
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div
+					class="bg-white dark:bg-slate-800 rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl transform transition-all duration-300 scale-95 opacity-0"
+				>
+					<div class="relative flex-shrink-0">
+						<button
+							id="closeModal"
+							class="absolute right-4 top-4 z-10 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-colors"
+							aria-label="Close modal"
+						>
+							<i class="fas fa-times"></i>
+						</button>
+						<div class="relative h-64 sm:h-96">
+							<img
+								id="modalImage"
+								src=""
+								alt=""
+								class="w-full h-full object-cover"
+							/>
+							<div
+								class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+							></div>
+							<div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+								<span
+									id="modalCategory"
+									class="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3"
+								></span>
+								<h2
+									id="modalTitle"
+									class="text-2xl sm:text-3xl font-bold text-white mb-2"
+								></h2>
+								<div class="flex gap-4 text-sm text-white/80">
+									<span id="modalAuthor"></span>
+									<span id="modalTime"></span>
+									<span id="modalViews"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="p-6 overflow-y-auto flex-grow">
+						<div id="modalContent" class="prose dark:prose-invert max-w-none">
+							<!-- Content will be inserted here -->
+						</div>
+					</div>
+					<div
+						class="p-6 pt-0 border-t border-slate-200 dark:border-slate-700 flex-shrink-0"
+					>
+						<h3 class="text-lg font-semibold mb-4">Share this article</h3>
+						<div class="flex gap-3">
+							<a
+								href="#"
+								class="social-btn w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Facebook"
+							>
+								<i class="fab fa-facebook-f"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-10 h-10 rounded-full bg-blue-400 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on Twitter"
+							>
+								<i class="fab fa-twitter"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-10 h-10 rounded-full bg-blue-700 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on LinkedIn"
+							>
+								<i class="fab fa-linkedin-in"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Share on WhatsApp"
+							>
+								<i class="fab fa-whatsapp"></i>
+							</a>
+							<a
+								href="#"
+								class="social-btn w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center hover:translate-y-[-2px] transition-transform"
+								aria-label="Save for later"
+							>
+								<i class="far fa-bookmark"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Loading Overlay -->
+		<div
+			id="loadingOverlay"
+			class="fixed inset-0 bg-white/80 dark:bg-slate-900/80 z-[1001] flex items-center justify-center transition-opacity duration-300 opacity-0 pointer-events-none"
+		>
+			<div class="text-center">
+				<div
+					class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4 mx-auto"
+				></div>
+				<p class="text-slate-600 dark:text-slate-400">Loading content...</p>
+			</div>
+		</div>
+
+		<footer
+			class="bg-slate-100 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-12"
+		>
+			<div class="container mx-auto px-4 sm:px-6 py-12">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+					<div class="max-w-xs">
+						<div
+							class="flex items-center gap-3 text-2xl font-bold text-primary mb-4"
+						>
+							<div class="bg-primary/10 dark:bg-primary/20 p-2 rounded-lg">
+								<i class="fas fa-globe text-primary"></i>
+							</div>
+							<span>Global News</span>
+						</div>
+						<p class="text-slate-600 dark:text-slate-400 text-sm mb-6">
+							Delivering accurate, unbiased news from around the world since
+							1995. Our team of journalists is committed to quality reporting.
+						</p>
+						<div class="flex gap-4">
+							<a
+								href="#"
+								class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-lg"
+								aria-label="Facebook"
+							>
+								<i class="fab fa-facebook-f"></i>
+							</a>
+							<a
+								href="#"
+								class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-lg"
+								aria-label="Twitter"
+							>
+								<i class="fab fa-twitter"></i>
+							</a>
+							<a
+								href="#"
+								class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-lg"
+								aria-label="Instagram"
+							>
+								<i class="fab fa-instagram"></i>
+							</a>
+							<a
+								href="#"
+								class="text-slate-500 dark:text-slate-400 hover:text-primary transition-colors text-lg"
+								aria-label="LinkedIn"
+							>
+								<i class="fab fa-linkedin-in"></i>
+							</a>
+						</div>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Categories</h3>
+						<ul class="space-y-3">
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									World</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Politics</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Business</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Technology</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Science</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Health</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Company</h3>
+						<ul class="space-y-3">
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i> About
+									Us</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Contact</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Careers</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Advertise</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Ethics Policy</a
+								>
+							</li>
+						</ul>
+					</div>
+
+					<div>
+						<h3 class="text-lg font-semibold mb-4">Legal</h3>
+						<ul class="space-y-3">
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i> Terms
+									of Service</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Privacy Policy</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Cookie Policy</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									GDPR</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm flex items-center gap-2"
+									><i class="fas fa-chevron-right text-xs opacity-70"></i>
+									Accessibility</a
+								>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<div
+					class="border-t border-slate-200 dark:border-slate-700 mt-10 pt-6 text-center"
+				>
+					<p class="text-slate-500 dark:text-slate-400 text-sm">
+						© 2023 Global News Network. All rights reserved.
+					</p>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Add Toast Notification before the closing </body> tag -->
+		<div
+			id="toast"
+			class="fixed bottom-4 right-4 transform translate-y-0 opacity-0 transition-all duration-300 bg-white dark:bg-slate-800 rounded-xl shadow-2xl p-4 max-w-sm z-50"
+		>
+			<div class="flex items-center gap-3">
+				<div
+					class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center"
+				>
+					<i class="fas fa-check text-green-500 dark:text-green-400"></i>
+				</div>
+				<div>
+					<h4 class="font-semibold text-slate-800 dark:text-slate-200">
+						Success!
+					</h4>
+					<p class="text-sm text-slate-600 dark:text-slate-400">
+						Your subscription has been received.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			document
+				.getElementById("subscribe-form")
+				.addEventListener("submit", function (e) {
+					e.preventDefault();
+
+					const email = document.getElementById("subscribe-email").value;
+
+					// Show toast notification
+					const toast = document.getElementById("toast");
+					toast.classList.remove("hidden");
+					toast.classList.add("opacity-100");
+
+					// Hide toast after 3 seconds
+					setTimeout(() => {
+						toast.classList.remove("opacity-100");
+						setTimeout(() => {
+							toast.classList.add("hidden");
+						}, 300);
+					}, 3000);
+
+					// Clear the form
+					document.getElementById("subscribe-email").value = "";
+				});
+			// Theme toggle functionality
+			const themeToggle = document.getElementById("themeToggle");
+			const themeIcon = themeToggle.querySelector("i");
+
+			themeToggle.addEventListener("click", () => {
+				document.documentElement.classList.toggle("dark");
+				const isDark = document.documentElement.classList.contains("dark");
+				localStorage.setItem("darkMode", isDark);
+
+				if (isDark) {
+					themeIcon.classList.replace("fa-moon", "fa-sun");
+				} else {
+					themeIcon.classList.replace("fa-sun", "fa-moon");
+				}
+			});
+
+			// Check for saved theme preference
+			if (
+				localStorage.getItem("darkMode") === "true" ||
+				(!localStorage.getItem("darkMode") &&
+					window.matchMedia("(prefers-color-scheme: dark)").matches)
+			) {
+				document.documentElement.classList.add("dark");
+				themeIcon.classList.replace("fa-moon", "fa-sun");
+			}
+
+			// Mobile navigation toggle
+			const navToggle = document.getElementById("navToggle");
+			const mainNav = document.getElementById("mainNav");
+
+			navToggle.addEventListener("click", () => {
+				mainNav.classList.toggle("hidden");
+				const isExpanded = !mainNav.classList.contains("hidden");
+				navToggle.setAttribute("aria-expanded", isExpanded);
+				navToggle.innerHTML = isExpanded
+					? '<i class="fas fa-times text-xl"></i>'
+					: '<i class="fas fa-bars text-xl"></i>';
+			});
+
+			// Close mobile menu when clicking on a link
+			document.querySelectorAll("#mainNav a").forEach((link) => {
+				link.addEventListener("click", () => {
+					mainNav.classList.add("hidden");
+					navToggle.setAttribute("aria-expanded", false);
+					navToggle.innerHTML = '<i class="fas fa-bars text-xl"></i>';
+				});
+			});
+
+			// Enhanced Carousel functionality
+			const carouselInner = document.querySelector(".carousel-inner");
+			const carouselItems = document.querySelectorAll(".carousel-item");
+			const prevBtn = document.querySelector(".carousel-control.prev");
+			const nextBtn = document.querySelector(".carousel-control.next");
+			const indicators = document.querySelectorAll(".carousel-indicator");
+
+			let currentIndex = 0;
+			const itemWidth = 100;
+			const totalItems = carouselItems.length;
+			let carouselInterval;
+			let isAnimating = false;
+
+			function updateCarousel() {
+				if (isAnimating) return;
+				isAnimating = true;
+
+				carouselInner.style.transform = `translateX(-${
+					currentIndex * itemWidth
+				}%)`;
+
+				// Update indicators
+				indicators.forEach((indicator, index) => {
+					indicator.classList.toggle("active", index === currentIndex);
+				});
+
+				// Reset animation flag after transition ends
+				carouselInner.addEventListener(
+					"transitionend",
+					() => {
+						isAnimating = false;
+					},
+					{ once: true }
+				);
+			}
+
+			function startCarousel() {
+				carouselInterval = setInterval(() => {
+					if (!document.hidden) {
+						currentIndex = (currentIndex + 1) % totalItems;
+						updateCarousel();
+					}
+				}, 7000);
+			}
+
+			function goToSlide(index) {
+				currentIndex = index;
+				updateCarousel();
+				resetCarouselInterval();
+			}
+
+			prevBtn.addEventListener("click", () => {
+				if (isAnimating) return;
+				currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+				updateCarousel();
+				resetCarouselInterval();
+			});
+
+			nextBtn.addEventListener("click", () => {
+				if (isAnimating) return;
+				currentIndex = (currentIndex + 1) % totalItems;
+				updateCarousel();
+				resetCarouselInterval();
+			});
+
+			// Click on indicator to go to specific slide
+			indicators.forEach((indicator, index) => {
+				indicator.addEventListener("click", () => {
+					if (isAnimating) return;
+					goToSlide(index);
+				});
+			});
+
+			function resetCarouselInterval() {
+				clearInterval(carouselInterval);
+				startCarousel();
+			}
+
+			// Pause carousel on hover
+			carouselInner.parentElement.addEventListener("mouseenter", () => {
+				clearInterval(carouselInterval);
+			});
+
+			carouselInner.parentElement.addEventListener("mouseleave", () => {
+				resetCarouselInterval();
+			});
+
+			// Start the carousel
+			startCarousel();
+
+			// Handle visibility change
+			document.addEventListener("visibilitychange", () => {
+				if (document.hidden) {
+					clearInterval(carouselInterval);
+				} else {
+					resetCarouselInterval();
+				}
+			});
+
+			// Lazy loading for images with IntersectionObserver
+			const lazyLoadImages = () => {
+				const lazyImages = document.querySelectorAll(".lazy");
+
+				const imageObserver = new IntersectionObserver(
+					(entries, observer) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) {
+								const img = entry.target;
+								const src = img.getAttribute("data-src");
+
+								if (src) {
+									// Show loading overlay for better UX
+									showLoadingOverlay();
+
+									// Create a new image to preload
+									const tempImg = new Image();
+									tempImg.src = src;
+									tempImg.onload = () => {
+										img.setAttribute("src", src);
+										img.classList.add("loaded");
+										observer.unobserve(img);
+										hideLoadingOverlay();
+									};
+									tempImg.onerror = () => {
+										// Fallback image if loading fails
+										img.src =
+											'https://plus.unsplash.com/premium_photo-1709007738178-103522f6904f?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+										img.classList.add("loaded");
+										observer.unobserve(img);
+										hideLoadingOverlay();
+									};
+								}
+							}
+						});
+					},
+					{
+						rootMargin: "200px 0px",
+						threshold: 0.01,
+					}
+				);
+
+				lazyImages.forEach((img) => {
+					imageObserver.observe(img);
+				});
+			};
+
+			// Loading overlay functions
+			function showLoadingOverlay() {
+				const overlay = document.getElementById("loadingOverlay");
+				overlay.classList.remove("opacity-0", "pointer-events-none");
+				overlay.classList.add("opacity-100");
+			}
+
+			function hideLoadingOverlay() {
+				const overlay = document.getElementById("loadingOverlay");
+				overlay.classList.add("opacity-0", "pointer-events-none");
+				overlay.classList.remove("opacity-100");
+			}
+
+			// Initialize lazy loading
+			document.addEventListener("DOMContentLoaded", lazyLoadImages);
+
+			// Search functionality with debounce
+			const searchInput = document.getElementById("searchInput");
+			const articleGrid = document.getElementById("articleGrid");
+			const articles = document.querySelectorAll(".article-card");
+
+			let searchTimeout;
+
+			searchInput.addEventListener("input", () => {
+				clearTimeout(searchTimeout);
+				searchTimeout = setTimeout(() => {
+					const searchTerm = searchInput.value.trim().toLowerCase();
+					filterArticles(searchTerm);
+				}, 300);
+			});
+
+			// Navigation category filtering
+			const navLinks = document.querySelectorAll("#mainNav a[data-category]");
+
+			navLinks.forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+
+					// Update active state
+					navLinks.forEach((navLink) => {
+						navLink.classList.remove("active", "text-primary");
+						navLink.classList.add("hover:text-primary");
+					});
+					link.classList.add("active", "text-primary");
+					link.classList.remove("hover:text-primary");
+
+					// Filter articles
+					const category = link.getAttribute("data-category");
+					if (category === "all") {
+						articles.forEach((article) => {
+							article.style.display = "flex";
+							article.classList.add("animate-slide-up");
+						});
+						// Clear search input
+						searchInput.value = "";
+					} else {
+						articles.forEach((article) => {
+							const articleCategory = article.getAttribute("data-category");
+							if (articleCategory === category) {
+								article.style.display = "flex";
+								article.classList.add("animate-slide-up");
+							} else {
+								article.style.display = "none";
+							}
+						});
+						// Clear search input
+						searchInput.value = "";
+					}
+
+					// Show no results message if needed
+					checkNoResults();
+				});
+			});
+
+			// Sorting functionality
+			const sortButtons = document.querySelectorAll("[data-sort]");
+			sortButtons.forEach((button) => {
+				button.addEventListener("click", () => {
+					const sortType = button.getAttribute("data-sort");
+					sortArticles(sortType);
+
+					// Update active sort button
+					sortButtons.forEach((btn) => {
+						btn.classList.remove("bg-primary", "text-white", "border-primary");
+						btn.classList.add("border-slate-300", "dark:border-slate-600");
+					});
+					button.classList.add("bg-primary", "text-white", "border-primary");
+					button.classList.remove("border-slate-300", "dark:border-slate-600");
+				});
+			});
+
+			function sortArticles(sortType) {
+				const articlesArray = Array.from(articles);
+
+				articlesArray.sort((a, b) => {
+					if (sortType === "newest") {
+						const dateA = new Date(a.getAttribute("data-date"));
+						const dateB = new Date(b.getAttribute("data-date"));
+						return dateB - dateA;
+					} else if (sortType === "popular") {
+						const viewsA = parseInt(a.getAttribute("data-views"));
+						const viewsB = parseInt(b.getAttribute("data-views"));
+						return viewsB - viewsA;
+					}
+					return 0;
+				});
+
+				// Re-append articles in sorted order
+				articlesArray.forEach((article) => {
+					articleGrid.appendChild(article);
+					article.classList.add("animate-slide-up");
+				});
+			}
+
+			function filterArticles(searchTerm) {
+				let hasResults = false;
+
+				articles.forEach((article) => {
+					const title = article.getAttribute("data-title").toLowerCase();
+					const category = article.getAttribute("data-category").toLowerCase();
+					const author = article
+						.querySelector("span")
+						.textContent.toLowerCase();
+
+					if (
+						title.includes(searchTerm) ||
+						category.includes(searchTerm) ||
+						author.includes(searchTerm)
+					) {
+						article.style.display = "flex";
+						article.classList.add("animate-slide-up");
+						hasResults = true;
+					} else {
+						article.style.display = "none";
+					}
+				});
+
+				// Update active nav link
+				if (searchTerm) {
+					navLinks.forEach((link) => {
+						link.classList.remove("active", "text-primary");
+						link.classList.add("hover:text-primary");
+					});
+				}
+
+				// Show no results message if no matches found
+				if (!hasResults) {
+					showNoResults();
+				} else {
+					removeNoResults();
+				}
+			}
+
+			function checkNoResults() {
+				const visibleArticles = Array.from(articles).filter(
+					(article) => article.style.display !== "none"
+				);
+
+				if (visibleArticles.length === 0) {
+					showNoResults();
+				} else {
+					removeNoResults();
+				}
+			}
+
+			function showNoResults() {
+				if (!document.querySelector(".no-results")) {
+					const noResultsDiv = document.createElement("div");
+					noResultsDiv.className =
+						"no-results col-span-full text-center py-12 animate-fade-in";
+					noResultsDiv.innerHTML = `
+                    <i class="fas fa-search text-4xl text-slate-400 mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">No articles found</h3>
+                    <p class="text-slate-500">Try a different search term or category</p>
+                    <button class="mt-4 text-primary font-medium" id="resetFilters">Reset filters</button>
+                `;
+					articleGrid.appendChild(noResultsDiv);
+
+					// Add event listener to reset button
+					document
+						.getElementById("resetFilters")
+						.addEventListener("click", () => {
+							searchInput.value = "";
+							articles.forEach((article) => {
+								article.style.display = "flex";
+							});
+							navLinks.forEach((link) => {
+								link.classList.remove("active", "text-primary");
+								link.classList.add("hover:text-primary");
+							});
+							navLinks[0].classList.add("active", "text-primary");
+							navLinks[0].classList.remove("hover:text-primary");
+							removeNoResults();
+						});
+				}
+			}
+
+			function removeNoResults() {
+				const noResults = document.querySelector(".no-results");
+				if (noResults) {
+					noResults.remove();
+				}
+			}
+
+			// Social share functionality
+			function setupSocialShare() {
+				document.querySelectorAll(".social-btn").forEach((btn) => {
+					btn.addEventListener("click", (e) => {
+						e.preventDefault();
+						const articleCard = btn.closest(".article-card");
+						const articleTitle = articleCard.querySelector("h3").textContent;
+						const articleUrl = window.location.href;
+						let shareUrl = "";
+
+						if (btn.classList.contains("fa-facebook-f")) {
+							shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+								articleUrl
+							)}&quote=${encodeURIComponent(articleTitle)}`;
+						} else if (btn.classList.contains("fa-twitter")) {
+							shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+								articleTitle
+							)}&url=${encodeURIComponent(articleUrl)}`;
+						} else if (btn.classList.contains("fa-linkedin-in")) {
+							shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+								articleUrl
+							)}&title=${encodeURIComponent(articleTitle)}`;
+						} else if (btn.classList.contains("fa-whatsapp")) {
+							shareUrl = `https://wa.me/?text=${encodeURIComponent(
+								articleTitle + " - " + articleUrl
+							)}`;
+						}
+
+						if (shareUrl) {
+							window.open(shareUrl, "_blank", "width=600,height=400");
+						}
+					});
+				});
+			}
+
+			// Modal social share
+			function setupModalSocialShare() {
+				document
+					.querySelectorAll("#articleModal .social-btn")
+					.forEach((btn) => {
+						btn.addEventListener("click", (e) => {
+							e.preventDefault();
+							const articleTitle =
+								document.getElementById("modalTitle").textContent;
+							const articleUrl = window.location.href;
+							let shareUrl = "";
+
+							if (btn.classList.contains("fa-facebook-f")) {
+								shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+									articleUrl
+								)}&quote=${encodeURIComponent(articleTitle)}`;
+							} else if (btn.classList.contains("fa-twitter")) {
+								shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+									articleTitle
+								)}&url=${encodeURIComponent(articleUrl)}`;
+							} else if (btn.classList.contains("fa-linkedin-in")) {
+								shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(
+									articleUrl
+								)}&title=${encodeURIComponent(articleTitle)}`;
+							} else if (btn.classList.contains("fa-whatsapp")) {
+								shareUrl = `https://wa.me/?text=${encodeURIComponent(
+									articleTitle + " - " + articleUrl
+								)}`;
+							} else if (btn.classList.contains("fa-bookmark")) {
+								// Bookmark functionality
+								alert("Article bookmarked!");
+								return;
+							}
+
+							if (shareUrl) {
+								window.open(shareUrl, "_blank", "width=600,height=400");
+							}
+						});
+					});
+			}
+
+			// Add focus styles for keyboard navigation
+			document.addEventListener("keyup", (e) => {
+				if (e.key === "Tab") {
+					document.documentElement.classList.add("keyboard-focus");
+				}
+			});
+
+			document.addEventListener("mousedown", () => {
+				document.documentElement.classList.remove("keyboard-focus");
+			});
+
+			// Article Modal functionality
+			const articleModal = document.getElementById("articleModal");
+			const closeModal = document.getElementById("closeModal");
+			const modalImage = document.getElementById("modalImage");
+			const modalCategory = document.getElementById("modalCategory");
+			const modalTitle = document.getElementById("modalTitle");
+			const modalAuthor = document.getElementById("modalAuthor");
+			const modalTime = document.getElementById("modalTime");
+			const modalViews = document.getElementById("modalViews");
+			const modalContent = document.getElementById("modalContent");
+
+			// Sample article content with more details
+			const articleContents = {
+				"Election Polls Show Tight Race": {
+					content: `
+                    <p class="mb-4">The latest polls in the upcoming election show an unprecedented dead heat between the leading candidates, with both polling at 48% among likely voters. This marks the closest race in recent history, with undecided voters becoming the key demographic that could decide the outcome.</p>
+                    
+                    <h4 class="text-lg font-semibold mt-6 mb-3">Key Findings</h4>
+                    <ul class="list-disc pl-5 mb-4 space-y-2">
+                        <li>Both candidates are tied at 48% among likely voters</li>
+                        <li>4% of voters remain undecided</li>
+                        <li>Swing states show even narrower margins</li>
+                        <li>Young voters (18-29) favor Candidate A by 12 points</li>
+                        <li>Seniors (65+) favor Candidate B by 8 points</li>
+                    </ul>
+                    
+                    <p class="mb-4">Political analysts suggest that the tight race reflects the polarized nature of the current political climate, with voters deeply divided on key issues such as healthcare, education, and economic policy. Both campaigns have intensified their efforts in swing states, where the margin of victory is expected to be razor-thin.</p>
+                    
+                    <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 my-6">
+                        <h4 class="font-semibold mb-2">Expert Analysis</h4>
+                        <p>"This is one of the most evenly divided electorates we've seen in decades," said Dr. Sarah Johnson, political science professor at State University. "The outcome will likely come down to turnout and which campaign does a better job mobilizing their base."</p>
+                    </div>
+                    
+                    <p class="mb-4">The final debate, scheduled for next week, is expected to be crucial in swaying undecided voters. Both candidates have been preparing extensively, with their teams focusing on key issues that resonate with the undecided demographic.</p>
+                    
+                    <h4 class="text-lg font-semibold mt-6 mb-3">What's Next</h4>
+                    <p>Voter turnout is expected to be high, with early voting numbers already breaking records in several states. Election officials are preparing for a potentially contested result, with both campaigns assembling legal teams to handle any disputes that may arise.</p>
+                    
+                    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                        <h4 class="font-semibold mb-3">Related Stories</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <a href="#" class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-600 rounded-md overflow-hidden">
+                                    <img src="https://plus.unsplash.com/premium_photo-1709007738178-103522f6904f?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Debate preview" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm font-medium">Final Debate Preview: What to Expect</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-600 rounded-md overflow-hidden">
+                                    <img src="https://plus.unsplash.com/premium_photo-1709007738178-103522f6904f?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Voting guide" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm font-medium">2023 Voting Guide: Everything You Need to Know</span>
+                            </a>
+                        </div>
+                    </div>
+                `,
+					author: "By Jane Smith, Senior Political Correspondent",
+					time: "3 hours ago",
+					views: "1.2k views",
+				},
+				"New Study Reveals Benefits of Mediterranean Diet": {
+					content: `
+                    <p class="mb-4">A comprehensive five-year study involving over 10,000 participants has confirmed significant health benefits associated with the Mediterranean diet. The research, published in the Journal of Nutrition, found that participants following this eating pattern showed a 30% reduction in cardiovascular disease risk and improved cognitive function.</p>
+                    
+                    <h4 class="text-lg font-semibold mt-6 mb-3">Study Highlights</h4>
+                    <ul class="list-disc pl-5 mb-4 space-y-2">
+                        <li>30% lower risk of cardiovascular disease</li>
+                        <li>23% reduction in Alzheimer's risk</li>
+                        <li>Improved gut microbiome diversity</li>
+                        <li>Lower inflammation markers</li>
+                        <li>Better weight management</li>
+                    </ul>
+                    
+                    <p class="mb-4">The study tracked participants across multiple countries, monitoring their dietary habits and health outcomes. Key components of the diet, including olive oil, fish, whole grains, and fresh vegetables, were found to contribute to these health benefits.</p>
+                    
+                    <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 my-6">
+                        <h4 class="font-semibold mb-2">Researcher's Insight</h4>
+                        <p>"The Mediterranean diet isn't just about individual foods, but rather a pattern of eating that emphasizes plant-based foods, healthy fats, and moderate consumption of fish and poultry," explained lead researcher Dr. Elena Petrov. "This holistic approach appears to be key to its health benefits."</p>
+                    </div>
+                    
+                    <p class="mb-4">Researchers noted that the benefits were particularly pronounced in older adults, with participants over 65 showing improved memory function and reduced inflammation markers. The study also found that the diet's benefits were consistent across different genetic backgrounds.</p>
+                    
+                    <h4 class="text-lg font-semibold mt-6 mb-3">Getting Started</h4>
+                    <p>Nutrition experts recommend these simple steps to adopt a Mediterranean-style diet:</p>
+                    <ol class="list-decimal pl-5 mb-4 space-y-2">
+                        <li>Use olive oil as your primary fat</li>
+                        <li>Eat plenty of vegetables and fruits</li>
+                        <li>Choose whole grains over refined</li>
+                        <li>Include nuts and legumes regularly</li>
+                        <li>Eat fish twice a week</li>
+                        <li>Limit red meat to a few times per month</li>
+                    </ol>
+                    
+                    <p>Nutrition experts are now recommending the Mediterranean diet as a sustainable and effective approach to long-term health maintenance, with potential applications in preventing age-related diseases and improving overall quality of life.</p>
+                    
+                    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                        <h4 class="font-semibold mb-3">Related Stories</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <a href="#" class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-600 rounded-md overflow-hidden">
+                                    <img src="https://source.unsplash.com/random/100x100/?oliveoil" alt="Olive oil benefits" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm font-medium">The Science Behind Olive Oil's Health Benefits</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-600 rounded-md overflow-hidden">
+                                    <img src="https://source.unsplash.com/random/100x100/?brainfood" alt="Brain food" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm font-medium">Foods That Boost Brain Health</span>
+                            </a>
+                        </div>
+                    </div>
+                `,
+					author: "By Dr. Michael Chen, Health Editor",
+					time: "5 hours ago",
+					views: "1.8k views",
+				},
+				"Mars Rover Discovers Evidence of Ancient Water": {
+					content: `
+                    <p class="mb-4">NASA's Perseverance rover has made a groundbreaking discovery that suggests Mars once had conditions suitable for life. The rover's analysis of rock samples in Jezero Crater has revealed clear evidence of ancient water systems and organic compounds.</p>
+                    
+                    <h4 class="text-lg font-semibold mt-6 mb-3">Key Discoveries</h4>
+                    <ul class="list-disc pl-5 mb-4 space-y-2">
+                        <li>Clay minerals that only form in water</li>
+                        <li>Salts that indicate evaporation of standing water</li>
+                        <li>Organic molecules preserved in rocks</li>
+                        <li>Layered rock formations typical of river deltas</li>
+                        <li>pH-neutral water conditions that could have supported life</li>
+                    </ul>
+                    
+                    <p class="mb-4">The findings, published in the journal Science, show that the crater was once a lake bed with a complex network of rivers and deltas. The preserved geological features indicate that water was present for extended periods, potentially creating habitable environments.</p>
+                    
+                    <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-4 my-6">
+                        <h4 class="font-semibold mb-2">Scientist's Perspective</h4>
+                        <p>"This is the most compelling evidence we've found that Mars once had persistent liquid water," said Dr. Amanda Zhou, lead scientist on the Perseverance mission. "The conditions we're seeing would have been suitable for microbial life, if it ever existed on Mars."</p>
+                    </div>
+                    
+                    <p class="mb-4">Scientists are particularly excited about the discovery of organic molecules, which are the building blocks of life. While this doesn't prove that life existed on Mars, it significantly increases the possibility that microbial life could have developed in these ancient water systems.</p>
+                    
+                    <h4 class="text-lg font-semibold mt-6 mb-3">Mission Update</h4>
+                    <p>The rover will continue its mission, collecting more samples that will eventually be returned to Earth for detailed analysis. These findings have reinvigorated the scientific community's interest in Mars exploration and the search for extraterrestrial life.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                        <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2">Next Steps</h4>
+                            <ul class="list-disc pl-5 space-y-1 text-sm">
+                                <li>Continue exploring Jezero Crater</li>
+                                <li>Collect additional rock samples</li>
+                                <li>Search for more complex organic molecules</li>
+                                <li>Prepare samples for future return mission</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-700 rounded-lg p-4">
+                            <h4 class="font-semibold mb-2">Timeline</h4>
+                            <ul class="list-disc pl-5 space-y-1 text-sm">
+                                <li>2026: Sample return mission launch</li>
+                                <li>2028: Samples arrive on Earth</li>
+                                <li>2030s: Potential crewed mission to Mars</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p>These discoveries come at a pivotal time for Mars exploration, with multiple space agencies planning missions to the Red Planet in the coming decade. The findings will help guide future exploration and the search for signs of past life.</p>
+                    
+                    <div class="mt-8 pt-6 border-t border-slate-200 dark:border-slate-700">
+                        <h4 class="font-semibold mb-3">Related Stories</h4>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <a href="#" class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-600 rounded-md overflow-hidden">
+                                    <img src="https://source.unsplash.com/random/100x100/?telescope" alt="Space telescope" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm font-medium">New Space Telescope Reveals Mars in Unprecedented Detail</span>
+                            </a>
+                            <a href="#" class="flex items-center gap-3 hover:bg-slate-100 dark:hover:bg-slate-700 p-2 rounded-lg transition-colors">
+                                <div class="w-16 h-16 bg-slate-200 dark:bg-slate-600 rounded-md overflow-hidden">
+                                    <img src="https://source.unsplash.com/random/100x100/?astronaut" alt="Astronaut" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm font-medium">NASA Announces Astronaut Selection for Future Mars Mission</span>
+                            </a>
+                        </div>
+                    </div>
+                `,
+					author: "By Sarah Johnson, Space Correspondent",
+					time: "8 hours ago",
+					views: "2.4k views",
+				},
+			};
+
+			// Add click event to all "Read more" links
+			document.querySelectorAll(".read-more-btn").forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					const articleCard = link.closest(".article-card");
+					const title = articleCard.querySelector("h3").textContent;
+					const category = articleCard.querySelector("span").textContent;
+					const author = articleCard.querySelector(
+						".text-slate-500 span"
+					).textContent;
+					const time = articleCard.querySelector(
+						".text-slate-500 span:nth-child(2)"
+					).textContent;
+					const views = articleCard.querySelector(
+						".text-slate-500 span:nth-child(3)"
+					).textContent;
+					const image = articleCard
+						.querySelector("img")
+						.getAttribute("data-src");
+
+					// Show loading overlay
+					showLoadingOverlay();
+
+					// Simulate loading delay for demo purposes
+					setTimeout(() => {
+						// Update modal content
+						modalImage.src = image;
+						modalCategory.textContent = category;
+						modalTitle.textContent = title;
+						modalAuthor.textContent = articleContents[title]?.author || author;
+						modalTime.textContent = articleContents[title]?.time || time;
+						modalViews.textContent = articleContents[title]?.views || views;
+						modalContent.innerHTML =
+							articleContents[title]?.content ||
+							`
+                        <p>Article content not available.</p>
+                        <p class="mt-4">We apologize for the inconvenience. Our team is working to restore this content as soon as possible.</p>
+                    `;
+
+						// Setup social sharing for modal
+						setupModalSocialShare();
+
+						// Show modal with animation
+						articleModal.classList.remove("hidden");
+						setTimeout(() => {
+							articleModal
+								.querySelector(".transform")
+								.classList.remove("scale-95", "opacity-0");
+							hideLoadingOverlay();
+						}, 10);
+					}, 800);
+				});
+			});
+
+			// Close modal functionality
+			function closeArticleModal() {
+				articleModal
+					.querySelector(".transform")
+					.classList.add("scale-95", "opacity-0");
+				setTimeout(() => {
+					articleModal.classList.add("hidden");
+				}, 300);
+			}
+
+			closeModal.addEventListener("click", closeArticleModal);
+
+			// Close modal when clicking outside
+			articleModal.addEventListener("click", (e) => {
+				if (e.target === articleModal) {
+					closeArticleModal();
+				}
+			});
+
+			// Close modal with Escape key
+			document.addEventListener("keydown", (e) => {
+				if (e.key === "Escape" && !articleModal.classList.contains("hidden")) {
+					closeArticleModal();
+				}
+			});
+
+			// Initialize social sharing
+			setupSocialShare();
+
+			// Add animation to elements when they come into view
+			const animateOnScroll = () => {
+				const elements = document.querySelectorAll(
+					".animate-slide-up, .animate-fade-in"
+				);
+
+				const observer = new IntersectionObserver(
+					(entries) => {
+						entries.forEach((entry) => {
+							if (entry.isIntersecting) {
+								entry.target.classList.add("opacity-100", "translate-y-0");
+								observer.unobserve(entry.target);
+							}
+						});
+					},
+					{
+						threshold: 0.1,
+					}
+				);
+
+				elements.forEach((element) => {
+					observer.observe(element);
+				});
+			};
+
+			// Initialize animations
+			document.addEventListener("DOMContentLoaded", () => {
+				animateOnScroll();
+
+				// Add animation classes to elements that should animate immediately
+				document.querySelectorAll(".animate-immediate").forEach((el) => {
+					el.classList.add("opacity-100", "translate-y-0");
+				});
+			});
+
+			// Handle window resize for responsive adjustments
+			let resizeTimer;
+			window.addEventListener("resize", () => {
+				clearTimeout(resizeTimer);
+				resizeTimer = setTimeout(() => {
+					// Update carousel on resize
+					updateCarousel();
+				}, 250);
+			});
+
+			// Initialize with newest first
+			sortArticles("newest");
+		</script>
+	</body>
+</html>
