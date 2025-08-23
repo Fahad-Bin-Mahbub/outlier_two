@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Orbital Mechanics Simulator</title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700&display=swap");
+
+			:root {
+				--space-black: #0f172a;
+				--space-dark: #1e293b;
+				--space-mid: #334155;
+				--space-light: #64748b;
+				--star-bright: #e2e8f0;
+				--accent-blue: #38bdf8;
+				--accent-purple: #a855f7;
+				--accent-red: #f43f5e;
+				--accent-green: #22c55e;
+			}
+
+			body {
+				font-family: "Exo 2", sans-serif;
+				background-color: var(--space-black);
+				color: white;
+				background-image: radial-gradient(
+						white,
+						rgba(255, 255, 255, 0.2) 2px,
+						transparent 2px
+					),
+					radial-gradient(white, rgba(255, 255, 255, 0.15) 1px, transparent 1px),
+					radial-gradient(white, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+				background-size: 550px 550px, 350px 350px, 250px 250px;
+				background-position: 0 0, 40px 60px, 130px 270px;
+				overflow-x: hidden;
+				min-height: 100vh;
+			}
+
+			.navbar-gradient {
+				background: linear-gradient(90deg, #0f172a 0%, #1e3a8a 100%);
+			}
+
+			.planet-card {
+				cursor: pointer;
+				transition: all 0.3s ease;
+			}
+
+			.planet-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3);
+			}
+
+			.planet-card.selected {
+				border: 2px solid var(--accent-blue);
+				box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+			}
+
+			.control-panel {
+				background-color: rgba(15, 23, 42, 0.8);
+				backdrop-filter: blur(10px);
+				border: 1px solid rgba(56, 189, 248, 0.3);
+			}
+
+			.simulation-container {
+				position: relative;
+				width: 100%;
+				background-color: rgba(15, 23, 42, 0.5);
+				border-radius: 1rem;
+				overflow: hidden;
+			}
+
+			.orbit-canvas {
+				background-color: transparent;
+			}
+
+			.slider-container input[type="range"] {
+				-webkit-appearance: none;
+				width: 100%;
+				height: 6px;
+				background: var(--space-mid);
+				border-radius: 3px;
+				outline: none;
+			}
+
+			.slider-container input[type="range"]::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				width: 18px;
+				height: 18px;
+				background: var(--accent-blue);
+				border-radius: 50%;
+				cursor: pointer;
+			}
+
+			.slider-container input[type="range"]::-moz-range-thumb {
+				width: 18px;
+				height: 18px;
+				background: var(--accent-blue);
+				border-radius: 50%;
+				cursor: pointer;
+				border: none;
+			}
+
+			.glowing-button {
+				position: relative;
+				overflow: hidden;
+				transition: all 0.3s ease;
+			}
+
+			.glowing-button:hover {
+				box-shadow: 0 0 15px rgba(56, 189, 248, 0.7);
+			}
+
+			.glowing-button:after {
+				content: "";
+				position: absolute;
+				top: -50%;
+				left: -50%;
+				width: 200%;
+				height: 200%;
+				background: linear-gradient(
+					60deg,
+					transparent,
+					rgba(56, 189, 248, 0.2),
+					transparent
+				);
+				transform: rotate(45deg);
+				animation: glow 3s linear infinite;
+			}
+
+			@keyframes glow {
+				0% {
+					transform: rotate(45deg) translateX(-100%);
+				}
+				100% {
+					transform: rotate(45deg) translateX(100%);
+				}
+			}
+
+			.tooltip {
+				position: relative;
+				display: inline-block;
+			}
+
+			.tooltip .tooltiptext {
+				visibility: hidden;
+				width: 200px;
+				background-color: var(--space-dark);
+				color: #fff;
+				text-align: center;
+				border-radius: 6px;
+				padding: 5px;
+				position: absolute;
+				z-index: 1;
+				bottom: 125%;
+				left: 50%;
+				margin-left: -100px;
+				opacity: 0;
+				transition: opacity 0.3s;
+				font-size: 0.8rem;
+				border: 1px solid var(--accent-blue);
+			}
+
+			.tooltip:hover .tooltiptext {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			/* Responsive styling */
+			@media (max-width: 768px) {
+				.control-panel {
+					margin-bottom: 1rem;
+				}
+
+				.orbit-data {
+					flex-direction: column;
+				}
+
+				.simulation-container {
+					height: 300px !important;
+				}
+
+				.planet-selection {
+					flex-wrap: wrap;
+					justify-content: center;
+				}
+
+				.planet-card {
+					width: 80px;
+					margin: 0.5rem;
+				}
+			}
+		</style>
+	</head>
+	<body class="text-gray-100">
+		<!-- Navbar -->
+		<nav class="navbar-gradient shadow-lg w-full">
+			<div
+				class="container mx-auto px-4 py-3 flex justify-between items-center"
+			>
+				<div class="flex items-center">
+					<i class="fas fa-planet-ringed text-3xl text-blue-400 mr-3"></i>
+					<h1 class="text-2xl font-bold">Orbital Mechanics Simulator</h1>
+				</div>
+				<div class="hidden md:flex space-x-6">
+					<a href="#simulator" class="hover:text-blue-400 transition-colors"
+						>Simulator</a
+					>
+					<a href="#education" class="hover:text-blue-400 transition-colors"
+						>Learn</a
+					>
+					<a href="#about" class="hover:text-blue-400 transition-colors"
+						>About</a
+					>
+				</div>
+				<button class="md:hidden text-xl">
+					<i class="fas fa-bars"></i>
+				</button>
+			</div>
+		</nav>
+
+		<!-- Main content -->
+		<main class="container mx-auto px-4 py-8">
+			<!-- Hero Section -->
+			<section class="mb-12 text-center">
+				<h2 class="text-4xl font-bold mb-4 text-blue-400">
+					Explore Orbital Dynamics
+				</h2>
+				<p class="text-xl max-w-3xl mx-auto text-gray-300">
+					Adjust parameters to see how mass, velocity, and distance affect the
+					orbits of celestial bodies.
+				</p>
+			</section>
+
+			<!-- Simulator Section -->
+			<section id="simulator" class="mb-16">
+				<div class="flex flex-col lg:flex-row gap-6">
+					<!-- Control Panel -->
+					<div class="control-panel rounded-lg p-6 shadow-lg lg:w-1/3">
+						<h3 class="text-2xl font-bold mb-6 text-center text-blue-400">
+							Control Panel
+						</h3>
+
+						<!-- Planet Selection -->
+						<div class="mb-8">
+							<h4 class="text-lg font-semibold mb-3">Select Central Body</h4>
+							<div class="planet-selection flex overflow-x-auto py-2 space-x-4">
+								<div
+									class="planet-card selected p-3 bg-gray-800 rounded-lg text-center flex-shrink-0"
+									data-mass="1.989e30"
+									data-radius="696340"
+									data-name="Sun"
+								>
+									<div
+										class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 mb-2"
+									></div>
+									<span>Sun</span>
+								</div>
+								<div
+									class="planet-card p-3 bg-gray-800 rounded-lg text-center flex-shrink-0"
+									data-mass="5.972e24"
+									data-radius="6371"
+									data-name="Earth"
+								>
+									<div
+										class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-400 to-green-500 mb-2"
+									></div>
+									<span>Earth</span>
+								</div>
+								<div
+									class="planet-card p-3 bg-gray-800 rounded-lg text-center flex-shrink-0"
+									data-mass="7.347e22"
+									data-radius="1737"
+									data-name="Moon"
+								>
+									<div
+										class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-gray-300 to-gray-500 mb-2"
+									></div>
+									<span>Moon</span>
+								</div>
+								<div
+									class="planet-card p-3 bg-gray-800 rounded-lg text-center flex-shrink-0"
+									data-mass="6.4185e23"
+									data-radius="3389"
+									data-name="Mars"
+								>
+									<div
+										class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-red-400 to-red-700 mb-2"
+									></div>
+									<span>Mars</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Orbital Parameters -->
+						<div class="mb-8">
+							<h4 class="text-lg font-semibold mb-4">Orbital Parameters</h4>
+
+							<!-- Mass Slider -->
+							<div class="slider-container mb-4">
+								<div class="flex justify-between items-center mb-2">
+									<label for="satellite-mass" class="text-sm"
+										>Satellite Mass (kg)</label
+									>
+									<span
+										id="mass-value"
+										class="text-sm font-mono bg-gray-800 px-2 py-1 rounded"
+										>1.00e3</span
+									>
+								</div>
+								<input
+									type="range"
+									id="satellite-mass"
+									min="1"
+									max="6"
+									step="0.1"
+									value="3"
+									class="w-full"
+								/>
+							</div>
+
+							<!-- Initial Distance Slider -->
+							<div class="slider-container mb-4">
+								<div class="flex justify-between items-center mb-2">
+									<label for="initial-distance" class="text-sm"
+										>Initial Distance (km)</label
+									>
+									<span
+										id="distance-value"
+										class="text-sm font-mono bg-gray-800 px-2 py-1 rounded"
+										>15000</span
+									>
+								</div>
+								<input
+									type="range"
+									id="initial-distance"
+									min="8000"
+									max="50000"
+									step="1000"
+									value="15000"
+									class="w-full"
+								/>
+							</div>
+
+							<!-- Initial Velocity Slider -->
+							<div class="slider-container mb-4">
+								<div class="flex justify-between items-center mb-2">
+									<label for="initial-velocity" class="text-sm"
+										>Initial Velocity (km/s)</label
+									>
+									<span
+										id="velocity-value"
+										class="text-sm font-mono bg-gray-800 px-2 py-1 rounded"
+										>5.0</span
+									>
+								</div>
+								<input
+									type="range"
+									id="initial-velocity"
+									min="0.1"
+									max="20"
+									step="0.1"
+									value="5.0"
+									class="w-full"
+								/>
+							</div>
+
+							<!-- Angle Slider -->
+							<div class="slider-container mb-6">
+								<div class="flex justify-between items-center mb-2">
+									<label for="angle" class="text-sm"
+										>Initial Angle (degrees)</label
+									>
+									<span
+										id="angle-value"
+										class="text-sm font-mono bg-gray-800 px-2 py-1 rounded"
+										>90</span
+									>
+								</div>
+								<input
+									type="range"
+									id="angle"
+									min="0"
+									max="360"
+									step="1"
+									value="90"
+									class="w-full"
+								/>
+							</div>
+
+							<!-- Simulation Controls -->
+							<div class="flex gap-4">
+								<button
+									id="simulate-btn"
+									class="glowing-button bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg flex-grow flex items-center justify-center"
+								>
+									<i class="fas fa-play mr-2"></i> Simulate
+								</button>
+								<button
+									id="reset-btn"
+									class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg"
+								>
+									<i class="fas fa-redo"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Simulation Display -->
+					<div class="lg:w-2/3">
+						<div class="simulation-container" style="height: 500px">
+							<canvas
+								id="orbit-canvas"
+								class="orbit-canvas w-full h-full"
+							></canvas>
+						</div>
+
+						<!-- Orbital Data Display -->
+						<div class="bg-gray-800 bg-opacity-70 rounded-lg mt-4 p-4">
+							<h4 class="text-lg font-semibold mb-3">Orbital Data</h4>
+							<div class="orbit-data grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div class="bg-gray-900 p-3 rounded-lg">
+									<div class="text-sm text-gray-400">Orbital Period</div>
+									<div id="orbital-period" class="text-lg font-mono">
+										-- days
+									</div>
+								</div>
+								<div class="bg-gray-900 p-3 rounded-lg">
+									<div class="text-sm text-gray-400">Eccentricity</div>
+									<div id="eccentricity" class="text-lg font-mono">--</div>
+								</div>
+								<div class="bg-gray-900 p-3 rounded-lg">
+									<div class="text-sm text-gray-400">Orbit Type</div>
+									<div id="orbit-type" class="text-lg">--</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Educational Section -->
+			<section id="education" class="mb-16">
+				<div class="bg-gray-800 bg-opacity-40 rounded-lg p-6 shadow-lg">
+					<h3 class="text-2xl font-bold mb-4 text-center text-blue-400">
+						Understanding Orbital Mechanics
+					</h3>
+
+					<div class="grid md:grid-cols-2 gap-6 mt-8">
+						<div>
+							<h4 class="text-xl font-semibold mb-3">Kepler's Laws</h4>
+							<ul class="space-y-3 text-gray-300">
+								<li class="flex items-start">
+									<span
+										class="bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-1"
+										>1</span
+									>
+									<span
+										>Planets move in elliptical orbits with the Sun at one
+										focus.</span
+									>
+								</li>
+								<li class="flex items-start">
+									<span
+										class="bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-1"
+										>2</span
+									>
+									<span
+										>A line joining a planet and the Sun sweeps out equal areas
+										in equal times.</span
+									>
+								</li>
+								<li class="flex items-start">
+									<span
+										class="bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center mr-3 flex-shrink-0 mt-1"
+										>3</span
+									>
+									<span
+										>The square of the orbital period is proportional to the
+										cube of the semi-major axis.</span
+									>
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<h4 class="text-xl font-semibold mb-3">Orbit Types</h4>
+							<div class="space-y-3 text-gray-300">
+								<div class="flex items-start">
+									<div
+										class="w-4 h-4 rounded-full bg-green-500 mt-1 mr-3"
+									></div>
+									<div>
+										<span class="font-semibold block">Circular (e = 0)</span>
+										<span class="text-sm"
+											>Special case of an ellipse where the foci coincide.</span
+										>
+									</div>
+								</div>
+								<div class="flex items-start">
+									<div class="w-4 h-4 rounded-full bg-blue-500 mt-1 mr-3"></div>
+									<div>
+										<span class="font-semibold block"
+											>Elliptical (0 < e < 1)</span
+										>
+										<span class="text-sm"
+											>Closed orbit with varying distance from the central
+											body.</span
+										>
+									</div>
+								</div>
+								<div class="flex items-start">
+									<div
+										class="w-4 h-4 rounded-full bg-yellow-500 mt-1 mr-3"
+									></div>
+									<div>
+										<span class="font-semibold block">Parabolic (e = 1)</span>
+										<span class="text-sm"
+											>Escape velocity with exactly enough energy to escape the
+											gravitational field.</span
+										>
+									</div>
+								</div>
+								<div class="flex items-start">
+									<div class="w-4 h-4 rounded-full bg-red-500 mt-1 mr-3"></div>
+									<div>
+										<span class="font-semibold block">Hyperbolic (e > 1)</span>
+										<span class="text-sm"
+											>Open orbit with excess velocity to escape the
+											gravitational field.</span
+										>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-8">
+						<h4 class="text-xl font-semibold mb-3">
+							Key Factors Affecting Orbits
+						</h4>
+						<div class="grid md:grid-cols-3 gap-4">
+							<div class="bg-gray-900 p-4 rounded-lg">
+								<h5 class="font-semibold text-blue-400 mb-2">Mass</h5>
+								<p class="text-gray-300 text-sm">
+									Larger central body mass creates stronger gravity, affecting
+									orbital velocity requirements and period.
+								</p>
+							</div>
+							<div class="bg-gray-900 p-4 rounded-lg">
+								<h5 class="font-semibold text-blue-400 mb-2">Velocity</h5>
+								<p class="text-gray-300 text-sm">
+									Initial velocity determines if an orbit is circular,
+									elliptical, parabolic, or hyperbolic. Escape velocity is key.
+								</p>
+							</div>
+							<div class="bg-gray-900 p-4 rounded-lg">
+								<h5 class="font-semibold text-blue-400 mb-2">Distance</h5>
+								<p class="text-gray-300 text-sm">
+									Initial distance affects required velocity for stable orbit
+									and helps determine orbital energy.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- About Section -->
+			<section id="about" class="mb-8">
+				<div class="bg-gray-800 bg-opacity-40 rounded-lg p-6 shadow-lg">
+					<h3 class="text-2xl font-bold mb-4 text-center text-blue-400">
+						About This Simulator
+					</h3>
+					<p class="text-gray-300 mb-4">
+						This orbital mechanics simulator provides an interactive way to
+						explore how different parameters affect the behavior of orbiting
+						bodies. The simulation uses real physics equations to calculate
+						orbital trajectories based on gravitational forces.
+					</p>
+					<p class="text-gray-300 mb-4">
+						While simplified for educational purposes, this simulator
+						demonstrates the fundamental principles of orbital mechanics that
+						govern the motion of planets, moons, and satellites in our solar
+						system and beyond.
+					</p>
+					<div
+						class="bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg p-4 text-sm"
+					>
+						<h4 class="font-semibold text-blue-400 mb-2">Simulation Notes:</h4>
+						<ul class="list-disc pl-5 space-y-1 text-gray-300">
+							<li>
+								Gravitational calculations use Newton's law of universal
+								gravitation
+							</li>
+							<li>The simulation uses a 2D representation of orbital paths</li>
+							<li>
+								Central body is fixed in place and rotation effects are not
+								simulated
+							</li>
+							<li>Relativistic effects are not included in this basic model</li>
+						</ul>
+					</div>
+				</div>
+			</section>
+		</main>
+
+		<!-- Footer -->
+		<footer class="bg-gray-900 py-6">
+			<div class="container mx-auto px-4">
+				<div class="flex flex-col md:flex-row justify-between items-center">
+					<div class="mb-4 md:mb-0">
+						<h3 class="text-xl font-bold text-blue-400">
+							Orbital Mechanics Simulator
+						</h3>
+						<p class="text-gray-400 text-sm">
+							Educational tool for exploring celestial mechanics
+						</p>
+					</div>
+					<div class="flex space-x-4">
+						<a href="#" class="text-gray-400 hover:text-blue-400">
+							<i class="fab fa-github text-xl"></i>
+						</a>
+						<a href="#" class="text-gray-400 hover:text-blue-400">
+							<i class="fab fa-twitter text-xl"></i>
+						</a>
+						<a href="#" class="text-gray-400 hover:text-blue-400">
+							<i class="fas fa-envelope text-xl"></i>
+						</a>
+					</div>
+				</div>
+				<div class="mt-6 text-center text-gray-500 text-sm">
+					© 2025 Orbital Mechanics Simulator | Created for educational purposes
+				</div>
+			</div>
+		</footer>
+
+		<!-- JavaScript -->
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				// Canvas setup
+				const canvas = document.getElementById("orbit-canvas");
+				const ctx = canvas.getContext("2d");
+
+				// Set canvas dimensions to match container
+				function resizeCanvas() {
+					const container = canvas.parentElement;
+					canvas.width = container.clientWidth;
+					canvas.height = container.clientHeight;
+				}
+
+				window.addEventListener("resize", resizeCanvas);
+				resizeCanvas();
+
+				// Physics constants
+				const G = 6.6743e-11; // Gravitational constant (m^3 kg^-1 s^-2)
+
+				// Simulation variables
+				let centralBodyMass = 1.989e30; // Default: Sun (kg)
+				let centralBodyRadius = 696340; // Default: Sun (km)
+				let centralBodyName = "Sun";
+				let satelliteMass = 1000; // kg
+				let initialDistance = 15000; // km
+				let initialVelocity = 5.0; // km/s
+				let initialAngle = 90; // degrees
+
+				// Orbit calculation variables
+				let orbitPoints = [];
+				let orbitType = "";
+				let eccentricity = 0;
+				let orbitalPeriod = 0;
+
+				// UI elements
+				const massSlider = document.getElementById("satellite-mass");
+				const distanceSlider = document.getElementById("initial-distance");
+				const velocitySlider = document.getElementById("initial-velocity");
+				const angleSlider = document.getElementById("angle");
+				const massValue = document.getElementById("mass-value");
+				const distanceValue = document.getElementById("distance-value");
+				const velocityValue = document.getElementById("velocity-value");
+				const angleValue = document.getElementById("angle-value");
+				const simulateBtn = document.getElementById("simulate-btn");
+				const resetBtn = document.getElementById("reset-btn");
+				const orbitalPeriodDisplay = document.getElementById("orbital-period");
+				const eccentricityDisplay = document.getElementById("eccentricity");
+				const orbitTypeDisplay = document.getElementById("orbit-type");
+				const planetCards = document.querySelectorAll(".planet-card");
+
+				// Initialize values
+				updateMassValue();
+				updateDistanceValue();
+				updateVelocityValue();
+				updateAngleValue();
+
+				// Event listeners for sliders
+				massSlider.addEventListener("input", updateMassValue);
+				distanceSlider.addEventListener("input", updateDistanceValue);
+				velocitySlider.addEventListener("input", updateVelocityValue);
+				angleSlider.addEventListener("input", updateAngleValue);
+
+				// Event listeners for buttons
+				simulateBtn.addEventListener("click", calculateOrbit);
+				resetBtn.addEventListener("click", resetSimulation);
+
+				// Event listeners for planet selection
+				planetCards.forEach((card) => {
+					card.addEventListener("click", function () {
+						planetCards.forEach((c) => c.classList.remove("selected"));
+						this.classList.add("selected");
+						centralBodyMass = parseFloat(this.getAttribute("data-mass"));
+						centralBodyRadius = parseFloat(this.getAttribute("data-radius"));
+						centralBodyName = this.getAttribute("data-name");
+
+						// Adjust distance scale based on selected body
+						if (centralBodyName === "Sun") {
+							distanceSlider.min = 8000;
+							distanceSlider.max = 50000;
+							distanceSlider.value = 15000;
+						} else if (centralBodyName === "Earth") {
+							distanceSlider.min = 6500;
+							distanceSlider.max = 20000;
+							distanceSlider.value = 8000;
+						} else if (centralBodyName === "Moon") {
+							distanceSlider.min = 1800;
+							distanceSlider.max = 10000;
+							distanceSlider.value = 2500;
+						} else if (centralBodyName === "Mars") {
+							distanceSlider.min = 3500;
+							distanceSlider.max = 15000;
+							distanceSlider.value = 5000;
+						}
+
+						updateDistanceValue();
+						calculateOrbit();
+					});
+				});
+
+				// Slider value update functions
+				function updateMassValue() {
+					satelliteMass = Math.pow(10, parseFloat(massSlider.value));
+					massValue.textContent = satelliteMass.toExponential(2);
+				}
+
+				function updateDistanceValue() {
+					initialDistance = parseInt(distanceSlider.value);
+					distanceValue.textContent = initialDistance;
+				}
+
+				function updateVelocityValue() {
+					initialVelocity = parseFloat(velocitySlider.value);
+					velocityValue.textContent = initialVelocity.toFixed(1);
+				}
+
+				function updateAngleValue() {
+					initialAngle = parseInt(angleSlider.value);
+					angleValue.textContent = initialAngle;
+				}
+
+				// Reset simulation
+				function resetSimulation() {
+					// Reset sliders to defaults
+					massSlider.value = 3;
+					if (centralBodyName === "Sun") {
+						distanceSlider.value = 15000;
+					} else if (centralBodyName === "Earth") {
+						distanceSlider.value = 8000;
+					} else if (centralBodyName === "Moon") {
+						distanceSlider.value = 2500;
+					} else if (centralBodyName === "Mars") {
+						distanceSlider.value = 5000;
+					}
+					velocitySlider.value = 5.0;
+					angleSlider.value = 90;
+
+					// Update values
+					updateMassValue();
+					updateDistanceValue();
+					updateVelocityValue();
+					updateAngleValue();
+
+					// Recalculate orbit
+					calculateOrbit();
+				}
+
+				// Calculate orbital parameters
+				function calculateOrbit() {
+					// Convert inputs to SI units for calculations
+					const m1 = centralBodyMass; // kg
+					const m2 = satelliteMass; // kg
+					const r = initialDistance * 1000; // m
+					const v = initialVelocity * 1000; // m/s
+					const angle = (initialAngle * Math.PI) / 180; // radians
+
+					// Calculate velocity components
+					const vx = v * Math.cos(angle);
+					const vy = v * Math.sin(angle);
+
+					// Calculate specific orbital energy
+					const mu = G * m1;
+					const energy = 0.5 * v * v - mu / r;
+
+					// Calculate angular momentum
+					const h = r * v * Math.sin(Math.PI / 2); // assuming perpendicular components
+
+					// Calculate eccentricity
+					const ex = (h * h) / (mu * r) - 1;
+					const ey = 0; // simplified 2D case
+					eccentricity = Math.sqrt(ex * ex + ey * ey);
+
+					// Determine orbit type
+					if (eccentricity < 0.01) {
+						orbitType = "Circular";
+						orbitTypeDisplay.innerHTML = `<span class="text-green-400">Circular</span>`;
+					} else if (eccentricity < 1) {
+						orbitType = "Elliptical";
+						orbitTypeDisplay.innerHTML = `<span class="text-blue-400">Elliptical</span>`;
+					} else if (Math.abs(eccentricity - 1) < 0.01) {
+						orbitType = "Parabolic";
+						orbitTypeDisplay.innerHTML = `<span class="text-yellow-400">Parabolic</span>`;
+					} else {
+						orbitType = "Hyperbolic";
+						orbitTypeDisplay.innerHTML = `<span class="text-red-400">Hyperbolic</span>`;
+					}
+
+					// Calculate semi-major axis
+					let a;
+					if (eccentricity !== 1) {
+						a = (h * h) / (mu * (1 - eccentricity * eccentricity));
+					} else {
+						a = Infinity;
+					}
+
+					// Calculate orbital period (only for elliptical orbits)
+					if (eccentricity < 1) {
+						orbitalPeriod =
+							2 * Math.PI * Math.sqrt(Math.pow(Math.abs(a), 3) / mu);
+						const orbitalPeriodDays = orbitalPeriod / (24 * 3600);
+
+						if (orbitalPeriodDays < 1) {
+							orbitalPeriodDisplay.textContent =
+								(orbitalPeriodDays * 24).toFixed(1) + " hours";
+						} else if (orbitalPeriodDays > 365) {
+							orbitalPeriodDisplay.textContent =
+								(orbitalPeriodDays / 365).toFixed(1) + " years";
+						} else {
+							orbitalPeriodDisplay.textContent =
+								orbitalPeriodDays.toFixed(1) + " days";
+						}
+					} else {
+						orbitalPeriodDisplay.textContent = "∞ (open orbit)";
+					}
+
+					eccentricityDisplay.textContent = eccentricity.toFixed(3);
+
+					// Generate points for the orbit (simplified for visualization)
+					generateOrbitPoints(a, eccentricity, mu);
+
+					// Draw the orbit
+					drawOrbit();
+				}
+
+				// Generate points for the orbit path
+				function generateOrbitPoints(a, e, mu) {
+					orbitPoints = [];
+
+					// Scale factor for visualization
+					const scaleFactor = 1.0;
+
+					// For closed orbits (elliptical)
+					if (e < 1) {
+						const b = a * Math.sqrt(1 - e * e); // Semi-minor axis
+						const center = e * a; // Distance from focus to center
+
+						// Generate points for a full ellipse
+						for (let angle = 0; angle < 2 * Math.PI; angle += 0.05) {
+							const r = (a * (1 - e * e)) / (1 + e * Math.cos(angle));
+							const x = r * Math.cos(angle);
+							const y = r * Math.sin(angle);
+							orbitPoints.push({ x, y });
+						}
+					}
+					// For parabolic orbits
+					else if (Math.abs(e - 1) < 0.01) {
+						const p = 2 * initialDistance * 1000; // Parameter of the parabola
+
+						// Generate points for the parabola
+						for (
+							let angle = -Math.PI + 0.1;
+							angle < Math.PI - 0.1;
+							angle += 0.05
+						) {
+							const r = p / (1 + Math.cos(angle));
+							const x = r * Math.cos(angle);
+							const y = r * Math.sin(angle);
+							orbitPoints.push({ x, y });
+						}
+					}
+					// For hyperbolic orbits
+					else {
+						const b = a * Math.sqrt(e * e - 1); // Semi-minor axis of hyperbola
+
+						// Generate points for one branch of the hyperbola
+						const maxAngle = Math.acos(-1 / e) - 0.1;
+						for (let angle = -maxAngle; angle <= maxAngle; angle += 0.05) {
+							const r = (a * (1 - e * e)) / (1 + e * Math.cos(angle));
+							const x = r * Math.cos(angle);
+							const y = r * Math.sin(angle);
+							orbitPoints.push({ x, y });
+						}
+					}
+				}
+
+				// Draw the orbit on the canvas
+				function drawOrbit() {
+					// Clear canvas
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+					// Set scale based on orbit size and canvas size
+					let maxDistance = 0;
+					for (const point of orbitPoints) {
+						const distance = Math.sqrt(point.x * point.x + point.y * point.y);
+						if (distance > maxDistance) {
+							maxDistance = distance;
+						}
+					}
+
+					// Calculate scale to fit in canvas with margin
+					const margin = 50;
+					const scale = Math.min(
+						(canvas.width - margin * 2) / (maxDistance * 2),
+						(canvas.height - margin * 2) / (maxDistance * 2)
+					);
+
+					// Draw starry background
+					drawStars();
+
+					// Draw central body
+					const centerX = canvas.width / 2;
+					const centerY = canvas.height / 2;
+
+					let bodyRadius = Math.max(
+						10,
+						Math.min(30, (centralBodyRadius * scale) / 1000)
+					);
+
+					// Draw central body glow
+					const gradient = ctx.createRadialGradient(
+						centerX,
+						centerY,
+						bodyRadius * 0.8,
+						centerX,
+						centerY,
+						bodyRadius * 3
+					);
+
+					if (centralBodyName === "Sun") {
+						gradient.addColorStop(0, "rgba(255, 200, 64, 0.8)");
+						gradient.addColorStop(1, "rgba(255, 200, 64, 0)");
+						ctx.fillStyle = "#ffcc33";
+					} else if (centralBodyName === "Earth") {
+						gradient.addColorStop(0, "rgba(64, 128, 255, 0.5)");
+						gradient.addColorStop(1, "rgba(64, 128, 255, 0)");
+						ctx.fillStyle = "#4080ff";
+					} else if (centralBodyName === "Moon") {
+						gradient.addColorStop(0, "rgba(200, 200, 200, 0.3)");
+						gradient.addColorStop(1, "rgba(200, 200, 200, 0)");
+						ctx.fillStyle = "#cccccc";
+					} else if (centralBodyName === "Mars") {
+						gradient.addColorStop(0, "rgba(255, 100, 64, 0.5)");
+						gradient.addColorStop(1, "rgba(255, 100, 64, 0)");
+						ctx.fillStyle = "#ff6440";
+					}
+
+					ctx.beginPath();
+					ctx.arc(centerX, centerY, bodyRadius * 3, 0, Math.PI * 2);
+					ctx.fillStyle = gradient;
+					ctx.fill();
+
+					// Draw central body
+					ctx.beginPath();
+					ctx.arc(centerX, centerY, bodyRadius, 0, Math.PI * 2);
+					if (centralBodyName === "Sun") {
+						const sunGradient = ctx.createRadialGradient(
+							centerX,
+							centerY,
+							0,
+							centerX,
+							centerY,
+							bodyRadius
+						);
+						sunGradient.addColorStop(0, "#fff9c4");
+						sunGradient.addColorStop(0.7, "#ffd54f");
+						sunGradient.addColorStop(1, "#ff9800");
+						ctx.fillStyle = sunGradient;
+					} else if (centralBodyName === "Earth") {
+						const earthGradient = ctx.createRadialGradient(
+							centerX,
+							centerY,
+							0,
+							centerX,
+							centerY,
+							bodyRadius
+						);
+						earthGradient.addColorStop(0, "#64b5f6");
+						earthGradient.addColorStop(0.7, "#4caf50");
+						earthGradient.addColorStop(1, "#1976d2");
+						ctx.fillStyle = earthGradient;
+					} else if (centralBodyName === "Moon") {
+						const moonGradient = ctx.createRadialGradient(
+							centerX,
+							centerY,
+							0,
+							centerX,
+							centerY,
+							bodyRadius
+						);
+						moonGradient.addColorStop(0, "#f5f5f5");
+						moonGradient.addColorStop(0.7, "#e0e0e0");
+						moonGradient.addColorStop(1, "#9e9e9e");
+						ctx.fillStyle = moonGradient;
+					} else if (centralBodyName === "Mars") {
+						const marsGradient = ctx.createRadialGradient(
+							centerX,
+							centerY,
+							0,
+							centerX,
+							centerY,
+							bodyRadius
+						);
+						marsGradient.addColorStop(0, "#ff8a65");
+						marsGradient.addColorStop(0.7, "#e64a19");
+						marsGradient.addColorStop(1, "#bf360c");
+						ctx.fillStyle = marsGradient;
+					}
+					ctx.fill();
+
+					// Draw orbit path
+					ctx.beginPath();
+					for (let i = 0; i < orbitPoints.length; i++) {
+						const x = centerX + (orbitPoints[i].x * scale) / 1000;
+						const y = centerY + (orbitPoints[i].y * scale) / 1000;
+
+						if (i === 0) {
+							ctx.moveTo(x, y);
+						} else {
+							ctx.lineTo(x, y);
+						}
+					}
+
+					if (eccentricity < 1) {
+						ctx.closePath();
+					}
+
+					// Style based on orbit type
+					if (orbitType === "Circular") {
+						ctx.strokeStyle = "rgba(46, 204, 113, 0.8)";
+					} else if (orbitType === "Elliptical") {
+						ctx.strokeStyle = "rgba(52, 152, 219, 0.8)";
+					} else if (orbitType === "Parabolic") {
+						ctx.strokeStyle = "rgba(241, 196, 15, 0.8)";
+					} else {
+						ctx.strokeStyle = "rgba(231, 76, 60, 0.8)";
+					}
+
+					ctx.lineWidth = 2;
+					ctx.stroke();
+
+					// Draw satellite at initial position
+					const initialX = centerX + (orbitPoints[0].x * scale) / 1000;
+					const initialY = centerY + (orbitPoints[0].y * scale) / 1000;
+
+					ctx.beginPath();
+					ctx.arc(initialX, initialY, 6, 0, Math.PI * 2);
+					ctx.fillStyle = "#f5f5f5";
+					ctx.fill();
+					ctx.strokeStyle = "#333";
+					ctx.lineWidth = 1;
+					ctx.stroke();
+
+					// Draw velocity vector
+					const angleRad = (initialAngle * Math.PI) / 180;
+					const vectorLength = 20;
+					ctx.beginPath();
+					ctx.moveTo(initialX, initialY);
+					ctx.lineTo(
+						initialX + vectorLength * Math.cos(angleRad),
+						initialY + vectorLength * Math.sin(angleRad)
+					);
+					ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+					ctx.lineWidth = 2;
+					ctx.stroke();
+
+					// Draw arrowhead
+					const arrowSize = 6;
+					const arrowAngle = Math.atan2(
+						vectorLength * Math.sin(angleRad),
+						vectorLength * Math.cos(angleRad)
+					);
+
+					ctx.beginPath();
+					ctx.moveTo(
+						initialX + vectorLength * Math.cos(angleRad),
+						initialY + vectorLength * Math.sin(angleRad)
+					);
+					ctx.lineTo(
+						initialX +
+							vectorLength * Math.cos(angleRad) -
+							arrowSize * Math.cos(arrowAngle - Math.PI / 6),
+						initialY +
+							vectorLength * Math.sin(angleRad) -
+							arrowSize * Math.sin(arrowAngle - Math.PI / 6)
+					);
+					ctx.lineTo(
+						initialX +
+							vectorLength * Math.cos(angleRad) -
+							arrowSize * Math.cos(arrowAngle + Math.PI / 6),
+						initialY +
+							vectorLength * Math.sin(angleRad) -
+							arrowSize * Math.sin(arrowAngle + Math.PI / 6)
+					);
+					ctx.closePath();
+					ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+					ctx.fill();
+				}
+
+				// Draw starry background
+				function drawStars() {
+					const numStars = 100;
+					ctx.fillStyle = "white";
+
+					for (let i = 0; i < numStars; i++) {
+						const x = Math.random() * canvas.width;
+						const y = Math.random() * canvas.height;
+						const size = Math.random() * 1.5;
+						const opacity = Math.random() * 0.7 + 0.3;
+
+						ctx.beginPath();
+						ctx.arc(x, y, size, 0, Math.PI * 2);
+						ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+						ctx.fill();
+					}
+				}
+
+				// Initialize simulation
+				calculateOrbit();
+
+				// Add mobile menu toggle
+				const mobileMenuBtn = document.querySelector("button.md\\:hidden");
+				const mobileMenu = document.querySelector(".md\\:flex.space-x-6");
+
+				mobileMenuBtn.addEventListener("click", function () {
+					if (mobileMenu.classList.contains("hidden")) {
+						mobileMenu.classList.remove("hidden");
+						mobileMenu.classList.add(
+							"flex",
+							"flex-col",
+							"absolute",
+							"top-16",
+							"right-4",
+							"bg-gray-900",
+							"p-4",
+							"rounded-lg",
+							"shadow-lg",
+							"z-50"
+						);
+					} else {
+						mobileMenu.classList.add("hidden");
+						mobileMenu.classList.remove(
+							"flex",
+							"flex-col",
+							"absolute",
+							"top-16",
+							"right-4",
+							"bg-gray-900",
+							"p-4",
+							"rounded-lg",
+							"shadow-lg",
+							"z-50"
+						);
+					}
+				});
+
+				// Handle menu item clicks on mobile
+				const menuLinks = document.querySelectorAll(".md\\:flex.space-x-6 a");
+				menuLinks.forEach((link) => {
+					link.addEventListener("click", function () {
+						if (
+							!mobileMenu.classList.contains("hidden") &&
+							window.innerWidth < 768
+						) {
+							mobileMenu.classList.add("hidden");
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
