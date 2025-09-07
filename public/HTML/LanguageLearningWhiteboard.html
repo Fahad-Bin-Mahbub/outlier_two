@@ -1,0 +1,6070 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1"
+		/>
+		<title>Language Learning Whiteboard</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				darkMode: "class",
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								50: "#f0f5fa",
+								100: "#dae6f3",
+								200: "#bacfe6",
+								300: "#8fb0d5",
+								400: "#6089bd",
+								500: "#4a6fa5",
+								600: "#3d5b8a",
+								700: "#344b71",
+								800: "#2e405f",
+								900: "#2a3850",
+								950: "#1a2334",
+							},
+							secondary: {
+								50: "#f3f8fc",
+								100: "#e6f0f8",
+								200: "#cde2f1",
+								300: "#a4cce6",
+								400: "#6d98ba",
+								500: "#5784a9",
+								600: "#476d92",
+								700: "#3c5977",
+								800: "#354c63",
+								900: "#304155",
+								950: "#1e2937",
+							},
+							accent: {
+								50: "#fff5f2",
+								100: "#ffe9e2",
+								200: "#ffd6c9",
+								300: "#ffb7a2",
+								400: "#ff8e6d",
+								500: "#e75c34",
+								600: "#d4421e",
+								700: "#c73c1f",
+								800: "#a5341d",
+								900: "#88321d",
+								950: "#4b170d",
+							},
+							success: "#28a745",
+							warning: "#bf8c05",
+							danger: "#dc3545",
+							info: "#17a2b8",
+							light: "#f4f9ff",
+							dark: "#334257",
+							neutral: {
+								50: "#f8fafc",
+								100: "#f1f5f9",
+								200: "#e2e8f0",
+								300: "#cbd5e1",
+								400: "#94a3b8",
+								500: "#64748b",
+								600: "#475569",
+								700: "#334155",
+								800: "#1e293b",
+								900: "#0f172a",
+								950: "#020617",
+							},
+						},
+						fontFamily: {
+							sans: ["Noto Sans Mono", "monospace"],
+							mono: ["Noto Sans Mono", "monospace"],
+						},
+						boxShadow: {
+							highlight: "0 0 0 2px rgba(74, 111, 165, 0.4)",
+							toolbar: "0 4px 20px -2px rgba(0, 0, 0, 0.18)",
+							card: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.06)",
+						},
+						keyframes: {
+							"fade-in": {
+								"0%": { opacity: "0", transform: "translateY(10px)" },
+								"100%": { opacity: "1", transform: "translateY(0)" },
+							},
+							"slide-in": {
+								"0%": { transform: "translateX(100%)" },
+								"100%": { transform: "translateX(0)" },
+							},
+							pulse: {
+								"0%, 100%": { opacity: "1" },
+								"50%": { opacity: "0.5" },
+							},
+							blink: {
+								"0%, 100%": { opacity: "1" },
+								"50%": { opacity: "0" },
+							},
+							"bounce-soft": {
+								"0%, 100%": { transform: "translateY(0)" },
+								"50%": { transform: "translateY(-5px)" },
+							},
+							"slide-out": {
+								"0%": { transform: "translateX(0)" },
+								"100%": { transform: "translateX(100%)" },
+							},
+							"fade-out": {
+								"0%": { opacity: "1" },
+								"100%": { opacity: "0" },
+							},
+						},
+						animation: {
+							"fade-in": "fade-in 0.3s ease-out",
+							"slide-in": "slide-in 0.3s ease-out",
+							pulse: "pulse 1.5s infinite",
+							blink: "blink 1s infinite",
+							"bounce-soft": "bounce-soft 2s infinite",
+							"slide-out": "slide-out 0.3s ease-out forwards",
+							"fade-out": "fade-out 0.3s ease-out forwards",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Mono:wght@400;500;600&display=swap");
+
+			.grammar-highlight {
+				background-color: rgba(74, 111, 165, 0.2);
+			}
+
+			.vocab-highlight {
+				background-color: rgba(212, 66, 30, 0.2);
+			}
+
+			.pronunciation-highlight {
+				background-color: rgba(40, 167, 69, 0.2);
+			}
+
+			.idiom-highlight {
+				background-color: rgba(191, 140, 5, 0.2);
+			}
+
+			.theme-option input[type="radio"]:checked + label {
+				border-color: #4a6fa5;
+				box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.5);
+			}
+
+			.theme-option label:hover {
+				transform: translateY(-2px);
+			}
+
+			.annotated-text {
+				text-decoration: underline;
+				text-decoration-style: dotted;
+				text-decoration-color: #4a6fa5;
+				text-decoration-thickness: 2px;
+				text-underline-offset: 3px;
+				position: relative;
+				transition: all 0.2s ease;
+			}
+
+			.annotated-text:hover {
+				background-color: rgba(74, 111, 165, 0.05);
+				box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+				border-radius: 2px;
+				cursor: pointer;
+			}
+
+			.audio-text {
+				text-decoration: underline;
+				text-decoration-style: wavy;
+				text-decoration-color: #d4421e;
+				text-decoration-thickness: 2px;
+				text-underline-offset: 3px;
+				position: relative;
+				transition: all 0.2s ease;
+			}
+
+			.audio-text:hover {
+				background-color: rgba(212, 66, 30, 0.05);
+				box-shadow: 0 0 0 2px rgba(212, 66, 30, 0.2);
+				border-radius: 2px;
+				cursor: pointer;
+			}
+
+			.annotated-audio-text {
+				text-decoration: underline;
+				text-decoration-style: dashed;
+				text-decoration-color: #28a745;
+				text-decoration-thickness: 2px;
+				text-underline-offset: 3px;
+				position: relative;
+				transition: all 0.2s ease;
+			}
+
+			.annotated-audio-text:hover {
+				background-color: rgba(40, 167, 69, 0.05);
+				box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+				border-radius: 2px;
+				cursor: pointer;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #f1f5f9;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #cbd5e1;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #94a3b8;
+			}
+
+			::selection {
+				background: rgba(74, 111, 165, 0.2);
+			}
+
+			.current-user-cursor {
+				position: fixed;
+				transform: translate(-50%, -50%);
+				will-change: left, top;
+				pointer-events: none;
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0.5;
+				}
+			}
+
+			@keyframes slide-in {
+				0% {
+					transform: translateX(100%);
+				}
+				100% {
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes slide-out {
+				0% {
+					transform: translateX(0);
+				}
+				100% {
+					transform: translateX(100%);
+				}
+			}
+
+			@keyframes fade-in {
+				0% {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				100% {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes fade-out {
+				0% {
+					opacity: 1;
+				}
+				100% {
+					opacity: 0;
+				}
+			}
+
+			.animate-pulse {
+				animation: pulse 1.5s infinite;
+			}
+
+			.animate-slide-in {
+				animation: slide-in 0.3s ease-out;
+			}
+
+			.animate-slide-out {
+				animation: slide-out 0.3s ease-out forwards;
+			}
+
+			.animate-fade-in {
+				animation: fade-in 0.3s ease-out;
+			}
+
+			.animate-fade-out {
+				animation: fade-out 0.3s ease-out forwards;
+			}
+
+			html,
+			body {
+				height: 100%;
+				overscroll-behavior-y: none;
+				-webkit-overflow-scrolling: touch;
+			}
+
+			.flex-1 {
+				flex: 1 1 0%;
+			}
+
+			.flex.flex-col.h-screen {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+			}
+
+			.flex.flex-1.overflow-hidden {
+				flex: 1;
+				display: flex;
+			}
+
+			.flex-1.p-0.sm\:p-5.overflow-y-auto.relative {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.border.border-neutral-200 {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			#editor {
+				flex: 1;
+				overflow-y: auto;
+				-webkit-overflow-scrolling: touch;
+				padding: 1rem;
+			}
+
+			.bottom-toolbar {
+				position: fixed;
+				bottom: 6rem;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 50;
+				transition: all 0.3s ease;
+			}
+
+			@media (max-width: 640px) {
+				.bottom-toolbar {
+					bottom: 5rem;
+					max-width: calc(100vw - 2rem);
+					overflow-x: visible;
+					-webkit-overflow-scrolling: touch;
+					padding: 0.75rem;
+					flex-direction: column;
+					gap: 0.75rem;
+					align-items: center;
+				}
+
+				.color-option {
+					min-width: 2rem;
+					min-height: 2rem;
+				}
+
+				.mobile-color-row {
+					display: flex;
+					gap: 0.5rem;
+					justify-content: center;
+				}
+
+				.mobile-action-row {
+					display: flex;
+					gap: 1rem;
+					justify-content: center;
+				}
+
+				.keyboard-visible .bottom-toolbar {
+					bottom: 1rem;
+					transform: translateX(-50%) translateY(-10px);
+					opacity: 0.9;
+					scale: 0.9;
+				}
+			}
+
+			@media (max-width: 639px) {
+				body {
+					position: static;
+					overflow: auto;
+					height: auto;
+					overscroll-behavior-y: none;
+				}
+
+				.flex.flex-col.h-screen {
+					min-height: 100%;
+					height: auto;
+					overflow: visible;
+				}
+
+				.flex.flex-1.overflow-hidden {
+					overflow: visible;
+				}
+
+				.flex-1.p-0.sm\:p-5.overflow-y-auto.relative {
+					overflow: visible;
+					height: auto;
+				}
+
+				.border.border-neutral-200 {
+					height: auto;
+					min-height: 70vh;
+					border-radius: 0;
+				}
+
+				#editor {
+					height: auto;
+					min-height: 60vh;
+					touch-action: pan-y;
+					-webkit-overflow-scrolling: touch;
+					padding: 1rem;
+					overflow-y: auto !important;
+				}
+
+				#sidebar {
+					position: fixed;
+					top: 0;
+					right: 0;
+					height: 100% !important;
+					width: 80% !important;
+					z-index: 50;
+					overflow-y: auto !important;
+					-webkit-overflow-scrolling: touch !important;
+					overscroll-behavior-y: contain;
+					max-height: 100vh;
+				}
+
+				#annotations-list {
+					max-height: calc(100vh - 120px);
+					overflow-y: auto !important;
+					-webkit-overflow-scrolling: touch !important;
+					overscroll-behavior-y: contain;
+					padding-bottom: 30px;
+				}
+
+				.flex-1.p-0.sm\:p-5 {
+					padding: 0 !important;
+				}
+			}
+
+			.animate-slide-in {
+				animation: slide-in 0.3s ease-out;
+			}
+
+			.animate-slide-out {
+				animation: slide-out 0.3s ease-out forwards;
+			}
+
+			.animate-fade-in {
+				animation: fade-in 0.3s ease-out;
+			}
+
+			.animate-fade-out {
+				animation: fade-out 0.3s ease-out forwards;
+			}
+
+			@media (max-width: 640px) {
+				.group:hover span.absolute,
+				.group:active span.absolute,
+				.group:focus span.absolute {
+					width: auto;
+					min-width: 120px;
+					opacity: 1 !important;
+					z-index: 50;
+					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+						0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				}
+
+				.color-option,
+				.color-option-popup,
+				#highlight-btn-mobile,
+				#annotate-btn,
+				#record-btn,
+				.popup-annotate-btn,
+				.popup-record-btn {
+					min-width: 32px;
+					min-height: 32px;
+					touch-action: manipulation;
+				}
+
+				.group span.absolute {
+					transition: opacity 0.3s ease-in-out;
+				}
+
+				#highlight-popup .group span.absolute {
+					top: -2.5rem !important;
+				}
+
+				#notification {
+					box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+					left: 50% !important;
+					right: auto !important;
+					transform: translateX(-50%) !important;
+					margin: 0 auto !important;
+					width: calc(100% - 2rem) !important;
+					max-width: 90% !important;
+				}
+			}
+
+			[contenteditable] {
+				-webkit-user-select: text;
+				user-select: text;
+				-webkit-overflow-scrolling: touch;
+				touch-action: pan-y;
+				cursor: text;
+			}
+
+			.grammar-highlight.vocab-highlight,
+			.grammar-highlight.pronunciation-highlight,
+			.grammar-highlight.idiom-highlight,
+			.vocab-highlight.pronunciation-highlight,
+			.vocab-highlight.idiom-highlight,
+			.pronunciation-highlight.idiom-highlight {
+				background-image: linear-gradient(
+						to right,
+						rgba(74, 111, 165, 0.2),
+						rgba(74, 111, 165, 0.2)
+					),
+					linear-gradient(
+						to right,
+						rgba(212, 66, 30, 0.2),
+						rgba(212, 66, 30, 0.2)
+					);
+				background-blend-mode: multiply;
+			}
+
+			.grammar-highlight.vocab-highlight.pronunciation-highlight,
+			.grammar-highlight.vocab-highlight.idiom-highlight,
+			.grammar-highlight.pronunciation-highlight.idiom-highlight,
+			.vocab-highlight.pronunciation-highlight.idiom-highlight {
+				background-image: linear-gradient(
+						to right,
+						rgba(74, 111, 165, 0.2),
+						rgba(74, 111, 165, 0.2)
+					),
+					linear-gradient(
+						to right,
+						rgba(212, 66, 30, 0.2),
+						rgba(212, 66, 30, 0.2)
+					),
+					linear-gradient(
+						to right,
+						rgba(40, 167, 69, 0.2),
+						rgba(40, 167, 69, 0.2)
+					);
+				background-blend-mode: multiply;
+			}
+
+			.grammar-highlight.vocab-highlight.pronunciation-highlight.idiom-highlight {
+				background-image: linear-gradient(
+						to right,
+						rgba(74, 111, 165, 0.2),
+						rgba(74, 111, 165, 0.2)
+					),
+					linear-gradient(
+						to right,
+						rgba(212, 66, 30, 0.2),
+						rgba(212, 66, 30, 0.2)
+					),
+					linear-gradient(
+						to right,
+						rgba(40, 167, 69, 0.2),
+						rgba(40, 167, 69, 0.2)
+					),
+					linear-gradient(
+						to right,
+						rgba(191, 140, 5, 0.2),
+						rgba(191, 140, 5, 0.2)
+					);
+				background-blend-mode: multiply;
+			}
+
+			#editor.font-mono {
+				letter-spacing: -0.01em;
+				line-height: 1.6;
+			}
+
+			body {
+				letter-spacing: -0.02em;
+			}
+
+			button,
+			.text-sm,
+			.text-xs {
+				letter-spacing: -0.01em;
+			}
+
+			@media (max-width: 360px) {
+				#editor {
+					min-height: 50vh;
+					padding: 0.75rem;
+					font-size: 0.95rem;
+					position: relative;
+					width: 100%;
+					overflow-y: scroll !important;
+					-webkit-overflow-scrolling: touch !important;
+				}
+
+				body,
+				html {
+					position: static;
+					width: 100%;
+					height: 100%;
+					overflow: auto;
+					overscroll-behavior-y: none;
+				}
+
+				.bottom-toolbar {
+					bottom: 4.5rem;
+					padding: 0.5rem;
+				}
+
+				.color-option,
+				#highlight-btn-mobile,
+				#annotate-btn,
+				#record-btn {
+					width: 2.25rem;
+					height: 2.25rem;
+				}
+
+				.border.border-neutral-200 {
+					min-height: 60vh;
+					overflow: auto;
+				}
+
+				.current-user-cursor {
+					display: none !important;
+				}
+			}
+
+			@media (max-width: 320px) {
+				#editor {
+					padding: 0.5rem;
+					font-size: 0.9rem;
+				}
+
+				.bottom-toolbar {
+					bottom: 3.5rem;
+					padding: 0.4rem;
+					gap: 0.3rem;
+				}
+
+				.color-option,
+				#highlight-btn-mobile,
+				#annotate-btn,
+				#record-btn {
+					width: 2rem;
+					height: 2rem;
+				}
+
+				.mobile-color-row,
+				.mobile-action-row {
+					gap: 0.3rem;
+				}
+
+				header {
+					padding: 0.5rem !important;
+					height: 60px !important;
+				}
+
+				.h-\[65px\] {
+					height: 60px !important;
+				}
+
+				.w-8,
+				.h-8 {
+					width: 1.75rem !important;
+					height: 1.75rem !important;
+				}
+			}
+
+			.toggle-checkbox:checked {
+				transform: translateX(100%);
+				border-color: #4a6fa5;
+			}
+
+			.toggle-checkbox:checked + .toggle-label {
+				background-color: #4a6fa5;
+			}
+
+			.toggle-label {
+				transition: background-color 0.2s ease;
+			}
+
+			span.absolute[class*="opacity-0"]:not(.dark *),
+			div.absolute[class*="opacity-0"]:not(.dark *) {
+				background-color: white !important;
+				color: #1e293b !important;
+				border: 1px solid #e2e8f0 !important;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+			}
+
+			.dark span.absolute[class*="opacity-0"],
+			.dark div.absolute[class*="opacity-0"] {
+				background-color: #1e293b !important;
+				color: white !important;
+				border-color: #334155 !important;
+			}
+
+			#settings-modal {
+				overscroll-behavior: contain;
+			}
+
+			#settings-modal-content {
+				max-height: 90vh;
+				display: flex;
+				flex-direction: column;
+			}
+
+			#settings-modal-content > div.p-5.overflow-y-auto {
+				overflow-y: auto;
+				-webkit-overflow-scrolling: touch;
+				overscroll-behavior: contain;
+			}
+
+			@media (max-width: 480px) {
+				.theme-option label {
+					padding: 0.5rem;
+				}
+
+				.theme-preview {
+					min-height: 60px;
+				}
+
+				#settings-modal-content {
+					max-width: 95%;
+					margin: 0 auto;
+				}
+
+				#confirmation-modal-content {
+					max-width: 95%;
+					margin: 0 auto;
+				}
+			}
+
+			.modal-open {
+				position: fixed;
+				width: 100%;
+				height: 100%;
+			}
+
+			@media (max-width: 480px) {
+				.theme-preview {
+					min-height: auto !important;
+					max-height: 70px !important;
+				}
+
+				.theme-preview .h-3 {
+					height: 0.5rem !important;
+				}
+
+				.theme-preview .p-2 {
+					padding: 0.5rem !important;
+				}
+
+				.theme-preview .h-1\.5 {
+					height: 0.25rem !important;
+				}
+
+				.theme-preview .h-1 {
+					height: 0.2rem !important;
+				}
+
+				.theme-preview .h-6 {
+					height: 1rem !important;
+				}
+
+				.theme-preview .mt-1\.5 {
+					margin-top: 0.25rem !important;
+				}
+
+				.theme-option label {
+					padding: 0.25rem !important;
+				}
+
+				.theme-option .mt-1\.5 {
+					margin-top: 0.25rem !important;
+					font-size: 0.65rem !important;
+				}
+
+				.grid.grid-cols-2.gap-3 {
+					gap: 0.5rem !important;
+				}
+			}
+
+			.theme-option[data-theme="light"] .theme-preview {
+				background-color: white !important;
+				border-color: #e2e8f0 !important;
+			}
+
+			.theme-option[data-theme="light"] .theme-preview .bg-gradient-to-r {
+				background-image: linear-gradient(
+					to right,
+					#3d5b8a,
+					#4a6fa5
+				) !important;
+			}
+
+			.theme-option[data-theme="light"] .theme-preview .bg-neutral-800 {
+				background-color: #1e293b !important;
+			}
+
+			.theme-option[data-theme="light"] .theme-preview .bg-neutral-400 {
+				background-color: #94a3b8 !important;
+			}
+
+			.theme-option[data-theme="light"] .theme-preview .bg-neutral-100 {
+				background-color: #f1f5f9 !important;
+			}
+
+			.theme-option[data-theme="dark"] .theme-preview {
+				background-color: #1e293b !important;
+				border-color: #334155 !important;
+			}
+
+			.theme-option[data-theme="dark"] .theme-preview .bg-gradient-to-r {
+				background-image: linear-gradient(
+					to right,
+					#344b71,
+					#3d5b8a
+				) !important;
+			}
+
+			.theme-option[data-theme="dark"] .theme-preview .bg-neutral-200 {
+				background-color: #e2e8f0 !important;
+			}
+
+			.theme-option[data-theme="dark"] .theme-preview .bg-neutral-500 {
+				background-color: #64748b !important;
+			}
+
+			.theme-option[data-theme="dark"] .theme-preview .bg-neutral-700 {
+				background-color: #334155 !important;
+			}
+
+			.theme-option .text-neutral-700 {
+				color: #334155 !important;
+			}
+
+			@media (max-width: 640px) {
+				#sidebar {
+					width: 90vw !important;
+					min-width: 0 !important;
+					max-width: 100vw !important;
+					left: 0 !important;
+					right: 0 !important;
+					border-radius: 0 !important;
+					z-index: 50 !important;
+				}
+				.w-80 {
+					width: 90vw !important;
+					min-width: 0 !important;
+				}
+				.border.border-neutral-200.rounded-xl {
+					border-radius: 0 !important;
+					min-height: 0 !important;
+					padding: 0.5rem !important;
+				}
+				.p-6 {
+					padding: 1rem !important;
+				}
+				.min-h-\[400px\] {
+					min-height: 200px !important;
+				}
+				.h-full,
+				.sm\:h-full {
+					height: auto !important;
+				}
+				.bottom-toolbar {
+					left: 0 !important;
+					right: 0 !important;
+					transform: none !important;
+					width: 100vw !important;
+					max-width: 100vw !important;
+					border-radius: 0 !important;
+					flex-wrap: wrap !important;
+					gap: 0.5rem !important;
+					padding: 0.5rem 0.25rem !important;
+					justify-content: center !important;
+				}
+				.mobile-color-row,
+				.mobile-action-row {
+					flex-wrap: wrap !important;
+					gap: 0.5rem !important;
+					justify-content: center !important;
+				}
+				.fixed.bottom-6.right-6.md\:hidden.z-50 {
+					right: 1rem !important;
+					bottom: 1rem !important;
+				}
+				#settings-modal-content,
+				#confirmation-modal-content,
+				#modal-content {
+					max-width: 98vw !important;
+					width: 98vw !important;
+					min-width: 0 !important;
+					border-radius: 0.5rem !important;
+					margin: 0 auto !important;
+				}
+				#settings-modal-content > div.p-5.overflow-y-auto,
+				#modal-content > div.p-5.overflow-y-auto {
+					max-height: 60vh !important;
+					overflow-y: auto !important;
+				}
+				.footer .grid {
+					grid-template-columns: 1fr !important;
+				}
+				.footer .flex-col.md\:flex-row {
+					flex-direction: column !important;
+					gap: 1rem !important;
+				}
+				.footer .flex.items-center.space-x-6 {
+					flex-direction: column !important;
+					gap: 0.5rem !important;
+				}
+				.footer .flex.items-center.space-x-2 {
+					gap: 0.5rem !important;
+				}
+				.footer .text-sm {
+					font-size: 0.95rem !important;
+				}
+				.footer .text-xs {
+					font-size: 0.85rem !important;
+				}
+			}
+
+			#profile-dropdown {
+				position: absolute;
+				right: 0;
+				top: 100%;
+				width: 200px;
+				background-color: white;
+				border: 1px solid #e2e8f0;
+				border-radius: 0.5rem;
+				box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+					0 2px 4px -1px rgba(0, 0, 0, 0.06);
+				margin-top: 0.5rem;
+				z-index: 60;
+				overflow: hidden;
+			}
+
+			.dark #profile-dropdown {
+				background-color: #1e293b;
+				border-color: #334155;
+			}
+
+			#profile-dropdown .dropdown-item {
+				padding: 0.75rem 1rem;
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				transition: all 0.2s;
+				cursor: pointer;
+			}
+
+			#profile-dropdown .dropdown-item:hover {
+				background-color: #f8fafc;
+			}
+
+			.dark #profile-dropdown .dropdown-item:hover {
+				background-color: #0f172a;
+			}
+
+			#profile-dropdown .dropdown-item:not(:last-child) {
+				border-bottom: 1px solid #f1f5f9;
+			}
+
+			.dark #profile-dropdown .dropdown-item:not(:last-child) {
+				border-bottom: 1px solid #334155;
+			}
+
+			.mobile-tour-btn {
+				position: fixed;
+
+				width: 3rem;
+				height: 3rem;
+				border-radius: 50%;
+				background-color: #4a6fa5;
+				color: white;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				z-index: 40;
+			}
+
+			@media (pointer: coarse) {
+				#editor {
+					padding: 1rem;
+					font-size: 16px;
+					line-height: 1.7;
+					letter-spacing: 0;
+				}
+
+				.highlight,
+				.annotated-text,
+				.audio-text,
+				.annotated-audio-text {
+					padding: 2px 0;
+				}
+
+				.bottom-toolbar button,
+				.color-option,
+				.color-option-popup,
+				.popup-annotate-btn,
+				.popup-record-btn {
+					min-height: 44px;
+					min-width: 44px;
+				}
+			}
+			@media (max-width: 640px) {
+				#highlight-popup {
+					display: none !important;
+				}
+			}
+		</style>
+	</head>
+
+	<body
+		class="font-sans text-neutral-800 bg-neutral-50 min-h-screen flex flex-col"
+	>
+		<div class="flex flex-col h-screen">
+			<header
+				class="h-[65px] bg-gradient-to-r from-primary-600 to-primary-500 text-white p-4 shadow-md flex justify-between items-center"
+			>
+				<div class="flex items-center space-x-2">
+					<svg
+						class="w-8 h-8"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<rect
+							x="3"
+							y="4"
+							width="18"
+							height="16"
+							rx="2"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M7 4V2"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M17 4V2"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M3 8H21"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M7 12H11"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M7 16H14"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M15 11L17 13L15 15"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+					<div class="sm:block text-xs lg:text-xl font-bold tracking-tight">
+						Language Learning Whiteboard
+					</div>
+				</div>
+				<div class="flex items-center space-x-2">
+					<button
+						id="guided-tour-btn"
+						class="mr-3 hidden md:flex items-center space-x-1 bg-primary-700 bg-opacity-20 hover:bg-opacity-30 transition-all duration-200 rounded-full py-1.5 px-2 sm:px-3 group"
+					>
+						<div
+							class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-800 flex items-center justify-center"
+						>
+							<svg
+								class="w-5 h-5 text-white"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<path
+									d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M16 17L21 12L16 7"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M12 12H21"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+						</div>
+						<span class="hidden sm:block text-xs lg:text-sm font-medium"
+							>Start a guided tour</span
+						>
+					</button>
+
+					<div class="relative" id="profile-container">
+						<button
+							id="profile-button"
+							class="flex items-center space-x-2 bg-primary-700 bg-opacity-20 hover:bg-opacity-30 transition-all duration-200 rounded-full py-1.5 px-2 sm:px-3"
+						>
+							<div
+								class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-800 flex items-center justify-center"
+							>
+								<svg
+									class="w-5 h-5 text-white"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M12 21C12 21 20 17 20 12V7L12 3L4 7V12C4 17 12 21 12 21Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</div>
+							<div class="hidden sm:block text-left">
+								<div class="text-xs md:text-sm font-medium">
+									Professor Garcia
+								</div>
+								<div class="text-xs opacity-70">Teacher</div>
+							</div>
+						</button>
+
+						<div id="profile-dropdown" class="hidden">
+							<div class="dropdown-item" id="settings-button">
+								<svg
+									class="w-5 h-5 text-neutral-500"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M10.325 4.317C10.751 2.561 13.249 2.561 13.675 4.317C13.8764 5.032 14.5019 5.53319 15.235 5.5C16.9205 5.42082 17.8599 7.4043 16.705 8.665C16.2049 9.2182 16.1051 10.0294 16.4664 10.6959C17.3546 12.1171 15.9162 13.802 14.4525 13.1114C13.8084 12.7882 13.0208 12.9808 12.5514 13.5016C11.5256 14.6449 9.47446 14.6449 8.44861 13.5016C7.97921 12.9808 7.19166 12.7882 6.54753 13.1114C5.08386 13.802 3.64544 12.1171 4.53355 10.6959C4.89485 10.0294 4.79513 9.2182 4.29499 8.665C3.14007 7.4043 4.0795 5.42082 5.76498 5.5C6.49812 5.53319 7.12362 5.032 7.32499 4.317C7.75098 2.561 10.249 2.561 10.675 4.317"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								<span class="text-sm text-neutral-700 dark:text-neutral-200"
+									>Settings</span
+								>
+							</div>
+							<div class="dropdown-item" id="export-button">
+								<svg
+									class="w-5 h-5 text-neutral-500"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M4 16V17C4 18.6569 5.34315 20 7 20H17C18.6569 20 20 18.6569 20 17V16M16 12L12 16M12 16L8 12M12 16V4"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								<span class="text-sm text-neutral-700 dark:text-neutral-200"
+									>Export Session</span
+								>
+							</div>
+							<div class="dropdown-item" id="guided-tour-mobile">
+								<svg
+									class="w-5 h-5 text-neutral-500"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M16 17L21 12L16 7"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M12 12H21"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								<span class="text-sm text-neutral-700 dark:text-neutral-200"
+									>Start Tour</span
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+
+			<div class="flex overflow-auto sm:overflow-hidden h-[calc(100vh-65px)]">
+				<div class="flex-1 p-0 sm:p-5 overflow-y-auto relative">
+					<div
+						class="border border-neutral-200 rounded-xl min-h-[400px] h-full sm:h-full p-6 bg-white relative shadow-card transition-all duration-300 hover:shadow-lg"
+					>
+						<div
+							id="editor"
+							contenteditable="true"
+							class="outline-none min-h-full h-full sm:h-full whitespace-pre-wrap overflow-y-auto -webkit-overflow-scrolling-touch font-mono"
+						>
+							Welcome to the Language Learning Whiteboard! This collaborative
+							space allows teachers and students to work together on language
+							learning activities. Try these features: - Highlight text for
+							grammar, vocabulary, pronunciation, or idioms - Add annotations
+							with voice recordings - Work offline with automatic session saving
+							Let's get started!
+						</div>
+					</div>
+				</div>
+
+				<div
+					id="sidebar"
+					class="w-80 bg-white border-l border-neutral-200 overflow-y-auto hidden md:block shadow-sm transition-all duration-300"
+				>
+					<div
+						class="sticky top-0 bg-white z-10 border-b border-neutral-100 px-4 py-3 flex justify-between items-center"
+					>
+						<h3 class="font-semibold text-lg text-neutral-800">Annotations</h3>
+						<div
+							class="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full"
+							id="annotation-count"
+						>
+							0
+						</div>
+					</div>
+					<div
+						id="annotations-list"
+						class="p-4 space-y-4 overflow-y-auto -webkit-overflow-scrolling-touch"
+					></div>
+					<div
+						id="empty-annotations"
+						class="p-8 flex flex-col items-center justify-center text-center text-neutral-400"
+					>
+						<svg
+							class="w-12 h-12 mb-3 opacity-50"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M8 10H16M8 14H12M9 18H15C16.6569 18 18 16.6569 18 15V9C18 7.34315 16.6569 6 15 6H9C7.34315 6 6 7.34315 6 9V15C6 16.6569 7.34315 18 9 18Z"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+						<p class="text-sm">No annotations yet</p>
+						<p class="text-xs mt-1">
+							Highlight text and click the annotation button to add notes
+						</p>
+					</div>
+				</div>
+			</div>
+
+			<div
+				class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-full shadow-toolbar py-2 px-5 flex gap-3 z-10 transition-all duration-300 animate-fade-in bottom-toolbar"
+			>
+				<div class="hidden sm:block">
+					<button
+						id="highlight-btn"
+						title="Highlight Text"
+						class="group w-10 h-10 rounded-full bg-neutral-100 text-neutral-700 flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 active:bg-primary-200 transition-all duration-200 relative"
+					>
+						<svg
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Highlight Text</span
+						>
+					</button>
+				</div>
+				<div class="flex gap-2 items-center px-1 mobile-color-row">
+					<div
+						class="color-option group w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 grammar-highlight shadow-sm hover:shadow relative"
+						data-type="grammar"
+						title="Grammar"
+					>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Grammar</span
+						>
+					</div>
+					<div
+						class="color-option group w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 vocab-highlight shadow-sm hover:shadow relative"
+						data-type="vocab"
+						title="Vocabulary"
+					>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Vocabulary</span
+						>
+					</div>
+					<div
+						class="color-option group w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 pronunciation-highlight shadow-sm hover:shadow relative"
+						data-type="pronunciation"
+						title="Pronunciation"
+					>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Pronunciation</span
+						>
+					</div>
+					<div
+						class="color-option group w-8 h-8 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 idiom-highlight shadow-sm hover:shadow relative"
+						data-type="idiom"
+						title="Idiom/Expression"
+					>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Idiom/Expression</span
+						>
+					</div>
+					<div
+						class="color-option group w-8 h-8 rounded-full cursor-pointer border-2 border-neutral-300 hover:scale-110 transition-transform duration-200 bg-white flex items-center justify-center shadow-sm hover:shadow relative"
+						data-type="none"
+						title="Remove highlight"
+					>
+						<svg
+							width="16"
+							height="16"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+								stroke="#94a3b8"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M5 5L19 19"
+								stroke="#94a3b8"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Remove highlight</span
+						>
+					</div>
+				</div>
+				<div class="flex gap-3 mobile-action-row">
+					<button
+						id="highlight-btn-mobile"
+						title="Highlight Text"
+						class="group w-10 h-10 rounded-full bg-neutral-100 text-neutral-700 flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 active:bg-primary-200 transition-all duration-200 relative sm:hidden"
+					>
+						<svg
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Highlight Text</span
+						>
+					</button>
+					<button
+						id="annotate-btn"
+						title="Add Annotation"
+						class="group w-10 h-10 rounded-full bg-neutral-100 text-neutral-700 flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 active:bg-primary-200 transition-all duration-200 relative"
+					>
+						<svg
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M7 8h10M7 12h4m1 8l4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Add Annotation</span
+						>
+					</button>
+					<button
+						id="record-btn"
+						title="Record Audio"
+						class="group w-10 h-10 rounded-full bg-neutral-100 text-neutral-700 flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 active:bg-primary-200 transition-all duration-200 relative"
+					>
+						<svg
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M12 14a4 4 0 004-4V6a4 4 0 00-8 0v4a4 4 0 004 4zm0 0v3m-4 4h8m-5-4a5 5 0 01-5-5v-1M17 8a5 5 0 01-5 5"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+						<span
+							class="absolute -top-10 left-1/2 transform -translate-x-1/2 text-xs py-1.5 px-2.5 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+							>Record Audio</span
+						>
+					</button>
+				</div>
+			</div>
+
+			<div class="fixed bottom-4 right-6 md:hidden z-50">
+				<button
+					id="mobile-sidebar-toggle"
+					class="w-12 h-12 rounded-full bg-primary-600 text-white shadow-lg flex items-center justify-center hover:bg-primary-700 active:bg-primary-800 transition-colors"
+				>
+					<svg
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M4 6H20M4 12H20M4 18H20"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+						></path>
+					</svg>
+				</button>
+			</div>
+
+			<div class="fixed bottom-3 left-6 md:hidden z-50">
+				<button
+					id="mobile-tour-button"
+					class="w-12 h-12 rounded-full bg-primary-600 text-white shadow-lg flex items-center justify-center hover:bg-primary-700 active:bg-primary-800 transition-colors"
+				>
+					<svg
+						class="w-6 h-6"
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<path
+							d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M16 17L21 12L16 7"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M12 12H21"
+							stroke="currentColor"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</button>
+			</div>
+		</div>
+
+		<footer
+			class="bg-gradient-to-r from-primary-700 to-primary-600 text-white py-16"
+		>
+			<div class="container mx-auto px-4">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-10">
+					<div class="space-y-6">
+						<div class="flex items-center space-x-3">
+							<svg
+								class="w-8 h-8"
+								viewBox="0 0 24 24"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<rect
+									x="3"
+									y="4"
+									width="18"
+									height="16"
+									rx="2"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M7 4V2"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M17 4V2"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M3 8H21"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M7 12H11"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M7 16H14"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+								<path
+									d="M15 11L17 13L15 15"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								/>
+							</svg>
+
+							<h3 class="text-2xl font-bold">Learning Language Whiteboard</h3>
+						</div>
+						<p class="text-primary-100 leading-relaxed">
+							A collaborative digital space designed for teachers and students
+							to enhance language learning through interactive annotations,
+							voice recordings, and real-time collaboration.
+						</p>
+						<div class="flex space-x-4">
+							<a
+								href="https://x.com/"
+								class="text-primary-100 hover:text-white transition-colors"
+							>
+								<svg
+									class="w-6 h-6"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+									aria-hidden="true"
+								>
+									<path
+										d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"
+									></path>
+								</svg>
+							</a>
+						</div>
+					</div>
+
+					<div class="space-y-6">
+						<h3 class="text-xl font-semibold">Get Started</h3>
+						<div class="space-y-4">
+							<div class="flex items-center space-x-3"></div>
+							<div class="flex items-center space-x-3">
+								<svg
+									class="w-6 h-6 text-primary-200"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										d="M17 3L21 7L17 11"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M3 19V13C3 11.8954 3.89543 11 5 11H21"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								<span class="text-primary-100"
+									>Start highlighting text to mark grammar, vocabulary, or
+									idioms.</span
+								>
+							</div>
+							<div class="flex items-center space-x-3">
+								<svg
+									class="w-6 h-6 text-primary-200"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										d="M17 3L21 7L17 11"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+									<path
+										d="M3 19V13C3 11.8954 3.89543 11 5 11H21"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+								<span class="text-primary-100"
+									>Add voice annotations to clarify pronunciation or
+									meaning.</span
+								>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="mt-12 pt-8 border-t border-primary-500">
+					<div
+						class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0"
+					>
+						<p class="text-primary-200 text-sm">
+							2024 Language Learning Whiteboard.
+						</p>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<div
+			id="annotation-modal"
+			class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden backdrop-blur-sm"
+		>
+			<div
+				class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0"
+				id="modal-content"
+			>
+				<div class="p-5 border-b border-neutral-200">
+					<h3 class="font-semibold text-lg text-neutral-800">Add Annotation</h3>
+				</div>
+				<div class="p-5">
+					<div class="mb-4">
+						<div class="text-sm text-neutral-500 mb-1">Selected text:</div>
+						<div
+							id="selected-text"
+							class="p-3 bg-neutral-50 rounded text-sm italic"
+						></div>
+					</div>
+					<div class="mb-4">
+						<label
+							for="annotation-text"
+							class="block text-sm font-medium text-neutral-700 mb-1"
+							id="annotation-text-label"
+							>Your annotation:</label
+						>
+						<textarea
+							id="annotation-text"
+							rows="4"
+							class="w-full p-3 border border-neutral-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-300 focus:border-primary-300 transition-all duration-200"
+							placeholder="Add your notes here..."
+						></textarea>
+					</div>
+					<div id="recording-controls" class="mb-4 hidden">
+						<div class="flex items-center justify-between">
+							<div class="text-sm font-medium text-neutral-700">
+								Audio recording:
+							</div>
+							<div id="recording-timer" class="text-sm text-primary-600">
+								0:00
+							</div>
+						</div>
+						<div class="mt-2 flex items-center gap-3">
+							<button
+								id="start-recording"
+								class="flex items-center gap-1.5 bg-primary-500 hover:bg-primary-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200"
+							>
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M12 15C13.6569 15 15 13.6569 15 12V6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6V12C9 13.6569 10.3431 15 12 15Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+									<path
+										d="M5 12C5 15.866 8.13401 19 12 19M12 19C15.866 19 19 15.866 19 12M12 19V22"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+								</svg>
+								Start Recording
+							</button>
+							<button
+								id="stop-recording"
+								class="flex items-center gap-1.5 bg-danger hover:bg-opacity-90 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 hidden"
+							>
+								<svg
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M5.25 7.5C5.25 6.25736 6.25736 5.25 7.5 5.25H16.5C17.7426 5.25 18.75 6.25736 18.75 7.5V16.5C18.75 17.7426 17.7426 18.75 16.5 18.75H7.5C6.25736 18.75 5.25 17.7426 5.25 16.5V7.5Z"
+										stroke="currentColor"
+										stroke-width="1.5"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									></path>
+								</svg>
+								Stop Recording
+							</button>
+							<div id="audio-preview" class="hidden flex-1"></div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="p-4 bg-neutral-50 rounded-b-lg border-t border-neutral-200 flex justify-end gap-2"
+				>
+					<button
+						id="cancel-annotation"
+						class="px-4 py-2 border border-neutral-300 rounded-md text-neutral-700 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-300 text-sm font-medium transition-all duration-200"
+					>
+						Cancel
+					</button>
+					<button
+						id="save-annotation"
+						class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 text-sm font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary-500"
+					>
+						Save Annotation
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div
+			id="notification"
+			class="fixed top-4 z-50 bg-white rounded-lg shadow-lg p-3 sm:p-4 transform transition-all duration-300 flex items-center gap-2 sm:gap-3 opacity-0 mx-auto sm:mx-0 left-0 right-0 sm:left-auto sm:right-4 w-[calc(100%-2rem)] sm:w-auto max-w-md sm:max-w-md hidden"
+		>
+			<div
+				class="flex-shrink-0 bg-success bg-opacity-10 rounded-full p-1.5 sm:p-2"
+			>
+				<svg
+					class="w-4 h-4 sm:w-5 sm:h-5 text-success"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M5 13L9 17L19 7"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+				</svg>
+			</div>
+			<div class="flex-1">
+				<h3
+					class="font-medium text-neutral-800 text-xs sm:text-sm"
+					id="notification-title"
+				>
+					Success!
+				</h3>
+				<p class="text-neutral-600 text-xs" id="notification-message">
+					Your changes have been saved.
+				</p>
+			</div>
+			<button
+				class="text-neutral-400 hover:text-neutral-600"
+				id="close-notification"
+			>
+				<svg
+					class="w-3 h-3 sm:w-4 sm:h-4"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M18 6L6 18M6 6L18 18"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+				</svg>
+			</button>
+		</div>
+
+		<div
+			id="highlight-popup"
+			class="fixed z-50 bg-white rounded-lg shadow-lg p-2 hidden transform transition-all duration-200 opacity-0 scale-95 flex items-center gap-2"
+		>
+			<div
+				class="color-option-popup group w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 grammar-highlight shadow-sm hover:shadow relative"
+				data-type="grammar"
+				title="Grammar"
+			>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Grammar</span
+				>
+			</div>
+			<div
+				class="color-option-popup group w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 vocab-highlight shadow-sm hover:shadow relative"
+				data-type="vocab"
+				title="Vocabulary"
+			>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Vocabulary</span
+				>
+			</div>
+			<div
+				class="color-option-popup group w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 pronunciation-highlight shadow-sm hover:shadow relative"
+				data-type="pronunciation"
+				title="Pronunciation"
+			>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Pronunciation</span
+				>
+			</div>
+			<div
+				class="color-option-popup group w-6 h-6 rounded-full cursor-pointer border-2 border-transparent hover:scale-110 transition-transform duration-200 idiom-highlight shadow-sm hover:shadow relative"
+				data-type="idiom"
+				title="Idiom/Expression"
+			>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Idiom</span
+				>
+			</div>
+			<div
+				class="color-option-popup group w-6 h-6 rounded-full cursor-pointer border-2 border-neutral-300 hover:scale-110 transition-transform duration-200 bg-white flex items-center justify-center shadow-sm hover:shadow relative"
+				data-type="none"
+				title="Remove highlight"
+			>
+				<svg
+					width="14"
+					height="14"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+						stroke="#94a3b8"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+					<path
+						d="M5 5L19 19"
+						stroke="#94a3b8"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					/>
+				</svg>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Remove</span
+				>
+			</div>
+			<div class="h-6 w-px bg-neutral-200 mx-1"></div>
+			<button
+				class="popup-annotate-btn group w-6 h-6 rounded-full cursor-pointer flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 transition-all duration-200 relative"
+				title="Add Annotation"
+			>
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M7 8h10M7 12h4m1 8l4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+				</svg>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Annotate</span
+				>
+			</button>
+			<button
+				class="popup-record-btn group w-6 h-6 rounded-full cursor-pointer flex items-center justify-center hover:bg-primary-100 hover:text-primary-700 transition-all duration-200 relative"
+				title="Record Audio"
+			>
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M12 14a4 4 0 004-4V6a4 4 0 00-8 0v4a4 4 0 004 4zm0 0v3m-4 4h8m-5-4a5 5 0 01-5-5v-1M17 8a5 5 0 01-5 5"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					></path>
+				</svg>
+				<span
+					class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap shadow-md z-50"
+					>Record</span
+				>
+			</button>
+		</div>
+
+		<div
+			id="settings-modal"
+			class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden backdrop-blur-sm"
+		>
+			<div
+				class="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0"
+				id="settings-modal-content"
+			>
+				<div
+					class="p-5 border-b border-neutral-200 flex justify-between items-center"
+				>
+					<h3 class="font-semibold text-lg text-neutral-800">Settings</h3>
+					<button
+						id="close-settings-modal"
+						class="text-neutral-400 hover:text-neutral-600"
+					>
+						<svg
+							class="w-5 h-5"
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<path
+								d="M18 6L6 18M6 6L18 18"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							></path>
+						</svg>
+					</button>
+				</div>
+				<div class="p-5 overflow-y-auto max-h-[70vh]">
+					<div class="space-y-6">
+						<div>
+							<h4
+								class="text-sm font-medium text-neutral-700 mb-3 flex items-center"
+							>
+								Interface
+								<div class="relative inline-block ml-1.5 group">
+									<svg
+										class="w-4 h-4 text-neutral-400 cursor-help"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+										<path
+											d="M12 16V12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+										<path
+											d="M12 8H12.01"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									<div
+										class="absolute left-1/2 bottom-full -translate-x-1/2 mb-2 w-60 text-xs rounded py-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md z-50"
+									>
+										Customize the appearance of your whiteboard. Dark mode is
+										easier on the eyes in low-light environments, and font size
+										adjustments can improve readability.
+									</div>
+								</div>
+							</h4>
+							<div class="space-y-4">
+								<div>
+									<label class="block text-sm text-neutral-600 mb-2"
+										>Theme</label
+									>
+									<div class="grid grid-cols-2 gap-3 sm:gap-3 max-w-full">
+										<div class="theme-option" data-theme="light">
+											<input
+												type="radio"
+												id="theme-light"
+												name="theme"
+												value="light"
+												class="sr-only"
+												checked
+											/>
+											<label
+												for="theme-light"
+												class="block cursor-pointer rounded-lg border-2 border-neutral-200 p-1 hover:border-primary-300 focus:ring-4 focus:ring-primary-100 transition-all duration-200"
+											>
+												<div
+													class="theme-preview bg-white border border-neutral-200 rounded-md overflow-hidden shadow-sm"
+												>
+													<div
+														class="h-3 bg-gradient-to-r from-primary-600 to-primary-500"
+													></div>
+													<div class="p-2">
+														<div
+															class="w-8 h-1.5 bg-neutral-800 rounded-full mb-1"
+														></div>
+														<div
+															class="w-10 h-1 bg-neutral-400 rounded-full"
+														></div>
+														<div
+															class="mt-1.5 w-full h-6 bg-neutral-100 rounded"
+														></div>
+													</div>
+												</div>
+												<div
+													class="mt-1.5 text-center text-xs font-medium text-neutral-700"
+												>
+													Light
+												</div>
+											</label>
+										</div>
+
+										<div class="theme-option" data-theme="dark">
+											<input
+												type="radio"
+												id="theme-dark"
+												name="theme"
+												value="dark"
+												class="sr-only"
+											/>
+											<label
+												for="theme-dark"
+												class="block cursor-pointer rounded-lg border-2 border-neutral-200 p-1 hover:border-primary-300 focus:ring-4 focus:ring-primary-100 transition-all duration-200"
+											>
+												<div
+													class="theme-preview bg-neutral-800 border border-neutral-700 rounded-md overflow-hidden shadow-sm"
+												>
+													<div
+														class="h-3 bg-gradient-to-r from-primary-900 to-primary-800"
+													></div>
+													<div class="p-2">
+														<div
+															class="w-8 h-1.5 bg-neutral-200 rounded-full mb-1"
+														></div>
+														<div
+															class="w-10 h-1 bg-neutral-500 rounded-full"
+														></div>
+														<div
+															class="mt-1.5 w-full h-6 bg-neutral-700 rounded"
+														></div>
+													</div>
+												</div>
+												<div
+													class="mt-1.5 text-center text-xs font-medium text-neutral-700"
+												>
+													Dark
+												</div>
+											</label>
+										</div>
+									</div>
+								</div>
+								<div>
+									<label
+										for="font-size"
+										class="block text-sm text-neutral-600 mb-1"
+										>Font Size</label
+									>
+									<select
+										id="font-size"
+										class="w-full p-2 border border-neutral-300 rounded-md text-sm"
+									>
+										<option value="small">Small</option>
+										<option value="medium" selected>Medium</option>
+										<option value="large">Large</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<div>
+							<h4
+								class="text-sm font-medium text-neutral-700 mb-3 flex items-center"
+							>
+								Highlighting
+								<div class="relative inline-block ml-1.5 group">
+									<svg
+										class="w-4 h-4 text-neutral-400 cursor-help"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+										<path
+											d="M12 16V12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+										<path
+											d="M12 8H12.01"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									<div
+										class="absolute left-1/2 bottom-full -translate-x-1/2 mb-2 w-60 text-xs rounded py-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md z-50"
+									>
+										Highlighting helps to categorize text for different language
+										learning purposes. Choose your preferred default highlight
+										type for quicker access when teaching.
+									</div>
+								</div>
+							</h4>
+							<div class="space-y-4">
+								<div>
+									<label
+										for="default-highlight-type"
+										class="block text-sm text-neutral-600 mb-1"
+										>Default Highlight Type</label
+									>
+									<select
+										id="default-highlight-type"
+										class="w-full p-2 border border-neutral-300 rounded-md text-sm"
+									>
+										<option value="grammar" selected>Grammar</option>
+										<option value="vocab">Vocabulary</option>
+										<option value="pronunciation">Pronunciation</option>
+										<option value="idiom">Idiom/Expression</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<div>
+							<h4
+								class="text-sm font-medium text-neutral-700 mb-3 flex items-center"
+							>
+								Session
+								<div class="relative inline-block ml-1.5 group">
+									<svg
+										class="w-4 h-4 text-neutral-400 cursor-help"
+										viewBox="0 0 24 24"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
+									>
+										<path
+											d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+										<path
+											d="M12 16V12"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+										<path
+											d="M12 8H12.01"
+											stroke="currentColor"
+											stroke-width="1.5"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+									<div
+										class="absolute left-1/2 bottom-full -translate-x-1/2 mb-2 w-60 bg-neutral-800 text-white text-xs rounded py-2 px-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none shadow-md z-50"
+									>
+										Manage your current work session. Auto-save ensures your
+										work is preserved even if your browser closes unexpectedly.
+										Clear session removes all highlights, annotations, and text
+										changes.
+									</div>
+								</div>
+							</h4>
+							<div class="space-y-4">
+								<button
+									id="clear-session-btn"
+									class="w-full mt-2 px-4 py-2 bg-danger text-white rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 text-sm font-medium transition-all duration-200"
+								>
+									Clear Current Session
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="p-4 bg-neutral-50 rounded-b-lg border-t border-neutral-200 flex justify-end gap-2"
+				>
+					<button
+						id="cancel-settings"
+						class="px-4 py-2 border border-neutral-300 rounded-md text-neutral-700 hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary-300 text-sm font-medium transition-all duration-200"
+					>
+						Cancel
+					</button>
+					<button
+						id="save-settings"
+						class="px-4 py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 text-sm font-medium transition-all duration-200"
+					>
+						Save Settings
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div
+			id="confirmation-modal"
+			class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden backdrop-blur-sm"
+		>
+			<div
+				class="bg-white dark:bg-neutral-800 rounded-lg shadow-lg w-full max-w-md mx-4 transform transition-all duration-300 scale-95 opacity-0"
+				id="confirmation-modal-content"
+			>
+				<div class="p-5 border-b border-neutral-200 dark:border-neutral-700">
+					<h3
+						class="font-semibold text-lg text-neutral-800 dark:text-neutral-200"
+						id="confirmation-title"
+					>
+						Confirm Action
+					</h3>
+				</div>
+				<div class="p-5">
+					<p
+						class="text-neutral-600 dark:text-neutral-400"
+						id="confirmation-message"
+					>
+						Are you sure you want to proceed with this action?
+					</p>
+				</div>
+				<div
+					class="p-4 bg-neutral-50 dark:bg-neutral-800 rounded-b-lg border-t border-neutral-200 dark:border-neutral-700 flex justify-end gap-2"
+				>
+					<button
+						id="cancel-confirmation"
+						class="px-4 py-2 border border-neutral-300 dark:border-neutral-600 rounded-md text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-300 text-sm font-medium transition-all duration-200"
+					>
+						Cancel
+					</button>
+					<button
+						id="confirm-action"
+						class="px-4 py-2 bg-danger text-white rounded-md hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-danger focus:ring-offset-2 text-sm font-medium transition-all duration-200"
+					>
+						Confirm
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				(function initializeSettings() {
+					const savedSettings = localStorage.getItem(
+						"languageWhiteboardSettings"
+					);
+					if (savedSettings) {
+						try {
+							const settings = JSON.parse(savedSettings);
+
+							if (settings.darkMode) {
+								document.documentElement.classList.add("dark");
+							} else {
+								document.documentElement.classList.remove("dark");
+							}
+
+							const editor = document.getElementById("editor");
+							if (editor && settings.fontSize) {
+								editor.classList.remove("text-sm", "text-base", "text-lg");
+
+								if (settings.fontSize === "small") {
+									editor.classList.add("text-sm");
+								} else if (settings.fontSize === "large") {
+									editor.classList.add("text-lg");
+								} else {
+									editor.classList.add("text-base");
+								}
+							}
+						} catch (e) {
+							console.error("Error parsing saved settings:", e);
+						}
+					} else {
+						const editor = document.getElementById("editor");
+						if (editor) {
+							editor.classList.remove("text-sm", "text-base", "text-lg");
+							editor.classList.add("text-base");
+						}
+					}
+				})();
+
+				const editor = document.getElementById("editor");
+				const highlightBtn = document.getElementById("highlight-btn");
+				const highlightBtnMobile = document.getElementById(
+					"highlight-btn-mobile"
+				);
+				const annotateBtn = document.getElementById("annotate-btn");
+				const recordBtn = document.getElementById("record-btn");
+				const colorOptions = document.querySelectorAll(".color-option");
+				const annotationsList = document.getElementById("annotations-list");
+				const annotationCount = document.getElementById("annotation-count");
+				const emptyAnnotations = document.getElementById("empty-annotations");
+				const sidebarToggle = document.getElementById("sidebar-toggle");
+				const mobileSidebarToggle = document.getElementById(
+					"mobile-sidebar-toggle"
+				);
+				const sidebar = document.getElementById("sidebar");
+				const shareBtn = document.getElementById("share-btn");
+				const bottomToolbar = document.querySelector(".bottom-toolbar");
+
+				const profileButton = document.getElementById("profile-button");
+				const profileDropdown = document.getElementById("profile-dropdown");
+				const profileContainer = document.getElementById("profile-container");
+				const settingsButton = document.getElementById("settings-button");
+				const guidedTourMobile = document.getElementById("guided-tour-mobile");
+				const mobileTourButton = document.getElementById("mobile-tour-button");
+
+				if (profileButton && profileDropdown) {
+					profileButton.addEventListener("click", function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+						profileDropdown.classList.toggle("hidden");
+					});
+
+					document.addEventListener("click", function (e) {
+						if (!profileContainer.contains(e.target)) {
+							profileDropdown.classList.add("hidden");
+						}
+					});
+				}
+
+				if (guidedTourMobile) {
+					guidedTourMobile.addEventListener("click", function () {
+						profileDropdown.classList.add("hidden");
+						startGuidedTour();
+					});
+				}
+
+				if (mobileTourButton) {
+					mobileTourButton.addEventListener("click", startGuidedTour);
+				}
+
+				let initialWindowHeight = window.innerHeight;
+				let keyboardVisible = false;
+
+				function checkKeyboardVisibility() {
+					const heightDifference = initialWindowHeight - window.innerHeight;
+					const keyboardThreshold = initialWindowHeight * 0.15;
+
+					if (heightDifference > keyboardThreshold) {
+						if (!keyboardVisible) {
+							document.body.classList.add("keyboard-visible");
+							keyboardVisible = true;
+						}
+					} else {
+						if (keyboardVisible) {
+							document.body.classList.remove("keyboard-visible");
+							keyboardVisible = false;
+						}
+					}
+				}
+
+				window.addEventListener(
+					"resize",
+					throttle(function () {
+						checkKeyboardVisibility();
+						updateNotificationPosition();
+					}, 100)
+				);
+
+				window.addEventListener("load", function () {
+					initialWindowHeight = window.innerHeight;
+				});
+
+				if ("ontouchstart" in window) {
+					editor.addEventListener("focus", function () {
+						document.body.classList.add("keyboard-visible");
+						keyboardVisible = true;
+					});
+
+					document.addEventListener(
+						"touchstart",
+						function (e) {
+							if (
+								!editor.contains(e.target) &&
+								document.activeElement === editor
+							) {
+								setTimeout(function () {
+									checkKeyboardVisibility();
+								}, 400);
+							}
+						},
+						{ passive: true }
+					);
+
+					if (window.visualViewport) {
+						window.visualViewport.addEventListener("resize", function () {
+							const heightDiff =
+								window.innerHeight - window.visualViewport.height;
+							if (heightDiff > 150) {
+								document.body.classList.add("keyboard-visible");
+								keyboardVisible = true;
+							} else {
+								document.body.classList.remove("keyboard-visible");
+								keyboardVisible = false;
+							}
+						});
+					}
+				}
+
+				const annotationModal = document.getElementById("annotation-modal");
+				const modalContent = document.getElementById("modal-content");
+				const selectedTextEl = document.getElementById("selected-text");
+				const annotationTextEl = document.getElementById("annotation-text");
+				const saveAnnotationBtn = document.getElementById("save-annotation");
+				const cancelAnnotationBtn =
+					document.getElementById("cancel-annotation");
+				const recordingControls = document.getElementById("recording-controls");
+				const startRecordingBtn = document.getElementById("start-recording");
+				const stopRecordingBtn = document.getElementById("stop-recording");
+				const recordingTimer = document.getElementById("recording-timer");
+				const audioPreview = document.getElementById("audio-preview");
+
+				const notification = document.getElementById("notification");
+				const notificationTitle = document.getElementById("notification-title");
+				const notificationMessage = document.getElementById(
+					"notification-message"
+				);
+				const closeNotificationBtn =
+					document.getElementById("close-notification");
+
+				let state = {
+					highlights: [],
+					annotations: [],
+					currentUser: {
+						name: "Professor Garcia",
+						id: "teacher-1",
+						color: "#4a6fa5",
+						type: "teacher",
+					},
+					selectedHighlightType: "grammar",
+					isRecording: false,
+					audioBlobs: {},
+					mediaRecorder: null,
+					currentSelection: null,
+					currentHighlightId: null,
+					recordingInterval: null,
+					recordingStartTime: 0,
+					currentAudioId: null,
+				};
+
+				let db;
+				const dbName = "languageWhiteboardDB";
+				const request = indexedDB.open(dbName, 1);
+
+				request.onupgradeneeded = (event) => {
+					db = event.target.result;
+					if (!db.objectStoreNames.contains("sessions")) {
+						db.createObjectStore("sessions", { keyPath: "id" });
+					}
+				};
+
+				request.onsuccess = (event) => {
+					db = event.target.result;
+					window.db = db;
+					loadSession();
+				};
+
+				request.onerror = (event) => {
+					console.error("IndexedDB error:", event.target.error);
+					showNotification(
+						"Error",
+						"Could not initialize database for offline storage.",
+						"error"
+					);
+				};
+
+				function loadSession() {
+					const transaction = db.transaction(["sessions"], "readonly");
+					const store = transaction.objectStore("sessions");
+					const getRequest = store.get("currentSession");
+
+					getRequest.onsuccess = (event) => {
+						if (event.target.result) {
+							const savedState = event.target.result.state;
+							state.highlights = savedState.highlights || [];
+							state.annotations = savedState.annotations || [];
+							editor.innerHTML = savedState.content || editor.innerHTML;
+
+							renderAnnotations();
+							showNotification(
+								"Session Loaded",
+								"Your previous session has been restored.",
+								"success"
+							);
+						}
+					};
+				}
+
+				function saveSession() {
+					if (!db) return;
+
+					const transaction = db.transaction(["sessions"], "readwrite");
+					const store = transaction.objectStore("sessions");
+
+					const sessionData = {
+						id: "currentSession",
+						state: {
+							highlights: state.highlights,
+							annotations: state.annotations,
+							content: editor.innerHTML,
+						},
+						timestamp: Date.now(),
+					};
+
+					store.put(sessionData);
+				}
+
+				setInterval(saveSession, 5000);
+
+				function generateUserId() {
+					return Math.random().toString(36).substring(2, 10);
+				}
+
+				function getRandomColor() {
+					const colors = [
+						"#4a6fa5",
+						"#6d98ba",
+						"#d4421e",
+						"#28a745",
+						"#bf8c05",
+						"#dc3545",
+						"#17a2b8",
+						"#6f42c1",
+					];
+					return colors[Math.floor(Math.random() * colors.length)];
+				}
+
+				function formatTime(seconds) {
+					const minutes = Math.floor(seconds / 60);
+					const remainingSeconds = seconds % 60;
+					return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+				}
+
+				function showHighlightPopupForElement(element, event) {
+					state.currentHighlightId = element.id;
+
+					const rect = element.getBoundingClientRect();
+
+					highlightPopup.style.left = `${(rect.left + rect.right) / 2}px`;
+					highlightPopup.style.top = `${rect.top - 10}px`;
+
+					highlightPopup.classList.remove("hidden", "opacity-0", "scale-95");
+					highlightPopup.classList.add("opacity-100", "scale-100");
+
+					const range = document.createRange();
+					range.selectNodeContents(element);
+					const selection = window.getSelection();
+					selection.removeAllRanges();
+					selection.addRange(range);
+					state.currentSelection = selection;
+
+					event.preventDefault();
+					event.stopPropagation();
+				}
+
+				function showNotification(title, message, type = "success") {
+					notificationTitle.textContent = title;
+					notificationMessage.textContent = message;
+
+					notification.classList.remove(
+						"bg-success-50",
+						"bg-danger-50",
+						"bg-warning-50",
+						"bg-info-50"
+					);
+
+					if (type === "error") {
+						notification
+							.querySelector(".flex-shrink-0")
+							.classList.remove("bg-success", "bg-opacity-10");
+						notification
+							.querySelector(".flex-shrink-0")
+							.classList.add("bg-danger", "bg-opacity-10");
+						notification.querySelector("svg").classList.remove("text-success");
+						notification.querySelector("svg").classList.add("text-danger");
+						notification
+							.querySelector("svg path")
+							.setAttribute("d", "M6 18L18 6M6 6l12 12");
+					} else {
+						notification
+							.querySelector(".flex-shrink-0")
+							.classList.remove("bg-danger", "bg-opacity-10");
+						notification
+							.querySelector(".flex-shrink-0")
+							.classList.add("bg-success", "bg-opacity-10");
+						notification.querySelector("svg").classList.remove("text-danger");
+						notification.querySelector("svg").classList.add("text-success");
+						notification
+							.querySelector("svg path")
+							.setAttribute("d", "M5 13L9 17L19 7");
+					}
+
+					notification.classList.remove("opacity-0", "hidden");
+					notification.classList.add("opacity-100");
+
+					setTimeout(() => {
+						hideNotification();
+					}, 3000);
+				}
+
+				window.showNotification = showNotification;
+
+				function hideNotification() {
+					notification.classList.remove("opacity-100");
+					notification.classList.add("opacity-0");
+
+					setTimeout(() => {
+						notification.classList.add("hidden");
+					}, 300);
+				}
+
+				function clearHighlights() {
+					const editorElement = document.getElementById("editor");
+					if (!editorElement) return;
+
+					const highlightElements = editorElement.querySelectorAll(
+						".highlight, .annotated-text, .audio-text, .annotated-audio-text"
+					);
+
+					highlightElements.forEach((element) => {
+						const fragment = document.createDocumentFragment();
+
+						while (element.firstChild) {
+							fragment.appendChild(element.firstChild);
+						}
+
+						element.parentNode.replaceChild(fragment, element);
+					});
+
+					if (window.state) {
+						window.state.highlights = [];
+						window.state.annotations = [];
+						window.state.audioBlobs = {};
+					} else if (state) {
+						state.highlights = [];
+						state.annotations = [];
+						state.audioBlobs = {};
+					}
+
+					const annotationsList = document.getElementById("annotations-list");
+					if (annotationsList) {
+						annotationsList.innerHTML = "";
+					}
+
+					const emptyAnnotations = document.getElementById("empty-annotations");
+					if (emptyAnnotations) {
+						emptyAnnotations.classList.remove("hidden");
+					}
+
+					const annotationCount = document.getElementById("annotation-count");
+					if (annotationCount) {
+						annotationCount.textContent = "0";
+					}
+
+					if (typeof saveSession === "function") {
+						saveSession();
+					} else if (typeof window.saveSession === "function") {
+						window.saveSession();
+					}
+				}
+
+				function openModal(highlightId, isRecording = false) {
+					const highlight = state.highlights.find((h) => h.id === highlightId);
+					if (!highlight) return;
+
+					saveAnnotationBtn.disabled = true;
+
+					state.currentHighlightId = highlightId;
+					selectedTextEl.textContent = highlight.text;
+
+					annotationTextEl.value = "";
+					state.currentAudioId = null;
+					audioPreview.innerHTML = "";
+					audioPreview.classList.add("hidden");
+
+					if (isRecording) {
+						recordingControls.classList.remove("hidden");
+						document.getElementById("annotation-text-label").innerHTML =
+							'Your annotation <span class="text-neutral-500 font-normal">(Optional)</span>:';
+						document.getElementById("annotation-text").placeholder =
+							"Add your notes here (optional)...";
+					} else {
+						recordingControls.classList.add("hidden");
+						document.getElementById("annotation-text-label").textContent =
+							"Your annotation:";
+						document.getElementById("annotation-text").placeholder =
+							"Add your notes here...";
+					}
+
+					annotationModal.classList.remove("hidden");
+					setTimeout(() => {
+						modalContent.classList.remove("scale-95", "opacity-0");
+						modalContent.classList.add("scale-100", "opacity-100");
+
+						validateAnnotationForm();
+					}, 10);
+
+					annotationTextEl.focus();
+				}
+
+				function validateAnnotationForm() {
+					const annotationText = annotationTextEl.value.trim();
+					const isRecordingMode =
+						!recordingControls.classList.contains("hidden");
+					const hasAudio = state.currentAudioId !== null;
+
+					const isValid =
+						(!isRecordingMode && annotationText.length > 0) ||
+						(isRecordingMode && (annotationText.length > 0 || hasAudio));
+
+					saveAnnotationBtn.disabled = !isValid;
+				}
+
+				annotationTextEl.addEventListener("input", validateAnnotationForm);
+
+				function updateFormValidationWithAudio() {
+					validateAnnotationForm();
+				}
+
+				function closeModal() {
+					modalContent.classList.remove("scale-100", "opacity-100");
+					modalContent.classList.add("scale-95", "opacity-0");
+
+					setTimeout(() => {
+						annotationModal.classList.add("hidden");
+						annotationTextEl.value = "";
+						stopRecording();
+					}, 300);
+				}
+
+				editor.addEventListener("mouseup", function () {
+					state.currentSelection = window.getSelection();
+				});
+
+				editor.addEventListener("touchend", function () {
+					setTimeout(() => {
+						state.currentSelection = window.getSelection();
+
+						if (state.currentSelection && !state.currentSelection.isCollapsed) {
+							const range = state.currentSelection.getRangeAt(0);
+							const rect = range.getBoundingClientRect();
+
+							highlightPopup.style.left = `${(rect.left + rect.right) / 2}px`;
+							highlightPopup.style.top = `${rect.top - 10}px`;
+
+							highlightPopup.classList.remove(
+								"hidden",
+								"opacity-0",
+								"scale-95"
+							);
+							highlightPopup.classList.add("opacity-100", "scale-100");
+						}
+					}, 100);
+				});
+
+				function applyDefaultHighlightType() {
+					const savedSettings = localStorage.getItem(
+						"languageWhiteboardSettings"
+					);
+					let defaultHighlightType = "grammar";
+
+					if (savedSettings) {
+						try {
+							const settings = JSON.parse(savedSettings);
+							if (settings.defaultHighlightType) {
+								defaultHighlightType = settings.defaultHighlightType;
+
+								if (typeof window.state === "undefined") {
+									window.state = window.state || {};
+								}
+								if (typeof state === "undefined") {
+									state = state || {};
+								}
+
+								if (window.state) {
+									window.state.selectedHighlightType = defaultHighlightType;
+								}
+
+								if (state) {
+									state.selectedHighlightType = defaultHighlightType;
+								}
+							}
+						} catch (e) {
+							console.error("Error parsing saved highlight type settings:", e);
+						}
+					}
+
+					colorOptions.forEach((option) => {
+						option.classList.remove(
+							"border-dark",
+							"border-primary-600",
+							"ring-2",
+							"ring-primary-300",
+							"scale-110"
+						);
+						if (option.dataset.type === defaultHighlightType) {
+							option.classList.add(
+								"border-primary-600",
+								"ring-2",
+								"ring-primary-300",
+								"scale-110"
+							);
+						}
+					});
+
+					const highlightBtn = document.getElementById("highlight-btn");
+					const highlightBtnMobile = document.getElementById(
+						"highlight-btn-mobile"
+					);
+
+					[highlightBtn, highlightBtnMobile].forEach((btn) => {
+						if (btn) {
+							btn.classList.remove(
+								"text-primary-700",
+								"text-accent-600",
+								"text-success",
+								"text-warning"
+							);
+						}
+					});
+				}
+
+				applyDefaultHighlightType();
+
+				colorOptions.forEach((option) => {
+					option.addEventListener("mousedown", function (e) {
+						e.preventDefault();
+
+						colorOptions.forEach((opt) =>
+							opt.classList.remove(
+								"border-dark",
+								"border-primary-600",
+								"ring-2",
+								"ring-primary-300",
+								"scale-110"
+							)
+						);
+						this.classList.add(
+							"border-primary-600",
+							"ring-2",
+							"ring-primary-300",
+							"scale-110"
+						);
+						state.selectedHighlightType = this.dataset.type;
+
+						const highlightBtnTooltip = document.querySelector(
+							"#highlight-btn span"
+						);
+						const highlightBtnMobileTooltip = document.querySelector(
+							"#highlight-btn-mobile span"
+						);
+
+						const displayType =
+							this.dataset.type === "none"
+								? "Remove"
+								: this.dataset.type.charAt(0).toUpperCase() +
+								  this.dataset.type.slice(1);
+					});
+				});
+
+				if (highlightBtnMobile) {
+					highlightBtnMobile.addEventListener("mousedown", function (e) {
+						e.preventDefault();
+
+						highlightBtn.dispatchEvent(
+							new MouseEvent("mousedown", {
+								bubbles: true,
+								cancelable: true,
+								view: window,
+							})
+						);
+					});
+				}
+
+				highlightBtn.addEventListener("mousedown", function (e) {
+					e.preventDefault();
+
+					const selection = window.getSelection();
+					if (!selection || selection.isCollapsed) {
+						showNotification(
+							"Selection Required",
+							"Please select text to highlight.",
+							"error"
+						);
+						return;
+					}
+
+					const range = selection.getRangeAt(0);
+
+					if (state.selectedHighlightType !== "none") {
+						try {
+							const tempRange = range.cloneRange();
+							const selectedText = selection.toString();
+
+							const highlightId = "highlight-" + Date.now();
+							const highlightNode = document.createElement("span");
+							highlightNode.className = `highlight ${state.selectedHighlightType}-highlight px-0.5 py-0 rounded relative transition-all duration-200 hover:shadow-highlight`;
+							highlightNode.id = highlightId;
+							highlightNode.dataset.type = state.selectedHighlightType;
+
+							tempRange.surroundContents(highlightNode);
+
+							state.highlights.push({
+								id: highlightId,
+								type: state.selectedHighlightType,
+								text: selectedText,
+								createdBy: state.currentUser.name,
+								timestamp: Date.now(),
+							});
+
+							saveSession();
+							showNotification(
+								"Text Highlighted",
+								"Text has been highlighted successfully.",
+								"success"
+							);
+
+							highlightNode.classList.add("animate-fade-in");
+							setTimeout(
+								() => highlightNode.classList.remove("animate-fade-in"),
+								300
+							);
+
+							highlightNode.addEventListener("click", function (e) {
+								showHighlightPopupForElement(this, e);
+							});
+						} catch (error) {
+							console.error("Error creating highlight:", error);
+							showNotification(
+								"Highlight Error",
+								"Could not create highlight: " + error.message,
+								"error"
+							);
+						}
+					} else {
+						const allHighlightNodes = [];
+						const iterator = document.createNodeIterator(
+							range.commonAncestorContainer,
+							NodeFilter.SHOW_ELEMENT
+						);
+						let currentNode;
+
+						while ((currentNode = iterator.nextNode())) {
+							if (
+								range.intersectsNode(currentNode) &&
+								currentNode.classList &&
+								currentNode.classList.contains("highlight")
+							) {
+								allHighlightNodes.push(currentNode);
+							}
+						}
+
+						if (allHighlightNodes.length > 0) {
+							allHighlightNodes.forEach((node) => {
+								const hasAnnotation = state.annotations.some(
+									(a) => a.highlightId === node.id
+								);
+								const hasAudio = state.annotations.some(
+									(a) => a.highlightId === node.id && a.audioId
+								);
+
+								if (node.classList.contains("highlight")) {
+									const oldType = node.dataset.type;
+									node.classList.remove(`highlight`, `${oldType}-highlight`);
+									node.classList.remove(
+										"hover:shadow-highlight",
+										"px-0.5",
+										"py-0",
+										"rounded",
+										"relative",
+										"transition-all",
+										"duration-200"
+									);
+
+									if (hasAudio && hasAnnotation) {
+										node.classList.add("annotated-audio-text");
+									} else if (hasAudio) {
+										node.classList.add("audio-text");
+									} else if (hasAnnotation) {
+										node.classList.add("annotated-text");
+									} else {
+										const parent = node.parentNode;
+										while (node.firstChild) {
+											parent.insertBefore(node.firstChild, node);
+										}
+										parent.removeChild(node);
+
+										const highlightIndex = state.highlights.findIndex(
+											(h) => h.id === node.id
+										);
+										if (highlightIndex !== -1) {
+											state.highlights.splice(highlightIndex, 1);
+										}
+									}
+
+									const existing = state.highlights.find(
+										(h) => h.id === node.id
+									);
+									if (existing && (hasAnnotation || hasAudio)) {
+										existing.type = "plain";
+										existing.timestamp = Date.now();
+									}
+								}
+							});
+
+							saveSession();
+							showNotification(
+								"Highlights Removed",
+								"Highlights have been removed.",
+								"success"
+							);
+							renderAnnotations();
+						}
+					}
+				});
+
+				annotateBtn.addEventListener("click", function () {
+					if (!state.currentSelection) return;
+
+					const selection = state.currentSelection;
+					if (selection.isCollapsed) {
+						showNotification(
+							"Selection Required",
+							"Please select text to annotate.",
+							"error"
+						);
+						return;
+					}
+
+					saveAnnotationBtn.disabled = true;
+
+					const range = selection.getRangeAt(0);
+					let parentElement = range.startContainer;
+
+					if (parentElement.nodeType === 3) {
+						parentElement = parentElement.parentElement;
+					}
+
+					if (
+						parentElement.classList &&
+						parentElement.classList.contains("highlight")
+					) {
+						const highlightId = parentElement.id;
+						openModal(highlightId, false);
+					} else {
+						const selectedText = selection.toString();
+						if (!selectedText.trim()) {
+							showNotification(
+								"Selection Required",
+								"Please select text to annotate.",
+								"error"
+							);
+							return;
+						}
+
+						const textId = "text-" + Date.now();
+
+						try {
+							const textNode = document.createElement("span");
+							textNode.className = "annotated-text";
+							textNode.id = textId;
+
+							range.surroundContents(textNode);
+
+							state.highlights.push({
+								id: textId,
+								type: "plain",
+								text: selectedText,
+								createdBy: state.currentUser.name,
+								timestamp: Date.now(),
+							});
+
+							state.currentHighlightId = textId;
+							selectedTextEl.textContent = selectedText;
+							annotationModal.classList.remove("hidden");
+							recordingControls.classList.add("hidden");
+
+							document.getElementById("annotation-text-label").textContent =
+								"Your annotation:";
+							document.getElementById("annotation-text").placeholder =
+								"Add your notes here...";
+
+							saveAnnotationBtn.disabled = true;
+
+							setTimeout(() => {
+								modalContent.classList.remove("scale-95", "opacity-0");
+								modalContent.classList.add("scale-100", "opacity-100");
+
+								validateAnnotationForm();
+							}, 10);
+
+							textNode.addEventListener("click", function (e) {
+								showHighlightPopupForElement(this, e);
+							});
+						} catch (error) {
+							console.error("Error creating annotation:", error);
+							showNotification(
+								"Annotation Error",
+								"Could not create annotation. The selection may span multiple elements.",
+								"error"
+							);
+						}
+					}
+				});
+
+				saveAnnotationBtn.addEventListener("click", function () {
+					const annotationText = annotationTextEl.value.trim();
+					const isRecordingMode =
+						!recordingControls.classList.contains("hidden");
+
+					if (
+						(!annotationText && !state.currentAudioId && isRecordingMode) ||
+						(!annotationText && !isRecordingMode)
+					) {
+						showNotification(
+							"Input Required",
+							isRecordingMode
+								? "Please enter annotation text or record audio."
+								: "Please enter annotation text.",
+							"error"
+						);
+						return;
+					}
+
+					const annotationId = "annotation-" + Date.now();
+
+					state.annotations.push({
+						id: annotationId,
+						highlightId: state.currentHighlightId,
+						text: annotationText,
+						createdBy: state.currentUser.name,
+						timestamp: Date.now(),
+						audioId: state.currentAudioId,
+					});
+
+					const highlight = state.highlights.find(
+						(h) => h.id === state.currentHighlightId
+					);
+					if (highlight && highlight.type === "plain") {
+						const textElement = document.getElementById(
+							state.currentHighlightId
+						);
+						if (textElement) {
+							if (state.currentAudioId) {
+								textElement.classList.remove("annotated-text", "audio-text");
+								textElement.classList.add("annotated-audio-text");
+							} else if (!textElement.classList.contains("annotated-text")) {
+								textElement.classList.add("annotated-text");
+							}
+						}
+					}
+
+					renderAnnotations();
+					saveSession();
+					closeModal();
+
+					showNotification(
+						"Annotation Added",
+						"Your annotation has been added successfully.",
+						"success"
+					);
+					state.currentAudioId = null;
+				});
+
+				cancelAnnotationBtn.addEventListener("click", closeModal);
+
+				function startRecording() {
+					navigator.mediaDevices
+						.getUserMedia({ audio: true })
+						.then((stream) => {
+							state.mediaRecorder = new MediaRecorder(stream);
+							const audioChunks = [];
+
+							state.mediaRecorder.addEventListener("dataavailable", (event) => {
+								audioChunks.push(event.data);
+							});
+
+							state.mediaRecorder.addEventListener("stop", () => {
+								const audioBlob = new Blob(audioChunks, { type: "audio/mp3" });
+								const audioId = "audio-" + Date.now();
+								state.audioBlobs[audioId] = audioBlob;
+								state.currentAudioId = audioId;
+
+								const audioUrl = URL.createObjectURL(audioBlob);
+								audioPreview.innerHTML = `
+                                <audio controls class="w-full h-8 mt-2">
+                                    <source src="${audioUrl}" type="audio/mp3">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            `;
+
+								audioPreview.classList.remove("hidden");
+
+								stream.getTracks().forEach((track) => track.stop());
+
+								clearInterval(state.recordingInterval);
+								state.recordingInterval = null;
+
+								showNotification(
+									"Recording Complete",
+									"Audio recording has been captured.",
+									"success"
+								);
+
+								validateAnnotationForm();
+							});
+
+							state.mediaRecorder.start();
+							state.isRecording = true;
+							startRecordingBtn.classList.add("hidden");
+							stopRecordingBtn.classList.remove("hidden");
+
+							state.recordingStartTime = Date.now();
+							state.recordingInterval = setInterval(() => {
+								const elapsedSeconds = Math.floor(
+									(Date.now() - state.recordingStartTime) / 1000
+								);
+								recordingTimer.textContent = formatTime(elapsedSeconds);
+
+								if (elapsedSeconds >= 60) {
+									stopRecording();
+								}
+							}, 1000);
+						})
+						.catch((err) => {
+							console.error("Error accessing microphone:", err);
+							showNotification(
+								"Microphone Error",
+								"Could not access microphone. Please check permissions.",
+								"error"
+							);
+						});
+				}
+
+				function stopRecording() {
+					if (
+						state.mediaRecorder &&
+						state.mediaRecorder.state === "recording"
+					) {
+						state.mediaRecorder.stop();
+						state.isRecording = false;
+						startRecordingBtn.classList.remove("hidden");
+						stopRecordingBtn.classList.add("hidden");
+
+						clearInterval(state.recordingInterval);
+						state.recordingInterval = null;
+					}
+				}
+
+				recordBtn.addEventListener("click", function () {
+					if (!state.currentSelection) return;
+
+					const selection = state.currentSelection;
+					if (selection.isCollapsed) {
+						showNotification(
+							"Selection Required",
+							"Please select text to record audio for.",
+							"error"
+						);
+						return;
+					}
+
+					saveAnnotationBtn.disabled = true;
+
+					const range = selection.getRangeAt(0);
+					let parentElement = range.startContainer;
+
+					if (parentElement.nodeType === 3) {
+						parentElement = parentElement.parentElement;
+					}
+
+					if (
+						parentElement.classList &&
+						parentElement.classList.contains("highlight")
+					) {
+						const highlightId = parentElement.id;
+						openModal(highlightId, true);
+					} else {
+						const selectedText = selection.toString();
+						if (!selectedText.trim()) {
+							showNotification(
+								"Selection Required",
+								"Please select text to record audio for.",
+								"error"
+							);
+							return;
+						}
+
+						const textId = "text-" + Date.now();
+
+						try {
+							const textNode = document.createElement("span");
+							textNode.className = "audio-text";
+							textNode.id = textId;
+
+							range.surroundContents(textNode);
+
+							state.highlights.push({
+								id: textId,
+								type: "plain",
+								text: selectedText,
+								createdBy: state.currentUser.name,
+								timestamp: Date.now(),
+							});
+
+							state.currentHighlightId = textId;
+							selectedTextEl.textContent = selectedText;
+							annotationModal.classList.remove("hidden");
+							recordingControls.classList.remove("hidden");
+
+							document.getElementById("annotation-text-label").innerHTML =
+								'Your annotation <span class="text-neutral-500 font-normal">(Optional)</span>:';
+							document.getElementById("annotation-text").placeholder =
+								"Add your notes here (optional)...";
+
+							saveAnnotationBtn.disabled = true;
+
+							setTimeout(() => {
+								modalContent.classList.remove("scale-95", "opacity-0");
+								modalContent.classList.add("scale-100", "opacity-100");
+
+								validateAnnotationForm();
+							}, 10);
+
+							textNode.addEventListener("click", function (e) {
+								showHighlightPopupForElement(this, e);
+							});
+						} catch (error) {
+							console.error("Error creating audio recording:", error);
+							showNotification(
+								"Recording Error",
+								"Could not create audio recording. The selection may span multiple elements.",
+								"error"
+							);
+						}
+					}
+				});
+
+				startRecordingBtn.addEventListener("click", startRecording);
+				stopRecordingBtn.addEventListener("click", stopRecording);
+				closeNotificationBtn.addEventListener("click", hideNotification);
+
+				function renderAnnotations() {
+					annotationsList.innerHTML = "";
+
+					if (state.annotations.length === 0) {
+						emptyAnnotations.classList.remove("hidden");
+						annotationCount.textContent = "0";
+					} else {
+						emptyAnnotations.classList.add("hidden");
+						annotationCount.textContent = state.annotations.length.toString();
+					}
+
+					const isDarkMode =
+						document.documentElement.classList.contains("dark");
+
+					state.annotations.forEach((annotation) => {
+						const highlight = state.highlights.find(
+							(h) => h.id === annotation.highlightId
+						);
+						if (!highlight) return;
+
+						const textElement = document.getElementById(highlight.id);
+						if (textElement && highlight.type === "plain") {
+							const hasAnnotation =
+								textElement.classList.contains("annotated-text");
+							const hasAudio = textElement.classList.contains("audio-text");
+
+							if (annotation.audioId && !hasAudio) {
+								textElement.classList.remove("annotated-text");
+								textElement.classList.add(
+									hasAnnotation ? "annotated-audio-text" : "audio-text"
+								);
+							} else if (!hasAnnotation) {
+								textElement.classList.add("annotated-text");
+							}
+						}
+
+						const highlightTypeClass =
+							highlight.type === "plain"
+								? isDarkMode
+									? "bg-neutral-700 text-neutral-200"
+									: "bg-neutral-100 text-neutral-700"
+								: `${highlight.type}-highlight`;
+						const annotationElement = document.createElement("div");
+
+						const cardBaseClasses = isDarkMode
+							? "bg-neutral-800 rounded-lg shadow-sm border border-neutral-700 overflow-hidden animate-fade-in"
+							: "bg-white rounded-lg shadow-sm border border-neutral-100 overflow-hidden animate-fade-in";
+
+						annotationElement.className = cardBaseClasses;
+
+						let annotationTypeLabel =
+							highlight.type === "plain"
+								? annotation.audioId && annotation.text
+									? "Note & Audio"
+									: annotation.audioId
+									? "Audio"
+									: "Note"
+								: highlight.type;
+
+						const headerClasses = isDarkMode
+							? "p-3 border-b border-neutral-700 flex justify-between items-center"
+							: "p-3 border-b border-neutral-100 flex justify-between items-center";
+
+						const quoteClasses = isDarkMode
+							? "text-sm italic text-neutral-400 mb-2 p-2 bg-neutral-700 rounded"
+							: "text-sm italic text-neutral-600 mb-2 p-2 bg-neutral-50 rounded";
+
+						const audioContainerClasses = isDarkMode
+							? "mt-3 p-2 bg-neutral-700 rounded flex items-center gap-2"
+							: "mt-3 p-2 bg-neutral-50 rounded flex items-center gap-2";
+
+						const textColor = isDarkMode ? "text-neutral-300" : "text-sm";
+						const metaTextColor = isDarkMode
+							? "text-neutral-400"
+							: "text-neutral-500";
+
+						let typeClass;
+						if (highlight.type === "plain") {
+							typeClass = isDarkMode
+								? "bg-neutral-700 text-neutral-200"
+								: "bg-neutral-100 text-neutral-700";
+						} else {
+							typeClass = `${highlight.type}-highlight`;
+						}
+
+						annotationElement.innerHTML = `
+                        <div class="${headerClasses}">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-shrink-0 rounded-full w-7 h-7 bg-primary-100 text-primary-700 flex items-center justify-center">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 8h10M7 12h4m1 8l4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-sm">${
+																			annotation.createdBy
+																		}</div>
+                                    <div class="text-xs ${metaTextColor}">${new Date(
+							annotation.timestamp
+						).toLocaleString()}</div>
+                                </div>
+                            </div>
+                            <div class="px-2 py-1 rounded-full text-xs font-medium ${typeClass} capitalize">${annotationTypeLabel}</div>
+                        </div>
+                        <div class="p-3">
+                            <div class="${quoteClasses}">"${
+							highlight.text
+						}"</div>
+                            ${
+															annotation.text
+																? `<p class="${textColor}">${annotation.text}</p>`
+																: ""
+														}
+                            ${
+															annotation.audioId
+																? `
+                            <div class="${audioContainerClasses}">
+                                <button class="play-audio w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center hover:bg-primary-600 transition-colors" data-audio-id="${annotation.audioId}">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M5 3l14 9-14 9V3z" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                                <div class="text-xs ${metaTextColor}">Audio recording available</div>
+                            </div>
+                            `
+																: ""
+														}
+                        </div>
+                    `;
+
+						annotationsList.appendChild(annotationElement);
+					});
+
+					document.querySelectorAll(".play-audio").forEach((button) => {
+						button.addEventListener("click", function () {
+							const audioId = this.dataset.audioId;
+							const audioBlob = state.audioBlobs[audioId];
+
+							if (audioBlob) {
+								const audioUrl = URL.createObjectURL(audioBlob);
+								const audio = new Audio(audioUrl);
+								audio.play();
+
+								this.innerHTML =
+									'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 9v6m4-6v6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+								audio.onended = () => {
+									this.innerHTML =
+										'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 3l14 9-14 9V3z" fill="currentColor"/></svg>';
+								};
+							}
+						});
+					});
+				}
+
+				if (mobileSidebarToggle) {
+					mobileSidebarToggle.addEventListener("click", function () {
+						toggleSidebar();
+					});
+				}
+
+				function toggleSidebar() {
+					if (sidebar.classList.contains("hidden")) {
+						sidebar.classList.remove("hidden");
+						sidebar.classList.add(
+							"fixed",
+							"top-0",
+							"right-0",
+							"h-full",
+							"w-4/5",
+							"z-20",
+							"shadow-lg",
+							"animate-slide-in"
+						);
+
+						sidebar.style.overflowY = "auto";
+						sidebar.style.webkitOverflowScrolling = "touch";
+						sidebar.style.overscrollBehaviorY = "contain";
+						sidebar.style.maxHeight = "100vh";
+
+						const annotationsList = document.getElementById("annotations-list");
+						if (annotationsList) {
+							annotationsList.style.overflowY = "auto";
+							annotationsList.style.webkitOverflowScrolling = "touch";
+							annotationsList.style.maxHeight = "calc(100vh - 120px)";
+							annotationsList.style.overscrollBehaviorY = "contain";
+							annotationsList.style.paddingBottom = "30px";
+						}
+
+						document.body.style.overflow = "hidden";
+
+						addSidebarOverlay();
+					} else {
+						sidebar.classList.remove("animate-slide-in");
+						sidebar.classList.add("animate-slide-out");
+
+						const overlay = document.getElementById("sidebar-overlay");
+						if (overlay) {
+							overlay.classList.remove("animate-fade-in");
+							overlay.classList.add("animate-fade-out");
+						}
+
+						document.body.style.overflow = "";
+
+						setTimeout(() => {
+							sidebar.classList.remove(
+								"fixed",
+								"top-0",
+								"right-0",
+								"h-full",
+								"w-4/5",
+								"z-20",
+								"shadow-lg",
+								"animate-slide-out"
+							);
+							sidebar.classList.add("hidden");
+							removeSidebarOverlay();
+						}, 280);
+					}
+				}
+
+				function addSidebarOverlay() {
+					removeSidebarOverlay();
+
+					const overlay = document.createElement("div");
+					overlay.id = "sidebar-overlay";
+					overlay.className =
+						"fixed inset-0 bg-black bg-opacity-20 z-10 animate-fade-in";
+					overlay.style.backdropFilter = "blur(2px)";
+
+					overlay.addEventListener("click", function (e) {
+						e.preventDefault();
+						toggleSidebar();
+					});
+
+					document.body.appendChild(overlay);
+				}
+
+				function removeSidebarOverlay() {
+					const existingOverlay = document.getElementById("sidebar-overlay");
+					if (existingOverlay) {
+						existingOverlay.remove();
+					}
+				}
+
+				function updateNotificationPosition() {
+					if (notification.classList.contains("opacity-100")) {
+						if (window.innerWidth < 640) {
+							notification.style.left = "50%";
+							notification.style.right = "auto";
+							notification.style.transform = "translateX(-50%)";
+							notification.style.width = "calc(100% - 2rem)";
+							notification.style.maxWidth = "100%";
+						} else {
+							notification.style.right = "1rem";
+							notification.style.left = "auto";
+							notification.style.transform = "translateX(0)";
+							notification.style.width = "auto";
+							notification.style.maxWidth = "24rem";
+						}
+					}
+				}
+
+				window.addEventListener(
+					"resize",
+					throttle(updateNotificationPosition, 100)
+				);
+
+				document.addEventListener("keydown", function (e) {
+					if (
+						e.key === "Escape" &&
+						sidebar &&
+						!sidebar.classList.contains("hidden")
+					) {
+						toggleSidebar();
+					}
+				});
+
+				setTimeout(() => {
+					showNotification(
+						"Welcome!",
+						"Language Learning Whiteboard is ready to use.",
+						"success"
+					);
+				}, 1000);
+
+				const cursorElement = document.createElement("div");
+				cursorElement.className =
+					"current-user-cursor absolute pointer-events-none z-10";
+				cursorElement.style.display = "none";
+
+				const isTouchDevice =
+					"ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+				if (!isTouchDevice) {
+					const cursorPointer = document.createElement("div");
+					cursorPointer.className =
+						"cursor-pointer w-[10px] h-[10px] rounded-full animate-pulse";
+					cursorPointer.style.backgroundColor = state.currentUser.color;
+
+					const cursorName = document.createElement("div");
+					cursorName.className =
+						"absolute -top-7 left-0 bg-black bg-opacity-70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs whitespace-nowrap";
+					cursorName.textContent = `${state.currentUser.name} (${state.currentUser.type})`;
+					cursorName.style.backgroundColor = state.currentUser.color;
+
+					cursorElement.appendChild(cursorPointer);
+					cursorElement.appendChild(cursorName);
+
+					document.body.appendChild(cursorElement);
+
+					const studentCursorElement = document.createElement("div");
+					studentCursorElement.className =
+						"current-user-cursor absolute pointer-events-none z-10";
+					studentCursorElement.style.display = "block";
+
+					const studentColor = "#d4421e";
+					const studentPointer = document.createElement("div");
+					studentPointer.className =
+						"cursor-pointer w-[10px] h-[10px] rounded-full animate-pulse";
+					studentPointer.style.backgroundColor = studentColor;
+
+					const studentName = document.createElement("div");
+					studentName.className =
+						"absolute -top-7 left-0 bg-black bg-opacity-70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs whitespace-nowrap";
+					studentName.textContent = "Student Lee (student)";
+					studentName.style.backgroundColor = studentColor;
+
+					studentCursorElement.appendChild(studentPointer);
+					studentCursorElement.appendChild(studentName);
+					document.body.appendChild(studentCursorElement);
+
+					function moveStudentCursorRandomly() {
+						const editorRect = editor.getBoundingClientRect();
+						const padding = 20;
+						const x =
+							editorRect.left +
+							padding +
+							Math.random() * (editorRect.width - 2 * padding);
+						const y =
+							editorRect.top +
+							padding +
+							Math.random() * (editorRect.height - 2 * padding);
+						studentCursorElement.style.left = `${x}px`;
+						studentCursorElement.style.top = `${y}px`;
+						const nextMove = 2000 + Math.random() * 2000;
+						setTimeout(moveStudentCursorRandomly, nextMove);
+					}
+					moveStudentCursorRandomly();
+
+					editor.style.cursor = "auto";
+
+					let isOverEditor = false;
+
+					function updateCursorPosition(e) {
+						const x = e.clientX;
+						const y = e.clientY;
+
+						if (isOverEditor) {
+							cursorElement.style.display = "block";
+							cursorElement.style.left = `${x}px`;
+							cursorElement.style.top = `${y}px`;
+						} else {
+							cursorElement.style.display = "none";
+						}
+					}
+
+					document.addEventListener(
+						"mousemove",
+						throttle(updateCursorPosition, 5)
+					);
+
+					editor.addEventListener("mouseenter", function () {
+						isOverEditor = true;
+						editor.style.cursor = "none";
+						cursorElement.style.display = "block";
+					});
+
+					editor.addEventListener("mouseleave", function () {
+						isOverEditor = false;
+						editor.style.cursor = "auto";
+						cursorElement.style.display = "none";
+					});
+				} else {
+					editor.style.cursor = "text";
+				}
+
+				const popupAnnotateBtn = document.querySelector(".popup-annotate-btn");
+				const popupRecordBtn = document.querySelector(".popup-record-btn");
+
+				popupAnnotateBtn.addEventListener("mousedown", function (e) {
+					e.preventDefault();
+
+					const selection = state.currentSelection;
+					if (!selection || selection.isCollapsed) {
+						showNotification(
+							"Selection Required",
+							"Please select text to annotate.",
+							"error"
+						);
+						return;
+					}
+
+					saveAnnotationBtn.disabled = true;
+
+					const range = selection.getRangeAt(0);
+					let parentElement = range.startContainer;
+
+					if (parentElement.nodeType === 3) {
+						parentElement = parentElement.parentElement;
+					}
+
+					if (
+						parentElement.classList &&
+						parentElement.classList.contains("highlight")
+					) {
+						const highlightId = parentElement.id;
+						openModal(highlightId, false);
+					} else {
+						const selectedText = selection.toString();
+						if (!selectedText.trim()) {
+							showNotification(
+								"Selection Required",
+								"Please select text to annotate.",
+								"error"
+							);
+							return;
+						}
+
+						const textId = "text-" + Date.now();
+
+						try {
+							const textNode = document.createElement("span");
+							textNode.className = "annotated-text";
+							textNode.id = textId;
+
+							range.surroundContents(textNode);
+
+							state.highlights.push({
+								id: textId,
+								type: "plain",
+								text: selectedText,
+								createdBy: state.currentUser.name,
+								timestamp: Date.now(),
+							});
+
+							state.currentHighlightId = textId;
+							selectedTextEl.textContent = selectedText;
+							annotationModal.classList.remove("hidden");
+							recordingControls.classList.add("hidden");
+
+							saveAnnotationBtn.disabled = true;
+
+							setTimeout(() => {
+								modalContent.classList.remove("scale-95", "opacity-0");
+								modalContent.classList.add("scale-100", "opacity-100");
+
+								validateAnnotationForm();
+							}, 10);
+
+							textNode.addEventListener("click", function (e) {
+								showHighlightPopupForElement(this, e);
+							});
+						} catch (error) {
+							console.error("Error creating annotation:", error);
+							showNotification(
+								"Annotation Error",
+								"Could not create annotation. The selection may span multiple elements.",
+								"error"
+							);
+						}
+					}
+
+					hideHighlightPopup();
+				});
+
+				popupRecordBtn.addEventListener("mousedown", function (e) {
+					e.preventDefault();
+
+					const selection = state.currentSelection;
+					if (!selection || selection.isCollapsed) {
+						showNotification(
+							"Selection Required",
+							"Please select text to record audio for.",
+							"error"
+						);
+						return;
+					}
+
+					saveAnnotationBtn.disabled = true;
+
+					const range = selection.getRangeAt(0);
+					let parentElement = range.startContainer;
+
+					if (parentElement.nodeType === 3) {
+						parentElement = parentElement.parentElement;
+					}
+
+					if (
+						parentElement.classList &&
+						parentElement.classList.contains("highlight")
+					) {
+						const highlightId = parentElement.id;
+						openModal(highlightId, true);
+					} else {
+						const selectedText = selection.toString();
+						if (!selectedText.trim()) {
+							showNotification(
+								"Selection Required",
+								"Please select text to record audio for.",
+								"error"
+							);
+							return;
+						}
+
+						const textId = "text-" + Date.now();
+
+						try {
+							const textNode = document.createElement("span");
+							textNode.className = "audio-text";
+							textNode.id = textId;
+
+							range.surroundContents(textNode);
+
+							state.highlights.push({
+								id: textId,
+								type: "plain",
+								text: selectedText,
+								createdBy: state.currentUser.name,
+								timestamp: Date.now(),
+							});
+
+							state.currentHighlightId = textId;
+							selectedTextEl.textContent = selectedText;
+							annotationModal.classList.remove("hidden");
+							recordingControls.classList.remove("hidden");
+
+							saveAnnotationBtn.disabled = true;
+
+							setTimeout(() => {
+								modalContent.classList.remove("scale-95", "opacity-0");
+								modalContent.classList.add("scale-100", "opacity-100");
+
+								document.getElementById("annotation-text-label").innerHTML =
+									'Your annotation <span class="text-neutral-500 font-normal">(Optional)</span>:';
+								document.getElementById("annotation-text").placeholder =
+									"Add your notes here (optional)...";
+
+								validateAnnotationForm();
+							}, 10);
+
+							textNode.addEventListener("click", function (e) {
+								showHighlightPopupForElement(this, e);
+							});
+						} catch (error) {
+							console.error("Error creating audio recording:", error);
+							showNotification(
+								"Recording Error",
+								"Could not create audio recording. The selection may span multiple elements.",
+								"error"
+							);
+						}
+					}
+
+					hideHighlightPopup();
+				});
+
+				const highlightPopup = document.getElementById("highlight-popup");
+				const colorOptionsPopup = document.querySelectorAll(
+					".color-option-popup"
+				);
+
+				editor.addEventListener("mouseup", function (e) {
+					const selection = window.getSelection();
+
+					if (!selection.isCollapsed) {
+						const range = selection.getRangeAt(0);
+						const rect = range.getBoundingClientRect();
+
+						highlightPopup.style.left = `${(rect.left + rect.right) / 2}px`;
+						highlightPopup.style.top = `${rect.top - 10}px`;
+
+						highlightPopup.classList.remove("hidden", "opacity-0", "scale-95");
+						highlightPopup.classList.add("opacity-100", "scale-100");
+
+						state.currentSelection = selection;
+					} else {
+						hideHighlightPopup();
+					}
+				});
+
+				document.addEventListener("mousedown", function (e) {
+					if (
+						!editor.contains(e.target) &&
+						!highlightPopup.contains(e.target)
+					) {
+						hideHighlightPopup();
+					}
+				});
+
+				function hideHighlightPopup() {
+					highlightPopup.classList.remove("opacity-100", "scale-100");
+					highlightPopup.classList.add("opacity-0", "scale-95");
+
+					setTimeout(() => {
+						highlightPopup.classList.add("hidden");
+					}, 200);
+				}
+
+				colorOptionsPopup.forEach((option) => {
+					option.addEventListener("mousedown", function (e) {
+						e.preventDefault();
+
+						const highlightType = this.dataset.type;
+						const selection = window.getSelection();
+
+						if (selection.rangeCount > 0) {
+							const range = selection.getRangeAt(0);
+
+							if (state.currentHighlightId) {
+								const element = document.getElementById(
+									state.currentHighlightId
+								);
+
+								if (element) {
+									if (element.classList.contains("highlight")) {
+										if (highlightType === "none") {
+											const oldType = element.dataset.type;
+											element.classList.remove(
+												`highlight`,
+												`${oldType}-highlight`
+											);
+
+											element.classList.remove(
+												"hover:shadow-highlight",
+												"px-0.5",
+												"py-0",
+												"rounded",
+												"relative",
+												"transition-all",
+												"duration-200"
+											);
+
+											const hasAnnotation = state.annotations.some(
+												(a) => a.highlightId === element.id
+											);
+											const hasAudio = state.annotations.some(
+												(a) => a.highlightId === element.id && a.audioId
+											);
+
+											if (hasAudio && hasAnnotation) {
+												element.classList.add("annotated-audio-text");
+											} else if (hasAudio) {
+												element.classList.add("audio-text");
+											} else if (hasAnnotation) {
+												element.classList.add("annotated-text");
+											} else {
+												const parent = element.parentNode;
+												while (element.firstChild) {
+													parent.insertBefore(element.firstChild, element);
+												}
+												parent.removeChild(element);
+
+												const highlightIndex = state.highlights.findIndex(
+													(h) => h.id === element.id
+												);
+												if (highlightIndex !== -1) {
+													state.highlights.splice(highlightIndex, 1);
+												}
+
+												saveSession();
+												showNotification(
+													"Highlight Removed",
+													"Highlight has been removed.",
+													"success"
+												);
+												hideHighlightPopup();
+												return;
+											}
+
+											const existing = state.highlights.find(
+												(h) => h.id === element.id
+											);
+											if (existing) {
+												existing.type = "plain";
+												existing.timestamp = Date.now();
+											}
+
+											saveSession();
+											showNotification(
+												"Highlight Removed",
+												"Highlight has been removed.",
+												"success"
+											);
+										} else {
+											const oldType = element.dataset.type;
+											element.classList.remove(`${oldType}-highlight`);
+											element.classList.add(`${highlightType}-highlight`);
+											element.dataset.type = highlightType;
+
+											const existing = state.highlights.find(
+												(h) => h.id === element.id
+											);
+											if (existing) {
+												existing.type = highlightType;
+												existing.timestamp = Date.now();
+											}
+
+											saveSession();
+											showNotification(
+												"Highlight Updated",
+												"Highlight color updated successfully.",
+												"success"
+											);
+										}
+									} else {
+										if (highlightType !== "none") {
+											const oldClasses = [
+												"annotated-text",
+												"audio-text",
+												"annotated-audio-text",
+											];
+											oldClasses.forEach((cls) => {
+												if (element.classList.contains(cls)) {
+													element.classList.remove(cls);
+												}
+											});
+
+											element.classList.add(
+												"highlight",
+												`${highlightType}-highlight`,
+												"px-0.5",
+												"py-0",
+												"rounded",
+												"relative",
+												"transition-all",
+												"duration-200",
+												"hover:shadow-highlight"
+											);
+											element.dataset.type = highlightType;
+
+											const existing = state.highlights.find(
+												(h) => h.id === element.id
+											);
+											if (existing) {
+												existing.type = highlightType;
+												existing.timestamp = Date.now();
+											}
+
+											saveSession();
+											showNotification(
+												"Text Highlighted",
+												"Text has been highlighted successfully.",
+												"success"
+											);
+										}
+									}
+
+									renderAnnotations();
+								}
+							} else {
+								if (highlightType !== "none") {
+									try {
+										const tempRange = range.cloneRange();
+										const selectedText = selection.toString();
+
+										const highlightId = "highlight-" + Date.now();
+										const highlightNode = document.createElement("span");
+										highlightNode.className = `highlight ${highlightType}-highlight px-0.5 py-0 rounded relative transition-all duration-200 hover:shadow-highlight`;
+										highlightNode.id = highlightId;
+										highlightNode.dataset.type = highlightType;
+
+										tempRange.surroundContents(highlightNode);
+
+										state.highlights.push({
+											id: highlightId,
+											type: highlightType,
+											text: selectedText,
+											createdBy: state.currentUser.name,
+											timestamp: Date.now(),
+										});
+
+										saveSession();
+										showNotification(
+											"Text Highlighted",
+											"Text has been highlighted successfully.",
+											"success"
+										);
+
+										highlightNode.classList.add("animate-fade-in");
+										setTimeout(
+											() => highlightNode.classList.remove("animate-fade-in"),
+											300
+										);
+
+										highlightNode.addEventListener("click", function (e) {
+											showHighlightPopupForElement(this, e);
+										});
+									} catch (error) {
+										console.error("Error creating highlight:", error);
+										showNotification(
+											"Highlight Error",
+											"Could not create highlight: " + error.message,
+											"error"
+										);
+									}
+								} else {
+									const allHighlightNodes = [];
+									const iterator = document.createNodeIterator(
+										range.commonAncestorContainer,
+										NodeFilter.SHOW_ELEMENT
+									);
+									let currentNode;
+
+									while ((currentNode = iterator.nextNode())) {
+										if (
+											range.intersectsNode(currentNode) &&
+											currentNode.classList &&
+											currentNode.classList.contains("highlight")
+										) {
+											allHighlightNodes.push(currentNode);
+										}
+									}
+
+									if (allHighlightNodes.length > 0) {
+										allHighlightNodes.forEach((node) => {
+											const hasAnnotation = state.annotations.some(
+												(a) => a.highlightId === node.id
+											);
+											const hasAudio = state.annotations.some(
+												(a) => a.highlightId === node.id && a.audioId
+											);
+
+											if (node.classList.contains("highlight")) {
+												const oldType = node.dataset.type;
+												node.classList.remove(
+													`highlight`,
+													`${oldType}-highlight`
+												);
+												node.classList.remove(
+													"hover:shadow-highlight",
+													"px-0.5",
+													"py-0",
+													"rounded",
+													"relative",
+													"transition-all",
+													"duration-200"
+												);
+
+												if (hasAudio && hasAnnotation) {
+													node.classList.add("annotated-audio-text");
+												} else if (hasAudio) {
+													node.classList.add("audio-text");
+												} else if (hasAnnotation) {
+													node.classList.add("annotated-text");
+												} else {
+													const parent = node.parentNode;
+													while (node.firstChild) {
+														parent.insertBefore(node.firstChild, node);
+													}
+													parent.removeChild(node);
+
+													const highlightIndex = state.highlights.findIndex(
+														(h) => h.id === node.id
+													);
+													if (highlightIndex !== -1) {
+														state.highlights.splice(highlightIndex, 1);
+													}
+												}
+
+												const existing = state.highlights.find(
+													(h) => h.id === node.id
+												);
+												if (existing && (hasAnnotation || hasAudio)) {
+													existing.type = "plain";
+													existing.timestamp = Date.now();
+												}
+											}
+										});
+
+										saveSession();
+										showNotification(
+											"Highlights Removed",
+											"Highlights have been removed.",
+											"success"
+										);
+										renderAnnotations();
+									}
+								}
+							}
+
+							hideHighlightPopup();
+							window.getSelection().removeAllRanges();
+
+							state.currentHighlightId = null;
+						}
+					});
+				});
+
+				const popupStyle = document.createElement("style");
+				popupStyle.textContent = `
+                #highlight-popup {
+                    transform-origin: center bottom;
+                    transform: translate(-50%, -100%) scale(0.95);
+                }
+                
+                #highlight-popup.scale-100 {
+                    transform: translate(-50%, -100%) scale(1);
+                }
+            `;
+				document.head.appendChild(popupStyle);
+
+				function setupTextElementEventListeners() {
+					document.querySelectorAll(".highlight").forEach((element) => {
+						element.addEventListener("click", function (e) {
+							showHighlightPopupForElement(this, e);
+						});
+					});
+
+					document
+						.querySelectorAll(
+							".annotated-text, .audio-text, .annotated-audio-text"
+						)
+						.forEach((element) => {
+							element.addEventListener("click", function (e) {
+								showHighlightPopupForElement(this, e);
+							});
+						});
+				}
+
+				setupTextElementEventListeners();
+
+				const editorObserver = new MutationObserver((mutations) => {
+					mutations.forEach((mutation) => {
+						if (
+							mutation.type === "childList" &&
+							mutation.addedNodes.length > 0
+						) {
+							setupTextElementEventListeners();
+						}
+					});
+				});
+
+				editorObserver.observe(editor, { childList: true, subtree: true });
+
+				function throttle(func, delay) {
+					let lastCall = 0;
+					return function (...args) {
+						const now = new Date().getTime();
+						if (now - lastCall < delay) {
+							return;
+						}
+						lastCall = now;
+						return func(...args);
+					};
+				}
+
+				renderAnnotations();
+
+				if ("ontouchstart" in window) {
+					const editorElement = document.getElementById("editor");
+					const mainContainer = document.querySelector(
+						".flex.flex-col.h-screen"
+					);
+					const contentContainer = document.querySelector(
+						".flex-1.p-0.sm\\:p-5.overflow-y-auto.relative"
+					);
+					const sidebar = document.getElementById("sidebar");
+					const annotationsList = document.getElementById("annotations-list");
+
+					[editorElement, sidebar, annotationsList].forEach((el) => {
+						if (el) {
+							el.style.overflowY = "auto";
+							el.style.webkitOverflowScrolling = "touch";
+							el.style.touchAction = "pan-y";
+							el.style.overscrollBehaviorY = "contain";
+						}
+					});
+
+					document
+						.querySelectorAll(".bottom-toolbar, .color-option")
+						.forEach((el) => {
+							el.addEventListener("touchmove", function (e) {
+								e.preventDefault();
+							});
+						});
+
+					document
+						.querySelectorAll(
+							"#annotation-modal input, #annotation-modal textarea"
+						)
+						.forEach((el) => {
+							el.addEventListener("focus", function () {
+								document.body.classList.add("keyboard-visible");
+							});
+
+							el.addEventListener("blur", function () {
+								setTimeout(function () {
+									checkKeyboardVisibility();
+								}, 300);
+							});
+						});
+
+					[
+						editorElement,
+						mainContainer,
+						contentContainer,
+						document.body,
+						sidebar,
+						annotationsList,
+					].forEach((element) => {
+						if (element) {
+							if (element === editorElement) {
+								element.style.cursor = "text";
+							}
+
+							element.addEventListener("touchstart", function (e) {}, {
+								passive: true,
+							});
+
+							element.addEventListener("touchmove", function (e) {}, {
+								passive: true,
+							});
+						}
+					});
+
+					if (sidebar) {
+						sidebar.addEventListener(
+							"touchmove",
+							function (e) {
+								e.stopPropagation();
+							},
+							{ passive: true }
+						);
+
+						if (annotationsList) {
+							annotationsList.addEventListener(
+								"touchmove",
+								function (e) {
+									e.stopPropagation();
+								},
+								{ passive: true }
+							);
+						}
+					}
+
+					editorElement.addEventListener(
+						"touchend",
+						function (e) {
+							if (
+								e.target === editorElement ||
+								editorElement.contains(e.target)
+							) {
+								if (!e.target.closest("button")) {
+									setTimeout(() => {
+										editorElement.focus();
+									}, 100);
+								}
+							}
+						},
+						{ passive: true }
+					);
+
+					if (!document.querySelector('meta[name="viewport"]')) {
+						const metaViewport = document.createElement("meta");
+						metaViewport.name = "viewport";
+						metaViewport.content =
+							"width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1";
+						document.head.appendChild(metaViewport);
+					} else {
+						const existingViewport = document.querySelector(
+							'meta[name="viewport"]'
+						);
+						existingViewport.content =
+							"width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=1";
+					}
+				}
+
+				window.clearHighlights = clearHighlights;
+				window.renderAnnotations = renderAnnotations;
+				window.showNotification = showNotification;
+				window.state = state;
+				window.saveSession = saveSession;
+				if (typeof db !== "undefined") {
+					window.db = db;
+				}
+
+				function showConfirmationDialog(title, message, confirmCallback) {
+					const confirmationModal =
+						document.getElementById("confirmation-modal");
+					const confirmationContent = document.getElementById(
+						"confirmation-modal-content"
+					);
+					const confirmationTitle =
+						document.getElementById("confirmation-title");
+					const confirmationMessage = document.getElementById(
+						"confirmation-message"
+					);
+					const confirmButton = document.getElementById("confirm-action");
+					const cancelButton = document.getElementById("cancel-confirmation");
+
+					confirmationTitle.textContent = title;
+					confirmationMessage.textContent = message;
+
+					confirmationModal.classList.remove("hidden");
+					setTimeout(() => {
+						confirmationContent.classList.remove("scale-95", "opacity-0");
+						confirmationContent.classList.add("scale-100", "opacity-100");
+					}, 10);
+
+					const handleConfirm = function () {
+						confirmButton.removeEventListener("click", handleConfirm);
+						cancelButton.removeEventListener("click", handleCancel);
+						confirmationModal.removeEventListener("click", handleOutsideClick);
+						document.removeEventListener("keydown", handleEscapeKey);
+
+						closeConfirmationModal();
+
+						if (typeof confirmCallback === "function") {
+							confirmCallback();
+						}
+					};
+
+					const handleCancel = function () {
+						confirmButton.removeEventListener("click", handleConfirm);
+						cancelButton.removeEventListener("click", handleCancel);
+						confirmationModal.removeEventListener("click", handleOutsideClick);
+						document.removeEventListener("keydown", handleEscapeKey);
+
+						closeConfirmationModal();
+					};
+
+					const handleOutsideClick = function (e) {
+						if (e.target === confirmationModal) {
+							handleCancel();
+						}
+					};
+
+					const handleEscapeKey = function (e) {
+						if (e.key === "Escape") {
+							handleCancel();
+						}
+					};
+
+					confirmButton.addEventListener("click", handleConfirm);
+					cancelButton.addEventListener("click", handleCancel);
+					confirmationModal.addEventListener("click", handleOutsideClick);
+					document.addEventListener("keydown", handleEscapeKey);
+				}
+
+				function closeConfirmationModal() {
+					const confirmationModal =
+						document.getElementById("confirmation-modal");
+					const confirmationContent = document.getElementById(
+						"confirmation-modal-content"
+					);
+
+					confirmationContent.classList.remove("scale-100", "opacity-100");
+					confirmationContent.classList.add("scale-95", "opacity-0");
+
+					setTimeout(() => {
+						confirmationModal.classList.add("hidden");
+					}, 300);
+				}
+
+				const settingsModal = document.getElementById("settings-modal");
+				const settingsModalContent = document.getElementById(
+					"settings-modal-content"
+				);
+				const closeSettingsModalBtn = document.getElementById(
+					"close-settings-modal"
+				);
+				const cancelSettingsBtn = document.getElementById("cancel-settings");
+				const saveSettingsBtn = document.getElementById("save-settings");
+
+				let currentSettings = null;
+
+				function openSettingsModal() {
+					const savedSettings = localStorage.getItem(
+						"languageWhiteboardSettings"
+					);
+					if (savedSettings) {
+						currentSettings = JSON.parse(savedSettings);
+					} else {
+						currentSettings = {
+							darkMode: false,
+							fontSize: "medium",
+							defaultHighlightType: "grammar",
+							autoSave: true,
+						};
+					}
+
+					updateSettingsForm(currentSettings);
+
+					settingsModal.classList.remove("hidden");
+					setTimeout(() => {
+						settingsModalContent.classList.remove("scale-95", "opacity-0");
+						settingsModalContent.classList.add("scale-100", "opacity-100");
+					}, 10);
+				}
+
+				function updateSettingsForm(settings) {
+					if (settings.darkMode) {
+						document.getElementById("theme-dark").checked = true;
+					} else {
+						document.getElementById("theme-light").checked = true;
+					}
+
+					document.getElementById("font-size").value =
+						settings.fontSize || "medium";
+					document.getElementById("default-highlight-type").value =
+						settings.defaultHighlightType || "grammar";
+
+					document.querySelectorAll(".theme-option label").forEach((label) => {
+						label.classList.remove("border-primary-500");
+					});
+
+					const selectedTheme = settings.darkMode ? "dark" : "light";
+					const selectedThemeOption = document.querySelector(
+						`.theme-option[data-theme="${selectedTheme}"] label`
+					);
+					if (selectedThemeOption) {
+						selectedThemeOption.classList.add("border-primary-500");
+					}
+				}
+
+				function closeSettingsModal() {
+					if (currentSettings) {
+						updateSettingsForm(currentSettings);
+						applySettings(currentSettings);
+
+						if (currentSettings.defaultHighlightType) {
+							if (typeof window.state === "undefined") {
+								window.state = window.state || {};
+							}
+							if (typeof state === "undefined") {
+								state = state || {};
+							}
+
+							if (window.state) {
+								window.state.selectedHighlightType =
+									currentSettings.defaultHighlightType;
+							}
+							if (state) {
+								state.selectedHighlightType =
+									currentSettings.defaultHighlightType;
+							}
+						}
+					}
+
+					settingsModalContent.classList.remove("scale-100", "opacity-100");
+					settingsModalContent.classList.add("scale-95", "opacity-0");
+
+					setTimeout(() => {
+						settingsModal.classList.add("hidden");
+					}, 300);
+				}
+
+				function saveSettings() {
+					const darkMode = document.getElementById("theme-dark").checked;
+					const fontSize = document.getElementById("font-size").value;
+					const defaultHighlightType = document.getElementById(
+						"default-highlight-type"
+					).value;
+
+					const settings = {
+						darkMode,
+						fontSize,
+						defaultHighlightType,
+						lastUpdated: new Date().toISOString(),
+					};
+
+					localStorage.setItem(
+						"languageWhiteboardSettings",
+						JSON.stringify(settings)
+					);
+
+					currentSettings = settings;
+
+					applySettings(settings);
+
+					if (typeof updateAnnotationsTheme === "function") {
+						updateAnnotationsTheme();
+					}
+
+					if (typeof window.state === "undefined") {
+						window.state = window.state || {};
+					}
+					if (typeof state === "undefined") {
+						state = state || {};
+					}
+
+					if (window.state) {
+						window.state.selectedHighlightType = defaultHighlightType;
+					}
+
+					if (state) {
+						state.selectedHighlightType = defaultHighlightType;
+					}
+
+					const colorOptions = document.querySelectorAll(".color-option");
+					colorOptions.forEach((option) => {
+						option.classList.remove(
+							"border-dark",
+							"border-primary-600",
+							"ring-2",
+							"ring-primary-300",
+							"scale-110"
+						);
+						if (option.dataset.type === defaultHighlightType) {
+							option.classList.add(
+								"border-primary-600",
+								"ring-2",
+								"ring-primary-300",
+								"scale-110"
+							);
+						}
+					});
+
+					showNotification(
+						"Settings Saved",
+						"Your preferences have been updated successfully.",
+						"success"
+					);
+
+					settingsModalContent.classList.remove("scale-100", "opacity-100");
+					settingsModalContent.classList.add("scale-95", "opacity-0");
+
+					setTimeout(() => {
+						settingsModal.classList.add("hidden");
+					}, 300);
+				}
+
+				function loadSettings() {
+					const savedSettings = localStorage.getItem(
+						"languageWhiteboardSettings"
+					);
+					if (savedSettings) {
+						const settings = JSON.parse(savedSettings);
+
+						currentSettings = settings;
+
+						updateSettingsForm(settings);
+
+						applySettings(settings);
+
+						if (settings.defaultHighlightType) {
+							if (typeof window.state === "undefined") {
+								window.state = window.state || {};
+							}
+							if (typeof state === "undefined") {
+								state = state || {};
+							}
+
+							if (window.state) {
+								window.state.selectedHighlightType =
+									settings.defaultHighlightType;
+							}
+
+							if (state) {
+								state.selectedHighlightType = settings.defaultHighlightType;
+							}
+
+							const colorOptions = document.querySelectorAll(".color-option");
+							colorOptions.forEach((opt) => {
+								opt.classList.remove(
+									"border-dark",
+									"border-primary-600",
+									"ring-2",
+									"ring-primary-300",
+									"scale-110"
+								);
+								if (opt.dataset.type === settings.defaultHighlightType) {
+									opt.classList.add(
+										"border-primary-600",
+										"ring-2",
+										"ring-primary-300",
+										"scale-110"
+									);
+								}
+							});
+						}
+					}
+				}
+
+				function applySettings(settings) {
+					const editor = document.getElementById("editor");
+					if (editor) {
+						editor.classList.remove("text-sm", "text-base", "text-lg");
+
+						if (settings.fontSize === "small") {
+							editor.classList.add("text-sm");
+						} else if (settings.fontSize === "large") {
+							editor.classList.add("text-lg");
+						} else {
+							editor.classList.add("text-base");
+						}
+					}
+
+					if (settings.darkMode) {
+						document.documentElement.classList.add("dark");
+						applyDarkMode();
+					} else {
+						document.documentElement.classList.remove("dark");
+						removeDarkMode();
+					}
+
+					if (typeof updateAnnotationsTheme === "function") {
+						setTimeout(updateAnnotationsTheme, 100);
+					}
+
+					if (settings.defaultHighlightType) {
+						if (typeof window.state === "undefined") {
+							window.state = window.state || {};
+						}
+						if (typeof state === "undefined") {
+							state = state || {};
+						}
+
+						if (window.state) {
+							window.state.selectedHighlightType =
+								settings.defaultHighlightType;
+						}
+
+						if (state) {
+							state.selectedHighlightType = settings.defaultHighlightType;
+						}
+
+						const colorOptions = document.querySelectorAll(".color-option");
+						colorOptions.forEach((opt) => {
+							opt.classList.remove(
+								"border-dark",
+								"border-primary-600",
+								"ring-2",
+								"ring-primary-300",
+								"scale-110"
+							);
+							if (opt.dataset.type === settings.defaultHighlightType) {
+								opt.classList.add(
+									"border-primary-600",
+									"ring-2",
+									"ring-primary-300",
+									"scale-110"
+								);
+							}
+						});
+					}
+
+					if (typeof settings.autoSave !== "undefined") {
+						if (window.autoSaveInterval) {
+							clearInterval(window.autoSaveInterval);
+							window.autoSaveInterval = null;
+						}
+
+						if (settings.autoSave) {
+							window.autoSaveInterval = setInterval(function () {
+								if (window.saveSession) {
+									window.saveSession();
+								}
+							}, 5000);
+						}
+					}
+				}
+
+				function applyDarkMode() {
+					document.documentElement.classList.add("dark");
+
+					document.body.classList.remove("bg-neutral-50", "text-neutral-800");
+					document.body.classList.add("bg-neutral-900", "text-neutral-100");
+
+					const editorContainer = document.querySelector(
+						".border.border-neutral-200"
+					);
+					if (editorContainer) {
+						editorContainer.classList.remove("bg-white", "border-neutral-200");
+						editorContainer.classList.add(
+							"bg-neutral-800",
+							"border-neutral-700"
+						);
+					}
+
+					if (editor) {
+						editor.classList.remove("text-neutral-800");
+						editor.classList.add("text-neutral-200");
+					}
+
+					const header = document.querySelector("header");
+					if (header) {
+						header.classList.remove("from-primary-600", "to-primary-500");
+						header.classList.add("from-primary-900", "to-primary-800");
+					}
+
+					const sidebar = document.getElementById("sidebar");
+					if (sidebar) {
+						sidebar.classList.remove("bg-white", "border-neutral-200");
+						sidebar.classList.add("bg-neutral-800", "border-neutral-700");
+
+						const emptyAnnotations =
+							document.getElementById("empty-annotations");
+						if (emptyAnnotations) {
+							emptyAnnotations.classList.remove("text-neutral-400");
+							emptyAnnotations.classList.add("text-neutral-500");
+						}
+					}
+
+					const annotationsHeader =
+						sidebar && sidebar.querySelector(".sticky.top-0.bg-white");
+					if (annotationsHeader) {
+						annotationsHeader.classList.remove("bg-white");
+						annotationsHeader.classList.add("bg-neutral-800");
+					}
+
+					document
+						.querySelectorAll("input, textarea, select")
+						.forEach((input) => {
+							input.classList.remove("bg-white", "border-neutral-300");
+							input.classList.add(
+								"bg-neutral-700",
+								"border-neutral-600",
+								"text-neutral-200"
+							);
+							input.style.color = "#e5e7eb";
+						});
+
+					const bottomToolbar = document.querySelector(".bottom-toolbar");
+					if (bottomToolbar) {
+						bottomToolbar.classList.remove("bg-white");
+						bottomToolbar.classList.add("bg-neutral-800");
+					}
+
+					document
+						.querySelectorAll("button:not(.color-option)")
+						.forEach((button) => {
+							if (button.classList.contains("bg-neutral-100")) {
+								button.classList.remove(
+									"bg-neutral-100",
+									"text-neutral-700",
+									"hover:bg-primary-100"
+								);
+								button.classList.add(
+									"bg-neutral-700",
+									"text-neutral-200",
+									"hover:bg-primary-800"
+								);
+							}
+						});
+
+					const highlightPopup = document.getElementById("highlight-popup");
+					if (highlightPopup) {
+						highlightPopup.classList.remove("bg-white");
+						highlightPopup.classList.add("bg-neutral-800");
+					}
+
+					document.querySelectorAll(".bg-white.rounded-lg").forEach((modal) => {
+						modal.classList.remove("bg-white");
+						modal.classList.add("bg-neutral-800");
+					});
+
+					document.querySelectorAll(".bg-neutral-50").forEach((el) => {
+						el.classList.remove("bg-neutral-50");
+						el.classList.add("bg-neutral-800");
+					});
+
+					document
+						.querySelectorAll(".border-neutral-100, .border-neutral-200")
+						.forEach((el) => {
+							el.classList.remove("border-neutral-100", "border-neutral-200");
+							el.classList.add("border-neutral-700");
+						});
+
+					document
+						.querySelectorAll(".text-neutral-700, .text-neutral-800")
+						.forEach((el) => {
+							el.classList.remove("text-neutral-700", "text-neutral-800");
+							el.classList.add("text-neutral-200");
+						});
+
+					document
+						.querySelectorAll(".text-neutral-500, .text-neutral-600")
+						.forEach((el) => {
+							el.classList.remove("text-neutral-500", "text-neutral-600");
+							el.classList.add("text-neutral-400");
+						});
+
+					if (profileDropdown) {
+						profileDropdown.classList.add(
+							"bg-neutral-800",
+							"border-neutral-700"
+						);
+						profileDropdown.classList.remove("bg-white", "border-neutral-200");
+
+						const dropdownItems =
+							profileDropdown.querySelectorAll(".dropdown-item");
+						dropdownItems.forEach((item) => {
+							item.classList.add("text-neutral-200", "hover:bg-neutral-700");
+							item.classList.remove("text-neutral-700", "hover:bg-neutral-100");
+						});
+					}
+				}
+
+				function removeDarkMode() {
+					document.documentElement.classList.remove("dark");
+
+					document.body.classList.remove("bg-neutral-900", "text-neutral-100");
+					document.body.classList.add("bg-neutral-50", "text-neutral-800");
+
+					const editorContainer = document.querySelector(
+						".border.border-neutral-700"
+					);
+					if (editorContainer) {
+						editorContainer.classList.remove(
+							"bg-neutral-800",
+							"border-neutral-700"
+						);
+						editorContainer.classList.add("bg-white", "border-neutral-200");
+					}
+
+					if (editor) {
+						editor.classList.remove("text-neutral-200");
+						editor.classList.add("text-neutral-800");
+					}
+
+					const header = document.querySelector("header");
+					if (header) {
+						header.classList.remove("from-primary-900", "to-primary-800");
+						header.classList.add("from-primary-600", "to-primary-500");
+					}
+
+					const sidebar = document.getElementById("sidebar");
+					if (sidebar) {
+						sidebar.classList.remove("bg-neutral-800", "border-neutral-700");
+						sidebar.classList.add("bg-white", "border-neutral-200");
+
+						const emptyAnnotations =
+							document.getElementById("empty-annotations");
+						if (emptyAnnotations) {
+							emptyAnnotations.classList.remove("text-neutral-500");
+							emptyAnnotations.classList.add("text-neutral-400");
+						}
+					}
+
+					const annotationsHeader =
+						sidebar && sidebar.querySelector(".sticky.top-0.bg-neutral-800");
+					if (annotationsHeader) {
+						annotationsHeader.classList.remove("bg-neutral-800");
+						annotationsHeader.classList.add("bg-white");
+					}
+
+					document
+						.querySelectorAll("input, textarea, select")
+						.forEach((input) => {
+							input.classList.remove(
+								"bg-neutral-700",
+								"border-neutral-600",
+								"text-neutral-200"
+							);
+							input.classList.add("bg-white", "border-neutral-300");
+							input.style.color = "";
+						});
+
+					const bottomToolbar = document.querySelector(".bottom-toolbar");
+					if (bottomToolbar) {
+						bottomToolbar.classList.remove("bg-neutral-800");
+						bottomToolbar.classList.add("bg-white");
+					}
+
+					document
+						.querySelectorAll("button:not(.color-option)")
+						.forEach((button) => {
+							if (button.classList.contains("bg-neutral-700")) {
+								button.classList.remove(
+									"bg-neutral-700",
+									"text-neutral-200",
+									"hover:bg-primary-800"
+								);
+								button.classList.add(
+									"bg-neutral-100",
+									"text-neutral-700",
+									"hover:bg-primary-100"
+								);
+							}
+						});
+
+					const highlightPopup = document.getElementById("highlight-popup");
+					if (highlightPopup) {
+						highlightPopup.classList.remove("bg-neutral-800");
+						highlightPopup.classList.add("bg-white");
+					}
+
+					document
+						.querySelectorAll(".bg-neutral-800.rounded-lg")
+						.forEach((modal) => {
+							modal.classList.remove("bg-neutral-800");
+							modal.classList.add("bg-white");
+						});
+
+					document
+						.querySelectorAll(".bg-neutral-800:not(.rounded-lg)")
+						.forEach((el) => {
+							el.classList.remove("bg-neutral-800");
+							el.classList.add("bg-neutral-50");
+						});
+
+					document.querySelectorAll(".border-neutral-700").forEach((el) => {
+						el.classList.remove("border-neutral-700");
+						el.classList.add("border-neutral-200");
+					});
+
+					document.querySelectorAll(".text-neutral-200").forEach((el) => {
+						el.classList.remove("text-neutral-200");
+						el.classList.add("text-neutral-800");
+					});
+
+					document.querySelectorAll(".text-neutral-400").forEach((el) => {
+						el.classList.remove("text-neutral-400");
+						el.classList.add("text-neutral-600");
+					});
+
+					if (profileDropdown) {
+						profileDropdown.classList.remove(
+							"bg-neutral-800",
+							"border-neutral-700"
+						);
+						profileDropdown.classList.add("bg-white", "border-neutral-200");
+
+						const dropdownItems =
+							profileDropdown.querySelectorAll(".dropdown-item");
+						dropdownItems.forEach((item) => {
+							item.classList.remove("text-neutral-200", "hover:bg-neutral-700");
+							item.classList.add("text-neutral-700", "hover:bg-neutral-100");
+						});
+					}
+				}
+
+				if (settingsButton) {
+					settingsButton.addEventListener("click", function () {
+						profileDropdown.classList.add("hidden");
+						openSettingsModal();
+					});
+				}
+
+				if (closeSettingsModalBtn) {
+					closeSettingsModalBtn.addEventListener("click", closeSettingsModal);
+				}
+
+				if (cancelSettingsBtn) {
+					cancelSettingsBtn.addEventListener("click", closeSettingsModal);
+				}
+
+				if (saveSettingsBtn) {
+					saveSettingsBtn.addEventListener("click", saveSettings);
+				}
+
+				const clearSessionBtn = document.getElementById("clear-session-btn");
+				if (clearSessionBtn) {
+					clearSessionBtn.addEventListener("click", function () {
+						showConfirmationDialog(
+							"Clear Session",
+							"Are you sure you want to clear your current session? This will remove all highlights, annotations, and text changes.",
+							function () {
+								const globalDb = window.db;
+								if (globalDb) {
+									try {
+										const transaction = globalDb.transaction(
+											["sessions"],
+											"readwrite"
+										);
+										const store = transaction.objectStore("sessions");
+										const deleteRequest = store.delete("currentSession");
+
+										deleteRequest.onsuccess = function () {
+											console.log(
+												"Session successfully deleted from IndexedDB"
+											);
+										};
+
+										deleteRequest.onerror = function () {
+											console.error("Error deleting session from IndexedDB");
+										};
+									} catch (error) {
+										console.error("Error accessing IndexedDB:", error);
+									}
+								} else {
+									const dbRequest = indexedDB.open("languageWhiteboardDB", 1);
+
+									dbRequest.onsuccess = function (event) {
+										const db = event.target.result;
+										try {
+											const transaction = db.transaction(
+												["sessions"],
+												"readwrite"
+											);
+											const store = transaction.objectStore("sessions");
+											const deleteRequest = store.delete("currentSession");
+
+											deleteRequest.onsuccess = function () {
+												console.log(
+													"Session successfully deleted from IndexedDB using direct access"
+												);
+											};
+
+											deleteRequest.onerror = function (e) {
+												console.error(
+													"Error deleting session using direct access:",
+													e
+												);
+											};
+										} catch (error) {
+											console.error("Error with IndexedDB transaction:", error);
+										}
+									};
+
+									dbRequest.onerror = function (event) {
+										console.error(
+											"Error opening IndexedDB directly:",
+											event.target.error
+										);
+									};
+								}
+
+								if (typeof clearHighlights === "function") {
+									clearHighlights();
+								} else if (typeof window.clearHighlights === "function") {
+									window.clearHighlights();
+								}
+
+								const annotationsList =
+									document.getElementById("annotations-list");
+								const emptyAnnotations =
+									document.getElementById("empty-annotations");
+								const annotationCount =
+									document.getElementById("annotation-count");
+
+								if (annotationsList) {
+									annotationsList.innerHTML = "";
+								}
+
+								if (emptyAnnotations) {
+									emptyAnnotations.classList.remove("hidden");
+								}
+
+								if (annotationCount) {
+									annotationCount.textContent = "0";
+								}
+
+								const editorElement = document.getElementById("editor");
+								if (editorElement) {
+									editorElement.innerHTML =
+										"Welcome to the Language Learning Whiteboard!\n\nThis collaborative space allows teachers and students to work together on language learning activities.\n\nTry these features:\n- Highlight text for grammar, vocabulary, pronunciation, or idioms\n- Add annotations with voice recordings\n- Work offline with automatic session saving\n\nLet's get started!";
+								}
+
+								showNotification(
+									"Session Restored",
+									"Your session has been reset to default.",
+									"success"
+								);
+								closeSettingsModal();
+							}
+						);
+					});
+				}
+
+				function updateAnnotationsTheme() {
+					const annotationsList = document.getElementById("annotations-list");
+					if (annotationsList) {
+						if (typeof window.renderAnnotations === "function") {
+							window.renderAnnotations();
+						} else if (typeof renderAnnotations === "function") {
+							renderAnnotations();
+						} else {
+							const isDarkMode =
+								document.documentElement.classList.contains("dark");
+
+							annotationsList
+								.querySelectorAll(
+									'div[class*="bg-white"], div[class*="bg-neutral-800"]'
+								)
+								.forEach((card) => {
+									if (isDarkMode) {
+										card.classList.remove("bg-white", "border-neutral-100");
+										card.classList.add("bg-neutral-800", "border-neutral-700");
+
+										const header = card.querySelector('div[class*="border-b"]');
+										if (header) {
+											header.classList.remove("border-neutral-100");
+											header.classList.add("border-neutral-700");
+										}
+
+										const quote = card.querySelector(
+											'div[class*="bg-neutral-50"]'
+										);
+										if (quote) {
+											quote.classList.remove(
+												"bg-neutral-50",
+												"text-neutral-600"
+											);
+											quote.classList.add("bg-neutral-700", "text-neutral-400");
+										}
+
+										const audioContainer = card.querySelector(
+											'div[class*="mt-3"][class*="bg-neutral-50"]'
+										);
+										if (audioContainer) {
+											audioContainer.classList.remove("bg-neutral-50");
+											audioContainer.classList.add("bg-neutral-700");
+										}
+
+										const typeLabels = card.querySelectorAll(
+											".px-2.py-1.rounded-full.text-xs.font-medium"
+										);
+										typeLabels.forEach((label) => {
+											if (
+												label.textContent === "Note" ||
+												label.textContent === "Audio" ||
+												label.textContent === "Note & Audio"
+											) {
+												label.classList.remove(
+													"bg-neutral-100",
+													"text-neutral-700"
+												);
+												label.classList.add(
+													"bg-neutral-700",
+													"text-neutral-200"
+												);
+											}
+										});
+
+										card
+											.querySelectorAll(
+												".text-neutral-500, .text-neutral-600, .text-neutral-700, .text-sm"
+											)
+											.forEach((el) => {
+												if (
+													el.classList.contains("bg-primary-100") ||
+													el.classList.contains("grammar-highlight") ||
+													el.classList.contains("vocab-highlight") ||
+													el.classList.contains("pronunciation-highlight") ||
+													el.classList.contains("idiom-highlight")
+												) {
+													return;
+												}
+
+												el.classList.remove(
+													"text-neutral-500",
+													"text-neutral-600",
+													"text-neutral-700",
+													"text-sm"
+												);
+												el.classList.add("text-neutral-300");
+											});
+									} else {
+										card.classList.remove(
+											"bg-neutral-800",
+											"border-neutral-700"
+										);
+										card.classList.add("bg-white", "border-neutral-100");
+
+										const header = card.querySelector('div[class*="border-b"]');
+										if (header) {
+											header.classList.remove("border-neutral-700");
+											header.classList.add("border-neutral-100");
+										}
+
+										const quote = card.querySelector(
+											'div[class*="bg-neutral-700"]'
+										);
+										if (quote) {
+											quote.classList.remove(
+												"bg-neutral-700",
+												"text-neutral-400"
+											);
+											quote.classList.add("bg-neutral-50", "text-neutral-600");
+										}
+
+										const audioContainer = card.querySelector(
+											'div[class*="mt-3"][class*="bg-neutral-700"]'
+										);
+										if (audioContainer) {
+											audioContainer.classList.remove("bg-neutral-700");
+											audioContainer.classList.add("bg-neutral-50");
+										}
+
+										const typeLabels = card.querySelectorAll(
+											".px-2.py-1.rounded-full.text-xs.font-medium"
+										);
+										typeLabels.forEach((label) => {
+											if (
+												label.textContent === "Note" ||
+												label.textContent === "Audio" ||
+												label.textContent === "Note & Audio"
+											) {
+												label.classList.remove(
+													"bg-neutral-700",
+													"text-neutral-200"
+												);
+												label.classList.add(
+													"bg-neutral-100",
+													"text-neutral-700"
+												);
+											}
+										});
+
+										card
+											.querySelectorAll(".text-neutral-300, .text-neutral-400")
+											.forEach((el) => {
+												if (
+													el.classList.contains("bg-primary-100") ||
+													el.classList.contains("grammar-highlight") ||
+													el.classList.contains("vocab-highlight") ||
+													el.classList.contains("pronunciation-highlight") ||
+													el.classList.contains("idiom-highlight")
+												) {
+													return;
+												}
+
+												el.classList.remove(
+													"text-neutral-300",
+													"text-neutral-400"
+												);
+												if (el.tagName === "P") {
+													el.classList.add("text-sm");
+												} else {
+													el.classList.add("text-neutral-600");
+												}
+											});
+									}
+								});
+						}
+					}
+				}
+
+				function startGuidedTour() {
+					const tourOverlay = document.createElement("div");
+					tourOverlay.className =
+						"fixed inset-0 bg-black bg-opacity-50 z-[9000] flex items-center justify-center";
+					tourOverlay.id = "tour-overlay";
+					document.body.appendChild(tourOverlay);
+
+					const tourModal = document.createElement("div");
+					tourModal.className =
+						"bg-white rounded-lg shadow-lg w-full max-w-xs sm:max-w-sm md:max-w-md mx-2 sm:mx-4 transform transition-all duration-300 animate-fade-in z-[9999]";
+					tourModal.id = "tour-modal";
+					tourModal.style.opacity = "1";
+					tourModal.style.position = "absolute";
+					tourModal.style.maxWidth = "280px";
+					tourModal.style.boxShadow =
+						"0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)";
+					document.body.appendChild(tourModal);
+
+					const tourSteps = [
+						{
+							title: "Welcome to the Language Learning Whiteboard!",
+							content:
+								"This guided tour will show you the main features of this application. Click 'Next' to continue.",
+							target: null,
+							position: "center",
+						},
+						{
+							title: "The Editor",
+							content:
+								"This is where you can write text for language learning exercises. Try typing or pasting some text here.",
+							target: "editor",
+							position: "right",
+						},
+						{
+							title: "Highlighting Text",
+							content:
+								"You can highlight text for different purposes: grammar, vocabulary, pronunciation, or idioms/expressions.",
+							target: "highlight-btn",
+							position: "top",
+						},
+						{
+							title: "Highlight Colors",
+							content:
+								"Choose different highlight colors to categorize your text based on learning focus.",
+							target: ".color-option",
+							position: "top",
+						},
+						{
+							title: "Adding Annotations",
+							content:
+								"Add notes and explanations to highlighted text to provide additional learning context.",
+							target: "annotate-btn",
+							position: "top",
+						},
+						{
+							title: "Recording Audio",
+							content:
+								"Record pronunciation examples or explanations for highlighted text.",
+							target: "record-btn",
+							position: "top",
+						},
+						{
+							title: "Annotations Panel",
+							content:
+								"All your annotations appear here for easy reference. On mobile, tap the menu button to view them.",
+							target: "sidebar",
+							position: "left",
+						},
+						{
+							title: "Settings",
+							content:
+								"Customize your experience, change themes, and manage your session.",
+							target: "profile-button",
+							position: "bottom",
+						},
+						{
+							title: "Tour Complete!",
+							content:
+								"You're now ready to use the Language Learning Whiteboard. Enjoy exploring all features!",
+							target: null,
+							position: "center",
+						},
+					];
+
+					let currentStep = 0;
+
+					function showTourStep(stepIndex) {
+						const step = tourSteps[stepIndex];
+
+						tourModal.innerHTML = "";
+
+						const content = document.createElement("div");
+						content.innerHTML = `
+        <div class="p-3 sm:p-5 border-b border-neutral-200 bg-white rounded-t-lg" style="opacity: 1 !important;">
+            <h3 class="font-semibold text-base sm:text-lg text-primary-700" style="opacity: 1 !important;">${
+							step.title
+						}</h3>
+        </div>
+        <div class="p-3 sm:p-5 bg-white" style="opacity: 1 !important;">
+            <p class="text-neutral-600 text-sm sm:text-base leading-relaxed" style="opacity: 1 !important;">${
+							step.content
+						}</p>
+        </div>
+        <div class="p-3 sm:p-4 bg-neutral-50 rounded-b-lg border-t border-neutral-200 flex justify-between items-center" style="opacity: 1 !important;">
+            <div>
+                <span class="text-xs text-neutral-500" style="opacity: 1 !important;">Step ${
+									stepIndex + 1
+								}/${tourSteps.length}</span>
+            </div>
+            <div class="flex gap-1 sm:gap-2">
+                ${
+									stepIndex > 0
+										? '<button id="tour-prev" class="px-2 sm:px-4 py-1.5 sm:py-2 border border-neutral-300 rounded-md text-neutral-700 hover:bg-neutral-100 text-xs sm:text-sm font-medium transition-all duration-200" style="opacity: 1 !important;">Previous</button>'
+										: ""
+								}
+                ${
+									stepIndex < tourSteps.length - 1
+										? '<button id="tour-next" class="px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 text-xs sm:text-sm font-medium transition-all duration-200" style="opacity: 1 !important;">Next</button>'
+										: '<button id="tour-finish" class="px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-500 text-white rounded-md hover:bg-primary-600 text-xs sm:text-sm font-medium transition-all duration-200" style="opacity: 1 !important;">Finish</button>'
+								}
+            </div>
+        </div>
+    `;
+						tourModal.appendChild(content);
+
+						const isMobile = window.innerWidth < 640;
+
+						if (step.target) {
+							let targetElement;
+							if (typeof step.target === "string") {
+								if (
+									step.target.startsWith(".") ||
+									step.target.startsWith("#") ||
+									step.target.includes("[")
+								) {
+									targetElement = document.querySelector(step.target);
+								} else {
+									targetElement = document.getElementById(step.target);
+								}
+							} else {
+								targetElement = step.target;
+							}
+
+							if (targetElement) {
+								const existingHighlight =
+									document.getElementById("tour-highlight");
+								if (existingHighlight) {
+									existingHighlight.remove();
+								}
+
+								const targetRect = targetElement.getBoundingClientRect();
+								const highlight = document.createElement("div");
+								highlight.className =
+									"absolute transition-all duration-300 border-2 border-primary-500 rounded-lg z-[9005] shadow-lg";
+								highlight.id = "tour-highlight";
+								highlight.style.top = `${
+									targetRect.top + window.scrollY - 5
+								}px`;
+								highlight.style.left = `${
+									targetRect.left + window.scrollX - 5
+								}px`;
+								highlight.style.width = `${targetRect.width + 10}px`;
+								highlight.style.height = `${targetRect.height + 10}px`;
+								highlight.style.pointerEvents = "none";
+								highlight.style.backgroundColor = "transparent";
+								highlight.style.boxShadow = "0 0 0 9999px rgba(0, 0, 0, 0.6)";
+								document.body.appendChild(highlight);
+
+								tourOverlay.style.backgroundColor = "transparent";
+
+								if (isMobile) {
+									tourModal.style.position = "fixed";
+									tourModal.style.top = "50%";
+									tourModal.style.left = "50%";
+									tourModal.style.transform = "translate(-50%, -50%)";
+									tourModal.style.maxWidth = `${Math.min(
+										300,
+										window.innerWidth - 40
+									)}px`;
+									tourModal.style.width = `${Math.min(
+										300,
+										window.innerWidth - 40
+									)}px`;
+									tourModal.style.zIndex = "9999";
+
+									tourModal.style.margin = "0";
+								} else {
+									tourModal.style.position = "absolute";
+
+									setTimeout(function () {
+										const modalRect = tourModal.getBoundingClientRect();
+										const targetRect = targetElement.getBoundingClientRect();
+
+										const margin = 20;
+										const gap = 20;
+
+										tourModal.style.maxWidth =
+											Math.min(350, window.innerWidth - margin * 2) + "px";
+
+										setTimeout(function () {
+											const updatedModalRect =
+												tourModal.getBoundingClientRect();
+
+											let finalTop, finalLeft;
+											let attemptedPosition = step.position;
+
+											const spaceTop = targetRect.top - margin - gap;
+											const spaceBottom =
+												window.innerHeight - targetRect.bottom - margin - gap;
+											const spaceLeft = targetRect.left - margin - gap;
+											const spaceRight =
+												window.innerWidth - targetRect.right - margin - gap;
+
+											if (
+												step.position === "top" &&
+												spaceTop < updatedModalRect.height
+											) {
+												if (spaceBottom >= updatedModalRect.height) {
+													attemptedPosition = "bottom";
+												} else if (spaceRight >= updatedModalRect.width) {
+													attemptedPosition = "right";
+												} else if (spaceLeft >= updatedModalRect.width) {
+													attemptedPosition = "left";
+												} else {
+													attemptedPosition = "bottom";
+												}
+											} else if (
+												step.position === "left" &&
+												spaceLeft < updatedModalRect.width
+											) {
+												if (spaceRight >= updatedModalRect.width) {
+													attemptedPosition = "right";
+												} else if (spaceBottom >= updatedModalRect.height) {
+													attemptedPosition = "bottom";
+												} else if (spaceTop >= updatedModalRect.height) {
+													attemptedPosition = "top";
+												} else {
+													attemptedPosition = "bottom";
+												}
+											}
+
+											switch (attemptedPosition) {
+												case "top":
+													finalTop =
+														targetRect.top +
+														window.scrollY -
+														updatedModalRect.height -
+														gap;
+													finalLeft =
+														targetRect.left +
+														window.scrollX +
+														targetRect.width / 2 -
+														updatedModalRect.width / 2;
+													break;
+												case "bottom":
+													finalTop = targetRect.bottom + window.scrollY + gap;
+													finalLeft =
+														targetRect.left +
+														window.scrollX +
+														targetRect.width / 2 -
+														updatedModalRect.width / 2;
+													break;
+												case "left":
+													finalTop =
+														targetRect.top +
+														window.scrollY +
+														targetRect.height / 2 -
+														updatedModalRect.height / 2;
+													finalLeft =
+														targetRect.left +
+														window.scrollX -
+														updatedModalRect.width -
+														gap;
+													break;
+												case "right":
+													finalTop =
+														targetRect.top +
+														window.scrollY +
+														targetRect.height / 2 -
+														updatedModalRect.height / 2;
+													finalLeft = targetRect.right + window.scrollX + gap;
+													break;
+												default:
+													finalTop = targetRect.bottom + window.scrollY + gap;
+													finalLeft =
+														targetRect.left +
+														window.scrollX +
+														targetRect.width / 2 -
+														updatedModalRect.width / 2;
+													break;
+											}
+
+											finalLeft = Math.max(
+												window.scrollX + margin,
+												Math.min(
+													finalLeft,
+													window.scrollX +
+														window.innerWidth -
+														updatedModalRect.width -
+														margin
+												)
+											);
+											finalTop = Math.max(
+												window.scrollY + margin,
+												Math.min(
+													finalTop,
+													window.scrollY +
+														window.innerHeight -
+														updatedModalRect.height -
+														margin
+												)
+											);
+
+											tourModal.style.top = finalTop + "px";
+											tourModal.style.left = finalLeft + "px";
+										}, 10);
+									}, 50);
+
+									tourModal.style.top = window.scrollY + 20 + "px";
+									tourModal.style.left = window.scrollX + 20 + "px";
+								}
+							}
+						} else {
+							tourModal.style.position = "fixed";
+							tourModal.style.top = "50%";
+							tourModal.style.left = "50%";
+							tourModal.style.transform = "translate(-50%, -50%)";
+							tourModal.style.margin = "0";
+
+							if (isMobile) {
+								tourModal.style.maxWidth = `${Math.min(
+									320,
+									window.innerWidth - 40
+								)}px`;
+							} else {
+								tourModal.style.maxWidth = `${Math.min(
+									450,
+									window.innerWidth - 80
+								)}px`;
+							}
+
+							const highlight = document.getElementById("tour-highlight");
+							if (highlight) {
+								highlight.remove();
+							}
+
+							tourOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+						}
+
+						const prevBtn = document.getElementById("tour-prev");
+						const nextBtn = document.getElementById("tour-next");
+						const finishBtn = document.getElementById("tour-finish");
+
+						if (prevBtn) {
+							prevBtn.addEventListener("click", function () {
+								const existingHighlight =
+									document.getElementById("tour-highlight");
+								if (existingHighlight) {
+									existingHighlight.remove();
+								}
+								currentStep--;
+								showTourStep(currentStep);
+							});
+						}
+
+						if (nextBtn) {
+							nextBtn.addEventListener("click", function () {
+								const existingHighlight =
+									document.getElementById("tour-highlight");
+								if (existingHighlight) {
+									existingHighlight.remove();
+								}
+								currentStep++;
+								showTourStep(currentStep);
+							});
+						}
+
+						if (finishBtn) {
+							finishBtn.addEventListener("click", endTour);
+						}
+					}
+					function endTour() {
+						const tourOverlay = document.getElementById("tour-overlay");
+						const tourModal = document.getElementById("tour-modal");
+						const highlight = document.getElementById("tour-highlight");
+
+						if (tourOverlay && tourOverlay.resizeHandler) {
+							window.removeEventListener("resize", tourOverlay.resizeHandler);
+						}
+
+						if (tourOverlay) {
+							tourOverlay.classList.add("animate-fade-out");
+							setTimeout(function () {
+								tourOverlay.remove();
+							}, 300);
+						}
+
+						if (tourModal) {
+							tourModal.classList.add("animate-fade-out");
+							setTimeout(function () {
+								tourModal.remove();
+							}, 300);
+						}
+
+						if (highlight) {
+							highlight.remove();
+						}
+
+						showNotification(
+							"Tour Completed",
+							"You can restart the tour anytime from the menu.",
+							"success"
+						);
+					}
+
+					tourOverlay.addEventListener("click", function (e) {
+						if (e.target === tourOverlay) {
+							endTour();
+						}
+					});
+
+					document.addEventListener("keydown", function (e) {
+						if (e.key === "Escape") {
+							endTour();
+						}
+					});
+
+					showTourStep(currentStep);
+
+					const resizeHandler = function () {
+						const activeModal = document.getElementById("tour-modal");
+						if (
+							activeModal &&
+							currentStep >= 0 &&
+							currentStep < tourSteps.length
+						) {
+							setTimeout(() => {
+								showTourStep(currentStep);
+							}, 100);
+						}
+					};
+
+					window.addEventListener("resize", resizeHandler);
+
+					tourOverlay.resizeHandler = resizeHandler;
+				}
+
+				const guidedTourBtn = document.getElementById("guided-tour-btn");
+				if (guidedTourBtn) {
+					guidedTourBtn.addEventListener("click", startGuidedTour);
+				}
+
+				loadSettings();
+
+				function setupSettingsEventListeners() {
+					document
+						.querySelectorAll('.theme-option input[type="radio"]')
+						.forEach((radio) => {
+							radio.addEventListener("change", function () {
+								document
+									.querySelectorAll(".theme-option label")
+									.forEach((label) => {
+										label.classList.remove("border-primary-500");
+									});
+
+								this.parentElement
+									.querySelector("label")
+									.classList.add("border-primary-500");
+
+								const tempSettings = { ...currentSettings };
+								tempSettings.darkMode = this.value === "dark";
+
+								applySettings(tempSettings);
+
+								if (typeof updateAnnotationsTheme === "function") {
+									setTimeout(updateAnnotationsTheme, 50);
+								}
+							});
+						});
+
+					const fontSizeSelect = document.getElementById("font-size");
+					if (fontSizeSelect) {
+						fontSizeSelect.addEventListener("change", function () {
+							const tempSettings = { ...currentSettings };
+							tempSettings.fontSize = this.value;
+
+							applySettings(tempSettings);
+						});
+					}
+
+					const highlightTypeSelect = document.getElementById(
+						"default-highlight-type"
+					);
+					if (highlightTypeSelect) {
+						highlightTypeSelect.addEventListener("change", function () {
+							const tempSettings = { ...currentSettings };
+							tempSettings.defaultHighlightType = this.value;
+
+							applySettings(tempSettings);
+
+							if (typeof window.state === "undefined") {
+								window.state = window.state || {};
+							}
+							if (typeof state === "undefined") {
+								state = state || {};
+							}
+
+							if (window.state) {
+								window.state.selectedHighlightType = this.value;
+							}
+							if (state) {
+								state.selectedHighlightType = this.value;
+							}
+						});
+					}
+
+					if (settingsButton) {
+						settingsButton.addEventListener("click", openSettingsModal);
+					}
+
+					if (closeSettingsModalBtn) {
+						closeSettingsModalBtn.addEventListener("click", closeSettingsModal);
+					}
+
+					if (cancelSettingsBtn) {
+						cancelSettingsBtn.addEventListener("click", closeSettingsModal);
+					}
+
+					if (saveSettingsBtn) {
+						saveSettingsBtn.addEventListener("click", saveSettings);
+					}
+				}
+
+				setupSettingsEventListeners();
+			});
+		</script>
+	</body>
+</html>
