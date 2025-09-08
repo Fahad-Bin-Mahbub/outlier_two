@@ -1,0 +1,3773 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>RareBid - Premium Auction Platform for Rare Collectibles</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="RareBid - The premier auction platform for rare and valuable collectibles. Bid on authenticated items with secure biometric verification."
+		/>
+
+		<script src="https://cdn.tailwindcss.com"></script>
+
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								DEFAULT: "#2563eb",
+								light: "#3b82f6",
+								dark: "#1d4ed8",
+								50: "#eff6ff",
+								100: "#dbeafe",
+								200: "#bfdbfe",
+								300: "#93c5fd",
+							},
+							neutral: {
+								50: "#f8fafc",
+								100: "#f1f5f9",
+								200: "#e2e8f0",
+								300: "#cbd5e1",
+								400: "#94a3b8",
+								500: "#64748b",
+								600: "#475569",
+								700: "#334155",
+								800: "#1e293b",
+								900: "#0f172a",
+							},
+							success: "#059669",
+							warning: "#dc2626",
+							surface: "#eef1f5",
+						},
+						boxShadow: {
+							"neu-flat": "5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff",
+							"neu-pressed":
+								"inset 2px 2px 5px #d1d9e6, inset -2px -2px 5px #ffffff",
+							"neu-convex":
+								"5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff, inset 1px 1px 2px #ffffff, inset -1px -1px 2px rgba(209, 217, 230, 0.5)",
+							"neu-concave":
+								"inset 1px 1px 3px #d1d9e6, inset -1px -1px 3px #ffffff, 2px 2px 5px rgba(255, 255, 255, 0.5), -2px -2px 5px rgba(209, 217, 230, 0.5)",
+						},
+						animation: {
+							"fade-in": "fadeIn 0.3s ease-in-out",
+							"slide-up": "slideUp 0.3s ease-out",
+							"scale-in": "scaleIn 0.3s ease-out",
+							"pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+							float: "float 6s ease-in-out infinite",
+						},
+						keyframes: {
+							fadeIn: {
+								"0%": { opacity: "0" },
+								"100%": { opacity: "1" },
+							},
+							slideUp: {
+								"0%": { transform: "translateY(20px)", opacity: "0" },
+								"100%": { transform: "translateY(0)", opacity: "1" },
+							},
+							scaleIn: {
+								"0%": { transform: "scale(0.95)", opacity: "0" },
+								"100%": { transform: "scale(1)", opacity: "1" },
+							},
+							float: {
+								"0%, 100%": { transform: "translateY(0)" },
+								"50%": { transform: "translateY(-10px)" },
+							},
+						},
+						backdropBlur: {
+							xs: "2px",
+						},
+						borderRadius: {
+							xl: "12px",
+							"2xl": "16px",
+							"3xl": "24px",
+						},
+					},
+				},
+			};
+		</script>
+
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+			:root {
+				--neu-shadow-color: #d1d9e6;
+				--neu-highlight-color: #ffffff;
+				--neu-background: #eef1f5;
+				--neu-dark-shadow: #c0c7d2;
+				--neu-text-primary: #2563eb;
+				--neu-text-secondary: #64748b;
+			}
+
+			body {
+				font-family: "Poppins", system-ui, -apple-system, sans-serif;
+				background-color: var(--neu-background);
+				min-height: 100vh;
+				position: relative;
+			}
+
+			.neu-flat {
+				background: var(--neu-background);
+				box-shadow: 5px 5px 10px var(--neu-shadow-color),
+					-5px -5px 10px var(--neu-highlight-color);
+				border-radius: 16px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.neu-flat-dark {
+				background: #1e293b;
+				box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2),
+					-5px -5px 10px rgba(60, 70, 90, 0.5);
+				border-radius: 16px;
+			}
+
+			.neu-pressed {
+				background: var(--neu-background);
+				box-shadow: inset 2px 2px 5px var(--neu-shadow-color),
+					inset -2px -2px 5px var(--neu-highlight-color);
+				border-radius: 16px;
+			}
+
+			.neu-convex {
+				background: linear-gradient(145deg, #f6f9fd, #e6ebf4);
+				box-shadow: 5px 5px 10px var(--neu-shadow-color),
+					-5px -5px 10px var(--neu-highlight-color);
+				border-radius: 16px;
+			}
+
+			.neu-concave {
+				background: linear-gradient(145deg, #e6ebf4, #f6f9fd);
+				box-shadow: inset 2px 2px 5px var(--neu-shadow-color),
+					inset -2px -2px 5px var(--neu-highlight-color);
+				border-radius: 16px;
+			}
+
+			.neu-outline {
+				background: var(--neu-background);
+				box-shadow: 5px 5px 10px var(--neu-shadow-color),
+					-5px -5px 10px var(--neu-highlight-color);
+				border-radius: 16px;
+				border: 1px solid rgba(209, 217, 230, 0.5);
+			}
+
+			.neu-btn {
+				position: relative;
+				background: var(--neu-background);
+				border-radius: 12px;
+				border: none;
+				box-shadow: 5px 5px 10px var(--neu-shadow-color),
+					-5px -5px 10px var(--neu-highlight-color);
+				transition: all 0.2s ease;
+				cursor: pointer;
+				overflow: hidden;
+			}
+
+			.neu-btn:active:not(:disabled) {
+				box-shadow: inset 2px 2px 5px var(--neu-shadow-color),
+					inset -2px -2px 5px var(--neu-highlight-color);
+				transform: scale(0.98);
+			}
+
+			.neu-btn::after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(
+					rgba(255, 255, 255, 0.15),
+					rgba(255, 255, 255, 0)
+				);
+				pointer-events: none;
+				opacity: 0;
+				transition: opacity 0.2s ease;
+			}
+
+			.neu-btn:hover::after {
+				opacity: 1;
+			}
+
+			.neu-btn:disabled {
+				opacity: 0.7;
+				cursor: not-allowed;
+			}
+
+			.neu-btn-primary {
+				background: linear-gradient(145deg, #2d6dff, #2563eb);
+				color: white;
+				box-shadow: 5px 5px 10px rgba(37, 99, 235, 0.3),
+					-2px -2px 6px rgba(255, 255, 255, 0.8);
+			}
+
+			.neu-btn-primary:active:not(:disabled) {
+				box-shadow: inset 2px 2px 5px rgba(29, 78, 216, 0.9),
+					inset -2px -2px 5px rgba(59, 130, 246, 0.5);
+			}
+
+			.neu-input {
+				background: var(--neu-background);
+				border-radius: 12px;
+				border: none;
+				box-shadow: inset 2px 2px 5px var(--neu-shadow-color),
+					inset -2px -2px 5px var(--neu-highlight-color);
+				padding: 12px 15px;
+				transition: all 0.2s ease;
+			}
+
+			.neu-input:focus {
+				outline: none;
+				box-shadow: inset 3px 3px 6px var(--neu-shadow-color),
+					inset -3px -3px 6px var(--neu-highlight-color);
+			}
+
+			.neu-card {
+				background: var(--neu-background);
+				border-radius: 16px;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				box-shadow: 5px 5px 15px var(--neu-shadow-color),
+					-5px -5px 15px var(--neu-highlight-color);
+				transition: all 0.3s ease;
+				overflow: hidden;
+			}
+
+			.neu-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 8px 8px 20px var(--neu-shadow-color),
+					-8px -8px 20px var(--neu-highlight-color);
+			}
+
+			.auction-timer {
+				background: linear-gradient(145deg, #e6ebf4, #f6f9fd);
+				box-shadow: inset 2px 2px 5px var(--neu-shadow-color),
+					inset -2px -2px 5px var(--neu-highlight-color);
+				border-radius: 12px;
+				padding: 8px 12px;
+				font-family: monospace;
+				font-weight: 600;
+			}
+
+			.bid-history-item {
+				border-bottom: 1px solid rgba(209, 217, 230, 0.3);
+				transition: all 0.2s ease;
+			}
+
+			.bid-history-item:hover {
+				background: rgba(255, 255, 255, 0.5);
+			}
+
+			.fingerprint-scanner {
+				width: 80px;
+				height: 80px;
+				background: linear-gradient(145deg, #e6ebf4, #f6f9fd);
+				border-radius: 50%;
+				position: relative;
+				box-shadow: 5px 5px 10px var(--neu-shadow-color),
+					-5px -5px 10px var(--neu-highlight-color);
+				margin: 0 auto 20px;
+				overflow: hidden;
+			}
+
+			.fingerprint-scanner::before {
+				content: "";
+				position: absolute;
+				top: 5px;
+				left: 5px;
+				right: 5px;
+				bottom: 5px;
+				border-radius: 50%;
+				background: linear-gradient(145deg, #d1d9e6, #f6f9fd);
+				box-shadow: inset 2px 2px 5px rgba(209, 217, 230, 0.7),
+					inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+			}
+
+			.fingerprint-scanner::after {
+				content: "👆";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				font-size: 30px;
+			}
+
+			.scanner-active .fingerprint-scanner::after {
+				animation: pulse 1.5s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					opacity: 1;
+					transform: translate(-50%, -50%) scale(1);
+				}
+				50% {
+					opacity: 0.5;
+					transform: translate(-50%, -50%) scale(0.95);
+				}
+				100% {
+					opacity: 1;
+					transform: translate(-50%, -50%) scale(1);
+				}
+			}
+
+			.scanning-line {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background: linear-gradient(90deg, transparent, #2563eb, transparent);
+				animation: scanning 1.5s linear infinite;
+				opacity: 0;
+			}
+
+			.scanner-active .scanning-line {
+				opacity: 1;
+			}
+
+			@keyframes scanning {
+				0% {
+					top: 0;
+				}
+				100% {
+					top: 100%;
+				}
+			}
+
+			.verified-badge {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%) scale(0);
+				width: 40px;
+				height: 40px;
+				background: #059669;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				color: white;
+				font-size: 24px;
+				opacity: 0;
+				transition: all 0.3s ease;
+			}
+
+			.verification-success .verified-badge {
+				opacity: 1;
+				transform: translate(-50%, -50%) scale(1);
+			}
+
+			.verification-success .fingerprint-scanner::after {
+				opacity: 0;
+			}
+
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: var(--neu-background);
+				border-radius: 5px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #c0c8d5;
+				border-radius: 5px;
+				border: 2px solid var(--neu-background);
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #a0a8b5;
+			}
+
+			.loading-dots span {
+				display: inline-block;
+				width: 6px;
+				height: 6px;
+				border-radius: 50%;
+				background-color: #2563eb;
+				margin: 0 2px;
+				animation: loadingDots 1.4s infinite ease-in-out both;
+			}
+
+			.loading-dots span:nth-child(1) {
+				animation-delay: -0.32s;
+			}
+
+			.loading-dots span:nth-child(2) {
+				animation-delay: -0.16s;
+			}
+
+			@keyframes loadingDots {
+				0%,
+				80%,
+				100% {
+					transform: scale(0);
+				}
+				40% {
+					transform: scale(1);
+				}
+			}
+
+			.zoom-in-animation {
+				animation: zoomIn 0.3s ease forwards;
+			}
+
+			@keyframes zoomIn {
+				from {
+					transform: scale(1);
+				}
+				to {
+					transform: scale(1.05);
+				}
+			}
+
+			.floating {
+				animation: float 6s ease-in-out infinite;
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0);
+				}
+				50% {
+					transform: translateY(-10px);
+				}
+			}
+
+			.tooltip {
+				position: relative;
+				display: inline-block;
+			}
+
+			.tooltip .tooltip-text {
+				visibility: hidden;
+				width: 120px;
+				background-color: rgba(30, 41, 59, 0.9);
+				color: #fff;
+				text-align: center;
+				border-radius: 6px;
+				padding: 5px;
+				position: absolute;
+				z-index: 1;
+				bottom: 125%;
+				left: 50%;
+				transform: translateX(-50%);
+				opacity: 0;
+				transition: opacity 0.3s;
+				font-size: 12px;
+			}
+
+			.tooltip .tooltip-text::after {
+				content: "";
+				position: absolute;
+				top: 100%;
+				left: 50%;
+				margin-left: -5px;
+				border-width: 5px;
+				border-style: solid;
+				border-color: rgba(30, 41, 59, 0.9) transparent transparent transparent;
+			}
+
+			.tooltip:hover .tooltip-text {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			.confetti {
+				position: fixed;
+				width: 10px;
+				height: 10px;
+				background-color: #2563eb;
+				opacity: 0;
+				animation: confetti 5s ease-in-out forwards;
+				z-index: 9999;
+			}
+
+			@keyframes confetti {
+				0% {
+					opacity: 1;
+					transform: translateY(0) rotateZ(0);
+				}
+				100% {
+					opacity: 0;
+					transform: translateY(100vh) rotateZ(720deg);
+				}
+			}
+
+			.notification-badge {
+				position: absolute;
+				top: -2px;
+				right: -2px;
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background-color: var(--neu-text-primary);
+				border: 2px solid var(--neu-background);
+			}
+
+			.dark-stats {
+				background: #2a3a50;
+				box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2),
+					-5px -5px 10px rgba(60, 70, 90, 0.5);
+			}
+
+			.dark-gradient {
+				background: linear-gradient(
+					135deg,
+					rgba(0, 0, 0, 0.8),
+					rgba(30, 41, 59, 0.9)
+				);
+			}
+
+			.category-tag {
+				background: linear-gradient(145deg, #2d6dff, #2563eb);
+				color: white;
+				padding: 2px 8px;
+				border-radius: 12px;
+				font-size: 0.7rem;
+				font-weight: 600;
+				box-shadow: 2px 2px 5px rgba(37, 99, 235, 0.3);
+			}
+
+			.mobile-menu-wrapper {
+				width: 100%;
+				height: 100vh;
+				position: fixed;
+				top: 0;
+				left: -100%;
+				background-color: var(--neu-background);
+				z-index: 100;
+				transition: left 0.3s ease;
+			}
+
+			.mobile-menu-wrapper.open {
+				left: 0;
+			}
+
+			.notification-panel {
+				position: fixed;
+				top: 0;
+				right: -350px;
+				width: 350px;
+				max-width: 100vw;
+				height: 100vh;
+				background-color: var(--neu-background);
+				z-index: 100;
+				transition: right 0.3s ease;
+				box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.notification-panel.open {
+				right: 0;
+			}
+
+			.status-badge {
+				display: inline-block;
+				padding: 2px 8px;
+				border-radius: 12px;
+				font-size: 0.75rem;
+				font-weight: 600;
+			}
+
+			.status-badge.active {
+				background-color: rgba(5, 150, 105, 0.15);
+				color: #059669;
+			}
+
+			.status-badge.won {
+				background-color: rgba(37, 99, 235, 0.15);
+				color: #2563eb;
+			}
+
+			.status-badge.outbid {
+				background-color: rgba(220, 38, 38, 0.15);
+				color: #dc2626;
+			}
+
+			.status-badge.ended {
+				background-color: rgba(100, 116, 139, 0.15);
+				color: #64748b;
+			}
+
+			.no-scrollbar {
+				-ms-overflow-style: none;
+				scrollbar-width: none;
+			}
+
+			.no-scrollbar::-webkit-scrollbar {
+				display: none;
+			}
+
+			@media (max-width: 640px) {
+				.sticky-bottom-nav {
+					position: fixed;
+					bottom: 0;
+					left: 0;
+					width: 100%;
+					background-color: var(--neu-background);
+					box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+					z-index: 40;
+					padding: 10px;
+				}
+
+				.main-content {
+					padding-bottom: 70px;
+				}
+			}
+		</style>
+	</head>
+
+	<body class="bg-surface text-neutral-800">
+		<header
+			class="sticky top-0 z-50 bg-surface border-b border-neutral-200/30 shadow-sm"
+		>
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex justify-between items-center h-16">
+					<div class="flex items-center">
+						<div class="flex-shrink-0">
+							<div class="flex items-center">
+								<span
+									class="text-2xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent"
+									>RareBid</span
+								>
+								<span
+									class="ml-2 hidden md:block text-xs font-medium px-2 py-1 rounded-full bg-primary-100 text-primary"
+									>PREMIUM</span
+								>
+							</div>
+						</div>
+
+						<div class="hidden md:flex ml-10 space-x-4">
+							<a
+								href="#"
+								class="neu-btn px-4 py-2 rounded-xl text-sm font-medium transition-all"
+								>Live Auctions</a
+							>
+							<a
+								href="#"
+								class="text-neutral-600 hover:text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all"
+								>Upcoming</a
+							>
+							<a
+								href="#"
+								class="text-neutral-600 hover:text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all"
+								>Past Sales</a
+							>
+							<a
+								href="#my-bids"
+								class="text-neutral-600 hover:text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all"
+								>My Bids</a
+							>
+							<a
+								href="#my-wins"
+								class="text-neutral-600 hover:text-primary px-4 py-2 rounded-xl text-sm font-medium transition-all"
+								>My Wins</a
+							>
+						</div>
+					</div>
+
+					<div class="flex items-center gap-3">
+						<button id="search-btn" class="neu-btn p-2 rounded-full tooltip">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+								/>
+							</svg>
+							<span class="tooltip-text">Search</span>
+						</button>
+
+						<button
+							id="notifications-btn"
+							class="neu-btn p-2 rounded-full tooltip relative"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+								/>
+							</svg>
+							<div class="notification-badge"></div>
+							<span class="tooltip-text">Notifications</span>
+						</button>
+
+						<button
+							id="mobile-menu-btn"
+							class="md:hidden neu-btn p-2 rounded-full"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-600"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 6h16M4 12h16M4 18h16"
+								/>
+							</svg>
+						</button>
+
+						<button
+							class="neu-btn-primary py-2 px-4 rounded-xl flex items-center gap-2 ml-2"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+								/>
+							</svg>
+							<span class="text-sm font-medium hidden sm:block">Sign In</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<div class="mobile-menu-wrapper" id="mobile-menu">
+			<div
+				class="p-4 flex justify-between items-center border-b border-neutral-200/30"
+			>
+				<div class="flex items-center">
+					<span
+						class="text-2xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent"
+						>RareBid</span
+					>
+					<span
+						class="ml-2 text-xs font-medium px-2 py-1 rounded-full bg-primary-100 text-primary"
+						>PREMIUM</span
+					>
+				</div>
+				<button id="close-mobile-menu" class="neu-btn p-2 rounded-full">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 text-neutral-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
+					</svg>
+				</button>
+			</div>
+			<div class="p-4 flex flex-col space-y-4">
+				<a
+					href="#"
+					class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 mr-3"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M13 10V3L4 14h7v7l9-11h-7z"
+						/>
+					</svg>
+					Live Auctions
+				</a>
+				<a
+					href="#"
+					class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 mr-3"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+						/>
+					</svg>
+					Upcoming
+				</a>
+				<a
+					href="#"
+					class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 mr-3"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+						/>
+					</svg>
+					Past Sales
+				</a>
+				<a
+					href="#my-bids"
+					class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 mr-3"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+						/>
+					</svg>
+					My Bids
+				</a>
+				<a
+					href="#my-wins"
+					class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 mr-3"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+						/>
+					</svg>
+					My Wins
+				</a>
+				<div class="border-t border-neutral-200/30 my-2 pt-2">
+					<a
+						href="#account"
+						class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 mr-3"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+							/>
+						</svg>
+						My Account
+					</a>
+					<a
+						href="#settings"
+						class="neu-btn px-4 py-3 rounded-xl text-sm font-medium flex items-center mt-4"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 mr-3"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+							/>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+							/>
+						</svg>
+						Settings
+					</a>
+				</div>
+			</div>
+		</div>
+
+		<div class="notification-panel" id="notification-panel">
+			<div
+				class="p-4 flex justify-between items-center border-b border-neutral-200/30"
+			>
+				<h2 class="text-xl font-bold text-neutral-800">Notifications</h2>
+				<button id="close-notifications" class="neu-btn p-2 rounded-full">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5 text-neutral-600"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M6 18L18 6M6 6l12 12"
+						/>
+					</svg>
+				</button>
+			</div>
+			<div class="p-4 overflow-y-auto max-h-[calc(100vh-80px)]">
+				<div class="flex justify-between items-center mb-4">
+					<h3 class="text-sm font-medium text-neutral-600">New</h3>
+					<button
+						id="mark-all-read"
+						class="text-primary text-sm font-medium hover:underline"
+					>
+						Mark all as read
+					</button>
+				</div>
+
+				<div class="space-y-4">
+					<div class="neu-flat p-4 rounded-xl relative">
+						<div
+							class="absolute top-3 right-3 w-2 h-2 bg-primary rounded-full"
+						></div>
+						<div class="flex items-start">
+							<div class="bg-primary-100 rounded-full p-2 mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-primary"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 10V3L4 14h7v7l9-11h-7z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<h4 class="text-sm font-medium">You've been outbid!</h4>
+								<p class="text-xs text-neutral-600 mt-1">
+									Collector99 placed a bid of $550,000 on Honus Wagner T206
+									Baseball Card.
+								</p>
+								<p class="text-xs text-primary mt-2">5 minutes ago</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="neu-flat p-4 rounded-xl relative">
+						<div
+							class="absolute top-3 right-3 w-2 h-2 bg-primary rounded-full"
+						></div>
+						<div class="flex items-start">
+							<div class="bg-success/10 rounded-full p-2 mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-success"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<h4 class="text-sm font-medium">
+									Congratulations! Auction Won
+								</h4>
+								<p class="text-xs text-neutral-600 mt-1">
+									You won the 1952 Topps Mickey Mantle Rookie Card for $120,000.
+								</p>
+								<p class="text-xs text-primary mt-2">30 minutes ago</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="neu-flat p-4 rounded-xl">
+						<div class="flex items-start">
+							<div class="bg-neutral-200 rounded-full p-2 mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-neutral-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<h4 class="text-sm font-medium">Auction Ending Soon</h4>
+								<p class="text-xs text-neutral-600 mt-1">
+									The auction for Action Comics #1 (1938) ends in 15 minutes.
+								</p>
+								<p class="text-xs text-neutral-500 mt-2">2 hours ago</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-6 mb-2">
+					<h3 class="text-sm font-medium text-neutral-600">Earlier</h3>
+				</div>
+
+				<div class="space-y-4">
+					<div class="neu-flat p-4 rounded-xl">
+						<div class="flex items-start">
+							<div class="bg-warning/10 rounded-full p-2 mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-warning"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<h4 class="text-sm font-medium">Authentication Complete</h4>
+								<p class="text-xs text-neutral-600 mt-1">
+									Your 1914 Cracker Jack Ty Cobb Card has been authenticated by
+									our experts.
+								</p>
+								<p class="text-xs text-neutral-500 mt-2">Yesterday</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="neu-flat p-4 rounded-xl">
+						<div class="flex items-start">
+							<div class="bg-neutral-200 rounded-full p-2 mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-neutral-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M7 11l5-5m0 0l5 5m-5-5v12"
+									/>
+								</svg>
+							</div>
+							<div>
+								<h4 class="text-sm font-medium">Deposit Successful</h4>
+								<p class="text-xs text-neutral-600 mt-1">
+									Your deposit of $50,000 has been processed successfully.
+								</p>
+								<p class="text-xs text-neutral-500 mt-2">2 days ago</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="relative bg-neutral-800 overflow-hidden w-full">
+			<div class="absolute inset-0">
+				<img
+					class="w-full h-full object-cover opacity-20"
+					src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=2070&auto=format&fit=crop"
+					alt="Hero background"
+				/>
+				<div class="absolute inset-0 dark-gradient"></div>
+			</div>
+			<div class="relative w-full py-24 px-4 sm:py-32 sm:px-6 lg:px-8">
+				<div class="text-center">
+					<h1
+						class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"
+					>
+						Discover Rare Collectibles
+					</h1>
+					<p class="mt-6 text-xl text-neutral-300 max-w-3xl mx-auto">
+						Join the world's premier auction platform for rare collectibles.
+						From vintage comics to rare coins, find your next prized possession.
+					</p>
+					<div class="mt-10 flex justify-center gap-4">
+						<a
+							href="#auction-list"
+							class="neu-btn-primary inline-flex items-center px-8 py-4 text-base font-medium rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+						>
+							Browse Auctions
+						</a>
+						<a
+							href="#"
+							class="inline-flex items-center px-8 py-4 border border-neutral-200/20 text-base font-medium rounded-xl text-white bg-gray-700 transition-all duration-200"
+						>
+							Learn More
+						</a>
+					</div>
+					<div
+						class="mt-16 grid grid-cols-2 gap-8 max-w-2xl mx-auto sm:grid-cols-4"
+					>
+						<div class="text-center dark-stats py-4 px-2 rounded-xl">
+							<div class="text-3xl font-bold text-white">1000+</div>
+							<div class="mt-1 text-sm text-neutral-300">Active Auctions</div>
+						</div>
+						<div class="text-center dark-stats py-4 px-2 rounded-xl">
+							<div class="text-3xl font-bold text-white">50K+</div>
+							<div class="mt-1 text-sm text-neutral-300">Collectors</div>
+						</div>
+						<div class="text-center dark-stats py-4 px-2 rounded-xl">
+							<div class="text-3xl font-bold text-white">$10M+</div>
+							<div class="mt-1 text-sm text-neutral-300">Monthly Volume</div>
+						</div>
+						<div class="text-center dark-stats py-4 px-2 rounded-xl">
+							<div class="text-3xl font-bold text-white">99%</div>
+							<div class="mt-1 text-sm text-neutral-300">Success Rate</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="fixed inset-y-0 left-0 w-72 bg-surface border-r border-neutral-200/30 transform -translate-x-full transition-transform duration-300 ease-in-out z-40 shadow-lg pt-16"
+			id="sidebar"
+		>
+			<div class="h-full flex flex-col">
+				<div class="px-6 py-6 border-b border-neutral-200/30">
+					<div class="flex items-center justify-between">
+						<h2 class="text-xl font-bold text-neutral-800">Filters</h2>
+						<button
+							class="text-neutral-500 hover:text-primary focus:outline-none transition-colors duration-200"
+							id="clear-filters"
+						>
+							Clear All
+						</button>
+					</div>
+				</div>
+
+				<div class="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+					<div class="neu-flat p-5 rounded-2xl">
+						<h3
+							class="text-sm font-semibold text-neutral-800 mb-4 flex items-center"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2 text-primary"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							Price Range
+						</h3>
+						<div class="space-y-4">
+							<div class="flex items-center space-x-4">
+								<div class="flex-1">
+									<label class="block text-xs text-neutral-500 mb-1"
+										>Min Price</label
+									>
+									<input
+										type="number"
+										id="min-price"
+										placeholder="0"
+										class="neu-input w-full px-3 py-2 text-sm focus:ring-primary"
+									/>
+								</div>
+								<span class="text-neutral-500">to</span>
+								<div class="flex-1">
+									<label class="block text-xs text-neutral-500 mb-1"
+										>Max Price</label
+									>
+									<input
+										type="number"
+										id="max-price"
+										placeholder="∞"
+										class="neu-input w-full px-3 py-2 text-sm focus:ring-primary"
+									/>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="neu-flat p-5 rounded-2xl">
+						<h3
+							class="text-sm font-semibold text-neutral-800 mb-4 flex items-center"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2 text-primary"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
+								/>
+							</svg>
+							Sort By
+						</h3>
+						<select
+							id="sort-options"
+							class="neu-input w-full px-3 py-3 text-sm focus:ring-primary appearance-none"
+						>
+							<option value="ending-soon">Ending Soon</option>
+							<option value="price-low-high">Price: Low to High</option>
+							<option value="price-high-low">Price: High to Low</option>
+							<option value="most-bids">Most Bids</option>
+							<option value="newest">Newest First</option>
+						</select>
+					</div>
+
+					<div class="neu-flat p-5 rounded-2xl">
+						<h3
+							class="text-sm font-semibold text-neutral-800 mb-4 flex items-center"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2 text-primary"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+								/>
+							</svg>
+							Categories
+						</h3>
+						<div class="space-y-2">
+							<label class="flex items-center space-x-3">
+								<input
+									type="checkbox"
+									class="neu-input rounded w-4 h-4"
+									value="trading-cards"
+								/>
+								<span class="text-sm text-neutral-700">Trading Cards</span>
+							</label>
+							<label class="flex items-center space-x-3">
+								<input
+									type="checkbox"
+									class="neu-input rounded w-4 h-4"
+									value="comics"
+								/>
+								<span class="text-sm text-neutral-700">Comics</span>
+							</label>
+							<label class="flex items-center space-x-3">
+								<input
+									type="checkbox"
+									class="neu-input rounded w-4 h-4"
+									value="coins"
+								/>
+								<span class="text-sm text-neutral-700">Coins</span>
+							</label>
+							<label class="flex items-center space-x-3">
+								<input
+									type="checkbox"
+									class="neu-input rounded w-4 h-4"
+									value="stamps"
+								/>
+								<span class="text-sm text-neutral-700">Stamps</span>
+							</label>
+							<label class="flex items-center space-x-3">
+								<input
+									type="checkbox"
+									class="neu-input rounded w-4 h-4"
+									value="memorabilia"
+								/>
+								<span class="text-sm text-neutral-700">Memorabilia</span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<div class="px-6 py-4 border-t border-neutral-200/30">
+					<button
+						id="apply-filters"
+						class="w-full neu-btn-primary px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+							/>
+						</svg>
+						Apply Filters
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<main
+			class="md:ml-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-28 main-content"
+		>
+			<div class="flex items-center justify-between mb-6 md:hidden">
+				<button
+					id="mobile-filter-toggle"
+					class="neu-btn py-2 px-4 rounded-xl flex items-center gap-2"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="currentColor"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							stroke-width="2"
+							d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+						/>
+					</svg>
+					<span>Filters</span>
+				</button>
+				<div class="text-sm text-neutral-500">
+					<span class="font-semibold text-primary" id="items-count">8</span>
+					items
+				</div>
+			</div>
+
+			<div class="flex flex-col md:flex-row">
+				<div class="hidden md:block md:w-72 pr-8">
+					<div class="sticky top-24">
+						<div class="flex items-center justify-between mb-6">
+							<h2 class="text-xl font-bold text-neutral-800">Filters</h2>
+							<button
+								id="clear-filters-desktop"
+								class="text-neutral-500 hover:text-primary focus:outline-none transition-colors duration-200"
+							>
+								Clear All
+							</button>
+						</div>
+
+						<div class="space-y-8">
+							<div class="neu-flat p-5 rounded-2xl">
+								<h3
+									class="text-sm font-semibold text-neutral-800 mb-4 flex items-center"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 mr-2 text-primary"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+										/>
+									</svg>
+									Price Range
+								</h3>
+								<div class="space-y-4">
+									<div class="flex items-center space-x-4">
+										<div class="flex-1">
+											<label class="block text-xs text-neutral-500 mb-1"
+												>Min Price</label
+											>
+											<input
+												type="number"
+												id="min-price-desktop"
+												placeholder="0"
+												class="neu-input w-full px-3 py-2 text-sm focus:ring-primary"
+											/>
+										</div>
+										<span class="text-neutral-500">to</span>
+										<div class="flex-1">
+											<label class="block text-xs text-neutral-500 mb-1"
+												>Max Price</label
+											>
+											<input
+												type="number"
+												id="max-price-desktop"
+												placeholder="∞"
+												class="neu-input w-full px-3 py-2 text-sm focus:ring-primary"
+											/>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="neu-flat p-5 rounded-2xl">
+								<h3
+									class="text-sm font-semibold text-neutral-800 mb-4 flex items-center"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 mr-2 text-primary"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"
+										/>
+									</svg>
+									Sort By
+								</h3>
+								<select
+									id="sort-options-desktop"
+									class="neu-input w-full px-3 py-3 text-sm focus:ring-primary appearance-none"
+								>
+									<option value="ending-soon">Ending Soon</option>
+									<option value="price-low-high">Price: Low to High</option>
+									<option value="price-high-low">Price: High to Low</option>
+									<option value="most-bids">Most Bids</option>
+									<option value="newest">Newest First</option>
+								</select>
+							</div>
+
+							<div class="neu-flat p-5 rounded-2xl">
+								<h3
+									class="text-sm font-semibold text-neutral-800 mb-4 flex items-center"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 mr-2 text-primary"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+										/>
+									</svg>
+									Categories
+								</h3>
+								<div class="space-y-2">
+									<label class="flex items-center space-x-3">
+										<input
+											type="checkbox"
+											class="neu-input rounded w-4 h-4"
+											value="trading-cards"
+										/>
+										<span class="text-sm text-neutral-700">Trading Cards</span>
+									</label>
+									<label class="flex items-center space-x-3">
+										<input
+											type="checkbox"
+											class="neu-input rounded w-4 h-4"
+											value="comics"
+										/>
+										<span class="text-sm text-neutral-700">Comics</span>
+									</label>
+									<label class="flex items-center space-x-3">
+										<input
+											type="checkbox"
+											class="neu-input rounded w-4 h-4"
+											value="coins"
+										/>
+										<span class="text-sm text-neutral-700">Coins</span>
+									</label>
+									<label class="flex items-center space-x-3">
+										<input
+											type="checkbox"
+											class="neu-input rounded w-4 h-4"
+											value="stamps"
+										/>
+										<span class="text-sm text-neutral-700">Stamps</span>
+									</label>
+									<label class="flex items-center space-x-3">
+										<input
+											type="checkbox"
+											class="neu-input rounded w-4 h-4"
+											value="memorabilia"
+										/>
+										<span class="text-sm text-neutral-700">Memorabilia</span>
+									</label>
+								</div>
+							</div>
+
+							<button
+								id="apply-filters-desktop"
+								class="w-full neu-btn-primary px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+									/>
+								</svg>
+								Apply Filters
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex-1">
+					<div class="hidden md:flex items-center justify-between mb-6">
+						<h2 class="text-2xl font-bold text-neutral-800">Live Auctions</h2>
+						<div class="text-sm text-neutral-500">
+							Showing
+							<span class="font-semibold text-primary" id="items-count-desktop"
+								>8</span
+							>
+							items
+						</div>
+					</div>
+
+					<section
+						class="auction-list flex flex-col gap-8"
+						id="auction-list"
+					></section>
+
+					<section id="my-bids-section" class="hidden flex flex-col gap-8">
+						<div class="flex items-center justify-between mb-6">
+							<h2 class="text-2xl font-bold text-neutral-800">My Bids</h2>
+							<div class="text-sm text-neutral-500">
+								Showing <span class="font-semibold text-primary">3</span> active
+								bids
+							</div>
+						</div>
+
+						<div class="neu-flat p-6 rounded-2xl">
+							<div
+								class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div>
+									<h3 class="text-lg font-semibold">
+										1952 Topps Mickey Mantle Rookie Card
+									</h3>
+									<div class="flex items-center gap-3 mt-2">
+										<span class="category-tag">Trading Cards</span>
+										<span class="status-badge active">Active</span>
+									</div>
+								</div>
+								<div class="flex flex-col items-end">
+									<span class="text-success font-semibold">$120,000</span>
+									<span class="text-sm text-neutral-500">Your current bid</span>
+								</div>
+							</div>
+							<div
+								class="mt-4 pt-4 border-t border-neutral-200/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div class="flex items-center gap-3">
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Time left:</span>
+										<span class="text-primary font-semibold font-mono ml-2"
+											>00:35:12</span
+										>
+									</div>
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Status:</span>
+										<span class="text-success font-semibold ml-2"
+											>Highest Bidder</span
+										>
+									</div>
+								</div>
+								<button class="neu-btn-primary py-2 px-4 rounded-xl text-sm">
+									View Auction
+								</button>
+							</div>
+						</div>
+
+						<div class="neu-flat p-6 rounded-2xl">
+							<div
+								class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div>
+									<h3 class="text-lg font-semibold">
+										Action Comics #1 (1938) - 1st Superman
+									</h3>
+									<div class="flex items-center gap-3 mt-2">
+										<span class="category-tag">Comics</span>
+										<span class="status-badge outbid">Outbid</span>
+									</div>
+								</div>
+								<div class="flex flex-col items-end">
+									<span class="text-neutral-500 font-semibold line-through"
+										>$275,000</span
+									>
+									<span class="text-success font-semibold"
+										>$300,000 (Current)</span
+									>
+								</div>
+							</div>
+							<div
+								class="mt-4 pt-4 border-t border-neutral-200/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div class="flex items-center gap-3">
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Time left:</span>
+										<span class="text-primary font-semibold font-mono ml-2"
+											>02:45:38</span
+										>
+									</div>
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Status:</span>
+										<span class="text-warning font-semibold ml-2"
+											>Outbid by Nostalgia88</span
+										>
+									</div>
+								</div>
+								<div class="flex gap-2">
+									<button class="neu-btn py-2 px-4 rounded-xl text-sm">
+										View Auction
+									</button>
+									<button class="neu-btn-primary py-2 px-4 rounded-xl text-sm">
+										Place New Bid
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<div class="neu-flat p-6 rounded-2xl">
+							<div
+								class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div>
+									<h3 class="text-lg font-semibold">
+										Honus Wagner T206 Baseball Card
+									</h3>
+									<div class="flex items-center gap-3 mt-2">
+										<span class="category-tag">Trading Cards</span>
+										<span class="status-badge outbid">Outbid</span>
+									</div>
+								</div>
+								<div class="flex flex-col items-end">
+									<span class="text-neutral-500 font-semibold line-through"
+										>$520,000</span
+									>
+									<span class="text-success font-semibold"
+										>$540,000 (Current)</span
+									>
+								</div>
+							</div>
+							<div
+								class="mt-4 pt-4 border-t border-neutral-200/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div class="flex items-center gap-3">
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Time left:</span>
+										<span class="text-primary font-semibold font-mono ml-2"
+											>00:12:44</span
+										>
+									</div>
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Status:</span>
+										<span class="text-warning font-semibold ml-2"
+											>Outbid by RookieHunter</span
+										>
+									</div>
+								</div>
+								<div class="flex gap-2">
+									<button class="neu-btn py-2 px-4 rounded-xl text-sm">
+										View Auction
+									</button>
+									<button class="neu-btn-primary py-2 px-4 rounded-xl text-sm">
+										Place New Bid
+									</button>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section id="my-wins-section" class="hidden flex flex-col gap-8">
+						<div class="flex items-center justify-between mb-6">
+							<h2 class="text-2xl font-bold text-neutral-800">My Wins</h2>
+							<div class="text-sm text-neutral-500">
+								Showing <span class="font-semibold text-primary">2</span> won
+								auctions
+							</div>
+						</div>
+
+						<div class="neu-flat p-6 rounded-2xl">
+							<div
+								class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div>
+									<div class="flex items-center gap-2">
+										<h3 class="text-lg font-semibold">
+											1952 Topps Mickey Mantle Rookie Card
+										</h3>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 text-primary"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+									<div class="flex items-center gap-3 mt-2">
+										<span class="category-tag">Trading Cards</span>
+										<span class="status-badge won">Won</span>
+									</div>
+								</div>
+								<div class="flex flex-col items-end">
+									<span class="text-success font-semibold">$120,000</span>
+									<span class="text-sm text-neutral-500">Final price</span>
+								</div>
+							</div>
+							<div
+								class="mt-4 pt-4 border-t border-neutral-200/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div class="flex items-center gap-3">
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Won on:</span>
+										<span class="text-neutral-800 font-semibold ml-2"
+											>June 7, 2025</span
+										>
+									</div>
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Status:</span>
+										<span class="text-primary font-semibold ml-2"
+											>Ready for Payment</span
+										>
+									</div>
+								</div>
+								<div class="flex gap-2">
+									<button class="neu-btn py-2 px-4 rounded-xl text-sm">
+										View Details
+									</button>
+									<button class="neu-btn-primary py-2 px-4 rounded-xl text-sm">
+										Proceed to Checkout
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<div class="neu-flat p-6 rounded-2xl">
+							<div
+								class="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div>
+									<div class="flex items-center gap-2">
+										<h3 class="text-lg font-semibold">
+											1939 Play Ball Joe DiMaggio #26
+										</h3>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 text-primary"
+											viewBox="0 0 20 20"
+											fill="currentColor"
+										>
+											<path
+												fill-rule="evenodd"
+												d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+												clip-rule="evenodd"
+											/>
+										</svg>
+									</div>
+									<div class="flex items-center gap-3 mt-2">
+										<span class="category-tag">Trading Cards</span>
+										<span class="status-badge ended">Shipped</span>
+									</div>
+								</div>
+								<div class="flex flex-col items-end">
+									<span class="text-success font-semibold">$85,000</span>
+									<span class="text-sm text-neutral-500">Final price</span>
+								</div>
+							</div>
+							<div
+								class="mt-4 pt-4 border-t border-neutral-200/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+							>
+								<div class="flex items-center gap-3">
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Won on:</span>
+										<span class="text-neutral-800 font-semibold ml-2"
+											>May 22, 2025</span
+										>
+									</div>
+									<div class="neu-pressed py-2 px-3 rounded-lg text-sm">
+										<span class="text-neutral-500">Delivery:</span>
+										<span class="text-primary font-semibold ml-2"
+											>June 12, 2025</span
+										>
+									</div>
+								</div>
+								<div class="flex gap-2">
+									<button class="neu-btn py-2 px-4 rounded-xl text-sm">
+										View Details
+									</button>
+									<button class="neu-btn-primary py-2 px-4 rounded-xl text-sm">
+										Track Shipment
+									</button>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+			</div>
+		</main>
+
+		<div
+			class="fixed bottom-0 left-0 w-full bg-surface border-t border-neutral-200/20 z-40 shadow-lg"
+			id="sticky-toolbar"
+		>
+			<div
+				class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4"
+			>
+				<div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+					<span
+						class="text-neutral-900 font-semibold truncate text-sm sm:text-base max-w-[200px] sm:max-w-[300px]"
+						id="toolbar-title"
+						>Select an auction…</span
+					>
+					<span
+						class="text-success font-semibold text-base sm:text-lg whitespace-nowrap"
+						id="toolbar-bid"
+					></span>
+				</div>
+				<button
+					class="w-full sm:w-auto neu-btn-primary px-5 py-3 rounded-xl font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:transform-none flex items-center justify-center gap-2"
+					id="quickBidBtn"
+					disabled
+				>
+					<span id="quickBidIcon" class="text-lg">🔒</span>
+					<span class="text-sm sm:text-base">Quick Bid</span>
+				</button>
+			</div>
+		</div>
+
+		<div
+			class="fixed right-4 sm:right-6 bottom-24 sm:bottom-28 z-50 flex flex-col gap-4 max-w-[90vw]"
+			id="notification-container"
+		></div>
+
+		<div
+			class="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-[9999] hidden items-center justify-center"
+			id="biometric-modal-bg"
+		>
+			<div
+				class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 neu-flat bg-surface rounded-2xl p-8 text-center max-w-md w-[90vw]"
+			>
+				<div class="fingerprint-scanner" id="fingerprint-scanner">
+					<div class="scanning-line"></div>
+					<div class="verified-badge">✓</div>
+				</div>
+				<div class="text-xl font-semibold mb-2">Biometric Authentication</div>
+				<div class="text-neutral-600 mb-6">
+					Please authenticate with your device's biometric method to place your
+					bid securely.
+				</div>
+				<div id="auth-message" class="text-sm text-neutral-500 mb-4 hidden">
+					<div class="loading-dots">
+						<span></span><span></span><span></span>
+					</div>
+					<p class="mt-2">Scanning fingerprint...</p>
+				</div>
+				<div class="flex gap-4 justify-center flex-wrap">
+					<button
+						class="neu-btn-primary px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+						id="biometric-auth-btn"
+					>
+						Authenticate
+					</button>
+					<button
+						class="neu-btn px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+						id="biometric-cancel-btn"
+					>
+						Cancel
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-[9999] hidden items-center justify-center"
+			id="search-modal-bg"
+		>
+			<div
+				class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 neu-flat bg-surface rounded-2xl p-6 max-w-2xl w-[95vw] animate-scale-in"
+			>
+				<div class="flex items-center mb-6">
+					<div class="flex-1">
+						<div class="relative">
+							<input
+								type="text"
+								placeholder="Search for collectibles..."
+								class="neu-input w-full py-3 px-12 rounded-xl"
+								id="search-input"
+							/>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400 absolute top-3.5 left-4"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+								/>
+							</svg>
+						</div>
+					</div>
+					<button id="close-search" class="neu-btn p-2 rounded-full ml-2">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-neutral-600"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+
+				<div class="mb-4">
+					<div class="flex gap-2 flex-wrap">
+						<button class="neu-btn py-1 px-3 rounded-lg text-sm">
+							Baseball Cards
+						</button>
+						<button class="neu-btn py-1 px-3 rounded-lg text-sm">
+							Superman
+						</button>
+						<button class="neu-btn py-1 px-3 rounded-lg text-sm">
+							Gold Coins
+						</button>
+						<button class="neu-btn py-1 px-3 rounded-lg text-sm">
+							PSA Graded
+						</button>
+						<button class="neu-btn py-1 px-3 rounded-lg text-sm">
+							Vintage Comics
+						</button>
+					</div>
+				</div>
+
+				<div class="mt-6 max-h-[60vh] overflow-y-auto pr-2">
+					<div class="text-sm font-medium text-neutral-500 mb-3">
+						Popular Searches
+					</div>
+
+					<div class="space-y-3">
+						<div class="neu-flat p-3 rounded-xl flex items-center gap-3">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<span>Mickey Mantle rookie card</span>
+						</div>
+
+						<div class="neu-flat p-3 rounded-xl flex items-center gap-3">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<span>Action Comics #1</span>
+						</div>
+
+						<div class="neu-flat p-3 rounded-xl flex items-center gap-3">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<span>Rare Gold Coins</span>
+						</div>
+
+						<div class="neu-flat p-3 rounded-xl flex items-center gap-3">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<span>PSA 10 Pokemon cards</span>
+						</div>
+
+						<div class="neu-flat p-3 rounded-xl flex items-center gap-3">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-neutral-400"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+								/>
+							</svg>
+							<span>1933 Double Eagle</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="fixed inset-0 bg-neutral-900/80 backdrop-blur-sm z-50 hidden items-center justify-center overflow-y-auto"
+			id="auction-detail-modal"
+		>
+			<div
+				class="neu-flat bg-surface rounded-2xl max-w-6xl w-[95vw] my-8 animate-scale-in"
+			>
+				<div
+					class="p-6 border-b border-neutral-200/30 flex justify-between items-center sticky top-0 bg-surface z-10 rounded-t-2xl"
+				>
+					<div class="flex-1 min-w-0">
+						<h2
+							class="text-2xl font-bold text-neutral-800 truncate"
+							id="detail-title"
+						></h2>
+						<p class="text-sm text-neutral-500 mt-1" id="detail-subtitle"></p>
+					</div>
+					<button
+						class="neu-btn p-2 rounded-full text-neutral-500 hover:text-neutral-700 ml-4 flex-shrink-0"
+						id="close-detail-modal"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M6 18L18 6M6 6l12 12"
+							/>
+						</svg>
+					</button>
+				</div>
+
+				<div
+					class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8 max-h-[calc(100vh-12rem)] overflow-y-auto"
+				>
+					<div class="space-y-8">
+						<div class="relative">
+							<div
+								id="main-image-container"
+								class="neu-flat aspect-square rounded-2xl overflow-hidden bg-neutral-100 relative"
+							>
+								<img
+									id="main-image"
+									src=""
+									alt=""
+									class="w-full h-full object-contain transition-transform duration-200"
+								/>
+								<div
+									class="absolute inset-0 bg-black/0 hover:bg-black/5 transition-colors duration-200"
+								></div>
+							</div>
+							<div class="mt-4 flex gap-3 justify-center">
+								<button
+									id="zoom-in"
+									class="neu-btn p-2.5 rounded-full hover:bg-neutral-200/50 transition-colors flex items-center justify-center tooltip"
+									title="Zoom In"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-neutral-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"
+										/>
+									</svg>
+									<span class="tooltip-text">Zoom In</span>
+								</button>
+								<button
+									id="zoom-out"
+									class="neu-btn p-2.5 rounded-full hover:bg-neutral-200/50 transition-colors flex items-center justify-center tooltip"
+									title="Zoom Out"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-neutral-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"
+										/>
+									</svg>
+									<span class="tooltip-text">Zoom Out</span>
+								</button>
+								<button
+									id="reset-zoom"
+									class="neu-btn p-2.5 rounded-full hover:bg-neutral-200/50 transition-colors flex items-center justify-center tooltip"
+									title="Reset Zoom"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-neutral-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+										/>
+									</svg>
+									<span class="tooltip-text">Reset Zoom</span>
+								</button>
+							</div>
+						</div>
+
+						<div class="space-y-6">
+							<div class="neu-flat p-6 rounded-2xl">
+								<h3 class="text-xl font-semibold mb-4">Item Description</h3>
+								<div
+									id="item-description"
+									class="prose prose-sm max-w-none text-neutral-600 leading-relaxed"
+								></div>
+							</div>
+
+							<div class="neu-flat p-6 rounded-2xl grid grid-cols-2 gap-6">
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Condition
+									</h4>
+									<p
+										id="item-condition"
+										class="text-sm text-neutral-800 font-medium"
+									></p>
+								</div>
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">Year</h4>
+									<p
+										id="item-year"
+										class="text-sm text-neutral-800 font-medium"
+									></p>
+								</div>
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Authenticity
+									</h4>
+									<p
+										id="item-authenticity"
+										class="text-sm text-neutral-800 font-medium"
+									></p>
+								</div>
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Provenance
+									</h4>
+									<p
+										id="item-provenance"
+										class="text-sm text-neutral-800 font-medium"
+									></p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="space-y-6">
+						<div class="neu-flat p-6 rounded-2xl space-y-6">
+							<div class="grid grid-cols-2 gap-6">
+								<div>
+									<h4 class="text-sm font-medium text-neutral-500 mb-1">
+										Current Bid
+									</h4>
+									<p
+										id="detail-current-bid"
+										class="text-2xl font-bold text-success"
+									></p>
+								</div>
+								<div>
+									<h4 class="text-sm font-medium text-neutral-500 mb-1">
+										Time Left
+									</h4>
+									<div
+										id="detail-timer"
+										class="auction-timer text-xl font-bold text-primary"
+									></div>
+								</div>
+							</div>
+
+							<div class="pt-4 border-t border-neutral-200/30">
+								<h4 class="text-sm font-medium text-neutral-500 mb-2">
+									Next Minimum Bid
+								</h4>
+								<p
+									id="detail-next-bid"
+									class="text-lg font-semibold text-neutral-800 neu-pressed py-2 px-4 rounded-xl inline-block"
+								></p>
+							</div>
+
+							<button
+								id="detail-bid-btn"
+								class="w-full neu-btn-primary px-6 py-3.5 rounded-xl font-semibold shadow-md transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:transform-none flex items-center justify-center gap-2"
+							>
+								<span id="detail-bid-icon">⚡</span> Place Bid
+							</button>
+						</div>
+
+						<div class="neu-flat rounded-2xl p-6 space-y-6">
+							<h3 class="text-lg font-semibold">Bidding Statistics</h3>
+							<div class="grid grid-cols-2 gap-6">
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Total Bids
+									</h4>
+									<p
+										id="detail-total-bids"
+										class="text-lg font-semibold text-neutral-800"
+									></p>
+								</div>
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Unique Bidders
+									</h4>
+									<p
+										id="detail-unique-bidders"
+										class="text-lg font-semibold text-neutral-800"
+									></p>
+								</div>
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Starting Price
+									</h4>
+									<p
+										id="detail-start-price"
+										class="text-lg font-semibold text-neutral-800"
+									></p>
+								</div>
+								<div class="space-y-1">
+									<h4 class="text-sm font-medium text-neutral-500">
+										Bid Increment
+									</h4>
+									<p
+										id="detail-bid-step"
+										class="text-lg font-semibold text-neutral-800"
+									></p>
+								</div>
+							</div>
+						</div>
+
+						<div class="neu-flat rounded-2xl p-6">
+							<div class="flex justify-between items-center mb-4">
+								<h3 class="text-lg font-semibold">Bid History</h3>
+								<span
+									class="text-sm text-neutral-500 neu-pressed py-1 px-3 rounded-full"
+									id="bid-history-count"
+								></span>
+							</div>
+							<div
+								id="detail-bid-history"
+								class="space-y-1.5 max-h-[300px] overflow-y-auto pr-2 -mr-2"
+							></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div
+			class="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-[9999] hidden items-center justify-center"
+			id="feature-modal-bg"
+		>
+			<div
+				class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 neu-flat bg-surface rounded-2xl p-6 text-center max-w-md w-[90vw] animate-scale-in"
+			>
+				<div class="text-4xl mb-4">🚧</div>
+				<div class="text-xl font-semibold mb-2">Feature will be available soon</div>
+				<div class="text-neutral-600 mb-6">
+					This feature is currently being developed and will be available soon.
+				</div>
+				<div class="flex justify-center">
+					<button
+						class="neu-btn px-6 py-3 rounded-xl font-medium transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+						id="feature-close-btn"
+					>
+						Got It
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const SAMPLE_AUCTIONS = [
+				{
+					id: "a1",
+					title: "1952 Topps Mickey Mantle Rookie Card",
+					category: "trading-cards",
+					image:
+						"https://images.unsplash.com/photo-1630918295202-9715cc167cc6?q=80&w=1974&auto=format&fit=crop",
+					endsAt: Date.now() + 1000 * 90,
+					startBid: 100000,
+					bidStep: 10000,
+					condition: "Near Mint",
+					year: "1952",
+					authenticity: "PSA Graded 8",
+					provenance: "Private Collection",
+					description:
+						"The iconic 1952 Topps Mickey Mantle rookie card, one of the most sought-after baseball cards in history. This particular specimen has been professionally graded by PSA as Near Mint 8, making it one of the finest examples available. The card features the legendary New York Yankees center fielder in his early career, with the classic Topps design that has become synonymous with baseball card collecting.",
+					bidHistory: [
+						{ bidder: "JaneS", amount: 100000, time: Date.now() - 85000 },
+						{ bidder: "TommyB", amount: 110000, time: Date.now() - 60000 },
+						{ bidder: "Yourself", amount: 120000, time: Date.now() - 30000 },
+					],
+				},
+				{
+					id: "a2",
+					title: "Action Comics #1 (1938) - 1st Superman",
+					category: "comics",
+					image:
+						"https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+					endsAt: Date.now() + 1000 * 200,
+					startBid: 250000,
+					bidStep: 25000,
+					condition: "Excellent",
+					year: "1938",
+					authenticity: "CGC Graded 6.5",
+					provenance: "Heritage Auctions",
+					description:
+						"The holy grail of comic books - Action Comics #1 featuring the first appearance of Superman. This copy has been professionally graded by CGC as 6.5, making it one of the finest unrestored copies in existence. The comic features the iconic cover of Superman lifting a car, marking the beginning of the superhero genre.",
+					bidHistory: [
+						{ bidder: "ComicsFan", amount: 250000, time: Date.now() - 180000 },
+						{ bidder: "Yourself", amount: 275000, time: Date.now() - 110000 },
+						{ bidder: "Nostalgia88", amount: 300000, time: Date.now() - 22000 },
+					],
+				},
+				{
+					id: "a3",
+					title: "Honus Wagner T206 Baseball Card",
+					category: "trading-cards",
+					image:
+						"https://images.unsplash.com/photo-1473187983305-f615310e7daa?auto=format&fit=crop&w=400&q=80",
+					endsAt: Date.now() + 1000 * 50,
+					startBid: 500000,
+					bidStep: 20000,
+					condition: "Mint",
+					year: "1909",
+					authenticity: "PSA Graded 5",
+					provenance: "Sotheby's",
+					description:
+						"The legendary T206 Honus Wagner card, often called the 'Mona Lisa of baseball cards.' This rare specimen was printed in 1909 and is one of only about 60 known examples in existence. The card's rarity is due to Wagner's objection to tobacco products, leading to its withdrawal from circulation.",
+					bidHistory: [
+						{ bidder: "OldCards", amount: 500000, time: Date.now() - 100000 },
+						{ bidder: "Yourself", amount: 520000, time: Date.now() - 70000 },
+						{ bidder: "RookieHunter", amount: 540000, time: Date.now() - 5000 },
+					],
+				},
+				{
+					id: "a4",
+					title: "1804 Silver Dollar Class I Original",
+					category: "coins",
+					image:
+						"https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?auto=format&fit=crop&w=400&q=80",
+					endsAt: Date.now() + 1000 * 150,
+					startBid: 3500000,
+					bidStep: 100000,
+					condition: "Mint",
+					year: "1804",
+					authenticity: "PCGS MS-65",
+					provenance: "Stack's Bowers",
+					description:
+						"The legendary 1804 Silver Dollar, one of the most famous and valuable coins in American numismatics. This Class I original is one of only eight known specimens. The coin features a beautiful portrait of Liberty on the obverse and a majestic eagle on the reverse.",
+					bidHistory: [
+						{
+							bidder: "CoinCollector",
+							amount: 3500000,
+							time: Date.now() - 120000,
+						},
+						{
+							bidder: "Numismatist",
+							amount: 3600000,
+							time: Date.now() - 80000,
+						},
+					],
+				},
+				{
+					id: "a5",
+					title: "British Guiana One-Cent Magenta Stamp",
+					category: "stamps",
+					image:
+						"https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?auto=format&fit=crop&w=400&q=80",
+					endsAt: Date.now() + 1000 * 120,
+					startBid: 8000000,
+					bidStep: 500000,
+					condition: "Very Good",
+					year: "1856",
+					authenticity: "Philatelic Foundation Certified",
+					provenance: "Sotheby's",
+					description:
+						"The world's most valuable stamp - the British Guiana One-Cent Magenta. This unique stamp is the only known example of its kind. Printed in 1856 in British Guiana (now Guyana), it features a ship design and the colony's motto.",
+					bidHistory: [
+						{
+							bidder: "StampMaster",
+							amount: 8000000,
+							time: Date.now() - 100000,
+						},
+						{
+							bidder: "Philatelist",
+							amount: 8500000,
+							time: Date.now() - 60000,
+						},
+					],
+				},
+				{
+					id: "a6",
+					title: "1933 Double Eagle Gold Coin",
+					category: "coins",
+					image:
+						"https://images.unsplash.com/photo-1586075010923-2dd4570fb338?auto=format&fit=crop&w=400&q=80",
+					endsAt: Date.now() + 1000 * 180,
+					startBid: 15000000,
+					bidStep: 1000000,
+					condition: "Mint",
+					year: "1933",
+					authenticity: "NGC MS-65",
+					provenance: "Sotheby's",
+					description:
+						"The legendary 1933 Double Eagle, one of the most valuable coins in the world. This coin was never officially released into circulation due to the Gold Reserve Act of 1933. Only a few examples are known to exist, making it one of the rarest and most valuable coins in numismatic history.",
+					bidHistory: [
+						{
+							bidder: "GoldCollector",
+							amount: 15000000,
+							time: Date.now() - 150000,
+						},
+						{
+							bidder: "Numismatist",
+							amount: 16000000,
+							time: Date.now() - 90000,
+						},
+					],
+				},
+				{
+					id: "a7",
+					title: "Amazing Fantasy #15 (1962) - 1st Spider-Man",
+					category: "comics",
+					image:
+						"https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+					endsAt: Date.now() + 1000 * 100,
+					startBid: 1200000,
+					bidStep: 50000,
+					condition: "Near Mint",
+					year: "1962",
+					authenticity: "CGC Graded 8.5",
+					provenance: "Heritage Auctions",
+					description:
+						"The first appearance of Spider-Man in Amazing Fantasy #15. This iconic comic book introduced the world to Peter Parker and his alter ego. The issue features the classic cover of Spider-Man swinging through the city, marking the beginning of one of Marvel's most popular characters.",
+					bidHistory: [
+						{ bidder: "SpideyFan", amount: 1200000, time: Date.now() - 80000 },
+						{ bidder: "ComicsFan", amount: 1250000, time: Date.now() - 40000 },
+					],
+				},
+				{
+					id: "a8",
+					title: "1914 Cracker Jack Ty Cobb Card",
+					category: "trading-cards",
+					image:
+						"https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&w=400&q=80",
+					endsAt: Date.now() + 1000 * 70,
+					startBid: 75000,
+					bidStep: 5000,
+					condition: "Excellent",
+					year: "1914",
+					authenticity: "PSA Graded 6",
+					provenance: "Private Collection",
+					description:
+						"A rare 1914 Cracker Jack Ty Cobb card featuring the legendary baseball player. This card is part of the iconic Cracker Jack baseball card set, known for its distinctive design and historical significance in the hobby.",
+					bidHistory: [
+						{ bidder: "BaseballFan", amount: 75000, time: Date.now() - 60000 },
+						{
+							bidder: "CardCollector",
+							amount: 80000,
+							time: Date.now() - 30000,
+						},
+					],
+				},
+			];
+
+			let auctions = JSON.parse(JSON.stringify(SAMPLE_AUCTIONS));
+			let selectedAuctionId = auctions[0].id;
+			let currentView = "auctions";
+
+			let wonAuctions = [];
+
+			const auctionListSection = document.getElementById("auction-list");
+			const myBidsSection = document.getElementById("my-bids-section");
+			const myWinsSection = document.getElementById("my-wins-section");
+			const mobileMenu = document.getElementById("mobile-menu");
+			const notificationPanel = document.getElementById("notification-panel");
+			const searchModal = document.getElementById("search-modal-bg");
+			const featureModal = document.getElementById("feature-modal-bg");
+
+			function formatMoney(n) {
+				return "$" + n.toLocaleString();
+			}
+
+			function timeLeft(ms) {
+				if (ms < 0) ms = 0;
+				let s = Math.floor(ms / 1000);
+				const h = Math.floor(s / 3600);
+				s = s % 3600;
+				const m = Math.floor(s / 60);
+				s = s % 60;
+				return `${h > 0 ? String(h).padStart(2, "0") + ":" : ""}${String(
+					m
+				).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+			}
+
+			function ago(t) {
+				const now = Date.now();
+				const s = Math.floor((now - t) / 1000);
+				if (s < 20) return "just now";
+				if (s < 60) return `${s}s ago`;
+				if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+				return `${Math.floor(s / 3600)}h ago`;
+			}
+
+			function getCurrentBid(auction) {
+				if (!auction.bidHistory.length) return auction.startBid;
+				return auction.bidHistory[auction.bidHistory.length - 1].amount;
+			}
+
+			function getCurrentBidder(auction) {
+				if (!auction.bidHistory.length) return null;
+				return auction.bidHistory[auction.bidHistory.length - 1].bidder;
+			}
+
+			function switchView(view) {
+				currentView = view;
+
+				auctionListSection.classList.add("hidden");
+				myBidsSection.classList.add("hidden");
+				myWinsSection.classList.add("hidden");
+
+				if (view === "auctions") {
+					auctionListSection.classList.remove("hidden");
+					document.querySelector('a[href="#"]').classList.add("text-primary");
+					document
+						.querySelector('a[href="#my-bids"]')
+						.classList.remove("text-primary");
+					document
+						.querySelector('a[href="#my-wins"]')
+						.classList.remove("text-primary");
+				} else if (view === "my-bids") {
+					myBidsSection.classList.remove("hidden");
+					document
+						.querySelector('a[href="#"]')
+						.classList.remove("text-primary");
+					document
+						.querySelector('a[href="#my-bids"]')
+						.classList.add("text-primary");
+					document
+						.querySelector('a[href="#my-wins"]')
+						.classList.remove("text-primary");
+				} else if (view === "my-wins") {
+					myWinsSection.classList.remove("hidden");
+					document
+						.querySelector('a[href="#"]')
+						.classList.remove("text-primary");
+					document
+						.querySelector('a[href="#my-bids"]')
+						.classList.remove("text-primary");
+					document
+						.querySelector('a[href="#my-wins"]')
+						.classList.add("text-primary");
+				}
+
+				closeMobileMenu();
+			}
+
+			function renderAuctions() {
+				auctionListSection.innerHTML = "";
+				auctions.forEach((auction) => {
+					const card = document.createElement("div");
+					card.className =
+						"neu-card flex flex-col sm:flex-row gap-0 cursor-pointer overflow-hidden";
+					card.dataset.aid = auction.id;
+
+					const imgContainer = document.createElement("div");
+					imgContainer.className =
+						"relative w-full sm:w-56 h-56 sm:h-auto overflow-hidden bg-surface flex items-center justify-center";
+
+					const img = document.createElement("img");
+					img.className =
+						"w-full h-full object-cover transition-transform duration-300 hover:scale-105";
+					img.src = auction.image;
+					img.alt = auction.title;
+					img.onerror = () => {
+						img.style.display = "none";
+					};
+					imgContainer.appendChild(img);
+
+					const categoryBadge = document.createElement("div");
+					categoryBadge.className = "category-tag absolute top-3 left-3";
+					categoryBadge.textContent = auction.category.replace("-", " ");
+					imgContainer.appendChild(categoryBadge);
+
+					card.appendChild(imgContainer);
+
+					const details = document.createElement("div");
+					details.className = "flex-1 p-6 flex flex-col";
+
+					const title = document.createElement("div");
+					title.className = "text-xl font-bold mb-4 text-neutral-800";
+					title.innerText = auction.title;
+					details.appendChild(title);
+
+					const infoRow = document.createElement("div");
+					infoRow.className = "flex flex-wrap gap-8 mb-6";
+
+					const timerContainer = document.createElement("div");
+					timerContainer.className = "flex flex-col gap-1";
+
+					const timerLabel = document.createElement("span");
+					timerLabel.className = "text-xs text-neutral-500";
+					timerLabel.textContent = "Ends in";
+					timerContainer.appendChild(timerLabel);
+
+					const timer = document.createElement("span");
+					timer.className =
+						"auction-timer text-primary font-semibold text-base";
+					timer.id = "timer-" + auction.id;
+					timer.title = "Time left";
+					timer.innerText = timeLeft(auction.endsAt - Date.now());
+					timerContainer.appendChild(timer);
+
+					infoRow.appendChild(timerContainer);
+
+					const bidContainer = document.createElement("div");
+					bidContainer.className = "flex flex-col gap-1";
+
+					const bidLabel = document.createElement("span");
+					bidLabel.className = "text-xs text-neutral-500";
+					bidLabel.textContent = "Current bid";
+					bidContainer.appendChild(bidLabel);
+
+					const currentBid = document.createElement("span");
+					currentBid.className = "text-success font-semibold text-base";
+					currentBid.id = "bid-" + auction.id;
+					currentBid.title = "Current bid";
+					currentBid.innerText = formatMoney(getCurrentBid(auction));
+					bidContainer.appendChild(currentBid);
+
+					infoRow.appendChild(bidContainer);
+					details.appendChild(infoRow);
+
+					const bhTitle = document.createElement("div");
+					bhTitle.className =
+						"text-sm text-neutral-500 uppercase tracking-wide font-medium mb-2 flex items-center justify-between";
+					bhTitle.innerHTML = `Bid History <span class="text-xs font-normal normal-case">${auction.bidHistory.length} bids</span>`;
+					details.appendChild(bhTitle);
+
+					const historyList = document.createElement("ul");
+					historyList.className =
+						"neu-pressed rounded-xl p-3 text-sm space-y-2 max-h-32 overflow-y-auto";
+					historyList.id = "history-" + auction.id;
+
+					auction.bidHistory
+						.slice()
+						.reverse()
+						.forEach((bid) => {
+							const li = document.createElement("li");
+							li.className =
+								"bid-history-item flex justify-between items-center py-1.5 px-2 rounded-lg";
+							li.innerHTML = `
+                <span class="text-primary font-medium">${bid.bidder}</span>
+                <span class="text-success font-semibold">${formatMoney(
+									bid.amount
+								)}</span>
+                <span class="text-neutral-500 text-xs ml-4">${ago(
+									bid.time
+								)}</span>
+              `;
+							historyList.appendChild(li);
+						});
+					details.appendChild(historyList);
+
+					card.appendChild(details);
+
+					if (auction.id === selectedAuctionId) {
+						card.classList.add("ring-2", "ring-primary", "ring-opacity-40");
+					}
+
+					card.onclick = () => onAuctionCardClick(auction.id);
+					auctionListSection.appendChild(card);
+				});
+
+				document.getElementById("items-count").textContent = auctions.length;
+				document.getElementById("items-count-desktop").textContent =
+					auctions.length;
+			}
+
+			function updateLiveData() {
+				auctions.forEach((auction) => {
+					const timeElem = document.getElementById("timer-" + auction.id);
+					const bidElem = document.getElementById("bid-" + auction.id);
+					if (timeElem) {
+						let msLeft = auction.endsAt - Date.now();
+						if (msLeft < 0) msLeft = 0;
+						timeElem.innerText = timeLeft(msLeft);
+						if (msLeft === 0 && !auction.ended) {
+							auction.ended = true;
+							handleAuctionEnd(auction);
+						}
+					}
+					if (bidElem) {
+						bidElem.innerText = formatMoney(getCurrentBid(auction));
+					}
+				});
+				auctions.forEach((auction) => {
+					const his = document.getElementById("history-" + auction.id);
+					if (his) {
+						Array.from(his.children).forEach((li, idx) => {
+							const bidIdx = auction.bidHistory.length - 1 - idx;
+							if (auction.bidHistory[bidIdx]) {
+								const bid = auction.bidHistory[bidIdx];
+								const bidTimeSpan = li.querySelector(".text-xs.ml-4");
+								if (bidTimeSpan) bidTimeSpan.innerText = ago(bid.time);
+							}
+						});
+					}
+				});
+				updateToolbar();
+			}
+			setInterval(updateLiveData, 1000);
+
+			function updateToolbar() {
+				const auction = auctions.find((a) => a.id === selectedAuctionId);
+				const ttitle = document.getElementById("toolbar-title");
+				const tbid = document.getElementById("toolbar-bid");
+				const btn = document.getElementById("quickBidBtn");
+				const icon = document.getElementById("quickBidIcon");
+				if (!auction || currentView !== "auctions") {
+					ttitle.innerText = "Select an auction…";
+					tbid.innerText = "";
+					btn.disabled = true;
+					icon.innerText = "🔒";
+					return;
+				}
+				ttitle.innerText = auction.title;
+				tbid.innerText = formatMoney(getCurrentBid(auction));
+				btn.disabled = !!auction.ended;
+				icon.innerText = auction.ended ? "🔒" : "⚡";
+			}
+
+			function onAuctionCardClick(id) {
+				selectedAuctionId = id;
+				renderAuctions();
+				updateToolbar();
+				showAuctionDetail(id);
+			}
+
+			document.getElementById("quickBidBtn").onclick = () => {
+				const auction = auctions.find((a) => a.id === selectedAuctionId);
+				if (!auction || auction.ended) return;
+				showBiometricModal().then((success) => {
+					if (!success) return;
+					performBid(auction);
+				});
+			};
+
+			function showBiometricModal() {
+				return new Promise((resolve) => {
+					const modalBg = document.getElementById("biometric-modal-bg");
+					const scanner = document.getElementById("fingerprint-scanner");
+					const authMessage = document.getElementById("auth-message");
+
+					modalBg.classList.remove("hidden");
+					modalBg.classList.add("flex");
+
+					let done = false;
+
+					const cleanup = (res) => {
+						if (done) return;
+						done = true;
+
+						if (res) {
+							scanner.classList.add("verification-success");
+							setTimeout(() => {
+								modalBg.classList.add("hidden");
+								modalBg.classList.remove("flex");
+
+								setTimeout(() => {
+									scanner.classList.remove(
+										"scanner-active",
+										"verification-success"
+									);
+									authMessage.classList.add("hidden");
+								}, 300);
+								resolve(res);
+							}, 1000);
+						} else {
+							modalBg.classList.add("hidden");
+							modalBg.classList.remove("flex");
+
+							setTimeout(() => {
+								scanner.classList.remove(
+									"scanner-active",
+									"verification-success"
+								);
+								authMessage.classList.add("hidden");
+							}, 300);
+							resolve(res);
+						}
+					};
+
+					document.getElementById("biometric-auth-btn").onclick = async () => {
+						try {
+							scanner.classList.add("scanner-active");
+							authMessage.classList.remove("hidden");
+
+							setTimeout(() => {
+								cleanup(true);
+							}, 2000);
+						} catch (err) {
+							showNotification("warning", "Authentication failed", err.message);
+							cleanup(false);
+						}
+					};
+
+					document.getElementById("biometric-cancel-btn").onclick = () =>
+						cleanup(false);
+
+					modalBg.onkeydown = (e) => {
+						if (e.key === "Escape") cleanup(false);
+					};
+				});
+			}
+
+			function performBid(auction) {
+				const myName = "Yourself";
+				const prevBid = getCurrentBid(auction);
+				const newBid = prevBid + auction.bidStep;
+				const newBidObj = { bidder: myName, amount: newBid, time: Date.now() };
+				auction.bidHistory.push(newBidObj);
+				renderAuctions();
+
+				createConfetti();
+
+				showNotification(
+					"success",
+					"Bid placed!",
+					`You are now the highest bidder on<br><b>${
+						auction.title
+					}</b> at <b>${formatMoney(newBid)}</b>.`
+				);
+				simulateOutbid(auction);
+			}
+
+			function createConfetti() {
+				const colors = ["#2563eb", "#3b82f6", "#4ade80", "#10b981", "#f59e0b"];
+
+				for (let i = 0; i < 50; i++) {
+					const confetti = document.createElement("div");
+					confetti.className = "confetti";
+					confetti.style.left = Math.random() * 100 + "vw";
+					confetti.style.top = -20 + "px";
+					confetti.style.backgroundColor =
+						colors[Math.floor(Math.random() * colors.length)];
+					confetti.style.width = Math.random() * 10 + 5 + "px";
+					confetti.style.height = Math.random() * 10 + 5 + "px";
+					confetti.style.opacity = Math.random() + 0.5;
+					confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+					confetti.style.animationDuration = Math.random() * 3 + 2 + "s";
+					confetti.style.animationDelay = Math.random() * 5 + "s";
+
+					document.body.appendChild(confetti);
+
+					setTimeout(() => {
+						confetti.remove();
+					}, 5000);
+				}
+			}
+
+			function simulateOutbid(auction) {
+				const myName = "Yourself";
+				const msLeft = auction.endsAt - Date.now();
+				if (msLeft < 16000) return;
+
+				if (auction._outbidTimeout) clearTimeout(auction._outbidTimeout);
+				auction._outbidTimeout = setTimeout(() => {
+					if (getCurrentBidder(auction) !== myName || auction.ended) return;
+					const outbid = {
+						bidder: sampleOtherBidder(),
+						amount: getCurrentBid(auction) + auction.bidStep,
+						time: Date.now(),
+					};
+					auction.bidHistory.push(outbid);
+					renderAuctions();
+					if (selectedAuctionId === auction.id) {
+						showNotification(
+							"warning",
+							"You've been outbid!",
+							`<b>${outbid.bidder}</b> has placed a bid of <b>${formatMoney(
+								outbid.amount
+							)}</b> on <b>${auction.title}</b>.`
+						);
+					}
+				}, 10000 + Math.random() * 15000);
+			}
+
+			function sampleOtherBidder() {
+				const pool = [
+					"Collector99",
+					"RareFinds",
+					"Nostalgia88",
+					"JaneS",
+					"TommyB",
+					"OldCards",
+					"RookieHunter",
+				];
+				return pool[Math.floor(Math.random() * pool.length)];
+			}
+
+			function handleAuctionEnd(auction) {
+				const winner = getCurrentBidder(auction);
+				if (winner === "Yourself") {
+					showNotification(
+						"success",
+						"Auction won!",
+						`Congratulations! You won <b>${
+							auction.title
+						}</b> for <b>${formatMoney(getCurrentBid(auction))}</b>.`
+					);
+
+					wonAuctions.push({
+						id: auction.id,
+						title: auction.title,
+						price: getCurrentBid(auction),
+						category: auction.category,
+						wonDate: new Date(),
+						status: "ready-for-payment",
+					});
+
+					createConfetti();
+				} else {
+					showNotification(
+						"warning",
+						"Auction ended",
+						`The auction has ended. <b>${winner}</b> won <b>${
+							auction.title
+						}</b> with a final bid of <b>${formatMoney(
+							getCurrentBid(auction)
+						)}</b>.`
+					);
+				}
+				updateToolbar();
+			}
+
+			function showNotification(type, title, message) {
+				const container = document.getElementById("notification-container");
+				const notif = document.createElement("div");
+				notif.className = `neu-flat p-4 min-w-[280px] max-w-[380px] animate-slide-up flex items-start gap-3 ${
+					type === "success"
+						? "border-l-4 border-success"
+						: type === "warning"
+						? "border-l-4 border-warning"
+						: "border-l-4 border-primary"
+				}`;
+
+				notif.innerHTML = `
+          <div class="text-xl ${
+						type === "success"
+							? "text-success"
+							: type === "warning"
+							? "text-warning"
+							: "text-primary"
+					}">${
+					type === "success" ? "✅" : type === "warning" ? "⚠️" : "🔔"
+				}</div>
+          <div>
+            <div class="font-semibold">${title}</div>
+            <div class="text-neutral-600">${message}</div>
+          </div>
+        `;
+
+				container.appendChild(notif);
+
+				notif.addEventListener("mouseenter", () => {
+					notif.style.transform = "translateY(-3px)";
+					notif.style.boxShadow = "0 10px 25px rgba(0, 0, 0, 0.1)";
+				});
+
+				notif.addEventListener("mouseleave", () => {
+					notif.style.transform = "translateY(0)";
+					notif.style.boxShadow = "";
+				});
+
+				setTimeout(() => {
+					notif.style.opacity = "0";
+					notif.style.transform = "translateY(20px)";
+					setTimeout(() => notif.remove(), 300);
+				}, 5000);
+			}
+
+			function showAuctionDetail(id) {
+				const auction = auctions.find((a) => a.id === id);
+				if (!auction) return;
+
+				document.getElementById("detail-title").textContent = auction.title;
+				document.getElementById(
+					"detail-subtitle"
+				).textContent = `Category: ${auction.category.replace(
+					"-",
+					" "
+				)} • Auction ID: ${auction.id}`;
+				document.getElementById("main-image").src = auction.image;
+				document.getElementById("main-image").alt = auction.title;
+				document.getElementById("item-description").textContent =
+					auction.description;
+				document.getElementById("item-condition").textContent =
+					auction.condition;
+				document.getElementById("item-year").textContent = auction.year;
+				document.getElementById("item-authenticity").textContent =
+					auction.authenticity;
+				document.getElementById("item-provenance").textContent =
+					auction.provenance;
+
+				document.getElementById("detail-current-bid").textContent = formatMoney(
+					getCurrentBid(auction)
+				);
+				document.getElementById("detail-timer").textContent = timeLeft(
+					auction.endsAt - Date.now()
+				);
+				document.getElementById("detail-next-bid").textContent = formatMoney(
+					getCurrentBid(auction) + auction.bidStep
+				);
+
+				document.getElementById("detail-total-bids").textContent =
+					auction.bidHistory.length;
+				document.getElementById("detail-unique-bidders").textContent = new Set(
+					auction.bidHistory.map((b) => b.bidder)
+				).size;
+				document.getElementById("detail-start-price").textContent = formatMoney(
+					auction.startBid
+				);
+				document.getElementById("detail-bid-step").textContent = formatMoney(
+					auction.bidStep
+				);
+
+				const historyContainer = document.getElementById("detail-bid-history");
+				const bidHistoryCount = document.getElementById("bid-history-count");
+				historyContainer.innerHTML = "";
+
+				if (auction.bidHistory.length === 0) {
+					historyContainer.innerHTML =
+						'<div class="text-center text-neutral-500 py-4">No bids yet</div>';
+					bidHistoryCount.textContent = "";
+				} else {
+					bidHistoryCount.textContent = `${auction.bidHistory.length} bids`;
+					auction.bidHistory
+						.slice()
+						.reverse()
+						.forEach((bid) => {
+							const bidEl = document.createElement("div");
+							bidEl.className =
+								"bid-history-item flex justify-between items-center py-2.5 px-3 rounded-lg hover:bg-white/50 transition-colors";
+							bidEl.innerHTML = `
+                <div class="flex items-center gap-3">
+                  <span class="text-primary font-medium">${bid.bidder}</span>
+                  <span class="text-neutral-500 text-sm">${ago(bid.time)}</span>
+                </div>
+                <span class="text-success font-semibold">${formatMoney(
+									bid.amount
+								)}</span>
+              `;
+							historyContainer.appendChild(bidEl);
+						});
+				}
+
+				const modal = document.getElementById("auction-detail-modal");
+				modal.classList.remove("hidden");
+				modal.classList.add("flex");
+
+				currentZoom = 1;
+				mainImage.style.transform = "scale(1)";
+			}
+
+			document.getElementById("close-detail-modal").onclick = () => {
+				const modal = document.getElementById("auction-detail-modal");
+				modal.classList.add("hidden");
+				modal.classList.remove("flex");
+			};
+
+			document.getElementById("detail-bid-btn").onclick = () => {
+				const auction = auctions.find((a) => a.id === selectedAuctionId);
+				if (!auction || auction.ended) return;
+				showBiometricModal().then((success) => {
+					if (!success) return;
+					performBid(auction);
+					showAuctionDetail(auction.id);
+				});
+			};
+
+			let currentZoom = 1;
+			const mainImage = document.getElementById("main-image");
+
+			document.getElementById("zoom-in").onclick = () => {
+				currentZoom = Math.min(currentZoom + 0.25, 3);
+				mainImage.style.transform = `scale(${currentZoom})`;
+			};
+
+			document.getElementById("zoom-out").onclick = () => {
+				currentZoom = Math.max(currentZoom - 0.25, 1);
+				mainImage.style.transform = `scale(${currentZoom})`;
+			};
+
+			document.getElementById("reset-zoom").onclick = () => {
+				currentZoom = 1;
+				mainImage.style.transform = "scale(1)";
+			};
+
+			function openMobileMenu() {
+				mobileMenu.classList.add("open");
+			}
+
+			function closeMobileMenu() {
+				mobileMenu.classList.remove("open");
+			}
+
+			document
+				.getElementById("mobile-menu-btn")
+				.addEventListener("click", openMobileMenu);
+			document
+				.getElementById("close-mobile-menu")
+				.addEventListener("click", closeMobileMenu);
+
+			function openNotificationPanel() {
+				notificationPanel.classList.add("open");
+			}
+
+			function closeNotificationPanel() {
+				notificationPanel.classList.remove("open");
+			}
+
+			document
+				.getElementById("notifications-btn")
+				.addEventListener("click", openNotificationPanel);
+			document
+				.getElementById("close-notifications")
+				.addEventListener("click", closeNotificationPanel);
+			document.getElementById("mark-all-read").addEventListener("click", () => {
+				const badges = notificationPanel.querySelectorAll(
+					".bg-primary.rounded-full"
+				);
+				badges.forEach((badge) => badge.remove());
+
+				document.querySelector(".notification-badge").style.display = "none";
+
+				showNotification(
+					"success",
+					"Notifications cleared",
+					"All notifications have been marked as read."
+				);
+			});
+
+			function openSearchModal() {
+				searchModal.classList.remove("hidden");
+				searchModal.classList.add("flex");
+				setTimeout(() => {
+					document.getElementById("search-input").focus();
+				}, 100);
+			}
+
+			function closeSearchModal() {
+				searchModal.classList.add("hidden");
+				searchModal.classList.remove("flex");
+			}
+
+			document
+				.getElementById("search-btn")
+				.addEventListener("click", openSearchModal);
+			document
+				.getElementById("close-search")
+				.addEventListener("click", closeSearchModal);
+			document
+				.getElementById("search-input")
+				.addEventListener("keydown", (e) => {
+					if (e.key === "Enter") {
+						const searchTerm = e.target.value.trim().toLowerCase();
+
+						if (searchTerm.length > 0) {
+							closeSearchModal();
+
+							const filteredAuctions = SAMPLE_AUCTIONS.filter(
+								(auction) =>
+									auction.title.toLowerCase().includes(searchTerm) ||
+									auction.category.toLowerCase().includes(searchTerm) ||
+									auction.description.toLowerCase().includes(searchTerm)
+							);
+
+							auctions = filteredAuctions;
+							renderAuctions();
+
+							showNotification(
+								"success",
+								"Search Results",
+								`Found ${filteredAuctions.length} results for "${searchTerm}"`
+							);
+						}
+					}
+				});
+
+			function showFeatureModal() {
+				featureModal.classList.remove("hidden");
+				featureModal.classList.add("flex");
+			}
+
+			function closeFeatureModal() {
+				featureModal.classList.add("hidden");
+				featureModal.classList.remove("flex");
+			}
+
+			document
+				.getElementById("feature-close-btn")
+				.addEventListener("click", closeFeatureModal);
+
+			document.querySelectorAll(".neu-btn").forEach((btn) => {
+				if (btn.id === "mobile-filter-toggle") {
+					btn.addEventListener("click", () => {
+						document
+							.getElementById("sidebar")
+							.classList.toggle("-translate-x-full");
+					});
+				}
+			});
+
+			document.querySelectorAll('a[href="#"]').forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					switchView("auctions");
+				});
+			});
+
+			document.querySelectorAll('a[href="#my-bids"]').forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					switchView("my-bids");
+				});
+			});
+
+			document.querySelectorAll('a[href="#my-wins"]').forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					switchView("my-wins");
+				});
+			});
+
+			document.querySelectorAll('a[href="#account"]').forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					showFeatureModal();
+				});
+			});
+
+			document.querySelectorAll('a[href="#settings"]').forEach((link) => {
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					showFeatureModal();
+				});
+			});
+
+			let filterState = {
+				priceRange: { min: null, max: null },
+				sortBy: "ending-soon",
+				categories: [],
+			};
+
+			function applyFilters() {
+				let filteredAuctions = [...SAMPLE_AUCTIONS];
+
+				if (
+					filterState.priceRange.min !== null ||
+					filterState.priceRange.max !== null
+				) {
+					filteredAuctions = filteredAuctions.filter((auction) => {
+						const currentBid = getCurrentBid(auction);
+						const minPrice =
+							filterState.priceRange.min !== null
+								? filterState.priceRange.min
+								: 0;
+						const maxPrice =
+							filterState.priceRange.max !== null
+								? filterState.priceRange.max
+								: Infinity;
+
+						return currentBid >= minPrice && currentBid <= maxPrice;
+					});
+				}
+
+				if (filterState.categories.length > 0) {
+					filteredAuctions = filteredAuctions.filter((auction) => {
+						return filterState.categories.includes(auction.category);
+					});
+				}
+
+				switch (filterState.sortBy) {
+					case "price-low-high":
+						filteredAuctions.sort((a, b) => {
+							const bidA = getCurrentBid(a);
+							const bidB = getCurrentBid(b);
+							return bidA - bidB;
+						});
+						break;
+					case "price-high-low":
+						filteredAuctions.sort((a, b) => {
+							const bidA = getCurrentBid(a);
+							const bidB = getCurrentBid(b);
+							return bidB - bidA;
+						});
+						break;
+					case "most-bids":
+						filteredAuctions.sort((a, b) => {
+							const bidsA = a.bidHistory.length;
+							const bidsB = b.bidHistory.length;
+							if (bidsB !== bidsA) return bidsB - bidsA;
+							return getCurrentBid(b) - getCurrentBid(a);
+						});
+						break;
+					case "newest":
+						filteredAuctions.sort((a, b) => {
+							return b.endsAt - a.endsAt;
+						});
+						break;
+					case "ending-soon":
+					default:
+						filteredAuctions.sort((a, b) => {
+							const timeA = a.endsAt - Date.now();
+							const timeB = b.endsAt - Date.now();
+							return timeA - timeB;
+						});
+				}
+
+				auctions = filteredAuctions;
+				renderAuctions();
+
+				document.getElementById("items-count").textContent =
+					filteredAuctions.length;
+				document.getElementById("items-count-desktop").textContent =
+					filteredAuctions.length;
+
+				const filterSummary = [];
+				if (
+					filterState.priceRange.min !== null ||
+					filterState.priceRange.max !== null
+				) {
+					const priceRange = [];
+					if (filterState.priceRange.min !== null)
+						priceRange.push(`$${filterState.priceRange.min.toLocaleString()}`);
+					if (filterState.priceRange.max !== null)
+						priceRange.push(`$${filterState.priceRange.max.toLocaleString()}`);
+					filterSummary.push(`Price: ${priceRange.join(" - ")}`);
+				}
+
+				if (filterState.categories.length > 0) {
+					filterSummary.push(
+						`Categories: ${filterState.categories
+							.map((c) => c.replace("-", " "))
+							.join(", ")}`
+					);
+				}
+
+				const sortLabels = {
+					"ending-soon": "Ending Soon",
+					"price-low-high": "Price: Low to High",
+					"price-high-low": "Price: High to Low",
+					"most-bids": "Most Bids",
+					newest: "Newest First",
+				};
+				filterSummary.push(`Sorted by: ${sortLabels[filterState.sortBy]}`);
+
+				showNotification(
+					"success",
+					"Filters Applied",
+					`Showing ${filteredAuctions.length} items${
+						filterSummary.length > 0 ? " with " + filterSummary.join(", ") : ""
+					}`
+				);
+			}
+
+			function clearFilters() {
+				document.getElementById("min-price").value = "";
+				document.getElementById("max-price").value = "";
+				document.getElementById("sort-options").value = "ending-soon";
+				document.getElementById("min-price-desktop").value = "";
+				document.getElementById("max-price-desktop").value = "";
+				document.getElementById("sort-options-desktop").value = "ending-soon";
+
+				document
+					.querySelectorAll('input[type="checkbox"]')
+					.forEach((checkbox) => {
+						checkbox.checked = false;
+					});
+
+				filterState = {
+					priceRange: { min: null, max: null },
+					sortBy: "ending-soon",
+					categories: [],
+				};
+				auctions = JSON.parse(JSON.stringify(SAMPLE_AUCTIONS));
+				renderAuctions();
+
+				showNotification(
+					"success",
+					"Filters Cleared",
+					"All filters have been reset."
+				);
+			}
+
+			function validatePriceRange(min, max) {
+				if (min !== null && max !== null && min > max) {
+					showNotification(
+						"warning",
+						"Invalid Price Range",
+						"Minimum price cannot be greater than maximum price."
+					);
+					return false;
+				}
+
+				if (min !== null && min < 0) {
+					showNotification(
+						"warning",
+						"Invalid Price",
+						"Minimum price cannot be negative."
+					);
+					return false;
+				}
+
+				if (max !== null && max < 0) {
+					showNotification(
+						"warning",
+						"Invalid Price",
+						"Maximum price cannot be negative."
+					);
+					return false;
+				}
+
+				return true;
+			}
+
+			document
+				.getElementById("clear-filters")
+				.addEventListener("click", clearFilters);
+			document
+				.getElementById("clear-filters-desktop")
+				.addEventListener("click", clearFilters);
+			document
+				.getElementById("apply-filters")
+				.addEventListener("click", applyFilters);
+			document
+				.getElementById("apply-filters-desktop")
+				.addEventListener("click", applyFilters);
+
+			document
+				.getElementById("min-price")
+				.addEventListener("change", function () {
+					const min = this.value ? parseInt(this.value) : null;
+					const max = document.getElementById("max-price").value
+						? parseInt(document.getElementById("max-price").value)
+						: null;
+
+					if (validatePriceRange(min, max)) {
+						filterState.priceRange.min = min;
+						document.getElementById("min-price-desktop").value =
+							min !== null ? min : "";
+					} else {
+						this.value = filterState.priceRange.min || "";
+					}
+				});
+
+			document
+				.getElementById("max-price")
+				.addEventListener("change", function () {
+					const min = document.getElementById("min-price").value
+						? parseInt(document.getElementById("min-price").value)
+						: null;
+					const max = this.value ? parseInt(this.value) : null;
+
+					if (validatePriceRange(min, max)) {
+						filterState.priceRange.max = max;
+						document.getElementById("max-price-desktop").value =
+							max !== null ? max : "";
+					} else {
+						this.value = filterState.priceRange.max || "";
+					}
+				});
+
+			document
+				.getElementById("min-price-desktop")
+				.addEventListener("change", function () {
+					const min = this.value ? parseInt(this.value) : null;
+					const max = document.getElementById("max-price-desktop").value
+						? parseInt(document.getElementById("max-price-desktop").value)
+						: null;
+
+					if (validatePriceRange(min, max)) {
+						filterState.priceRange.min = min;
+						document.getElementById("min-price").value =
+							min !== null ? min : "";
+					} else {
+						this.value = filterState.priceRange.min || "";
+					}
+				});
+
+			document
+				.getElementById("max-price-desktop")
+				.addEventListener("change", function () {
+					const min = document.getElementById("min-price-desktop").value
+						? parseInt(document.getElementById("min-price-desktop").value)
+						: null;
+					const max = this.value ? parseInt(this.value) : null;
+
+					if (validatePriceRange(min, max)) {
+						filterState.priceRange.max = max;
+						document.getElementById("max-price").value =
+							max !== null ? max : "";
+					} else {
+						this.value = filterState.priceRange.max || "";
+					}
+				});
+
+			document
+				.getElementById("sort-options")
+				.addEventListener("change", function () {
+					filterState.sortBy = this.value;
+					document.getElementById("sort-options-desktop").value = this.value;
+				});
+
+			document
+				.getElementById("sort-options-desktop")
+				.addEventListener("change", function () {
+					filterState.sortBy = this.value;
+					document.getElementById("sort-options").value = this.value;
+				});
+
+			document
+				.querySelectorAll('input[type="checkbox"]')
+				.forEach((checkbox) => {
+					checkbox.addEventListener("change", function () {
+						const category = this.value;
+
+						if (this.checked) {
+							if (!filterState.categories.includes(category)) {
+								filterState.categories.push(category);
+							}
+						} else {
+							filterState.categories = filterState.categories.filter(
+								(c) => c !== category
+							);
+						}
+
+						document
+							.querySelectorAll(`input[type="checkbox"][value="${category}"]`)
+							.forEach((cb) => {
+								cb.checked = this.checked;
+							});
+					});
+				});
+
+			document.addEventListener("keydown", function (e) {
+				if (e.key === "Escape") {
+					if (
+						!document
+							.getElementById("auction-detail-modal")
+							.classList.contains("hidden")
+					) {
+						document.getElementById("close-detail-modal").click();
+					} else if (
+						!document
+							.getElementById("biometric-modal-bg")
+							.classList.contains("hidden")
+					) {
+						document.getElementById("biometric-cancel-btn").click();
+					} else if (
+						!document
+							.getElementById("search-modal-bg")
+							.classList.contains("hidden")
+					) {
+						document.getElementById("close-search").click();
+					} else if (
+						!document
+							.getElementById("feature-modal-bg")
+							.classList.contains("hidden")
+					) {
+						document.getElementById("feature-close-btn").click();
+					} else if (notificationPanel.classList.contains("open")) {
+						closeNotificationPanel();
+					} else if (mobileMenu.classList.contains("open")) {
+						closeMobileMenu();
+					}
+				}
+			});
+
+			function preloadImages() {
+				const images = [
+					"https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=2070&auto=format&fit=crop",
+					"https://images.unsplash.com/photo-1630918295202-9715cc167cc6?q=80&w=1974&auto=format&fit=crop",
+					"https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+				];
+
+				images.forEach((src) => {
+					const img = new Image();
+					img.src = src;
+				});
+			}
+
+			function init() {
+				renderAuctions();
+				updateToolbar();
+				preloadImages();
+
+				setTimeout(() => {
+					showNotification(
+						"success",
+						"Welcome to RareBid",
+						"Browse our exclusive collection of rare collectibles and place your bids securely."
+					);
+				}, 1000);
+			}
+
+			init();
+		</script>
+	</body>
+</html>
