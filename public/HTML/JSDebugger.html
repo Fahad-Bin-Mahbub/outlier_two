@@ -1,0 +1,2495 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>JS Debugging Toolkit Pro</title>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/addon/edit/matchbrackets.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/addon/edit/closebrackets.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/addon/comment/comment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/addon/selection/active-line.min.js"></script>
+
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/dracula.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/theme/material.min.css"
+		/>
+
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+		/>
+
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+
+		<style>
+			:root {
+				--bg-primary: #1e1e2e;
+				--bg-secondary: #282a36;
+				--bg-tertiary: #44475a;
+				--text-primary: #f8f8f2;
+				--text-secondary: #bd93f9;
+				--text-muted: #6272a4;
+				--accent-primary: #8be9fd;
+				--accent-secondary: #50fa7b;
+				--accent-hover: #bd93f9;
+				--border-color: #44475a;
+				--error-color: #ff5555;
+				--warning-color: #ffb86c;
+				--success-color: #50fa7b;
+				--info-color: #8be9fd;
+				--shadow-color: rgba(0, 0, 0, 0.5);
+			}
+
+			.light-theme {
+				--bg-primary: #f8f9fa;
+				--bg-secondary: #e9ecef;
+				--bg-tertiary: #dee2e6;
+				--text-primary: #212529;
+				--text-secondary: #495057;
+				--text-muted: #6c757d;
+				--accent-primary: #0d6efd;
+				--accent-secondary: #198754;
+				--accent-hover: #6610f2;
+				--border-color: #ced4da;
+				--error-color: #dc3545;
+				--warning-color: #ffc107;
+				--success-color: #198754;
+				--info-color: #0dcaf0;
+				--shadow-color: rgba(0, 0, 0, 0.15);
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family: "Inter", sans-serif;
+				background-color: var(--bg-primary);
+				color: var(--text-primary);
+				overflow: hidden;
+				height: 100vh;
+				width: 100vw;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.container {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
+				overflow: hidden;
+			}
+
+			.header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0.5rem 0.75rem;
+				background-color: var(--bg-secondary);
+				border-bottom: 1px solid var(--border-color);
+				box-shadow: 0 2px 4px var(--shadow-color);
+				z-index: 10;
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-weight: 700;
+				color: var(--accent-primary);
+				user-select: none;
+			}
+
+			.controls {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+			}
+
+			.btn {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.5rem;
+				border-radius: 0.375rem;
+				border: none;
+				font-weight: 500;
+				font-size: 0.875rem;
+				cursor: pointer;
+				transition: all 0.2s;
+				color: var(--text-primary);
+				background-color: var(--bg-tertiary);
+				min-width: 36px;
+				min-height: 36px;
+			}
+
+			.btn:hover {
+				opacity: 0.9;
+			}
+
+			.btn:active {
+				transform: translateY(1px);
+			}
+
+			.btn-primary {
+				background-color: var(--accent-primary);
+				color: var(--bg-primary);
+			}
+
+			.btn-success {
+				background-color: var(--success-color);
+				color: var(--bg-primary);
+			}
+
+			.btn-danger {
+				background-color: var(--error-color);
+				color: var(--text-primary);
+			}
+
+			.btn:disabled {
+				opacity: 0.5;
+				cursor: not-allowed;
+			}
+
+			.main-content {
+				display: flex;
+				flex: 1;
+				overflow: hidden;
+			}
+
+			.editor-panel {
+				width: 60%;
+				min-width: 200px;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+				border-right: 1px solid var(--border-color);
+			}
+
+			.editor-toolbar {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0.5rem;
+				background-color: var(--bg-secondary);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.editor-container {
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.CodeMirror {
+				height: 100% !important;
+				font-family: "JetBrains Mono", monospace;
+				font-size: 14px;
+				line-height: 1.6;
+			}
+
+			.cm-s-dracula .CodeMirror-gutters {
+				background-color: var(--bg-secondary) !important;
+				border-right: 1px solid var(--border-color) !important;
+			}
+
+			.cm-s-dracula .CodeMirror-linenumber {
+				color: var(--text-muted) !important;
+			}
+
+			.breakpoint {
+				color: var(--error-color);
+				font-weight: bold;
+			}
+
+			.CodeMirror-activeline-background {
+				background-color: rgba(255, 255, 255, 0.1) !important;
+			}
+
+			.debugging-line {
+				background-color: rgba(255, 184, 108, 0.2) !important;
+			}
+
+			.output-panel {
+				width: 40%;
+				min-width: 200px;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.resizer {
+				width: 6px;
+				cursor: col-resize;
+				background-color: var(--border-color);
+				transition: background-color 0.2s;
+			}
+
+			.resizer:hover,
+			.resizer.dragging {
+				background-color: var(--accent-primary);
+			}
+
+			.resizer-horizontal {
+				width: 100%;
+				height: 6px;
+				cursor: row-resize;
+				background-color: var(--border-color);
+				transition: background-color 0.2s;
+				display: none;
+			}
+
+			.resizer-horizontal:hover,
+			.resizer-horizontal.dragging {
+				background-color: var(--accent-primary);
+			}
+
+			.tabs {
+				display: flex;
+				background-color: var(--bg-secondary);
+				border-bottom: 1px solid var(--border-color);
+				overflow-x: auto;
+				scrollbar-width: thin;
+			}
+
+			.tab {
+				padding: 0.65rem 0.75rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s;
+				user-select: none;
+				white-space: nowrap;
+				color: var(--text-primary);
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.875rem;
+			}
+
+			.tab:hover {
+				background-color: rgba(255, 255, 255, 0.05);
+			}
+
+			.tab.active {
+				color: var(--accent-primary);
+				border-bottom: 2px solid var(--accent-primary);
+			}
+
+			.tab-content {
+				flex: 1;
+				overflow: hidden;
+			}
+
+			.tab-pane {
+				height: 100%;
+				display: none;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.tab-pane.active {
+				display: flex;
+			}
+
+			.console-container {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.console-output {
+				flex: 1;
+				overflow-y: auto;
+				padding: 0.5rem;
+				font-family: "JetBrains Mono", monospace;
+				font-size: 0.75rem;
+				line-height: 1.5;
+				background-color: var(--bg-primary);
+			}
+
+			.console-input-wrapper {
+				display: flex;
+				align-items: center;
+				padding: 0.5rem;
+				background-color: var(--bg-secondary);
+				border-top: 1px solid var(--border-color);
+			}
+
+			.console-input {
+				flex: 1;
+				padding: 0.5rem;
+				background-color: var(--bg-tertiary);
+				color: var(--text-primary);
+				border: 1px solid var(--border-color);
+				border-radius: 0.25rem;
+				outline: none;
+				font-family: "JetBrains Mono", monospace;
+				font-size: 0.75rem;
+			}
+
+			.console-input:focus {
+				border-color: var(--accent-primary);
+			}
+
+			.console-line {
+				padding: 0.25rem 0.375rem;
+				border-radius: 0.25rem;
+				margin-bottom: 0.25rem;
+				white-space: pre-wrap;
+				word-break: break-word;
+			}
+
+			.console-line.log {
+				color: var(--text-primary);
+			}
+
+			.console-line.info {
+				color: var(--info-color);
+				background-color: rgba(139, 233, 253, 0.1);
+			}
+
+			.console-line.error {
+				color: var(--error-color);
+				background-color: rgba(255, 85, 85, 0.1);
+			}
+
+			.console-line.warning {
+				color: var(--warning-color);
+				background-color: rgba(255, 184, 108, 0.1);
+			}
+
+			.console-line.success {
+				color: var(--success-color);
+				background-color: rgba(80, 250, 123, 0.1);
+			}
+
+			.variables-container {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.variables-header {
+				display: flex;
+				align-items: center;
+				padding: 0.5rem;
+				gap: 0.5rem;
+				background-color: var(--bg-secondary);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.variables-input {
+				flex: 1;
+				padding: 0.5rem;
+				background-color: var(--bg-tertiary);
+				color: var(--text-primary);
+				border: 1px solid var(--border-color);
+				border-radius: 0.25rem;
+				outline: none;
+				font-size: 0.75rem;
+			}
+
+			.variables-input:focus {
+				border-color: var(--accent-primary);
+			}
+
+			.variables-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: 0.5rem;
+			}
+
+			.variable-item {
+				display: flex;
+				justify-content: space-between;
+				padding: 0.5rem;
+				margin-bottom: 0.5rem;
+				background-color: var(--bg-secondary);
+				border-radius: 0.375rem;
+				border-left: 3px solid var(--accent-primary);
+				font-size: 0.75rem;
+			}
+
+			.variable-name {
+				font-weight: 500;
+				color: var(--accent-primary);
+				font-family: "JetBrains Mono", monospace;
+			}
+
+			.variable-value {
+				font-family: "JetBrains Mono", monospace;
+				color: var(--text-secondary);
+				max-width: 60%;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.variable-actions {
+				display: flex;
+				gap: 0.5rem;
+			}
+
+			.variable-remove {
+				background: none;
+				border: none;
+				color: var(--error-color);
+				cursor: pointer;
+				font-size: 1rem;
+			}
+
+			.breakpoints-container {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.breakpoints-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: 0.5rem;
+			}
+
+			.breakpoint-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0.5rem;
+				margin-bottom: 0.5rem;
+				background-color: var(--bg-secondary);
+				border-radius: 0.375rem;
+				border-left: 3px solid var(--error-color);
+				font-size: 0.75rem;
+			}
+
+			.breakpoint-line {
+				font-weight: 500;
+			}
+
+			.breakpoint-code {
+				color: var(--text-muted);
+				font-family: "JetBrains Mono", monospace;
+				font-size: 0.75rem;
+				margin-top: 0.125rem;
+			}
+
+			.breakpoint-remove {
+				background: none;
+				border: none;
+				color: var(--error-color);
+				cursor: pointer;
+				font-size: 1rem;
+			}
+
+			.timeline-container {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				overflow: hidden;
+			}
+
+			.timeline-list {
+				flex: 1;
+				overflow-y: auto;
+				padding: 0.5rem;
+			}
+
+			.timeline-item {
+				display: flex;
+				gap: 0.5rem;
+				padding: 0.5rem;
+				margin-bottom: 0.5rem;
+				background-color: var(--bg-secondary);
+				border-radius: 0.375rem;
+				border-left: 3px solid var(--info-color);
+				font-size: 0.75rem;
+			}
+
+			.timeline-time {
+				color: var(--text-muted);
+				font-size: 0.75rem;
+				white-space: nowrap;
+			}
+
+			.status-bar {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 0.25rem 0.5rem;
+				background-color: var(--bg-secondary);
+				border-top: 1px solid var(--border-color);
+				font-size: 0.7rem;
+				color: var(--text-muted);
+			}
+
+			.status-item {
+				display: flex;
+				align-items: center;
+				gap: 0.25rem;
+			}
+
+			.theme-switch {
+				position: relative;
+				display: inline-block;
+				width: 40px;
+				height: 20px;
+			}
+
+			.theme-switch input {
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			.slider {
+				position: absolute;
+				cursor: pointer;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: var(--bg-tertiary);
+				transition: 0.4s;
+				border-radius: 20px;
+			}
+
+			.slider:before {
+				position: absolute;
+				content: "";
+				height: 16px;
+				width: 16px;
+				left: 2px;
+				bottom: 2px;
+				background-color: white;
+				transition: 0.4s;
+				border-radius: 50%;
+			}
+
+			input:checked + .slider {
+				background-color: var(--accent-primary);
+			}
+
+			input:checked + .slider:before {
+				transform: translateX(20px);
+			}
+
+			.modal-backdrop {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 100;
+				display: none;
+			}
+
+			.modal {
+				background-color: var(--bg-secondary);
+				border-radius: 0.5rem;
+				width: 90%;
+				max-width: 500px;
+				max-height: 80vh;
+				overflow-y: auto;
+			}
+
+			.modal-header {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 1rem;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.modal-title {
+				font-size: 1.25rem;
+				font-weight: 600;
+			}
+
+			.modal-close {
+				background: none;
+				border: none;
+				font-size: 1.5rem;
+				color: var(--text-muted);
+				cursor: pointer;
+			}
+
+			.modal-close:hover {
+				color: var(--text-primary);
+			}
+
+			.modal-body {
+				padding: 1rem;
+				overflow-y: auto;
+			}
+
+			.modal-footer {
+				display: flex;
+				justify-content: flex-end;
+				gap: 0.75rem;
+				padding: 1rem;
+				border-top: 1px solid var(--border-color);
+			}
+
+			.form-group {
+				margin-bottom: 1rem;
+			}
+
+			.form-label {
+				display: block;
+				margin-bottom: 0.5rem;
+				font-weight: 500;
+			}
+
+			.form-control {
+				width: 100%;
+				padding: 0.5rem;
+				background-color: var(--bg-tertiary);
+				color: var(--text-primary);
+				border: 1px solid var(--border-color);
+				border-radius: 0.25rem;
+				outline: none;
+			}
+
+			.form-check {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.form-check-input {
+				width: 1rem;
+				height: 1rem;
+			}
+
+			.toast-container {
+				position: fixed;
+				bottom: 1rem;
+				right: 1rem;
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+				z-index: 1000;
+			}
+
+			.toast {
+				min-width: 200px;
+				max-width: 300px;
+				background-color: var(--bg-secondary);
+				color: var(--text-primary);
+				border-radius: 0.375rem;
+				padding: 0.5rem 0.75rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				box-shadow: 0 4px 6px var(--shadow-color);
+				animation: slideInRight 0.3s;
+				font-size: 0.75rem;
+			}
+
+			.toast-success {
+				border-left: 4px solid var(--success-color);
+			}
+
+			.toast-error {
+				border-left: 4px solid var(--error-color);
+			}
+
+			.toast-warning {
+				border-left: 4px solid var(--warning-color);
+			}
+
+			.toast-info {
+				border-left: 4px solid var(--info-color);
+			}
+
+			.toast-icon {
+				font-size: 1rem;
+			}
+
+			.toast-content {
+				flex: 1;
+			}
+
+			.toast-close {
+				background: none;
+				border: none;
+				color: var(--text-muted);
+				cursor: pointer;
+				font-size: 0.875rem;
+			}
+
+			.loader {
+				display: inline-block;
+				width: 1.5rem;
+				height: 1.5rem;
+				border: 3px solid rgba(255, 255, 255, 0.3);
+				border-radius: 50%;
+				border-top-color: var(--accent-primary);
+				animation: spin 1s ease-in-out infinite;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			@keyframes slideInRight {
+				from {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			.empty-state {
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				padding: 1rem;
+				text-align: center;
+				color: var(--text-muted);
+			}
+
+			.empty-state-icon {
+				font-size: 2rem;
+				margin-bottom: 0.5rem;
+				opacity: 0.7;
+			}
+
+			.empty-state-text {
+				font-size: 0.75rem;
+				max-width: 250px;
+				line-height: 1.5;
+			}
+
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: var(--bg-secondary);
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--bg-tertiary);
+				border-radius: 3px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: var(--accent-primary);
+			}
+
+			@media (max-width: 768px) {
+				.main-content {
+					flex-direction: column;
+				}
+
+				.editor-panel {
+					width: 100% !important;
+					height: 50% !important;
+					border-right: none;
+					border-bottom: 1px solid var(--border-color);
+				}
+
+				.output-panel {
+					width: 100% !important;
+					height: 50% !important;
+				}
+
+				.resizer {
+					display: none;
+				}
+
+				.resizer-horizontal {
+					display: block;
+				}
+
+				.btn-text {
+					display: none;
+				}
+
+				.logo-text {
+					display: none;
+				}
+
+				.header {
+					padding: 0.375rem 0.5rem;
+				}
+
+				.tab {
+					padding: 0.5rem 0.625rem;
+					font-size: 0.75rem;
+				}
+
+				.status-bar {
+					padding: 0.2rem 0.375rem;
+					font-size: 0.65rem;
+				}
+
+				.btn {
+					min-width: 32px;
+					min-height: 32px;
+					padding: 0.375rem;
+				}
+			}
+
+			@media (max-width: 320px) {
+				.controls {
+					gap: 0.25rem;
+				}
+
+				.btn {
+					min-width: 28px;
+					min-height: 28px;
+					padding: 0.25rem;
+					font-size: 0.75rem;
+				}
+
+				.theme-switch {
+					width: 32px;
+					height: 16px;
+				}
+
+				.slider:before {
+					height: 12px;
+					width: 12px;
+					left: 2px;
+					bottom: 2px;
+				}
+
+				input:checked + .slider:before {
+					transform: translateX(16px);
+				}
+
+				.tab {
+					padding: 0.375rem 0.5rem;
+					font-size: 0.7rem;
+				}
+
+				.console-line,
+				.timeline-item,
+				.breakpoint-item,
+				.variable-item {
+					padding: 0.375rem;
+					margin-bottom: 0.375rem;
+				}
+
+				.console-input {
+					padding: 0.375rem;
+				}
+
+				.header {
+					padding: 0.25rem 0.375rem;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header class="header">
+				<div class="logo">
+					<i class="fas fa-bug"></i>
+					<span class="logo-text">JS Debugging Toolkit Pro</span>
+				</div>
+				<div class="controls">
+					<button id="run-btn" class="btn btn-success" title="Run code (F5)">
+						<i class="fas fa-play"></i>
+						<span class="btn-text">Run</span>
+					</button>
+					<button
+						id="continue-btn"
+						class="btn btn-primary"
+						title="Continue to next breakpoint"
+						disabled
+					>
+						<i class="fas fa-forward"></i>
+						<span class="btn-text">Continue</span>
+					</button>
+					<button
+						id="stop-btn"
+						class="btn btn-danger"
+						title="Stop execution"
+						disabled
+					>
+						<i class="fas fa-stop"></i>
+						<span class="btn-text">Stop</span>
+					</button>
+					<button id="clear-btn" class="btn" title="Clear console">
+						<i class="fas fa-trash"></i>
+						<span class="btn-text">Clear</span>
+					</button>
+					<button id="settings-btn" class="btn" title="Settings">
+						<i class="fas fa-cog"></i>
+						<span class="btn-text">Settings</span>
+					</button>
+					<label class="theme-switch" title="Toggle theme">
+						<input type="checkbox" id="theme-toggle" />
+						<span class="slider"></span>
+					</label>
+				</div>
+			</header>
+
+			<div class="main-content">
+				<div class="editor-panel" id="editor-panel">
+					<div class="editor-toolbar">
+						<div>
+							<button id="format-btn" class="btn" title="Format code">
+								<i class="fas fa-indent"></i>
+							</button>
+						</div>
+						<div>
+							<button id="copy-btn" class="btn" title="Copy code">
+								<i class="fas fa-copy"></i>
+							</button>
+							<button id="save-btn" class="btn" title="Save to localStorage">
+								<i class="fas fa-save"></i>
+							</button>
+						</div>
+					</div>
+					<div class="editor-container">
+						<textarea id="code-editor">
+
+let a = 5;
+const b = 10;
+var c = 15;
+console.log('Sum:', a + b + c);
+</textarea
+						>
+					</div>
+				</div>
+
+				<div class="resizer" id="vertical-resizer"></div>
+
+				<div class="output-panel" id="output-panel">
+					<div class="tabs">
+						<div class="tab active" data-tab="console">
+							<i class="fas fa-terminal"></i> Console
+						</div>
+						<div class="tab" data-tab="variables">
+							<i class="fas fa-eye"></i> Variables
+						</div>
+						<div class="tab" data-tab="breakpoints">
+							<i class="fas fa-pause-circle"></i> Breakpoints
+						</div>
+						<div class="tab" data-tab="timeline">
+							<i class="fas fa-history"></i> Timeline
+						</div>
+					</div>
+
+					<div class="tab-content">
+						<div class="tab-pane active" id="console-tab">
+							<div class="console-container">
+								<div class="console-output" id="console-output">
+									<div class="console-line info">
+										Welcome to JS Debugging Toolkit Pro! Run your code with the
+										"Run" button or press F5.
+									</div>
+								</div>
+								<div class="console-input-wrapper">
+									<input
+										type="text"
+										class="console-input"
+										id="console-input"
+										placeholder="Enter JavaScript expressions..."
+									/>
+								</div>
+							</div>
+						</div>
+
+						<div class="tab-pane" id="variables-tab">
+							<div class="variables-container">
+								<div class="variables-header">
+									<input
+										type="text"
+										class="variables-input"
+										id="variables-input"
+										placeholder="Add variable to watch..."
+									/>
+									<button id="add-watch-btn" class="btn btn-primary">
+										<i class="fas fa-plus"></i>
+									</button>
+								</div>
+								<div class="variables-list" id="variables-list">
+									<div class="empty-state">
+										<i class="fas fa-eye-slash empty-state-icon"></i>
+										<p class="empty-state-text">
+											No variables being watched. Run your code or add variables
+											manually.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="tab-pane" id="breakpoints-tab">
+							<div class="breakpoints-container">
+								<div class="breakpoints-list" id="breakpoints-list">
+									<div class="empty-state">
+										<i class="fas fa-pause-circle empty-state-icon"></i>
+										<p class="empty-state-text">
+											No breakpoints set. Click on line numbers in the editor to
+											add breakpoints.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="tab-pane" id="timeline-tab">
+							<div class="timeline-container">
+								<div class="timeline-list" id="timeline-list">
+									<div class="empty-state">
+										<i class="fas fa-history empty-state-icon"></i>
+										<p class="empty-state-text">
+											No execution events recorded. Run your code to see the
+											execution timeline.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="resizer-horizontal" id="horizontal-resizer"></div>
+			</div>
+
+			<div class="status-bar">
+				<div class="status-left">
+					<div class="status-item" id="cursor-position">
+						<i class="fas fa-cursor"></i> Line: 1, Col: 1
+					</div>
+				</div>
+				<div class="status-right">
+					<div class="status-item" id="execution-status">
+						<i class="fas fa-circle" style="color: var(--success-color)"></i>
+						Ready
+					</div>
+					<div class="status-item" id="memory-usage">
+						<i class="fas fa-memory"></i> 0 KB
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="modal-backdrop" id="settings-modal">
+			<div class="modal">
+				<div class="modal-header">
+					<h3 class="modal-title">Settings</h3>
+					<button class="modal-close" id="settings-close">×</button>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label class="form-label" for="editor-theme">Editor Theme</label>
+						<select class="form-control" id="editor-theme">
+							<option value="dracula">Dracula</option>
+							<option value="material">Material</option>
+							<option value="solarized">Solarized</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label" for="font-size">Font Size</label>
+						<select class="form-control" id="font-size">
+							<option value="12px">Small (12px)</option>
+							<option value="14px" selected>Medium (14px)</option>
+							<option value="16px">Large (16px)</option>
+							<option value="18px">Extra Large (18px)</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label" for="tab-size">Tab Size</label>
+						<select class="form-control" id="tab-size">
+							<option value="2">2 spaces</option>
+							<option value="4" selected>4 spaces</option>
+							<option value="8">8 spaces</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="form-label">Editor Options</label>
+						<div class="form-check">
+							<input type="checkbox" class="form-check-input" id="auto-run" />
+							<label for="auto-run">Auto-run code on changes</label>
+						</div>
+						<div class="form-check">
+							<input
+								type="checkbox"
+								class="form-check-input"
+								id="preserve-logs"
+								checked
+							/>
+							<label for="preserve-logs">Preserve logs between runs</label>
+						</div>
+						<div class="form-check">
+							<input
+								type="checkbox"
+								class="form-check-input"
+								id="safe-mode"
+								checked
+							/>
+							<label for="safe-mode">Safe mode (prevent infinite loops)</label>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button class="btn" id="settings-cancel">Cancel</button>
+					<button class="btn btn-primary" id="settings-save">
+						Save Changes
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="toast-container" id="toast-container"></div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				let editor;
+				let currentTheme = "dark";
+				let breakpoints = new Set();
+				let watchedVariables = new Map();
+				let timelineEvents = [];
+				let consoleHistory = [];
+				let consoleHistoryIndex = -1;
+				let isRunning = false;
+				let isDebugging = false;
+				let debugContext = null;
+				let currentBreakpointIndex = -1;
+				let executionTimeoutId = null;
+				let MAX_EXECUTION_TIME = 5000;
+
+				initEditor();
+				setupTabs();
+				setupEventListeners();
+				setupResizers();
+				loadFromLocalStorage();
+				showToast("info", "JS Debugging Toolkit Pro is ready!");
+
+				function initEditor() {
+					CodeMirror.defineOption(
+						"breakpoints",
+						false,
+						function (cm, val, old) {
+							if (old && old != CodeMirror.Init) {
+								cm.clearGutter("breakpoints");
+							}
+							if (val) {
+								updateBreakpointGutter(cm);
+							}
+						}
+					);
+
+					editor = CodeMirror.fromTextArea(
+						document.getElementById("code-editor"),
+						{
+							mode: "javascript",
+							theme: "dracula",
+							lineNumbers: true,
+							lineWrapping: true,
+							indentUnit: 4,
+							tabSize: 4,
+							autoCloseBrackets: true,
+							matchBrackets: true,
+							styleActiveLine: true,
+							gutters: ["CodeMirror-linenumbers", "breakpoints"],
+							breakpoints: true,
+							extraKeys: {
+								F5: function () {
+									if (!isRunning) {
+										runCode();
+									}
+								},
+								Tab: function (cm) {
+									if (cm.somethingSelected()) {
+										cm.indentSelection("add");
+									} else {
+										cm.replaceSelection("    ", "end");
+									}
+								},
+							},
+						}
+					);
+
+					editor.setSize("100%", "100%");
+
+					editor.on("gutterClick", function (cm, line, gutter) {
+						if (gutter === "CodeMirror-linenumbers") {
+							toggleBreakpoint(line);
+						}
+					});
+
+					editor.on("cursorActivity", function () {
+						updateCursorPosition();
+					});
+
+					updateCursorPosition();
+				}
+
+				function setupTabs() {
+					const tabs = document.querySelectorAll(".tab");
+					tabs.forEach((tab) => {
+						tab.addEventListener("click", () => {
+							document.querySelectorAll(".tab").forEach((t) => {
+								t.classList.remove("active");
+							});
+
+							tab.classList.add("active");
+
+							document.querySelectorAll(".tab-pane").forEach((pane) => {
+								pane.classList.remove("active");
+							});
+
+							const tabName = tab.getAttribute("data-tab");
+							document.getElementById(`${tabName}-tab`).classList.add("active");
+						});
+					});
+				}
+
+				function setupEventListeners() {
+					document
+						.getElementById("run-btn")
+						.addEventListener("click", function () {
+							if (!isRunning) {
+								runCode();
+							}
+						});
+
+					document
+						.getElementById("continue-btn")
+						.addEventListener("click", function () {
+							if (isDebugging) {
+								stepCode();
+							}
+						});
+
+					document
+						.getElementById("stop-btn")
+						.addEventListener("click", function () {
+							if (isRunning) {
+								stopExecution();
+							}
+						});
+
+					document
+						.getElementById("clear-btn")
+						.addEventListener("click", clearConsole);
+
+					document
+						.getElementById("settings-btn")
+						.addEventListener("click", openSettings);
+
+					document
+						.getElementById("theme-toggle")
+						.addEventListener("change", toggleTheme);
+
+					document
+						.getElementById("format-btn")
+						.addEventListener("click", formatCode);
+
+					document
+						.getElementById("copy-btn")
+						.addEventListener("click", copyCode);
+
+					document
+						.getElementById("save-btn")
+						.addEventListener("click", saveToLocalStorage);
+
+					document
+						.getElementById("settings-close")
+						.addEventListener("click", closeSettings);
+					document
+						.getElementById("settings-cancel")
+						.addEventListener("click", closeSettings);
+					document
+						.getElementById("settings-save")
+						.addEventListener("click", saveSettings);
+
+					document
+						.getElementById("add-watch-btn")
+						.addEventListener("click", addWatch);
+					document
+						.getElementById("variables-input")
+						.addEventListener("keydown", (e) => {
+							if (e.key === "Enter") {
+								addWatch();
+							}
+						});
+
+					document
+						.getElementById("console-input")
+						.addEventListener("keydown", (e) => {
+							if (e.key === "Enter") {
+								handleConsoleInput();
+							} else if (e.key === "ArrowUp") {
+								navigateConsoleHistory(1);
+							} else if (e.key === "ArrowDown") {
+								navigateConsoleHistory(-1);
+							}
+						});
+
+					document.addEventListener("keydown", (e) => {
+						if (e.key === "F5") {
+							e.preventDefault();
+							if (!isRunning) {
+								runCode();
+							}
+						} else if (e.key === "s" && (e.ctrlKey || e.metaKey)) {
+							e.preventDefault();
+							saveToLocalStorage();
+						} else if (e.key === "F9") {
+							e.preventDefault();
+							const line = editor.getCursor().line;
+							toggleBreakpoint(line);
+						}
+					});
+				}
+
+				function setupResizers() {
+					const editorPanel = document.getElementById("editor-panel");
+					const outputPanel = document.getElementById("output-panel");
+					const verticalResizer = document.getElementById("vertical-resizer");
+					const horizontalResizer =
+						document.getElementById("horizontal-resizer");
+
+					let isResizingVertical = false;
+					let isResizingHorizontal = false;
+
+					verticalResizer.addEventListener("mousedown", (e) => {
+						isResizingVertical = true;
+						verticalResizer.classList.add("dragging");
+						document.body.style.cursor = "col-resize";
+						e.preventDefault();
+					});
+
+					horizontalResizer.addEventListener("mousedown", (e) => {
+						isResizingHorizontal = true;
+						horizontalResizer.classList.add("dragging");
+						document.body.style.cursor = "row-resize";
+						e.preventDefault();
+					});
+
+					document.addEventListener("mousemove", (e) => {
+						if (isResizingVertical) {
+							const containerWidth =
+								document.querySelector(".main-content").offsetWidth;
+							const editorWidth = (e.clientX / containerWidth) * 100;
+
+							if (editorWidth > 15 && editorWidth < 85) {
+								editorPanel.style.width = `${editorWidth}%`;
+								outputPanel.style.width = `${100 - editorWidth}%`;
+							}
+						}
+
+						if (isResizingHorizontal) {
+							const containerHeight =
+								document.querySelector(".main-content").offsetHeight;
+							const editorHeight = (e.clientY / containerHeight) * 100;
+
+							if (editorHeight > 15 && editorHeight < 85) {
+								editorPanel.style.height = `${editorHeight}%`;
+								outputPanel.style.height = `${100 - editorHeight}%`;
+							}
+						}
+					});
+
+					document.addEventListener("mouseup", () => {
+						if (isResizingVertical) {
+							isResizingVertical = false;
+							verticalResizer.classList.remove("dragging");
+							document.body.style.cursor = "";
+						}
+
+						if (isResizingHorizontal) {
+							isResizingHorizontal = false;
+							horizontalResizer.classList.remove("dragging");
+							document.body.style.cursor = "";
+						}
+					});
+
+					verticalResizer.addEventListener("touchstart", (e) => {
+						isResizingVertical = true;
+						verticalResizer.classList.add("dragging");
+						e.preventDefault();
+					});
+
+					horizontalResizer.addEventListener("touchstart", (e) => {
+						isResizingHorizontal = true;
+						horizontalResizer.classList.add("dragging");
+						e.preventDefault();
+					});
+
+					document.addEventListener("touchmove", (e) => {
+						if (isResizingVertical) {
+							const touch = e.touches[0];
+							const containerWidth =
+								document.querySelector(".main-content").offsetWidth;
+							const editorWidth = (touch.clientX / containerWidth) * 100;
+
+							if (editorWidth > 15 && editorWidth < 85) {
+								editorPanel.style.width = `${editorWidth}%`;
+								outputPanel.style.width = `${100 - editorWidth}%`;
+							}
+						}
+
+						if (isResizingHorizontal) {
+							const touch = e.touches[0];
+							const containerHeight =
+								document.querySelector(".main-content").offsetHeight;
+							const editorHeight = (touch.clientY / containerHeight) * 100;
+
+							if (editorHeight > 15 && editorHeight < 85) {
+								editorPanel.style.height = `${editorHeight}%`;
+								outputPanel.style.height = `${100 - editorHeight}%`;
+							}
+						}
+					});
+
+					document.addEventListener("touchend", () => {
+						if (isResizingVertical) {
+							isResizingVertical = false;
+							verticalResizer.classList.remove("dragging");
+						}
+
+						if (isResizingHorizontal) {
+							isResizingHorizontal = false;
+							horizontalResizer.classList.remove("dragging");
+						}
+					});
+
+					checkResponsiveLayout();
+					window.addEventListener("resize", checkResponsiveLayout);
+				}
+
+				function checkResponsiveLayout() {
+					const editorPanel = document.getElementById("editor-panel");
+					const outputPanel = document.getElementById("output-panel");
+
+					if (window.innerWidth <= 768) {
+						editorPanel.style.width = "100%";
+						editorPanel.style.height = "50%";
+						outputPanel.style.width = "100%";
+						outputPanel.style.height = "50%";
+					} else {
+						if (editorPanel.style.width === "100%") {
+							editorPanel.style.width = "60%";
+							editorPanel.style.height = "";
+							outputPanel.style.width = "40%";
+							outputPanel.style.height = "";
+						}
+					}
+				}
+
+				function updateCursorPosition() {
+					const cursor = editor.getCursor();
+					document.getElementById("cursor-position").innerHTML = `
+            <i class="fas fa-cursor"></i> Line: ${cursor.line + 1}, Col: ${
+						cursor.ch + 1
+					}
+          `;
+				}
+
+				function toggleBreakpoint(line) {
+					const info = editor.lineInfo(line);
+
+					if (info.gutterMarkers && info.gutterMarkers.breakpoints) {
+						editor.setGutterMarker(line, "breakpoints", null);
+						breakpoints.delete(line);
+					} else {
+						const marker = document.createElement("div");
+						marker.innerHTML = "●";
+						marker.className = "breakpoint";
+						editor.setGutterMarker(line, "breakpoints", marker);
+						breakpoints.add(line);
+					}
+
+					updateBreakpointsList();
+				}
+
+				function updateBreakpointsList() {
+					const breakpointsList = document.getElementById("breakpoints-list");
+
+					if (breakpoints.size === 0) {
+						breakpointsList.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-pause-circle empty-state-icon"></i>
+                <p class="empty-state-text">No breakpoints set. Click on line numbers in the editor to add breakpoints.</p>
+              </div>
+            `;
+						return;
+					}
+
+					breakpointsList.innerHTML = "";
+
+					breakpoints.forEach((line) => {
+						const code = editor.getLine(line) || "";
+						const breakpointItem = document.createElement("div");
+						breakpointItem.className = "breakpoint-item";
+						breakpointItem.innerHTML = `
+              <div>
+                <div class="breakpoint-line">Line ${line + 1}</div>
+                <div class="breakpoint-code">${code.trim().substring(0, 40)}${
+							code.length > 40 ? "..." : ""
+						}</div>
+              </div>
+              <button class="breakpoint-remove" data-line="${line}">
+                <i class="fas fa-times"></i>
+              </button>
+            `;
+						breakpointsList.appendChild(breakpointItem);
+					});
+
+					document.querySelectorAll(".breakpoint-remove").forEach((button) => {
+						button.addEventListener("click", () => {
+							const line = parseInt(button.getAttribute("data-line"));
+							toggleBreakpoint(line);
+						});
+					});
+				}
+
+				function addWatch() {
+					const input = document.getElementById("variables-input");
+					const varName = input.value.trim();
+
+					if (varName) {
+						watchedVariables.set(varName, undefined);
+						updateWatchedVariablesList();
+						input.value = "";
+						showToast("info", `Added "${varName}" to watched variables`);
+					}
+				}
+
+				function updateWatchedVariablesList() {
+					const variablesList = document.getElementById("variables-list");
+
+					if (watchedVariables.size === 0) {
+						variablesList.innerHTML = `
+              <div class="empty-state">
+                <i class="fas fa-eye-slash empty-state-icon"></i>
+                <p class="empty-state-text">No variables being watched. Run your code or add variables manually.</p>
+              </div>
+            `;
+						return;
+					}
+
+					variablesList.innerHTML = "";
+
+					for (const [name, value] of watchedVariables.entries()) {
+						const variableItem = document.createElement("div");
+						variableItem.className = "variable-item";
+
+						let formattedValue = "undefined";
+						if (value !== undefined) {
+							if (typeof value === "object" && value !== null) {
+								try {
+									formattedValue = JSON.stringify(value).substring(0, 60);
+									if (JSON.stringify(value).length > 60) {
+										formattedValue += "...";
+									}
+								} catch (e) {
+									formattedValue = "[Object]";
+								}
+							} else {
+								formattedValue = String(value);
+							}
+						}
+
+						variableItem.innerHTML = `
+              <div class="variable-name">${name}</div>
+              <div class="variable-value">${formattedValue}</div>
+              <div class="variable-actions">
+                <button class="variable-remove" data-name="${name}">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            `;
+
+						variablesList.appendChild(variableItem);
+					}
+
+					document.querySelectorAll(".variable-remove").forEach((button) => {
+						button.addEventListener("click", () => {
+							const name = button.getAttribute("data-name");
+							watchedVariables.delete(name);
+							updateWatchedVariablesList();
+						});
+					});
+				}
+
+				function runCode() {
+					const code = editor.getValue();
+
+					if (!code.trim()) {
+						showToast("warning", "No code to run");
+						return;
+					}
+
+					isRunning = true;
+					updateExecutionStatus("running");
+
+					if (!document.getElementById("preserve-logs").checked) {
+						clearConsole(false);
+					}
+
+					addTimelineEvent("Code execution started");
+
+					document.getElementById("run-btn").disabled = true;
+					document.getElementById("stop-btn").disabled = false;
+
+					try {
+						const sandbox = document.createElement("iframe");
+						sandbox.style.display = "none";
+						document.body.appendChild(sandbox);
+
+						if (document.getElementById("safe-mode").checked) {
+							executionTimeoutId = setTimeout(() => {
+								if (isRunning) {
+									stopExecution(true);
+									logToConsole(
+										"error",
+										"Execution timed out. Possible infinite loop or long-running operation."
+									);
+									showToast("error", "Execution timed out");
+								}
+							}, MAX_EXECUTION_TIME);
+						}
+
+						extractVariableNames(code);
+
+						const executionContext = {
+							console: {
+								log: (...args) => {
+									logToConsole("log", ...args);
+								},
+								info: (...args) => {
+									logToConsole("info", ...args);
+								},
+								warn: (...args) => {
+									logToConsole("warning", ...args);
+								},
+								error: (...args) => {
+									logToConsole("error", ...args);
+								},
+								time: (label) => {
+									executionContext._timers = executionContext._timers || {};
+									executionContext._timers[label] = performance.now();
+									addTimelineEvent(`Timer "${label}" started`);
+								},
+								timeEnd: (label) => {
+									if (
+										executionContext._timers &&
+										executionContext._timers[label]
+									) {
+										const duration =
+											performance.now() - executionContext._timers[label];
+										logToConsole("info", `${label}: ${duration.toFixed(2)}ms`);
+										delete executionContext._timers[label];
+										addTimelineEvent(
+											`Timer "${label}" ended: ${duration.toFixed(2)}ms`
+										);
+									}
+								},
+							},
+						};
+
+						if (breakpoints.size > 0) {
+							isDebugging = true;
+							document.getElementById("continue-btn").disabled = false;
+							debugContext = executionContext;
+
+							executeWithBreakpoints(code, executionContext);
+						} else {
+							executeSafely(code, executionContext);
+						}
+
+						document.body.removeChild(sandbox);
+					} catch (error) {
+						console.error("Execution setup error:", error);
+						logToConsole(
+							"error",
+							"Error setting up execution environment:",
+							error.toString()
+						);
+						updateExecutionStatus("error");
+						resetExecutionState();
+					}
+				}
+
+				function executeSafely(code, executionContext) {
+					try {
+						const wrappedCode = `
+              try {
+                
+                const originalConsole = console;
+                console = {
+                  log: function(...args) { 
+                    executionContext.console.log(...args);
+                    originalConsole.log(...args);
+                  },
+                  info: function(...args) { 
+                    executionContext.console.info(...args);
+                    originalConsole.info(...args);
+                  },
+                  warn: function(...args) { 
+                    executionContext.console.warn(...args);
+                    originalConsole.warn(...args);
+                  },
+                  error: function(...args) { 
+                    executionContext.console.error(...args);
+                    originalConsole.error(...args);
+                  },
+                  time: function(label) { 
+                    executionContext.console.time(label);
+                    originalConsole.time(label);
+                  },
+                  timeEnd: function(label) { 
+                    executionContext.console.timeEnd(label);
+                    originalConsole.timeEnd(label);
+                  }
+                };
+                
+                
+                ${code}
+                
+                
+                const __result = {};
+                ${Array.from(watchedVariables.keys())
+									.map(
+										(name) =>
+											`try { if (typeof ${name} !== 'undefined') __result['${name}'] = ${name}; } catch(e) {}`
+									)
+									.join("\n")}
+                
+                
+                return __result;
+              } catch (error) {
+                
+                executionContext.console.error('Uncaught:', error);
+                throw error;
+              }
+            `;
+
+						const execFunction = new Function("executionContext", wrappedCode);
+
+						const result = execFunction(executionContext);
+
+						if (result) {
+							for (const [name, value] of Object.entries(result)) {
+								watchedVariables.set(name, value);
+							}
+						}
+
+						updateWatchedVariablesList();
+						updateExecutionStatus("success");
+						addTimelineEvent("Code execution completed successfully");
+						showToast("success", "Execution completed");
+					} catch (error) {
+						console.error("Execution error:", error);
+						logToConsole("error", "Execution error:", error.toString());
+						updateExecutionStatus("error");
+						addTimelineEvent(`Code execution failed: ${error.message}`);
+						showToast("error", "Execution failed");
+					} finally {
+						if (executionTimeoutId) {
+							clearTimeout(executionTimeoutId);
+							executionTimeoutId = null;
+						}
+
+						resetExecutionState();
+					}
+				}
+
+				function extractVariableNames(code) {
+					try {
+						const patterns = [
+							/\b(?:var|let|const)\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g,
+							/\bfunction\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g,
+							/\bclass\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\b/g,
+						];
+
+						for (const pattern of patterns) {
+							let match;
+							while ((match = pattern.exec(code)) !== null) {
+								const varName = match[1];
+								if (!watchedVariables.has(varName)) {
+									watchedVariables.set(varName, undefined);
+								}
+							}
+						}
+					} catch (e) {
+						console.error("Error extracting variables:", e);
+					}
+				}
+
+				function executeWithBreakpoints(code, executionContext) {
+					try {
+						const lines = code.split("\n");
+
+						const sortedBreakpoints = Array.from(breakpoints).sort(
+							(a, b) => a - b
+						);
+						currentBreakpointIndex = -1;
+
+						debugContext = {
+							lines,
+							breakpoints: sortedBreakpoints,
+							executionContext,
+							currentLine: 0,
+						};
+
+						if (sortedBreakpoints.length > 0) {
+							editor.addLineClass(
+								sortedBreakpoints[0],
+								"background",
+								"debugging-line"
+							);
+							addTimelineEvent(
+								`Paused at breakpoint on line ${sortedBreakpoints[0] + 1}`
+							);
+							logToConsole(
+								"info",
+								`Paused at breakpoint on line ${
+									sortedBreakpoints[0] + 1
+								}. Click 'Continue' to proceed to the next breakpoint or 'Stop' to halt execution.`
+							);
+							updateExecutionStatus("paused");
+						} else {
+							executeSafely(code, executionContext);
+						}
+					} catch (error) {
+						console.error("Debugging error:", error);
+						logToConsole("error", "Debugging error:", error.toString());
+						updateExecutionStatus("error");
+						addTimelineEvent(`Debugging failed: ${error.message}`);
+						resetExecutionState();
+					}
+				}
+
+				function stepCode() {
+					if (!isDebugging || !debugContext) {
+						return;
+					}
+
+					if (
+						currentBreakpointIndex >= 0 &&
+						debugContext.breakpoints[currentBreakpointIndex] !== undefined
+					) {
+						editor.removeLineClass(
+							debugContext.breakpoints[currentBreakpointIndex],
+							"background",
+							"debugging-line"
+						);
+					}
+
+					currentBreakpointIndex++;
+
+					if (currentBreakpointIndex >= debugContext.breakpoints.length) {
+						const code = editor.getValue();
+						executeSafely(code, debugContext.executionContext);
+						updateExecutionStatus("success");
+						logToConsole(
+							"info",
+							"All breakpoints passed. Execution completed."
+						);
+						return;
+					}
+
+					const currentBreakpoint =
+						debugContext.breakpoints[currentBreakpointIndex];
+					editor.addLineClass(
+						currentBreakpoint,
+						"background",
+						"debugging-line"
+					);
+
+					const code = editor.getValue();
+					const lines = code.split("\n");
+					const codeSegment = lines.slice(0, currentBreakpoint + 1).join("\n");
+
+					try {
+						const wrappedCode = `
+              try {
+                
+                const originalConsole = console;
+                console = {
+                  log: function(...args) { 
+                    executionContext.console.log(...args);
+                    originalConsole.log(...args);
+                  },
+                  info: function(...args) { 
+                    executionContext.console.info(...args);
+                    originalConsole.info(...args);
+                  },
+                  warn: function(...args) { 
+                    executionContext.console.warn(...args);
+                    originalConsole.warn(...args);
+                  },
+                  error: function(...args) { 
+                    executionContext.console.error(...args);
+                    originalConsole.error(...args);
+                  },
+                  time: function(label) { 
+                    executionContext.console.time(label);
+                    originalConsole.time(label);
+                  },
+                  timeEnd: function(label) { 
+                    executionContext.console.timeEnd(label);
+                    originalConsole.timeEnd(label);
+                  }
+                };
+                
+                
+                ${codeSegment}
+                
+                
+                const __result = {};
+                ${Array.from(watchedVariables.keys())
+									.map(
+										(name) =>
+											`try { if (typeof ${name} !== 'undefined') __result['${name}'] = ${name}; } catch(e) {}`
+									)
+									.join("\n")}
+                
+                
+                return __result;
+              } catch (error) {
+                
+                executionContext.console.error('Uncaught:', error);
+                throw error;
+              }
+            `;
+
+						const execFunction = new Function("executionContext", wrappedCode);
+						const result = execFunction(debugContext.executionContext);
+
+						if (result) {
+							for (const [name, value] of Object.entries(result)) {
+								watchedVariables.set(name, value);
+							}
+						}
+
+						updateWatchedVariablesList();
+						addTimelineEvent(`Stepped to line ${currentBreakpoint + 1}`);
+						logToConsole(
+							"info",
+							`Paused at breakpoint on line ${
+								currentBreakpoint + 1
+							}. Click 'Continue' to proceed to the next breakpoint or 'Stop' to halt execution.`
+						);
+						updateExecutionStatus("paused");
+					} catch (error) {
+						console.error("Step execution error:", error);
+						logToConsole("error", "Step execution error:", error.toString());
+						updateExecutionStatus("error");
+						addTimelineEvent(`Step execution failed: ${error.message}`);
+
+						setTimeout(stepCode, 0);
+					}
+				}
+
+				function stopExecution(isTimeout = false) {
+					if (!isRunning) {
+						return;
+					}
+
+					if (executionTimeoutId) {
+						clearTimeout(executionTimeoutId);
+						executionTimeoutId = null;
+					}
+
+					if (debugContext && debugContext.breakpoints) {
+						debugContext.breakpoints.forEach((line) => {
+							editor.removeLineClass(line, "background", "debugging-line");
+						});
+					}
+
+					updateExecutionStatus(isTimeout ? "error" : "stopped");
+					addTimelineEvent(
+						isTimeout
+							? "Execution stopped due to timeout"
+							: "Execution stopped by user"
+					);
+					if (!isTimeout) {
+						logToConsole("warning", "Execution stopped by user");
+						showToast("warning", "Execution stopped");
+					}
+
+					resetExecutionState();
+				}
+
+				function resetExecutionState() {
+					isRunning = false;
+					isDebugging = false;
+					debugContext = null;
+					currentBreakpointIndex = -1;
+					document.getElementById("run-btn").disabled = false;
+					document.getElementById("stop-btn").disabled = true;
+					document.getElementById("continue-btn").disabled = true;
+				}
+
+				function logToConsole(type, ...args) {
+					const consoleOutput = document.getElementById("console-output");
+					const consoleItem = document.createElement("div");
+					consoleItem.className = `console-line ${type}`;
+
+					const formattedContent = args
+						.map((arg) => {
+							if (arg === undefined) return "undefined";
+							if (arg === null) return "null";
+							if (typeof arg === "object") {
+								try {
+									return JSON.stringify(arg, null, 2);
+								} catch (e) {
+									return String(arg);
+								}
+							}
+							return String(arg);
+						})
+						.join(" ");
+
+					consoleItem.textContent = formattedContent;
+					consoleOutput.appendChild(consoleItem);
+					consoleOutput.scrollTop = consoleOutput.scrollHeight;
+				}
+
+				function addTimelineEvent(message) {
+					const now = new Date();
+					const time = now.toLocaleTimeString([], {
+						hour: "2-digit",
+						minute: "2-digit",
+						second: "2-digit",
+						fractionalSecondDigits: 3,
+					});
+
+					timelineEvents.push({
+						time: now,
+						message: message,
+					});
+
+					const timelineList = document.getElementById("timeline-list");
+
+					if (timelineList.querySelector(".empty-state")) {
+						timelineList.innerHTML = "";
+					}
+
+					const timelineItem = document.createElement("div");
+					timelineItem.className = "timeline-item";
+					timelineItem.innerHTML = `
+            <div class="timeline-time">${time}</div>
+            <div class="timeline-message">${message}</div>
+          `;
+
+					timelineList.appendChild(timelineItem);
+					timelineList.scrollTop = timelineList.scrollHeight;
+				}
+
+				function clearConsole(showToastMessage = true) {
+					document.getElementById("console-output").innerHTML = "";
+					document.getElementById("timeline-list").innerHTML = `
+            <div class="empty-state">
+              <i class="fas fa-history empty-state-icon"></i>
+              <p class="empty-state-text">No execution events recorded. Run your code to see the execution timeline.</p>
+            </div>
+          `;
+
+					timelineEvents = [];
+					addTimelineEvent("Console cleared");
+					if (showToastMessage) {
+						showToast("info", "Console cleared");
+					}
+				}
+
+				function updateExecutionStatus(status) {
+					const statusElement = document.getElementById("execution-status");
+
+					switch (status) {
+						case "running":
+							statusElement.innerHTML = `
+                <i class="fas fa-circle-notch fa-spin" style="color: var(--warning-color);"></i> Running
+              `;
+							break;
+						case "success":
+							statusElement.innerHTML = `
+                <i class="fas fa-check-circle" style="color: var(--success-color);"></i> Success
+              `;
+							break;
+						case "error":
+							statusElement.innerHTML = `
+                <i class="fas fa-exclamation-circle" style="color: var(--error-color);"></i> Error
+              `;
+							break;
+						case "stopped":
+							statusElement.innerHTML = `
+                <i class="fas fa-stop-circle" style="color: var(--warning-color);"></i> Stopped
+              `;
+							break;
+						case "paused":
+							statusElement.innerHTML = `
+                <i class="fas fa-pause-circle" style="color: var(--info-color);"></i> Paused at breakpoint
+              `;
+							break;
+						default:
+							statusElement.innerHTML = `
+                <i class="fas fa-circle" style="color: var(--success-color);"></i> Ready
+              `;
+					}
+				}
+
+				function handleConsoleInput() {
+					const input = document.getElementById("console-input");
+					const command = input.value.trim();
+
+					if (command) {
+						consoleHistory.unshift(command);
+						if (consoleHistory.length > 50) {
+							consoleHistory.pop();
+						}
+						consoleHistoryIndex = -1;
+
+						logToConsole("log", `> ${command}`);
+
+						try {
+							const result = eval(command);
+							if (result !== undefined) {
+								logToConsole("log", result);
+							}
+						} catch (error) {
+							logToConsole("error", error.toString());
+						}
+
+						input.value = "";
+					}
+				}
+
+				function navigateConsoleHistory(direction) {
+					if (consoleHistory.length === 0) {
+						return;
+					}
+
+					consoleHistoryIndex += direction;
+
+					if (consoleHistoryIndex < -1) {
+						consoleHistoryIndex = -1;
+					} else if (consoleHistoryIndex >= consoleHistory.length) {
+						consoleHistoryIndex = consoleHistory.length - 1;
+					}
+
+					const input = document.getElementById("console-input");
+
+					if (consoleHistoryIndex === -1) {
+						input.value = "";
+					} else {
+						input.value = consoleHistory[consoleHistoryIndex];
+					}
+				}
+
+				function formatCode() {
+					const code = editor.getValue();
+
+					try {
+						const formattedCode = formatJavaScript(code);
+						editor.setValue(formattedCode);
+						showToast("success", "Code formatted");
+					} catch (e) {
+						showToast("error", "Error formatting code");
+						console.error("Format error:", e);
+					}
+				}
+
+				function formatJavaScript(code) {
+					const lines = code.split("\n");
+					let formattedLines = [];
+					let indentLevel = 0;
+
+					for (let i = 0; i < lines.length; i++) {
+						let line = lines[i].trim();
+
+						if (!line) {
+							formattedLines.push("");
+							continue;
+						}
+
+						if (line.match(/^[}\]\)]/)) {
+							indentLevel = Math.max(0, indentLevel - 1);
+						}
+
+						const indent = " ".repeat(4 * indentLevel);
+						formattedLines.push(indent + line);
+
+						if (line.match(/[{$]/) && !line.match(/[{}][^{}]*$/)) {
+							indentLevel++;
+						}
+					}
+
+					return formattedLines.join("\n");
+				}
+
+				function copyCode() {
+					const code = editor.getValue();
+
+					navigator.clipboard
+						.writeText(code)
+						.then(() => {
+							showToast("success", "Code copied to clipboard");
+						})
+						.catch(() => {
+							const textarea = document.createElement("textarea");
+							textarea.value = code;
+							textarea.style.position = "fixed";
+							document.body.appendChild(textarea);
+							textarea.focus();
+							textarea.select();
+
+							try {
+								document.execCommand("copy");
+								showToast("success", "Code copied to clipboard");
+							} catch (err) {
+								showToast("error", "Failed to copy code");
+							}
+
+							document.body.removeChild(textarea);
+						});
+				}
+
+				function toggleTheme() {
+					const themeToggle = document.getElementById("theme-toggle");
+
+					if (themeToggle.checked) {
+						document.body.classList.add("light-theme");
+						editor.setOption("theme", "default");
+						currentTheme = "light";
+					} else {
+						document.body.classList.remove("light-theme");
+						editor.setOption("theme", "dracula");
+						currentTheme = "dark";
+					}
+
+					showToast("info", `Switched to ${currentTheme} theme`);
+				}
+
+				function openSettings() {
+					document.getElementById("settings-modal").style.display = "flex";
+				}
+
+				function closeSettings() {
+					document.getElementById("settings-modal").style.display = "none";
+				}
+
+				function saveSettings() {
+					const editorTheme = document.getElementById("editor-theme").value;
+					const fontSize = document.getElementById("font-size").value;
+					const tabSize = parseInt(document.getElementById("tab-size").value);
+					const autoRun = document.getElementById("auto-run").checked;
+					const preserveLogs = document.getElementById("preserve-logs").checked;
+					const safeMode = document.getElementById("safe-mode").checked;
+
+					editor.setOption("theme", editorTheme);
+					document.querySelector(".CodeMirror").style.fontSize = fontSize;
+					editor.setOption("tabSize", tabSize);
+					editor.setOption("indentUnit", tabSize);
+					MAX_EXECUTION_TIME = safeMode ? 5000 : 30000;
+
+					if (autoRun && !editor._changeHandler) {
+						const debouncedRun = debounce(() => {
+							if (!isRunning) {
+								runCode();
+							}
+						}, 1000);
+						editor._changeHandler = editor.on("changes", debouncedRun);
+						editor._debouncedRun = debouncedRun;
+					} else if (!autoRun && editor._changeHandler) {
+						editor.off("changes", editor._changeHandler);
+						if (editor._debouncedRun) {
+							editor._debouncedRun.cancel();
+						}
+						editor._changeHandler = null;
+						editor._debouncedRun = null;
+					}
+
+					const settings = {
+						editorTheme: editorTheme,
+						fontSize: fontSize,
+						tabSize: tabSize,
+						autoRun: autoRun,
+						preserveLogs: preserveLogs,
+						safeMode: safeMode,
+					};
+					localStorage.setItem(
+						"debug_toolkit_settings",
+						JSON.stringify(settings)
+					);
+
+					closeSettings();
+					showToast("success", "Settings saved");
+				}
+
+				function loadFromLocalStorage() {
+					const savedCode = localStorage.getItem("debug_toolkit_code");
+					if (savedCode) {
+						editor.setValue(savedCode);
+					}
+
+					const savedSettings = localStorage.getItem("debug_toolkit_settings");
+					if (savedSettings) {
+						const settings = JSON.parse(savedSettings);
+
+						if (settings.editorTheme) {
+							document.getElementById("editor-theme").value =
+								settings.editorTheme;
+							editor.setOption("theme", settings.editorTheme);
+						}
+						if (settings.fontSize) {
+							document.getElementById("font-size").value = settings.fontSize;
+							document.querySelector(".CodeMirror").style.fontSize =
+								settings.fontSize;
+						}
+						if (settings.tabSize) {
+							document.getElementById("tab-size").value = settings.tabSize;
+							editor.setOption("tabSize", settings.tabSize);
+							editor.setOption("indentUnit", settings.tabSize);
+						}
+						if (settings.autoRun !== undefined) {
+							document.getElementById("auto-run").checked = settings.autoRun;
+							if (settings.autoRun) {
+								const debouncedRun = debounce(() => {
+									if (!isRunning) {
+										runCode();
+									}
+								}, 1000);
+								editor._changeHandler = editor.on("changes", debouncedRun);
+								editor._debouncedRun = debouncedRun;
+							} else {
+								if (editor._changeHandler) {
+									editor.off("changes", editor._changeHandler);
+									if (editor._debouncedRun) {
+										editor._debouncedRun.cancel();
+									}
+									editor._changeHandler = null;
+									editor._debouncedRun = null;
+								}
+							}
+						}
+						if (settings.preserveLogs !== undefined) {
+							document.getElementById("preserve-logs").checked =
+								settings.preserveLogs;
+						}
+						if (settings.safeMode !== undefined) {
+							document.getElementById("safe-mode").checked = settings.safeMode;
+							MAX_EXECUTION_TIME = settings.safeMode ? 5000 : 30000;
+						}
+					}
+				}
+
+				function saveToLocalStorage() {
+					const code = editor.getValue();
+					localStorage.setItem("debug_toolkit_code", code);
+					showToast("success", "Code saved to localStorage");
+				}
+
+				function showToast(type, message, duration = 3000) {
+					const toastContainer = document.getElementById("toast-container");
+
+					const toast = document.createElement("div");
+					toast.className = `toast toast-${type}`;
+
+					toast.innerHTML = `
+            <div class="toast-icon">
+              <i class="fas fa-${
+								type === "success"
+									? "check-circle"
+									: type === "error"
+									? "exclamation-circle"
+									: type === "warning"
+									? "exclamation-triangle"
+									: "info-circle"
+							}"></i>
+            </div>
+            <div class="toast-content">${message}</div>
+            <button class="toast-close">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+
+					toastContainer.appendChild(toast);
+
+					toast.querySelector(".toast-close").addEventListener("click", () => {
+						toast.remove();
+					});
+
+					setTimeout(() => {
+						if (toast.parentNode) {
+							toast.remove();
+						}
+					}, duration);
+				}
+
+				function debounce(func, wait) {
+					let timeout;
+					const debounced = function (...args) {
+						clearTimeout(timeout);
+						timeout = setTimeout(() => func.apply(this, args), wait);
+					};
+					debounced.cancel = function () {
+						clearTimeout(timeout);
+						timeout = null;
+					};
+					return debounced;
+				}
+
+				function updateBreakpointGutter(cm) {
+					const gutters = cm.getOption("gutters").slice(0);
+					if (gutters.indexOf("breakpoints") === -1) {
+						gutters.push("breakpoints");
+						cm.setOption("gutters", gutters);
+					}
+				}
+
+				setInterval(() => {
+					const code = editor.getValue();
+					localStorage.setItem("debug_toolkit_code", code);
+				}, 30000);
+			});
+		</script>
+	</body>
+</html>
