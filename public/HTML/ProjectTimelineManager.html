@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Project Timeline Manager</title>
+		<!-- Tailwind CSS -->
+		<script src="https://cdn.tailwindcss.com"></script>
+		<!-- Flatpickr for date selection -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+		<!-- Font Awesome for icons -->
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<!-- AOS for animations -->
+		<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+		<!-- Custom styling -->
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+			body {
+				font-family: "Inter", sans-serif;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				background-color: #0f172a;
+				color: #e2e8f0;
+			}
+
+			#timeline {
+				position: relative;
+			}
+
+			.timeline-container {
+				max-height: 500px;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.task-bar {
+				position: absolute;
+				margin-bottom: 10px;
+				transition: all 0.2s ease;
+			}
+
+			.task-bar:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+				z-index: 10;
+			}
+
+			.animate-in {
+				animation: fadeIn 0.2s ease-out forwards;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(5px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.dragging {
+				opacity: 0.9;
+				z-index: 50;
+				box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+			}
+
+			.user-avatar {
+				width: 28px;
+				height: 28px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				font-weight: 600;
+				font-size: 12px;
+				border: 2px solid #1e293b;
+			}
+
+			.progress-bar {
+				transition: width 0.3s ease;
+			}
+
+			.modal-overlay {
+				background: rgba(0, 0, 0, 0.7);
+				backdrop-filter: blur(5px);
+			}
+
+			.month-marker {
+				position: sticky;
+				left: 0;
+				z-index: 20;
+				background: linear-gradient(
+					90deg,
+					rgba(15, 23, 42, 0.9) 0%,
+					rgba(15, 23, 42, 0.7) 80%,
+					rgba(15, 23, 42, 0) 100%
+				);
+			}
+
+			::-webkit-scrollbar {
+				height: 8px;
+				width: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #1e293b;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #475569;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #64748b;
+			}
+
+			.timeline-border {
+				position: relative;
+				border-radius: 0.75rem;
+			}
+
+			.timeline-border::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				border-radius: 0.75rem;
+				padding: 1px;
+				background: linear-gradient(135deg, #6366f1, #8b5cf6);
+				-webkit-mask: linear-gradient(#fff 0 0) content-box,
+					linear-gradient(#fff 0 0);
+				-webkit-mask-composite: xor;
+				mask-composite: exclude;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body class="min-h-screen flex flex-col">
+		<!-- Header -->
+		<header class="bg-slate-900 border-b border-slate-800 py-4">
+			<div class="container mx-auto px-4">
+				<div
+					class="flex flex-col md:flex-row justify-between items-center gap-4"
+				>
+					<div class="flex items-center gap-3">
+						<div
+							class="bg-gradient-to-r from-indigo-500 to-purple-500 p-2 rounded-lg"
+						>
+							<i class="fas fa-project-diagram text-white text-xl"></i>
+						</div>
+						<div>
+							<h1 class="text-2xl font-bold text-white">
+								Project Timeline Manager
+							</h1>
+							<p class="text-slate-400 text-sm">
+								Track and manage your team's progress
+							</p>
+						</div>
+					</div>
+
+					<div class="flex flex-wrap gap-3 justify-center">
+						<button
+							id="addTaskBtn"
+							class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all shadow hover:shadow-lg"
+						>
+							<i class="fas fa-plus"></i> Add Task
+						</button>
+
+						<button
+							id="addUserBtn"
+							class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-all shadow hover:shadow-lg"
+						>
+							<i class="fas fa-user-plus"></i> Add Member
+						</button>
+
+						<div class="relative">
+							<select
+								id="filterSelect"
+								class="appearance-none bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-sm text-sm text-slate-200"
+							>
+								<option value="all">All Tasks</option>
+							</select>
+							<div
+								class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400"
+							>
+								<i class="fas fa-chevron-down text-xs"></i>
+							</div>
+						</div>
+
+						<div class="relative">
+							<input
+								id="dateRangeInput"
+								class="bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-sm text-sm text-slate-200 w-full md:w-64"
+								placeholder="Select date range"
+							/>
+							<div
+								class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400"
+							>
+								<i class="fas fa-calendar text-xs"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="flex-grow container mx-auto px-4 py-8">
+			<!-- Timeline Controls -->
+			<div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+				<div class="flex items-center gap-2">
+					<span
+						id="zoomLevel"
+						class="text-sm font-medium px-3 py-1.5 bg-slate-800 rounded-lg border border-slate-700"
+						>Month View</span
+					>
+
+					<div class="flex items-center gap-2 ml-2">
+						<button
+							id="prevBtn"
+							class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors shadow-sm text-slate-300 hover:text-white"
+						>
+							<i class="fas fa-chevron-left"></i>
+						</button>
+						<span
+							id="dateRange"
+							class="text-sm font-medium px-3 py-1.5 bg-slate-800 rounded-lg border border-slate-700"
+							>Jan 1 - Jan 31, 2023</span
+						>
+						<button
+							id="nextBtn"
+							class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors shadow-sm text-slate-300 hover:text-white"
+						>
+							<i class="fas fa-chevron-right"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Timeline -->
+			<div class="timeline-border bg-slate-800 rounded-xl shadow-sm relative">
+				<!-- Time markers -->
+				<div id="timelineHeader" class="overflow-x-auto pb-2 bg-slate-800">
+					<div id="timeMarkers" class="flex border-b border-slate-700 h-10">
+						<!-- Time markers will be populated by JS -->
+					</div>
+				</div>
+
+				<!-- Scrollable timeline -->
+				<div
+					id="timelineContainer"
+					class="timeline-container overflow-x-auto relative h-[500px] bg-slate-800 rounded-b-xl"
+				>
+					<div id="timeline" class="relative h-full">
+						<!-- Tasks will be populated by JS -->
+					</div>
+				</div>
+			</div>
+
+			<!-- Legend -->
+			<div
+				class="mt-6 flex flex-wrap gap-4 items-center justify-center bg-slate-800 p-4 rounded-lg border border-slate-700"
+			>
+				<div class="flex items-center gap-2">
+					<div class="w-3 h-3 rounded-full bg-red-500 shadow-md"></div>
+					<span class="text-sm text-slate-300">Not Started</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<div class="w-3 h-3 rounded-full bg-yellow-500 shadow-md"></div>
+					<span class="text-sm text-slate-300">In Progress</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<div class="w-3 h-3 rounded-full bg-green-500 shadow-md"></div>
+					<span class="text-sm text-slate-300">Completed</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<div class="w-3 h-3 rounded-full bg-blue-500 shadow-md"></div>
+					<span class="text-sm text-slate-300">On Hold</span>
+				</div>
+				<div class="flex items-center gap-2">
+					<div class="w-3 h-3 rounded-full bg-purple-500 shadow-md"></div>
+					<span class="text-sm text-slate-300">Milestone</span>
+				</div>
+			</div>
+		</main>
+
+		<!-- About Us Section -->
+		<section class="py-16 bg-slate-900 border-t border-slate-800">
+			<div class="container mx-auto px-4">
+				<div class="max-w-6xl mx-auto">
+					<div class="text-center mb-12">
+						<h2 class="text-3xl font-bold text-white mb-4">
+							About Our Company
+						</h2>
+						<p class="text-slate-400 max-w-2xl mx-auto text-lg">
+							Empowering teams to deliver exceptional results through intuitive
+							timeline management solutions.
+						</p>
+					</div>
+
+					<!-- Company Story -->
+					<div class="grid md:grid-cols-2 gap-12 mb-16">
+						<div class="space-y-6" data-aos="fade-right">
+							<div
+								class="bg-gradient-to-r from-indigo-500 to-purple-500 p-1 rounded-xl inline-block"
+							>
+								<div class="bg-slate-900 rounded-lg p-6">
+									<h3 class="text-xl font-bold text-white mb-4">Our Story</h3>
+									<p class="text-slate-400">
+										Founded in 2020 by a team of project management experts and
+										software engineers, we recognized the growing need for
+										intuitive timeline management tools in the modern digital
+										workspace. Our platform has helped over 5,000 teams
+										worldwide deliver projects more efficiently.
+									</p>
+								</div>
+							</div>
+							<div class="flex items-center gap-4">
+								<div class="flex-shrink-0">
+									<div class="bg-indigo-500 p-3 rounded-lg">
+										<i class="fas fa-rocket text-white text-2xl"></i>
+									</div>
+								</div>
+								<div>
+									<h4 class="text-white font-semibold mb-2">Our Mission</h4>
+									<p class="text-slate-400">
+										Simplify complex project timelines while maintaining clarity
+										and team collaboration.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="relative group" data-aos="fade-left">
+							<div
+								class="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity"
+							></div>
+							<div
+								class="relative bg-slate-800 rounded-xl h-full p-8 border border-slate-700"
+							>
+								<div class="grid grid-cols-2 gap-4">
+									<div class="bg-slate-900 p-6 rounded-lg text-center">
+										<div class="text-3xl font-bold text-indigo-500 mb-2">
+											5K+
+										</div>
+										<div class="text-sm text-slate-400">Active Teams</div>
+									</div>
+									<div class="bg-slate-900 p-6 rounded-lg text-center">
+										<div class="text-3xl font-bold text-purple-500 mb-2">
+											98%
+										</div>
+										<div class="text-sm text-slate-400">
+											Customer Satisfaction
+										</div>
+									</div>
+									<div class="bg-slate-900 p-6 rounded-lg text-center">
+										<div class="text-3xl font-bold text-green-500 mb-2">
+											150+
+										</div>
+										<div class="text-sm text-slate-400">Features</div>
+									</div>
+									<div class="bg-slate-900 p-6 rounded-lg text-center">
+										<div class="text-3xl font-bold text-blue-500 mb-2">
+											24/7
+										</div>
+										<div class="text-sm text-slate-400">Support</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Team Section -->
+					<section class="py-16 bg-slate-900">
+						<div class="container mx-auto px-4">
+							<div class="max-w-6xl mx-auto">
+								<h3 class="text-2xl font-bold text-white mb-8 text-center">
+									Meet Our Leadership
+								</h3>
+								<div class="grid md:grid-cols-3 gap-8">
+									<!-- John Smith -->
+									<div
+										class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 transition-all"
+										data-aos="zoom-in"
+									>
+										<div class="mb-4 relative">
+											<div
+												class="w-32 h-32 rounded-full mx-auto bg-gradient-to-r from-indigo-500 to-purple-500 p-1"
+											>
+												<div class="relative w-full h-full">
+													<img
+														src="https://images.unsplash.com/photo-1560250097-0b93528c311a"
+														class="rounded-full w-full h-full object-cover"
+														alt="John Smith"
+														onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';"
+													/>
+													<svg
+														class="absolute inset-0 w-full h-full text-white"
+														viewBox="0 0 100 100"
+														aria-hidden="true"
+														style="display: none"
+													>
+														<text
+															x="50%"
+															y="50%"
+															dominant-baseline="middle"
+															text-anchor="middle"
+															font-size="40"
+															font-weight="600"
+														>
+															JS
+														</text>
+													</svg>
+												</div>
+											</div>
+										</div>
+										<h4 class="text-white font-semibold mb-1 text-center">
+											John Smith
+										</h4>
+										<p class="text-slate-400 text-sm mb-4 text-center">
+											CEO & Founder
+										</p>
+										<div class="flex justify-center space-x-4">
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fab fa-linkedin text-lg"></i>
+											</a>
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fab fa-twitter text-lg"></i>
+											</a>
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fas fa-envelope text-lg"></i>
+											</a>
+										</div>
+									</div>
+
+									<!-- Sarah Johnson -->
+									<div
+										class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 transition-all"
+										data-aos="zoom-in"
+										data-aos-delay="100"
+									>
+										<div class="mb-4 relative">
+											<div
+												class="w-32 h-32 rounded-full mx-auto bg-gradient-to-r from-purple-500 to-indigo-500 p-1"
+											>
+												<div class="relative w-full h-full">
+													<img
+														src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2"
+														class="rounded-full w-full h-full object-cover"
+														alt="Sarah Johnson"
+														onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';"
+													/>
+													<svg
+														class="absolute inset-0 w-full h-full text-white"
+														viewBox="0 0 100 100"
+														aria-hidden="true"
+														style="display: none"
+													>
+														<text
+															x="50%"
+															y="50%"
+															dominant-baseline="middle"
+															text-anchor="middle"
+															font-size="40"
+															font-weight="600"
+														>
+															SJ
+														</text>
+													</svg>
+												</div>
+											</div>
+										</div>
+										<h4 class="text-white font-semibold mb-1 text-center">
+											Sarah Johnson
+										</h4>
+										<p class="text-slate-400 text-sm mb-4 text-center">
+											Chief Technology Officer
+										</p>
+										<div class="flex justify-center space-x-4">
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fab fa-github text-lg"></i>
+											</a>
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fab fa-stack-overflow text-lg"></i>
+											</a>
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fas fa-envelope text-lg"></i>
+											</a>
+										</div>
+									</div>
+
+									<!-- Michael Chen -->
+									<div
+										class="bg-slate-800 p-6 rounded-xl border border-slate-700 hover:border-indigo-500 transition-all"
+										data-aos="zoom-in"
+										data-aos-delay="200"
+									>
+										<div class="mb-4 relative">
+											<div
+												class="w-32 h-32 rounded-full mx-auto bg-gradient-to-r from-green-500 to-blue-500 p-1"
+											>
+												<div class="relative w-full h-full">
+													<img
+														src="https://images.unsplash.com/photo-1600878459138-e1123b37cb30"
+														class="rounded-full w-full h-full object-cover"
+														alt="Michael Chen"
+														onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='block';"
+													/>
+													<svg
+														class="absolute inset-0 w-full h-full text-white"
+														viewBox="0 0 100 100"
+														aria-hidden="true"
+														style="display: none"
+													>
+														<text
+															x="50%"
+															y="50%"
+															dominant-baseline="middle"
+															text-anchor="middle"
+															font-size="40"
+															font-weight="600"
+														>
+															MC
+														</text>
+													</svg>
+												</div>
+											</div>
+										</div>
+										<h4 class="text-white font-semibold mb-1 text-center">
+											Michael Chen
+										</h4>
+										<p class="text-slate-400 text-sm mb-4 text-center">
+											Chief Operations Officer
+										</p>
+										<div class="flex justify-center space-x-4">
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fab fa-linkedin text-lg"></i>
+											</a>
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fab fa-medium text-lg"></i>
+											</a>
+											<a
+												href="#"
+												class="text-slate-400 hover:text-indigo-500 transition-colors"
+											>
+												<i class="fas fa-envelope text-lg"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<!-- Values Section -->
+					<div class="text-center">
+						<h3 class="text-2xl font-bold text-white mb-8">Our Core Values</h3>
+						<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+							<div
+								class="bg-slate-800 p-6 rounded-xl border border-slate-700"
+								data-aos="fade-up"
+							>
+								<div class="text-indigo-500 text-3xl mb-4">
+									<i class="fas fa-users"></i>
+								</div>
+								<h4 class="text-white font-semibold mb-2">
+									Collaboration First
+								</h4>
+								<p class="text-slate-400 text-sm">
+									We believe the best results come from empowered teams working
+									together.
+								</p>
+							</div>
+							<div
+								class="bg-slate-800 p-6 rounded-xl border border-slate-700"
+								data-aos="fade-up"
+								data-aos-delay="100"
+							>
+								<div class="text-purple-500 text-3xl mb-4">
+									<i class="fas fa-shield-alt"></i>
+								</div>
+								<h4 class="text-white font-semibold mb-2">Security Focused</h4>
+								<p class="text-slate-400 text-sm">
+									Your data's security is our top priority with enterprise-grade
+									protection.
+								</p>
+							</div>
+							<div
+								class="bg-slate-800 p-6 rounded-xl border border-slate-700"
+								data-aos="fade-up"
+								data-aos-delay="200"
+							>
+								<div class="text-green-500 text-3xl mb-4">
+									<i class="fas fa-heart"></i>
+								</div>
+								<h4 class="text-white font-semibold mb-2">
+									User-Centric Design
+								</h4>
+								<p class="text-slate-400 text-sm">
+									Building tools that people love to use every day.
+								</p>
+							</div>
+							<div
+								class="bg-slate-800 p-6 rounded-xl border border-slate-700"
+								data-aos="fade-up"
+								data-aos-delay="300"
+							>
+								<div class="text-blue-500 text-3xl mb-4">
+									<i class="fas fa-code"></i>
+								</div>
+								<h4 class="text-white font-semibold mb-2">
+									Continuous Innovation
+								</h4>
+								<p class="text-slate-400 text-sm">
+									Constantly evolving to meet our users' changing needs.
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Plans Section -->
+		<section class="py-16 bg-slate-900">
+			<div class="container mx-auto px-4">
+				<h2 class="text-3xl font-bold text-center text-white mb-8">
+					Pricing Plans
+				</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<!-- Basic Plan -->
+					<div
+						class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-indigo-500 transition-all"
+					>
+						<div class="text-center mb-6">
+							<h3 class="text-xl font-bold text-white mb-2">Basic</h3>
+							<p class="text-4xl font-bold text-white">
+								$9<span class="text-lg text-slate-400">/mo</span>
+							</p>
+						</div>
+						<ul class="space-y-3 mb-6">
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Up to 5
+								projects
+							</li>
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Basic
+								analytics
+							</li>
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>3 team
+								members
+							</li>
+						</ul>
+						<button
+							class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition-all"
+						>
+							Get Started
+						</button>
+					</div>
+
+					<!-- Pro Plan -->
+					<div
+						class="bg-slate-800 rounded-xl p-6 border border-purple-500 transform hover:scale-105 transition-all"
+					>
+						<div class="text-center mb-6">
+							<h3 class="text-xl font-bold text-white mb-2">Pro</h3>
+							<p class="text-4xl font-bold text-white">
+								$29<span class="text-lg text-slate-400">/mo</span>
+							</p>
+						</div>
+						<ul class="space-y-3 mb-6">
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Unlimited
+								projects
+							</li>
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Advanced
+								analytics
+							</li>
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>10 team
+								members
+							</li>
+						</ul>
+						<button
+							class="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg transition-all"
+						>
+							Get Started
+						</button>
+					</div>
+
+					<!-- Enterprise Plan -->
+					<div
+						class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-indigo-500 transition-all"
+					>
+						<div class="text-center mb-6">
+							<h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
+							<p class="text-4xl font-bold text-white">
+								$99<span class="text-lg text-slate-400">/mo</span>
+							</p>
+						</div>
+						<ul class="space-y-3 mb-6">
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Unlimited
+								everything
+							</li>
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Priority
+								support
+							</li>
+							<li class="flex items-center text-slate-300">
+								<i class="fas fa-check-circle text-green-500 mr-2"></i>Custom
+								solutions
+							</li>
+						</ul>
+						<button
+							class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition-all"
+						>
+							Contact Sales
+						</button>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Contact Section -->
+		<section class="py-16 bg-slate-900 border-t border-slate-800">
+			<div class="container mx-auto px-4">
+				<div class="max-w-4xl mx-auto">
+					<h2 class="text-3xl font-bold text-center text-white mb-8">
+						Contact Us
+					</h2>
+					<div class="flex flex-col md:flex-row gap-8">
+						<!-- Contact Form -->
+						<div class="md:w-1/2">
+							<form class="space-y-6">
+								<div>
+									<label class="block text-slate-300 mb-2">Full Name</label>
+									<input
+										type="text"
+										class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 text-white"
+									/>
+								</div>
+								<div>
+									<label class="block text-slate-300 mb-2">Email Address</label>
+									<input
+										type="email"
+										class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 text-white"
+									/>
+								</div>
+								<div>
+									<label class="block text-slate-300 mb-2">Message</label>
+									<textarea
+										rows="4"
+										class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 text-white"
+									></textarea>
+								</div>
+								<button
+									class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition-all"
+								>
+									Send Message
+								</button>
+							</form>
+						</div>
+
+						<!-- Contact Info -->
+						<div class="md:w-1/2">
+							<div class="bg-slate-800 rounded-xl p-6 border border-slate-700">
+								<div class="space-y-6">
+									<div class="flex items-center gap-4">
+										<div class="bg-indigo-500 p-3 rounded-lg">
+											<i class="fas fa-map-marker-alt text-white text-xl"></i>
+										</div>
+										<div>
+											<h4 class="text-white font-semibold">Our Office</h4>
+											<p class="text-slate-400">
+												123 Business Street<br />New York, NY 10001
+											</p>
+										</div>
+									</div>
+									<div class="flex items-center gap-4">
+										<div class="bg-purple-500 p-3 rounded-lg">
+											<i class="fas fa-phone text-white text-xl"></i>
+										</div>
+										<div>
+											<h4 class="text-white font-semibold">Phone Number</h4>
+											<p class="text-slate-400">+1 (555) 123-4567</p>
+										</div>
+									</div>
+									<div class="flex items-center gap-4">
+										<div class="bg-green-500 p-3 rounded-lg">
+											<i class="fas fa-envelope text-white text-xl"></i>
+										</div>
+										<div>
+											<h4 class="text-white font-semibold">Email Address</h4>
+											<p class="text-slate-400">support@timemanager.com</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Social Links -->
+							<div class="mt-6 flex justify-center gap-4">
+								<a
+									href="#"
+									class="text-slate-400 hover:text-indigo-500 transition-colors"
+								>
+									<i class="fab fa-facebook text-2xl"></i>
+								</a>
+								<a
+									href="#"
+									class="text-slate-400 hover:text-indigo-500 transition-colors"
+								>
+									<i class="fab fa-twitter text-2xl"></i>
+								</a>
+								<a
+									href="#"
+									class="text-slate-400 hover:text-indigo-500 transition-colors"
+								>
+									<i class="fab fa-linkedin text-2xl"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- FAQ Section -->
+		<section class="py-16 bg-slate-900 border-t border-slate-800">
+			<div class="container mx-auto px-4">
+				<h2 class="text-3xl font-bold text-center text-white mb-8">
+					Frequently Asked Questions
+				</h2>
+				<div class="max-w-3xl mx-auto space-y-4">
+					<!-- FAQ Item -->
+					<details
+						class="bg-slate-800 rounded-lg border border-slate-700 open:border-indigo-500 transition-all"
+					>
+						<summary
+							class="px-6 py-4 text-white font-semibold cursor-pointer list-none"
+						>
+							How do I upgrade my plan?
+							<i
+								class="fas fa-chevron-down float-right mt-1 transform transition-transform duration-300"
+							></i>
+						</summary>
+						<div class="px-6 pb-4 pt-2 border-t border-slate-700">
+							<p class="text-slate-400">
+								You can upgrade your plan at any time from your account
+								settings. Any prorated differences in pricing will be applied to
+								your next billing cycle.
+							</p>
+						</div>
+					</details>
+
+					<details
+						class="bg-slate-800 rounded-lg border border-slate-700 open:border-indigo-500 transition-all"
+					>
+						<summary
+							class="px-6 py-4 text-white font-semibold cursor-pointer list-none"
+						>
+							Can I cancel my subscription anytime?
+							<i
+								class="fas fa-chevron-down float-right mt-1 transform transition-transform duration-300"
+							></i>
+						</summary>
+						<div class="px-6 pb-4 pt-2 border-t border-slate-700">
+							<p class="text-slate-400">
+								Yes, you can cancel your subscription at any time. Your access
+								will continue until the end of your current billing period.
+							</p>
+						</div>
+					</details>
+
+					<details
+						class="bg-slate-800 rounded-lg border border-slate-700 open:border-indigo-500 transition-all"
+					>
+						<summary
+							class="px-6 py-4 text-white font-semibold cursor-pointer list-none"
+						>
+							How secure is my data?
+							<i
+								class="fas fa-chevron-down float-right mt-1 transform transition-transform duration-300"
+							></i>
+						</summary>
+						<div class="px-6 pb-4 pt-2 border-t border-slate-700">
+							<p class="text-slate-400">
+								We use enterprise-grade security measures including AES-256
+								encryption and regular security audits to protect your data.
+							</p>
+						</div>
+					</details>
+				</div>
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="bg-slate-900 border-t border-slate-800 py-6">
+			<div class="container mx-auto px-4">
+				<div
+					class="flex flex-col md:flex-row justify-between items-center gap-4"
+				>
+					<div class="text-slate-400 text-sm">
+						© 2025 Project Timeline Manager. All rights reserved.
+					</div>
+					<div class="flex items-center gap-4">
+						<a
+							href="#"
+							class="text-slate-400 hover:text-slate-300 transition-colors"
+						>
+							<i class="fab fa-github"></i>
+						</a>
+						<a
+							href="#"
+							class="text-slate-400 hover:text-slate-300 transition-colors"
+						>
+							<i class="fab fa-twitter"></i>
+						</a>
+						<a
+							href="#"
+							class="text-slate-400 hover:text-slate-300 transition-colors"
+						>
+							<i class="fab fa-linkedin"></i>
+						</a>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Add Task Modal -->
+		<div id="taskModal" class="fixed inset-0 z-50 hidden modal-overlay">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div
+					class="bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-md animate-in border border-slate-700"
+					data-aos="zoom-in"
+				>
+					<div class="flex justify-between items-center mb-4">
+						<h3 class="text-lg font-bold text-white">
+							<i class="fas fa-tasks mr-2 text-indigo-400"></i>Add New Task
+						</h3>
+						<button
+							id="closeTaskModal"
+							class="text-slate-400 hover:text-slate-300"
+						>
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+
+					<form id="taskForm" class="space-y-4">
+						<div>
+							<label
+								for="taskName"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-heading mr-1 text-indigo-400"></i>Task Name
+							</label>
+							<input
+								type="text"
+								id="taskName"
+								class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+								required
+							/>
+						</div>
+
+						<div class="grid grid-cols-2 gap-4">
+							<div>
+								<label
+									for="taskStart"
+									class="block text-sm font-medium mb-1 text-slate-300"
+								>
+									<i class="fas fa-calendar-day mr-1 text-indigo-400"></i>Start
+									Date
+								</label>
+								<input
+									type="date"
+									id="taskStart"
+									class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+									required
+								/>
+							</div>
+							<div>
+								<label
+									for="taskEnd"
+									class="block text-sm font-medium mb-1 text-slate-300"
+								>
+									<i class="fas fa-calendar-week mr-1 text-indigo-400"></i>End
+									Date
+								</label>
+								<input
+									type="date"
+									id="taskEnd"
+									class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+									required
+								/>
+							</div>
+						</div>
+
+						<div>
+							<label
+								for="taskAssignee"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-user mr-1 text-indigo-400"></i>Assignee
+							</label>
+							<select
+								id="taskAssignee"
+								class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+								required
+							>
+								<!-- Options will be populated by JS -->
+							</select>
+						</div>
+
+						<div>
+							<label
+								for="taskStatus"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-info-circle mr-1 text-indigo-400"></i>Status
+							</label>
+							<select
+								id="taskStatus"
+								class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+								required
+							>
+								<option value="not-started">Not Started</option>
+								<option value="in-progress">In Progress</option>
+								<option value="completed">Completed</option>
+								<option value="on-hold">On Hold</option>
+								<option value="milestone">Milestone</option>
+							</select>
+						</div>
+
+						<div>
+							<label
+								for="taskProgress"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-spinner mr-1 text-indigo-400"></i>Progress (%)
+							</label>
+							<div class="flex items-center gap-3">
+								<input
+									type="range"
+									id="taskProgress"
+									min="0"
+									max="100"
+									value="0"
+									class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer progress-bar"
+								/>
+								<span
+									id="progressValue"
+									class="text-sm w-12 text-center text-slate-300"
+									>0%</span
+								>
+							</div>
+						</div>
+
+						<div class="flex justify-end gap-3 pt-4">
+							<button
+								type="button"
+								id="cancelTask"
+								class="px-4 py-2 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors shadow-sm text-slate-300"
+							>
+								Cancel
+							</button>
+							<button
+								type="submit"
+								class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow hover:shadow-lg"
+							>
+								<i class="fas fa-save mr-1"></i>Save Task
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Add User Modal -->
+		<div id="userModal" class="fixed inset-0 z-50 hidden modal-overlay">
+			<div class="flex items-center justify-center min-h-screen p-4">
+				<div
+					class="bg-slate-800 rounded-xl shadow-2xl p-6 w-full max-w-md animate-in border border-slate-700"
+					data-aos="zoom-in"
+				>
+					<div class="flex justify-between items-center mb-4">
+						<h3 class="text-lg font-bold text-white">
+							<i class="fas fa-user-plus mr-2 text-purple-400"></i>Add Team
+							Member
+						</h3>
+						<button
+							id="closeUserModal"
+							class="text-slate-400 hover:text-slate-300"
+						>
+							<i class="fas fa-times"></i>
+						</button>
+					</div>
+
+					<form id="userForm" class="space-y-4">
+						<div>
+							<label
+								for="userName"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-user mr-1 text-purple-400"></i>Full Name
+							</label>
+							<input
+								type="text"
+								id="userName"
+								class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+								required
+							/>
+						</div>
+
+						<div>
+							<label
+								for="userEmail"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-envelope mr-1 text-purple-400"></i>Email
+							</label>
+							<input
+								type="email"
+								id="userEmail"
+								class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+								required
+							/>
+						</div>
+
+						<div>
+							<label
+								for="userRole"
+								class="block text-sm font-medium mb-1 text-slate-300"
+							>
+								<i class="fas fa-briefcase mr-1 text-purple-400"></i>Role
+							</label>
+							<select
+								id="userRole"
+								class="w-full px-3 py-2 border border-slate-700 rounded-lg bg-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-white shadow-sm"
+								required
+							>
+								<option value="developer">Developer</option>
+								<option value="designer">Designer</option>
+								<option value="manager">Project Manager</option>
+								<option value="qa">QA Engineer</option>
+							</select>
+						</div>
+
+						<div class="flex justify-end gap-3 pt-4">
+							<button
+								type="button"
+								id="cancelUser"
+								class="px-4 py-2 border border-slate-700 rounded-lg hover:bg-slate-700 transition-colors shadow-sm text-slate-300"
+							>
+								Cancel
+							</button>
+							<button
+								type="submit"
+								class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors shadow hover:shadow-lg"
+							>
+								<i class="fas fa-user-plus mr-1"></i>Add Member
+							</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- Tooltip -->
+		<div
+			id="tooltip"
+			class="absolute bg-slate-800 shadow-xl rounded-lg p-4 border border-slate-700 z-50 opacity-0 max-w-xs pointer-events-none transition-all duration-200"
+		>
+			<div class="flex justify-between items-start mb-2">
+				<h4 id="tooltipTitle" class="font-bold text-lg text-white"></h4>
+				<span id="tooltipStatus" class="text-xs px-2 py-1 rounded-full"></span>
+			</div>
+			<div class="space-y-3 text-sm text-slate-300">
+				<div class="flex items-center gap-2">
+					<i class="fas fa-calendar-day text-slate-500"></i>
+					<span id="tooltipDates"></span>
+				</div>
+				<div class="flex items-center gap-2">
+					<i class="fas fa-user text-slate-500"></i>
+					<span id="tooltipAssignee"></span>
+				</div>
+				<div class="flex items-center gap-2">
+					<i class="fas fa-spinner text-slate-500"></i>
+					<span id="tooltipProgress"></span>
+				</div>
+				<div class="pt-2">
+					<div class="w-full bg-slate-700 rounded-full h-2">
+						<div id="tooltipProgressBar" class="h-2 rounded-full"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+		<script>
+			AOS.init({
+				duration: 600,
+				easing: "ease-in-out",
+				once: true,
+			});
+
+			const state = {
+				tasks: [
+					{
+						id: "1",
+						name: "Project Kickoff",
+						start: "2023-01-02",
+						end: "2023-01-02",
+						assignee: "1",
+						status: "milestone",
+						progress: 100,
+					},
+					{
+						id: "2",
+						name: "UI Design",
+						start: "2023-01-03",
+						end: "2023-01-20",
+						assignee: "2",
+						status: "completed",
+						progress: 100,
+					},
+					{
+						id: "3",
+						name: "API Development",
+						start: "2023-01-15",
+						end: "2023-02-10",
+						assignee: "1",
+						status: "in-progress",
+						progress: 60,
+					},
+					{
+						id: "4",
+						name: "Database Setup",
+						start: "2023-01-10",
+						end: "2023-01-25",
+						assignee: "3",
+						status: "in-progress",
+						progress: 30,
+					},
+					{
+						id: "5",
+						name: "Testing Phase",
+						start: "2023-02-01",
+						end: "2023-02-15",
+						assignee: "4",
+						status: "not-started",
+						progress: 0,
+					},
+					{
+						id: "6",
+						name: "Deployment",
+						start: "2023-02-16",
+						end: "2023-02-16",
+						assignee: "1",
+						status: "not-started",
+						progress: 0,
+					},
+				],
+				users: [
+					{
+						id: "1",
+						name: "John Doe",
+						email: "john@example.com",
+						role: "developer",
+					},
+					{
+						id: "2",
+						name: "Jane Smith",
+						email: "jane@example.com",
+						role: "designer",
+					},
+					{
+						id: "3",
+						name: "Mike Johnson",
+						email: "mike@example.com",
+						role: "developer",
+					},
+					{
+						id: "4",
+						name: "Sarah Williams",
+						email: "sarah@example.com",
+						role: "qa",
+					},
+				],
+				currentDateRange: {
+					start: new Date("2023-01-01"),
+					end: new Date("2023-01-31"),
+				},
+				zoomLevel: "month",
+				draggingTask: null,
+				dragStartX: 0,
+				taskStartX: 0,
+				taskStartWidth: 0,
+				dragType: null,
+				editingTaskId: null,
+			};
+
+			const elements = {
+				timeline: document.getElementById("timeline"),
+				timeMarkers: document.getElementById("timeMarkers"),
+				timelineHeader: document.getElementById("timelineHeader"),
+				timelineContainer: document.getElementById("timelineContainer"),
+				dateRange: document.getElementById("dateRange"),
+				zoomLevel: document.getElementById("zoomLevel"),
+				filterSelect: document.getElementById("filterSelect"),
+				taskModal: document.getElementById("taskModal"),
+				userModal: document.getElementById("userModal"),
+				tooltip: document.getElementById("tooltip"),
+				taskForm: document.getElementById("taskForm"),
+				userForm: document.getElementById("userForm"),
+				taskAssignee: document.getElementById("taskAssignee"),
+				taskProgress: document.getElementById("taskProgress"),
+				progressValue: document.getElementById("progressValue"),
+				dateRangeInput: document.getElementById("dateRangeInput"),
+			};
+
+			function init() {
+				updateTimelineDimensions();
+
+				renderTimeMarkers();
+				renderTasks();
+				populateUserDropdown();
+				populateFilterDropdown();
+				updateDateRangeText();
+				initDateRangePicker();
+
+				setupEventListeners();
+
+				setupSynchronizedScrolling();
+
+				window.addEventListener("resize", handleWindowResize);
+
+				createResizeObserver();
+
+				setupTooltipClickOutside();
+			}
+
+			function createResizeObserver() {
+				if ("ResizeObserver" in window) {
+					const resizeObserver = new ResizeObserver((entries) => {
+						document.body.style.display = "none";
+
+						void document.body.offsetHeight;
+						document.body.style.display = "";
+
+						setTimeout(() => {
+							updateTimelineDimensions();
+							renderTimeMarkers();
+							renderTasks(elements.filterSelect.value);
+						}, 50);
+					});
+
+					resizeObserver.observe(elements.timelineContainer);
+				}
+			}
+			function openTaskModalForEdit(taskId) {
+				const task = state.tasks.find((t) => t.id === taskId);
+				if (!task) return;
+
+				state.editingTaskId = taskId;
+				elements.taskModal.classList.remove("hidden");
+				document.body.style.overflow = "hidden";
+
+				document.getElementById("taskName").value = task.name;
+				document.getElementById("taskStart").value = task.start;
+				document.getElementById("taskEnd").value = task.end;
+				document.getElementById("taskAssignee").value = task.assignee;
+				document.getElementById("taskStatus").value = task.status;
+				document.getElementById("taskProgress").value = task.progress;
+				document.getElementById(
+					"progressValue"
+				).textContent = `${task.progress}%`;
+
+				document.querySelector(
+					"#taskModal h3"
+				).innerHTML = `<i class="fas fa-edit mr-2 text-indigo-400"></i>Edit Task`;
+			}
+
+			function setupTooltipClickOutside() {
+				const tooltipBackdrop = document.createElement("div");
+				tooltipBackdrop.className = "tooltip-backdrop";
+				tooltipBackdrop.id = "tooltipBackdrop";
+				tooltipBackdrop.style.display = "none";
+				document.body.appendChild(tooltipBackdrop);
+
+				tooltipBackdrop.addEventListener("click", hideTooltip);
+
+				document.addEventListener("click", (e) => {
+					const tooltip = elements.tooltip;
+					const clickedTooltip = tooltip.contains(e.target);
+					const clickedTask = e.target.closest(".task-bar");
+
+					if (
+						!clickedTooltip &&
+						!clickedTask &&
+						tooltip.style.opacity === "1"
+					) {
+						hideTooltip();
+					}
+				});
+			}
+
+			function setupEventListeners() {
+				document
+					.getElementById("addTaskBtn")
+					.addEventListener("click", openTaskModal);
+				document
+					.getElementById("addUserBtn")
+					.addEventListener("click", openUserModal);
+				document
+					.getElementById("closeTaskModal")
+					.addEventListener("click", closeTaskModal);
+				document
+					.getElementById("closeUserModal")
+					.addEventListener("click", closeUserModal);
+				document
+					.getElementById("cancelTask")
+					.addEventListener("click", closeTaskModal);
+				document
+					.getElementById("cancelUser")
+					.addEventListener("click", closeUserModal);
+				document
+					.getElementById("prevBtn")
+					.addEventListener("click", navigateTimeline.bind(null, "prev"));
+				document
+					.getElementById("nextBtn")
+					.addEventListener("click", navigateTimeline.bind(null, "next"));
+
+				elements.taskForm.addEventListener("submit", handleTaskSubmit);
+				elements.userForm.addEventListener("submit", handleUserSubmit);
+				elements.taskProgress.addEventListener("input", updateProgressValue);
+				elements.filterSelect.addEventListener("change", filterTasks);
+			}
+
+			function setupSynchronizedScrolling() {
+				elements.timelineContainer.addEventListener("scroll", function () {
+					elements.timelineHeader.scrollLeft =
+						elements.timelineContainer.scrollLeft;
+				});
+
+				elements.timelineHeader.addEventListener("scroll", function () {
+					elements.timelineContainer.scrollLeft =
+						elements.timelineHeader.scrollLeft;
+				});
+			}
+
+			function handleWindowResize() {
+				updateTimelineDimensions();
+				renderTimeMarkers();
+				renderTasks(elements.filterSelect.value);
+			}
+
+			function updateTimelineDimensions() {
+				const containerWidth = elements.timelineContainer.clientWidth;
+				const days = getDaysInRange(
+					state.currentDateRange.start,
+					state.currentDateRange.end
+				);
+
+				const requiredWidth = calculateRequiredWidth(days.length);
+
+				const timelineWidth = Math.max(containerWidth, requiredWidth);
+
+				elements.timeline.style.width = `${timelineWidth}px`;
+				elements.timeMarkers.style.width = `${timelineWidth}px`;
+			}
+
+			function calculateRequiredWidth(numDays) {
+				const minDayWidth = 30;
+				const containerWidth = elements.timelineContainer.clientWidth;
+
+				if (containerWidth / numDays >= minDayWidth) {
+					return containerWidth;
+				}
+
+				return numDays * minDayWidth;
+			}
+
+			function getDayWidth() {
+				const days = getDaysInRange(
+					state.currentDateRange.start,
+					state.currentDateRange.end
+				);
+				const timelineWidth = parseInt(elements.timeline.style.width);
+				return timelineWidth / days.length;
+			}
+
+			function initDateRangePicker() {
+				flatpickr(elements.dateRangeInput, {
+					mode: "range",
+					dateFormat: "Y-m-d",
+					defaultDate: [
+						state.currentDateRange.start,
+						state.currentDateRange.end,
+					],
+					onChange: function (selectedDates) {
+						if (selectedDates.length === 2) {
+							state.currentDateRange.start = selectedDates[0];
+							state.currentDateRange.end = selectedDates[1];
+							updateDateRangeText();
+							updateTimelineDimensions();
+							renderTimeMarkers();
+							renderTasks(elements.filterSelect.value);
+						}
+					},
+					theme: "dark",
+				});
+			}
+
+			function renderTimeMarkers() {
+				elements.timeMarkers.innerHTML = "";
+
+				const days = getDaysInRange(
+					state.currentDateRange.start,
+					state.currentDateRange.end
+				);
+				const dayWidth = getDayWidth();
+
+				days.forEach((day) => {
+					const marker = document.createElement("div");
+					marker.className =
+						"flex flex-col items-center justify-end px-1 border-r border-slate-700";
+					marker.style.width = `${dayWidth}px`;
+					marker.style.minWidth = `${dayWidth}px`;
+
+					const dayName = document.createElement("span");
+					dayName.className = "text-xs font-medium text-slate-400";
+					dayName.textContent = day
+						.toLocaleDateString("en-US", { weekday: "short" })
+						.charAt(0);
+
+					const dayNumber = document.createElement("span");
+					dayNumber.className = "text-sm font-medium text-slate-300";
+					dayNumber.textContent = day.getDate();
+
+					const today = new Date();
+					if (day.toDateString() === today.toDateString()) {
+						dayNumber.className +=
+							" bg-indigo-500 text-white rounded-full w-6 h-6 flex items-center justify-center";
+					}
+
+					marker.appendChild(dayName);
+					marker.appendChild(dayNumber);
+					elements.timeMarkers.appendChild(marker);
+				});
+			}
+
+			function renderTasks(filterUserId = "all") {
+				elements.timeline.innerHTML = "";
+
+				const dateFilteredTasks = state.tasks.filter((task) => {
+					const taskStart = new Date(task.start);
+					const taskEnd = new Date(task.end);
+					return (
+						taskStart <= state.currentDateRange.end &&
+						taskEnd >= state.currentDateRange.start
+					);
+				});
+
+				const filteredTasks =
+					filterUserId === "all"
+						? [...dateFilteredTasks].sort(
+								(a, b) => new Date(a.start) - new Date(b.start)
+						  )
+						: dateFilteredTasks
+								.filter((task) => task.assignee === filterUserId)
+								.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+				const lanes = [];
+
+				filteredTasks.forEach((task) => {
+					const startDate = new Date(task.start);
+					const endDate = new Date(task.end);
+					const dayWidth = getDayWidth();
+
+					const visibleStartDate = new Date(
+						Math.max(startDate, state.currentDateRange.start)
+					);
+					const visibleEndDate = new Date(
+						Math.min(endDate, state.currentDateRange.end)
+					);
+
+					const daysFromStart = Math.max(
+						0,
+						dateDiffInDays(state.currentDateRange.start, visibleStartDate)
+					);
+					const taskDuration =
+						dateDiffInDays(visibleStartDate, visibleEndDate) + 1;
+
+					const left = daysFromStart * dayWidth;
+					const width = taskDuration * dayWidth;
+
+					if (width <= 0) return;
+
+					let laneIndex = 0;
+					while (laneIndex < lanes.length) {
+						const laneEnd = lanes[laneIndex] || 0;
+						if (left >= laneEnd) {
+							break;
+						}
+						laneIndex++;
+					}
+
+					lanes[laneIndex] = left + width;
+
+					createTaskElement(task, left, width, laneIndex * 70);
+				});
+			}
+
+			function createTaskElement(task, left, width, topOffset = 0) {
+				const taskElement = document.createElement("div");
+				taskElement.id = `task-${task.id}`;
+				taskElement.className =
+					"task-bar absolute h-14 rounded-lg flex items-center px-3 cursor-move shadow-sm draggable";
+
+				taskElement.style.left = `${left}px`;
+				taskElement.style.width = `${width}px`;
+				taskElement.style.top = `${20 + topOffset}px`;
+
+				setTaskColor(taskElement, task.status);
+
+				const progressBar = document.createElement("div");
+				progressBar.className =
+					"absolute bottom-0 left-0 h-1 rounded-b-lg progress-bar";
+				progressBar.style.width = `${task.progress}%`;
+
+				if (task.status === "completed") {
+					progressBar.classList.add("bg-green-600");
+				} else if (task.status === "in-progress") {
+					progressBar.classList.add("bg-yellow-600");
+				} else {
+					progressBar.classList.add("bg-slate-600", "opacity-30");
+				}
+
+				taskElement.appendChild(progressBar);
+
+				const taskContent = document.createElement("div");
+				taskContent.className = "flex flex-col w-full overflow-hidden";
+
+				const taskName = document.createElement("span");
+				taskName.className = "text-sm font-medium truncate text-white";
+				taskName.textContent = task.name;
+				taskContent.appendChild(taskName);
+
+				if (width > 100) {
+					const taskDates = document.createElement("div");
+					taskDates.className = "flex items-center gap-2 mt-1";
+
+					const startDate = document.createElement("span");
+					startDate.className =
+						"text-xs px-1.5 py-0.5 rounded-full bg-white/10 text-white";
+					startDate.textContent = formatShortDate(task.start);
+					taskDates.appendChild(startDate);
+
+					if (task.status !== "milestone") {
+						const arrow = document.createElement("i");
+						arrow.className =
+							"fas fa-arrow-right text-white opacity-70 text-xs";
+						taskDates.appendChild(arrow);
+
+						const endDate = document.createElement("span");
+						endDate.className =
+							"text-xs px-1.5 py-0.5 rounded-full bg-white/10 text-white";
+						endDate.textContent = formatShortDate(task.end);
+						taskDates.appendChild(endDate);
+					}
+
+					taskContent.appendChild(taskDates);
+				}
+
+				taskElement.appendChild(taskContent);
+
+				const user = state.users.find((u) => u.id === task.assignee);
+				if (user) {
+					const avatar = document.createElement("div");
+					avatar.className = "user-avatar absolute -right-2 -top-2 shadow-md";
+					avatar.style.backgroundColor = getAvatarColor(user.id);
+					avatar.textContent = user.name
+						.split(" ")
+						.map((n) => n[0])
+						.join("")
+						.toUpperCase();
+					taskElement.appendChild(avatar);
+				}
+
+				const editButton = document.createElement("button");
+				editButton.className =
+					"absolute right-2 bottom-1 text-white opacity-0 hover:opacity-100 transition-opacity";
+				editButton.innerHTML = '<i class="fas fa-edit text-xs"></i>';
+				editButton.addEventListener("click", (e) => {
+					e.stopPropagation();
+					e.preventDefault();
+					openTaskModalForEdit(task.id);
+				});
+				taskElement.appendChild(editButton);
+
+				taskElement.addEventListener("mouseenter", () => {
+					editButton.classList.remove("opacity-0");
+					editButton.classList.add("opacity-100");
+				});
+
+				taskElement.addEventListener("mouseleave", () => {
+					editButton.classList.remove("opacity-100");
+					editButton.classList.add("opacity-0");
+				});
+
+				if (task.status !== "milestone" && width > 50) {
+					const resizeHandle = document.createElement("div");
+					resizeHandle.className =
+						"absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize";
+					resizeHandle.addEventListener("mousedown", (e) =>
+						startResizeTask(e, taskElement, task)
+					);
+					taskElement.appendChild(resizeHandle);
+				}
+
+				taskElement.addEventListener("mousedown", (e) => {
+					if (!e.target.closest("button")) {
+						startDragTask(e, taskElement, task);
+					}
+				});
+				taskElement.addEventListener("mouseenter", (e) => showTooltip(e, task));
+				taskElement.addEventListener("mouseleave", hideTooltip);
+				addTouchEventListeners(taskElement, task);
+				elements.timeline.appendChild(taskElement);
+			}
+
+			function setTaskColor(taskElement, status) {
+				const baseClasses =
+					"task-bar absolute h-14 rounded-lg flex items-center px-3 cursor-move shadow-sm draggable";
+
+				taskElement.className = baseClasses;
+
+				switch (status) {
+					case "not-started":
+						taskElement.classList.add("bg-red-500", "hover:bg-red-600");
+						break;
+					case "in-progress":
+						taskElement.classList.add("bg-yellow-500", "hover:bg-yellow-600");
+						break;
+					case "completed":
+						taskElement.classList.add("bg-green-500", "hover:bg-green-600");
+						break;
+					case "on-hold":
+						taskElement.classList.add("bg-blue-500", "hover:bg-blue-600");
+						break;
+					case "milestone":
+						taskElement.classList.add("bg-purple-500", "hover:bg-purple-600");
+						break;
+					default:
+						taskElement.classList.add("bg-slate-500", "hover:bg-slate-600");
+				}
+			}
+
+			function formatShortDate(dateString) {
+				const date = new Date(dateString);
+				return date.toLocaleDateString("en-US", {
+					month: "short",
+					day: "numeric",
+				});
+			}
+
+			function dateDiffInDays(a, b) {
+				const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+				const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+				const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+				return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+			}
+
+			function getDaysInRange(start, end) {
+				const days = [];
+				let current = new Date(start);
+
+				while (current <= end) {
+					days.push(new Date(current));
+					current.setDate(current.getDate() + 1);
+				}
+
+				return days;
+			}
+
+			function getAvatarColor(userId) {
+				const colors = [
+					"#f87171",
+					"#fb923c",
+					"#fbbf24",
+					"#a3e635",
+					"#4ade80",
+					"#34d399",
+					"#2dd4bf",
+					"#22d3ee",
+					"#38bdf8",
+					"#60a5fa",
+					"#818cf8",
+					"#a78bfa",
+					"#c084fc",
+					"#e879f9",
+					"#f472b6",
+					"#fb7185",
+				];
+				const index = parseInt(userId) % colors.length;
+				return colors[index];
+			}
+
+			function updateDateRangeText() {
+				const start = state.currentDateRange.start;
+				const end = state.currentDateRange.end;
+
+				const startStr = start.toLocaleDateString("en-US", {
+					month: "short",
+					day: "numeric",
+				});
+				const endStr = end.toLocaleDateString("en-US", {
+					month: "short",
+					day: "numeric",
+					year: "numeric",
+				});
+
+				elements.dateRange.textContent = `${startStr} - ${endStr}`;
+			}
+
+			function populateUserDropdown() {
+				elements.taskAssignee.innerHTML = "";
+
+				state.users.forEach((user) => {
+					const option = document.createElement("option");
+					option.value = user.id;
+					option.textContent = user.name;
+					elements.taskAssignee.appendChild(option);
+				});
+			}
+
+			function populateFilterDropdown() {
+				const filterSelect = elements.filterSelect;
+
+				while (filterSelect.options.length > 1) {
+					filterSelect.remove(1);
+				}
+
+				state.users.forEach((user) => {
+					const option = document.createElement("option");
+					option.value = user.id;
+					option.textContent = user.name;
+					filterSelect.appendChild(option);
+				});
+			}
+
+			function showTooltip(e, task) {
+				const tooltip = elements.tooltip;
+				const tooltipBackdrop = document.getElementById("tooltipBackdrop");
+				const user = state.users.find((u) => u.id === task.assignee);
+
+				document.getElementById("tooltipTitle").textContent = task.name;
+				document.getElementById(
+					"tooltipDates"
+				).textContent = `${formatShortDate(task.start)} - ${formatShortDate(
+					task.end
+				)}`;
+				document.getElementById("tooltipAssignee").textContent = user
+					? user.name
+					: "Unassigned";
+				document.getElementById(
+					"tooltipProgress"
+				).textContent = `${task.progress}% complete`;
+
+				const statusElement = document.getElementById("tooltipStatus");
+				statusElement.textContent = task.status.replace("-", " ");
+				statusElement.className = "text-xs px-2 py-1 rounded-full capitalize";
+
+				switch (task.status) {
+					case "not-started":
+						statusElement.classList.add("bg-red-900", "text-red-200");
+						break;
+					case "in-progress":
+						statusElement.classList.add("bg-yellow-900", "text-yellow-200");
+						break;
+					case "completed":
+						statusElement.classList.add("bg-green-900", "text-green-200");
+						break;
+					case "on-hold":
+						statusElement.classList.add("bg-blue-900", "text-blue-200");
+						break;
+					case "milestone":
+						statusElement.classList.add("bg-purple-900", "text-purple-200");
+						break;
+				}
+
+				const progressBar = document.getElementById("tooltipProgressBar");
+				progressBar.style.width = `${task.progress}%`;
+				progressBar.className = "h-2 rounded-full";
+
+				if (task.progress === 100) {
+					progressBar.classList.add("bg-green-500");
+				} else if (task.progress > 0) {
+					progressBar.classList.add("bg-yellow-500");
+				} else {
+					progressBar.classList.add("bg-slate-600");
+				}
+
+				const isMobile = window.innerWidth < 640;
+
+				if (isMobile) {
+					tooltipBackdrop.style.display = "block";
+					tooltip.style.left = "50%";
+					tooltip.style.top = "50%";
+					tooltip.style.transform = "translate(-50%, -50%)";
+				} else {
+					positionTooltip(e);
+				}
+
+				tooltip.style.opacity = "1";
+				tooltip.style.pointerEvents = "auto";
+			}
+
+			function positionTooltip(e) {
+				const tooltip = elements.tooltip;
+				const viewportWidth = window.innerWidth;
+				const viewportHeight = window.innerHeight;
+				const tooltipWidth = tooltip.offsetWidth;
+				const tooltipHeight = tooltip.offsetHeight;
+
+				let left = e.pageX + 10;
+				let top = e.pageY + 10;
+
+				if (left + tooltipWidth > viewportWidth - 20) {
+					left = Math.max(20, e.pageX - tooltipWidth - 10);
+				}
+
+				if (top + tooltipHeight > viewportHeight - 20) {
+					top = Math.max(20, e.pageY - tooltipHeight - 10);
+				}
+
+				tooltip.style.left = `${left}px`;
+				tooltip.style.top = `${top}px`;
+				tooltip.style.transform = "";
+			}
+
+			function hideTooltip() {
+				elements.tooltip.style.opacity = "0";
+				elements.tooltip.style.pointerEvents = "none";
+
+				const tooltipBackdrop = document.getElementById("tooltipBackdrop");
+				if (tooltipBackdrop) {
+					tooltipBackdrop.style.display = "none";
+				}
+			}
+
+			function startDragTask(e, taskElement, task) {
+				if (e.button !== 0) return;
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				state.draggingTask = task;
+				state.dragStartX = e.clientX;
+				state.taskStartX = taskElement.offsetLeft;
+				state.dragType = "move";
+
+				taskElement.classList.add("dragging");
+				document.body.style.cursor = "grabbing";
+
+				document.addEventListener("mousemove", dragTask);
+				document.addEventListener("mouseup", stopDragTask);
+			}
+
+			function startResizeTask(e, taskElement, task) {
+				e.preventDefault();
+				e.stopPropagation();
+
+				state.draggingTask = task;
+				state.dragStartX = e.clientX;
+				state.taskStartWidth = taskElement.offsetWidth;
+				state.dragType = "resize";
+
+				taskElement.classList.add("dragging");
+				document.body.style.cursor = "ew-resize";
+
+				document.addEventListener("mousemove", dragTask);
+				document.addEventListener("mouseup", stopDragTask);
+			}
+
+			function dragTask(e) {
+				if (!state.draggingTask) return;
+
+				const taskElement = document.getElementById(
+					`task-${state.draggingTask.id}`
+				);
+				if (!taskElement) return;
+
+				const dayWidth = getDayWidth();
+				const deltaX = e.clientX - state.dragStartX;
+
+				if (state.dragType === "move") {
+					const newLeft = Math.max(0, state.taskStartX + deltaX);
+					const daysMoved = Math.round(newLeft / dayWidth);
+
+					taskElement.style.left = `${daysMoved * dayWidth}px`;
+
+					const startDate = new Date(state.draggingTask.start);
+					const endDate = new Date(state.draggingTask.end);
+					const duration = dateDiffInDays(startDate, endDate);
+
+					startDate.setDate(startDate.getDate() + daysMoved);
+					endDate.setDate(startDate.getDate() + duration);
+
+					if (elements.tooltip.style.opacity === "1") {
+						document.getElementById(
+							"tooltipDates"
+						).textContent = `${formatShortDate(startDate)} - ${formatShortDate(
+							endDate
+						)}`;
+					}
+				} else if (state.dragType === "resize") {
+					const newWidth = Math.max(dayWidth, state.taskStartWidth + deltaX);
+					const daysAdded =
+						Math.round(newWidth / dayWidth) -
+						Math.round(state.taskStartWidth / dayWidth);
+
+					taskElement.style.width = `${newWidth}px`;
+
+					if (elements.tooltip.style.opacity === "1") {
+						const endDate = new Date(state.draggingTask.end);
+						endDate.setDate(endDate.getDate() + daysAdded);
+						document.getElementById(
+							"tooltipDates"
+						).textContent = `${formatShortDate(
+							state.draggingTask.start
+						)} - ${formatShortDate(endDate)}`;
+					}
+				}
+			}
+
+			function stopDragTask() {
+				if (!state.draggingTask) return;
+
+				const taskElement = document.getElementById(
+					`task-${state.draggingTask.id}`
+				);
+				if (taskElement) {
+					taskElement.classList.remove("dragging");
+
+					const dayWidth = getDayWidth();
+					const left = parseInt(taskElement.style.left);
+					const width = parseInt(taskElement.style.width);
+
+					const daysMoved = Math.round(left / dayWidth);
+					const daysDuration = Math.round(width / dayWidth);
+
+					const taskIndex = state.tasks.findIndex(
+						(t) => t.id === state.draggingTask.id
+					);
+					if (taskIndex !== -1) {
+						const startDate = new Date(state.currentDateRange.start);
+						startDate.setDate(startDate.getDate() + daysMoved);
+
+						const endDate = new Date(startDate);
+						endDate.setDate(startDate.getDate() + daysDuration - 1);
+
+						state.tasks[taskIndex].start = startDate
+							.toISOString()
+							.split("T")[0];
+						state.tasks[taskIndex].end = endDate.toISOString().split("T")[0];
+					}
+				}
+
+				document.body.style.cursor = "";
+				document.removeEventListener("mousemove", dragTask);
+				document.removeEventListener("mouseup", stopDragTask);
+
+				state.draggingTask = null;
+				state.dragType = null;
+
+				renderTasks(elements.filterSelect.value);
+			}
+			function addTouchEventListeners(taskElement, task) {
+				taskElement.addEventListener(
+					"touchstart",
+					(e) => {
+						if (e.target.closest("button")) return;
+
+						const touch = e.touches[0];
+						state.draggingTask = task;
+						state.dragStartX = touch.clientX;
+						state.taskStartX = taskElement.offsetLeft;
+						state.dragType = "move";
+
+						taskElement.classList.add("dragging");
+
+						e.preventDefault();
+					},
+					{ passive: false }
+				);
+
+				taskElement.addEventListener(
+					"touchmove",
+					(e) => {
+						if (!state.draggingTask) return;
+
+						const touch = e.touches[0];
+						const dayWidth = getDayWidth();
+						const deltaX = touch.clientX - state.dragStartX;
+
+						if (state.dragType === "move") {
+							const newLeft = Math.max(0, state.taskStartX + deltaX);
+							const daysMoved = Math.round(newLeft / dayWidth);
+
+							taskElement.style.left = `${daysMoved * dayWidth}px`;
+						}
+
+						e.preventDefault();
+					},
+					{ passive: false }
+				);
+
+				taskElement.addEventListener("touchend", (e) => {
+					if (!state.draggingTask) return;
+
+					taskElement.classList.remove("dragging");
+
+					const dayWidth = getDayWidth();
+					const left = parseInt(taskElement.style.left);
+
+					const daysMoved = Math.round(left / dayWidth);
+
+					const taskIndex = state.tasks.findIndex(
+						(t) => t.id === state.draggingTask.id
+					);
+					if (taskIndex !== -1) {
+						const startDate = new Date(state.currentDateRange.start);
+						startDate.setDate(startDate.getDate() + daysMoved);
+
+						const originalStart = new Date(state.tasks[taskIndex].start);
+						const originalEnd = new Date(state.tasks[taskIndex].end);
+						const duration = dateDiffInDays(originalStart, originalEnd);
+
+						const endDate = new Date(startDate);
+						endDate.setDate(startDate.getDate() + duration);
+
+						state.tasks[taskIndex].start = startDate
+							.toISOString()
+							.split("T")[0];
+						state.tasks[taskIndex].end = endDate.toISOString().split("T")[0];
+					}
+
+					state.draggingTask = null;
+					state.dragType = null;
+
+					renderTasks(elements.filterSelect.value);
+				});
+			}
+
+			function filterTasks() {
+				const userId = elements.filterSelect.value;
+				renderTasks(userId);
+			}
+
+			function navigateTimeline(direction) {
+				const range = state.currentDateRange;
+				const amount = direction === "prev" ? -1 : 1;
+
+				if (state.zoomLevel === "month") {
+					range.start.setMonth(range.start.getMonth() + amount);
+
+					range.end = new Date(
+						range.start.getFullYear(),
+						range.start.getMonth() + 1,
+						0
+					);
+				}
+
+				updateDateRangeText();
+				updateTimelineDimensions();
+				renderTimeMarkers();
+				renderTasks(elements.filterSelect.value);
+
+				if (elements.dateRangeInput._flatpickr) {
+					elements.dateRangeInput._flatpickr.setDate([range.start, range.end]);
+				}
+			}
+
+			function openTaskModal() {
+				elements.taskModal.classList.remove("hidden");
+				document.body.style.overflow = "hidden";
+
+				elements.taskForm.reset();
+				document.getElementById("taskProgress").value = 0;
+				document.getElementById("progressValue").textContent = "0%";
+
+				const today = new Date().toISOString().split("T")[0];
+				document.getElementById("taskStart").value = today;
+				document.getElementById("taskEnd").value = today;
+			}
+
+			function closeTaskModal() {
+				elements.taskModal.classList.add("hidden");
+				document.body.style.overflow = "";
+				state.editingTaskId = null;
+
+				document.querySelector(
+					"#taskModal h3"
+				).innerHTML = `<i class="fas fa-tasks mr-2 text-indigo-400"></i>Add New Task`;
+			}
+
+			function openUserModal() {
+				elements.userModal.classList.remove("hidden");
+				document.body.style.overflow = "hidden";
+				elements.userForm.reset();
+			}
+
+			function closeUserModal() {
+				elements.userModal.classList.add("hidden");
+				document.body.style.overflow = "";
+			}
+
+			function handleTaskSubmit(e) {
+				e.preventDefault();
+
+				const formData = {
+					name: document.getElementById("taskName").value,
+					start: document.getElementById("taskStart").value,
+					end: document.getElementById("taskEnd").value,
+					assignee: document.getElementById("taskAssignee").value,
+					status: document.getElementById("taskStatus").value,
+					progress: parseInt(document.getElementById("taskProgress").value),
+				};
+
+				if (state.editingTaskId) {
+					const taskIndex = state.tasks.findIndex(
+						(t) => t.id === state.editingTaskId
+					);
+					if (taskIndex !== -1) {
+						formData.id = state.editingTaskId;
+						state.tasks[taskIndex] = formData;
+					}
+
+					state.editingTaskId = null;
+				} else {
+					formData.id = Date.now().toString();
+					state.tasks.push(formData);
+				}
+
+				document.querySelector(
+					"#taskModal h3"
+				).innerHTML = `<i class="fas fa-tasks mr-2 text-indigo-400"></i>Add New Task`;
+
+				renderTasks(elements.filterSelect.value);
+
+				closeTaskModal();
+			}
+
+			function handleUserSubmit(e) {
+				e.preventDefault();
+
+				const formData = {
+					id: Date.now().toString(),
+					name: document.getElementById("userName").value,
+					email: document.getElementById("userEmail").value,
+					role: document.getElementById("userRole").value,
+				};
+
+				state.users.push(formData);
+
+				populateUserDropdown();
+				populateFilterDropdown();
+
+				closeUserModal();
+			}
+
+			function updateProgressValue() {
+				const value = elements.taskProgress.value;
+				elements.progressValue.textContent = `${value}%`;
+			}
+
+			document.addEventListener("DOMContentLoaded", init);
+		</script>
+	</body>
+</html>
