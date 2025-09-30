@@ -1,0 +1,3307 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Enterprise Network Dashboard</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								50: "#f0f9ff",
+								100: "#e0f2fe",
+								500: "#0ea5e9",
+								600: "#0284c7",
+								700: "#0369a1",
+							},
+							dark: {
+								800: "#1e293b",
+								900: "#0f172a",
+							},
+						},
+						animation: {
+							"pulse-fast": "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+						},
+					},
+				},
+			};
+		</script>
+		<style>
+			.chart-container {
+				position: relative;
+				height: 200px;
+				width: 100%;
+			}
+			.toast {
+				animation: toast-entry 0.3s ease-out,
+					toast-exit 0.3s ease-in 4.7s forwards;
+				z-index: 100;
+			}
+			@keyframes toast-entry {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+			@keyframes toast-exit {
+				to {
+					opacity: 0;
+					transform: translateY(-10px);
+				}
+			}
+			.widget {
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+				cursor: grab;
+			}
+			.widget.dragging {
+				opacity: 0.8;
+				transform: scale(1.02);
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+				cursor: grabbing;
+			}
+			.widget-placeholder {
+				border: 2px dashed #0ea5e9;
+				background-color: rgba(14, 165, 233, 0.05);
+			}
+			.tab-content {
+				display: none;
+			}
+			.tab-content.active {
+				display: block;
+				animation: fadeIn 0.3s ease-out;
+			}
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			.mobile-menu {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height 0.3s ease-out;
+			}
+			.mobile-menu.open {
+				max-height: 500px;
+			}
+
+			.resizable-handle {
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				width: 16px;
+				height: 16px;
+				cursor: nwse-resize;
+				background: rgba(14, 165, 233, 0.2);
+				border-radius: 3px 0 3px 0;
+				z-index: 10;
+			}
+
+			.dark-mode {
+				background-color: #0f172a;
+				color: #e5e7eb;
+			}
+			.dark-mode .bg-white {
+				background-color: #1e293b;
+				color: #e5e7eb;
+			}
+			.dark-mode .text-gray-500 {
+				color: #9ca3af;
+			}
+			.dark-mode .text-gray-600 {
+				color: #d1d5db;
+			}
+			.dark-mode .text-gray-700 {
+				color: #e5e7eb;
+			}
+			.dark-mode .text-gray-800 {
+				color: #f3f4f6;
+			}
+			.dark-mode .bg-gray-50 {
+				background-color: #1e293b;
+			}
+			.dark-mode .bg-gray-100 {
+				background-color: #334155;
+			}
+			.dark-mode .border-gray-200 {
+				border-color: #334155;
+			}
+			.dark-mode .chart-container canvas {
+				filter: invert(0.85) hue-rotate(180deg);
+			}
+
+			.scan-animation {
+				background: linear-gradient(
+					90deg,
+					rgba(14, 165, 233, 0) 0%,
+					rgba(14, 165, 233, 0.2) 50%,
+					rgba(14, 165, 233, 0) 100%
+				);
+				background-size: 200% 100%;
+				animation: scan 1.5s infinite;
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				pointer-events: none;
+			}
+			@keyframes scan {
+				0% {
+					background-position: 100% 0;
+				}
+				100% {
+					background-position: -100% 0;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.stats-grid {
+					grid-template-columns: repeat(2, 1fr);
+				}
+				.widget-grid {
+					grid-template-columns: 1fr;
+				}
+				.widget {
+					width: 100%;
+				}
+				.history-widget {
+					order: 4;
+				}
+				.contact-columns {
+					flex-direction: column;
+				}
+				.feature-cards {
+					flex-direction: column;
+				}
+				.feature-card {
+					width: 100%;
+				}
+			}
+
+			@media (max-width: 480px) {
+				.stats-grid {
+					grid-template-columns: 1fr;
+				}
+				.header-content {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+				.header-buttons {
+					margin-top: 0.5rem;
+					width: 100%;
+					justify-content: space-between;
+				}
+				.chart-container {
+					height: 180px;
+				}
+				.tab-buttons {
+					flex-wrap: wrap;
+				}
+				.tab-buttons button {
+					margin-bottom: 0.25rem;
+					padding: 0.25rem 0.5rem;
+					font-size: 0.75rem;
+				}
+			}
+
+			.donut-segment {
+				transition: all 0.3s ease-out;
+			}
+			.donut-segment:hover {
+				transform: scale(1.03);
+			}
+
+			.pulse-dot {
+				position: relative;
+			}
+			.pulse-dot::before {
+				content: "";
+				position: absolute;
+				width: 8px;
+				height: 8px;
+				border-radius: 50%;
+				background-color: rgba(16, 185, 129, 0.8);
+				left: -12px;
+				top: 50%;
+				transform: translateY(-50%);
+				animation: pulse-animation 1.5s infinite;
+			}
+			@keyframes pulse-animation {
+				0% {
+					transform: translateY(-50%) scale(0.8);
+					opacity: 0.8;
+				}
+				50% {
+					transform: translateY(-50%) scale(1.2);
+					opacity: 0.4;
+				}
+				100% {
+					transform: translateY(-50%) scale(0.8);
+					opacity: 0.8;
+				}
+			}
+
+			.toggle-checkbox:checked {
+				right: 0;
+				border-color: #0ea5e9;
+			}
+			.toggle-checkbox:checked + .toggle-label {
+				background-color: #0ea5e9;
+			}
+		</style>
+	</head>
+	<body class="bg-gray-50 min-h-screen font-sans antialiased">
+		<!-- Header with mobile menu -->
+		<header
+			class="bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md"
+		>
+			<div class="container mx-auto px-4 py-3">
+				<div class="flex justify-between items-center header-content">
+					<div class="flex items-center space-x-2">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"
+							/>
+						</svg>
+						<h1 class="text-xl font-bold">Enterprise Network Dashboard</h1>
+					</div>
+
+					<div class="hidden md:flex items-center space-x-4 tab-buttons">
+						<button
+							onclick="showTab('dashboard')"
+							class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition-colors"
+						>
+							Dashboard
+						</button>
+						<button
+							onclick="showTab('security')"
+							class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition-colors"
+						>
+							Security
+						</button>
+						<button
+							onclick="showTab('departments')"
+							class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition-colors"
+						>
+							Departments
+						</button>
+						<button
+							onclick="showTab('about')"
+							class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition-colors"
+						>
+							About
+						</button>
+						<button
+							onclick="showTab('contact')"
+							class="text-sm bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition-colors"
+						>
+							Contact
+						</button>
+						<span id="currentTime" class="text-sm font-mono ml-2"></span>
+					</div>
+
+					<div class="flex items-center space-x-3">
+						<!-- Dark mode toggle -->
+
+						<!-- Mobile menu button -->
+						<button
+							id="mobileMenuButton"
+							class="md:hidden text-white focus:outline-none"
+						>
+							<svg
+								class="h-6 w-6"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M4 6h16M4 12h16M4 18h16"
+								></path>
+							</svg>
+						</button>
+					</div>
+				</div>
+
+				<!-- Mobile menu -->
+				<div id="mobileMenu" class="mobile-menu md:hidden">
+					<div class="pt-2 pb-4 space-y-1">
+						<button
+							onclick="showTab('dashboard'); toggleMobileMenu()"
+							class="block w-full text-left px-3 py-2 rounded text-sm font-medium hover:bg-white/10 transition-colors"
+						>
+							Dashboard
+						</button>
+						<button
+							onclick="showTab('security'); toggleMobileMenu()"
+							class="block w-full text-left px-3 py-2 rounded text-sm font-medium hover:bg-white/10 transition-colors"
+						>
+							Security
+						</button>
+						<button
+							onclick="showTab('departments'); toggleMobileMenu()"
+							class="block w-full text-left px-3 py-2 rounded text-sm font-medium hover:bg-white/10 transition-colors"
+						>
+							Departments
+						</button>
+						<button
+							onclick="showTab('about'); toggleMobileMenu()"
+							class="block w-full text-left px-3 py-2 rounded text-sm font-medium hover:bg-white/10 transition-colors"
+						>
+							About
+						</button>
+						<button
+							onclick="showTab('contact'); toggleMobileMenu()"
+							class="block w-full text-left px-3 py-2 rounded text-sm font-medium hover:bg-white/10 transition-colors"
+						>
+							Contact
+						</button>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="container mx-auto px-4 py-6">
+			<!-- Dashboard Tab -->
+			<div id="dashboard-tab" class="tab-content active">
+				<!-- Stats Overview - Responsive grid -->
+				<div
+					class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+				>
+					<div
+						class="bg-white rounded-lg shadow p-4 border-l-4 border-primary-500"
+					>
+						<div class="flex items-center">
+							<div class="bg-primary-100 p-2 rounded-full mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-primary-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+									/>
+								</svg>
+							</div>
+							<div>
+								<p class="text-xs text-gray-500">Bandwidth</p>
+								<p class="font-semibold pulse-dot">
+									<span id="currentBandwidth">0</span>
+									<span class="text-xs">MB/s</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div
+						class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500"
+					>
+						<div class="flex items-center">
+							<div class="bg-green-100 p-2 rounded-full mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-green-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<p class="text-xs text-gray-500">Active Devices</p>
+								<p class="font-semibold pulse-dot">
+									<span id="activeDevices">0</span>
+									<span class="text-xs">connected</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div
+						class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500"
+					>
+						<div class="flex items-center">
+							<div class="bg-yellow-100 p-2 rounded-full mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-yellow-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<p class="text-xs text-gray-500">Warnings</p>
+								<p class="font-semibold">
+									<span id="warningCount">0</span>
+									<span class="text-xs">alerts</span>
+								</p>
+							</div>
+						</div>
+					</div>
+					<div class="bg-white rounded-lg shadow p-4 border-l-4 border-red-500">
+						<div class="flex items-center">
+							<div class="bg-red-100 p-2 rounded-full mr-3">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 text-red-600"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+							</div>
+							<div>
+								<p class="text-xs text-gray-500">Critical</p>
+								<p class="font-semibold">
+									<span id="criticalCount">0</span>
+									<span class="text-xs">issues</span>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Network Status Banner -->
+				<div
+					class="mb-6 bg-gradient-to-r from-green-500 to-green-600 shadow rounded-lg overflow-hidden"
+				>
+					<div class="px-4 py-3 flex justify-between items-center">
+						<div class="flex items-center text-white">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M13 10V3L4 14h7v7l9-11h-7z"
+								/>
+							</svg>
+							<div>
+								<span class="font-medium">Network Status:</span>
+								<span id="networkStatus" class="ml-1">Operational</span>
+							</div>
+						</div>
+						<div class="flex items-center space-x-3">
+							<span id="uptime" class="text-white text-sm">Uptime: 99.99%</span>
+							<button
+								id="refreshBtn"
+								class="text-white bg-white/20 hover:bg-white/30 rounded p-1"
+								onclick="refreshDashboard()"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-4 w-4"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Dashboard Grid with Draggable Widgets - Responsive layout -->
+				<div
+					id="dashboardGrid"
+					class="widget-grid grid grid-cols-1 lg:grid-cols-3 gap-4"
+				>
+					<!-- Bandwidth Chart -->
+					<div
+						class="widget relative lg:col-span-3 bg-white rounded-lg shadow"
+						draggable="true"
+						data-widget="bandwidth"
+					>
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Bandwidth Usage (Live)</h2>
+							<div class="flex space-x-1">
+								<button
+									onclick="toggleFullscreen(this)"
+									class="text-gray-500 hover:text-primary-600 p-1"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"
+										/>
+									</svg>
+								</button>
+								<button
+									onclick="exportPDF('bandwidth')"
+									class="text-gray-500 hover:text-primary-600 p-1"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="p-4">
+							<div class="chart-container">
+								<canvas id="bandwidthChart"></canvas>
+							</div>
+						</div>
+						<div class="resizable-handle"></div>
+					</div>
+
+					<!-- Devices Table -->
+					<div
+						class="widget relative bg-white rounded-lg shadow"
+						draggable="true"
+						data-widget="devices"
+					>
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Network Devices</h2>
+							<div class="flex space-x-1">
+								<select
+									id="deptFilter"
+									class="text-xs border border-gray-200 rounded p-1"
+								>
+									<option value="">All Departments</option>
+									<option value="IT">IT</option>
+									<option value="HR">HR</option>
+									<option value="Sales">Sales</option>
+									<option value="Marketing">Marketing</option>
+									<option value="Finance">Finance</option>
+								</select>
+								<button
+									onclick="exportPDF('devices')"
+									class="text-gray-500 hover:text-primary-600 p-1"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="p-4">
+							<div class="mb-3 relative">
+								<input
+									type="text"
+									id="deviceSearch"
+									placeholder="Search devices..."
+									class="w-full pl-8 pr-3 py-1.5 border rounded text-sm focus:ring-1 focus:ring-primary-500"
+								/>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-3.5 w-3.5 absolute left-2.5 top-2 text-gray-400"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+									/>
+								</svg>
+							</div>
+							<div class="overflow-auto" style="max-height: 200px">
+								<table id="devicesTable" class="w-full text-xs">
+									<thead class="bg-gray-50">
+										<tr>
+											<th class="p-1.5 text-left">Device</th>
+											<th class="p-1.5 text-left">IP Address</th>
+											<th class="p-1.5 text-left">Department</th>
+											<th class="p-1.5 text-left">Status</th>
+										</tr>
+									</thead>
+									<tbody class="divide-y divide-gray-200"></tbody>
+								</table>
+							</div>
+						</div>
+						<div class="resizable-handle"></div>
+					</div>
+
+					<!-- Alerts Center -->
+					<div
+						class="widget relative bg-white rounded-lg shadow"
+						draggable="true"
+						data-widget="alerts"
+					>
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Alerts Center</h2>
+							<button
+								id="clearAlerts"
+								class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 rounded px-2 py-1"
+							>
+								Clear All
+							</button>
+						</div>
+						<div class="p-4">
+							<div class="mb-3">
+								<label class="block text-xs text-gray-500 mb-1"
+									>Bandwidth Threshold (MB/s)</label
+								>
+								<input
+									type="range"
+									id="thresholdRange"
+									min="10"
+									max="100"
+									value="50"
+									class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+								/>
+								<div class="flex justify-between text-xs text-gray-500 mt-1">
+									<span>10</span>
+									<span id="thresholdValue">50</span>
+									<span>100</span>
+								</div>
+							</div>
+							<button
+								onclick="setThreshold()"
+								class="w-full bg-primary-600 hover:bg-primary-700 text-white py-1.5 rounded text-sm transition-colors"
+							>
+								Update Threshold
+							</button>
+
+							<div class="mt-4">
+								<h3 class="text-xs font-medium text-gray-500 mb-2">
+									Recent Alerts
+								</h3>
+								<div
+									id="alertsList"
+									class="space-y-2 text-xs max-h-40 overflow-y-auto"
+								>
+									<!-- Alerts will be added here dynamically -->
+								</div>
+							</div>
+						</div>
+						<div class="resizable-handle"></div>
+					</div>
+
+					<!-- History Chart -->
+					<div
+						class="widget relative history-widget lg:col-span-2 bg-white rounded-lg shadow"
+						draggable="true"
+						data-widget="history"
+					>
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Historical Bandwidth</h2>
+							<div class="flex space-x-1">
+								<select
+									id="historyRange"
+									class="text-xs border border-gray-200 rounded p-1"
+								>
+									<option value="day">Last 24 Hours</option>
+									<option value="week">Last Week</option>
+									<option value="month">Last Month</option>
+								</select>
+								<button
+									onclick="exportPDF('history')"
+									class="text-gray-500 hover:text-primary-600 p-1"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+										/>
+									</svg>
+								</button>
+							</div>
+						</div>
+						<div class="p-4">
+							<div class="chart-container">
+								<canvas id="historyChart"></canvas>
+							</div>
+						</div>
+						<div class="resizable-handle"></div>
+					</div>
+
+					<!-- Traffic Sources -->
+					<div
+						class="widget relative bg-white rounded-lg shadow"
+						draggable="true"
+						data-widget="traffic"
+					>
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Traffic Sources</h2>
+							<div class="flex space-x-1">
+								<button
+									class="text-xs text-gray-500 bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
+									onclick="toggleTrafficView()"
+								>
+									<span id="trafficViewText">View Details</span>
+								</button>
+							</div>
+						</div>
+						<div class="p-4">
+							<div class="chart-container">
+								<canvas id="trafficSourcesChart"></canvas>
+							</div>
+							<div id="trafficDetails" class="mt-2 text-xs hidden">
+								<div class="border-t border-gray-100 pt-2">
+									<table class="w-full">
+										<thead>
+											<tr class="text-gray-500">
+												<th class="p-1 text-left">Source</th>
+												<th class="p-1 text-right">Data</th>
+												<th class="p-1 text-right">%</th>
+											</tr>
+										</thead>
+										<tbody id="trafficDetailsList">
+											<!-- Traffic details will be added here -->
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+						<div class="resizable-handle"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Security Tab -->
+			<div id="security-tab" class="tab-content">
+				<div class="max-w-6xl mx-auto">
+					<!-- Security Overview -->
+					<div
+						class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+					>
+						<div
+							class="bg-white rounded-lg shadow p-4 border-l-4 border-green-500"
+						>
+							<div class="flex items-center">
+								<div class="bg-green-100 p-2 rounded-full mr-3">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-green-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+										/>
+									</svg>
+								</div>
+								<div>
+									<p class="text-xs text-gray-500">Firewall Status</p>
+									<p class="font-semibold text-green-600">Active</p>
+								</div>
+							</div>
+						</div>
+						<div
+							class="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500"
+						>
+							<div class="flex items-center">
+								<div class="bg-blue-100 p-2 rounded-full mr-3">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-blue-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+										/>
+									</svg>
+								</div>
+								<div>
+									<p class="text-xs text-gray-500">Security Policy</p>
+									<p class="font-semibold text-blue-600">Enterprise</p>
+								</div>
+							</div>
+						</div>
+						<div
+							class="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500"
+						>
+							<div class="flex items-center">
+								<div class="bg-yellow-100 p-2 rounded-full mr-3">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-yellow-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+										/>
+									</svg>
+								</div>
+								<div>
+									<p class="text-xs text-gray-500">Threats Detected</p>
+									<p class="font-semibold text-yellow-600">
+										<span id="threatCount">0</span> today
+									</p>
+								</div>
+							</div>
+						</div>
+						<div
+							class="bg-white rounded-lg shadow p-4 border-l-4 border-indigo-500"
+						>
+							<div class="flex items-center">
+								<div class="bg-indigo-100 p-2 rounded-full mr-3">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-5 w-5 text-indigo-600"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+										/>
+									</svg>
+								</div>
+								<div>
+									<p class="text-xs text-gray-500">Last Scan</p>
+									<p class="font-semibold text-indigo-600" id="lastScanTime">
+										2 hours ago
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Security Scan Section -->
+					<div class="bg-white rounded-lg shadow mb-6 overflow-hidden">
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Network Security Scanner</h2>
+							<button
+								id="startScanBtn"
+								class="text-xs bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded transition-colors"
+							>
+								Start Scan
+							</button>
+						</div>
+						<div class="p-4">
+							<div id="scanProgress" class="hidden">
+								<div class="relative pt-1">
+									<div class="flex mb-2 items-center justify-between">
+										<div>
+											<span
+												class="text-xs font-medium text-primary-600 inline-block py-1"
+											>
+												Scanning your network...
+											</span>
+										</div>
+										<div class="text-right">
+											<span
+												id="scanPercentage"
+												class="text-xs font-medium text-primary-600 inline-block"
+											>
+												0%
+											</span>
+										</div>
+									</div>
+									<div
+										class="relative h-2 overflow-hidden rounded-full bg-gray-200"
+									>
+										<div
+											id="scanProgressBar"
+											class="scan-animation h-2 bg-primary-500"
+											style="width: 0%"
+										></div>
+									</div>
+								</div>
+							</div>
+
+							<div id="scanResults" class="hidden mt-4">
+								<h3 class="text-sm font-medium mb-2">Scan Results</h3>
+								<div class="border border-gray-200 rounded-lg overflow-hidden">
+									<table class="min-w-full divide-y divide-gray-200">
+										<thead class="bg-gray-50">
+											<tr>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Type
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Description
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Severity
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Action
+												</th>
+											</tr>
+										</thead>
+										<tbody
+											id="vulnerabilityList"
+											class="bg-white divide-y divide-gray-200 text-xs"
+										>
+											<!-- Scan results will be populated here -->
+										</tbody>
+									</table>
+								</div>
+
+								<div class="mt-4 text-right">
+									<button
+										class="text-xs bg-primary-600 hover:bg-primary-700 text-white px-3 py-1 rounded transition-colors"
+										onclick="generateSecurityReport()"
+									>
+										Generate Report
+									</button>
+								</div>
+							</div>
+
+							<div id="scanInstructions" class="text-sm text-gray-600">
+								<p>The network security scanner checks for:</p>
+								<ul class="list-disc ml-5 mt-2 text-xs space-y-1">
+									<li>Unauthorized devices on the network</li>
+									<li>Open ports and vulnerable services</li>
+									<li>Outdated firmware and software</li>
+									<li>Weak encryption protocols</li>
+									<li>Suspicious network traffic patterns</li>
+								</ul>
+								<p class="mt-4 text-xs">
+									Click "Start Scan" to perform a comprehensive security
+									assessment of your network.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Security Charts Grid -->
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<!-- Threat Types Chart -->
+						<div class="bg-white rounded-lg shadow">
+							<div class="border-b border-gray-200 px-4 py-3">
+								<h2 class="font-medium">Threat Categories</h2>
+							</div>
+							<div class="p-4">
+								<div class="chart-container">
+									<canvas id="threatTypesChart"></canvas>
+								</div>
+							</div>
+						</div>
+
+						<!-- Blocked Traffic Chart -->
+						<div class="bg-white rounded-lg shadow">
+							<div class="border-b border-gray-200 px-4 py-3">
+								<h2 class="font-medium">Blocked Traffic (Last 7 Days)</h2>
+							</div>
+							<div class="p-4">
+								<div class="chart-container">
+									<canvas id="blockedTrafficChart"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Departments Tab -->
+			<div id="departments-tab" class="tab-content">
+				<div class="max-w-6xl mx-auto">
+					<div class="bg-white rounded-lg shadow mb-6">
+						<div
+							class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+						>
+							<h2 class="font-medium">Department Bandwidth Usage</h2>
+							<div class="flex items-center space-x-2">
+								<button
+									onclick="exportPDF('departments')"
+									class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-2 py-1 rounded"
+								>
+									Export
+								</button>
+								<select
+									id="timeRangeSelect"
+									class="text-xs border border-gray-200 rounded p-1"
+								>
+									<option value="day">Today</option>
+									<option value="week">This Week</option>
+									<option value="month">This Month</option>
+								</select>
+							</div>
+						</div>
+						<div class="p-4">
+							<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+								<!-- Department Donut Chart -->
+								<div class="chart-container mx-auto" style="max-width: 300px">
+									<canvas id="departmentsChart"></canvas>
+								</div>
+
+								<!-- Department Details -->
+								<div>
+									<table class="min-w-full divide-y divide-gray-200">
+										<thead class="bg-gray-50">
+											<tr>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Department
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Usage
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Devices
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Trend
+												</th>
+											</tr>
+										</thead>
+										<tbody
+											id="departmentsList"
+											class="bg-white divide-y divide-gray-200 text-xs"
+										>
+											<!-- Department data will be populated here -->
+										</tbody>
+									</table>
+
+									<div class="mt-4 p-3 bg-gray-50 rounded-lg text-xs">
+										<h3 class="font-medium text-sm mb-2">Usage Insights</h3>
+										<ul class="space-y-2" id="usageInsights">
+											<!-- Insights will be populated here -->
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<!-- Top Bandwidth Users -->
+						<div class="bg-white rounded-lg shadow">
+							<div class="border-b border-gray-200 px-4 py-3">
+								<h2 class="font-medium">Top Bandwidth Users</h2>
+							</div>
+							<div class="p-4">
+								<div class="max-h-80 overflow-y-auto">
+									<table class="min-w-full divide-y divide-gray-200">
+										<thead class="bg-gray-50 sticky top-0">
+											<tr>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													User/Device
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Department
+												</th>
+												<th
+													class="px-4 py-2 text-left text-xs font-medium text-gray-500"
+												>
+													Usage
+												</th>
+											</tr>
+										</thead>
+										<tbody
+											id="topUsersList"
+											class="bg-white divide-y divide-gray-200 text-xs"
+										>
+											<!-- Top users will be populated here -->
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+						<!-- Department Usage Trends -->
+						<div class="bg-white rounded-lg shadow">
+							<div
+								class="border-b border-gray-200 px-4 py-3 flex justify-between items-center"
+							>
+								<h2 class="font-medium">Department Usage Trends</h2>
+								<select
+									id="trendDepartment"
+									class="text-xs border border-gray-200 rounded p-1"
+								>
+									<option value="all">All Departments</option>
+									<option value="IT">IT</option>
+									<option value="HR">HR</option>
+									<option value="Sales">Sales</option>
+									<option value="Marketing">Marketing</option>
+									<option value="Finance">Finance</option>
+								</select>
+							</div>
+							<div class="p-4">
+								<div class="chart-container">
+									<canvas id="departmentTrendsChart"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- About Tab - Responsive layout -->
+			<div id="about-tab" class="tab-content">
+				<div
+					class="max-w-4xl mx-auto bg-white rounded-lg shadow overflow-hidden"
+				>
+					<div
+						class="bg-gradient-to-r from-primary-600 to-primary-700 p-6 text-white"
+					>
+						<h2 class="text-2xl font-bold">
+							About Enterprise Network Dashboard
+						</h2>
+						<p class="mt-2 opacity-90">
+							Your comprehensive network monitoring solution
+						</p>
+					</div>
+					<div class="p-6">
+						<div class="feature-cards flex flex-col md:flex-row gap-6">
+							<div class="feature-card md:w-1/3">
+								<div
+									class="bg-primary-50 p-4 rounded-lg border border-primary-100"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-10 w-10 text-primary-600 mb-3"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+										/>
+									</svg>
+									<h3 class="font-semibold text-lg text-gray-800">
+										Real-time Monitoring
+									</h3>
+									<p class="mt-2 text-gray-600">
+										Track your network performance with live updates and
+										comprehensive analytics.
+									</p>
+								</div>
+							</div>
+							<div class="feature-card md:w-1/3">
+								<div
+									class="bg-primary-50 p-4 rounded-lg border border-primary-100"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-10 w-10 text-primary-600 mb-3"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+										/>
+									</svg>
+									<h3 class="font-semibold text-lg text-gray-800">
+										Device Management
+									</h3>
+									<p class="mt-2 text-gray-600">
+										View all connected devices, their status, and network
+										details at a glance.
+									</p>
+								</div>
+							</div>
+							<div class="feature-card md:w-1/3">
+								<div
+									class="bg-primary-50 p-4 rounded-lg border border-primary-100"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-10 w-10 text-primary-600 mb-3"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+										/>
+									</svg>
+									<h3 class="font-semibold text-lg text-gray-800">
+										Custom Reports
+									</h3>
+									<p class="mt-2 text-gray-600">
+										Generate detailed reports for analysis and compliance
+										documentation.
+									</p>
+								</div>
+							</div>
+						</div>
+
+						<div class="mt-8">
+							<h3 class="text-xl font-semibold text-gray-800 mb-4">
+								Our Mission
+							</h3>
+							<p class="text-gray-600 leading-relaxed">
+								Enterprise Network Dashboard was created to provide IT
+								professionals and network administrators with a powerful yet
+								intuitive tool for monitoring and managing their network
+								infrastructure. Our goal is to simplify complex network data
+								into actionable insights that help you maintain optimal
+								performance and quickly identify potential issues.
+							</p>
+							<p class="text-gray-600 leading-relaxed mt-4">
+								With over 5 years of development and feedback from network
+								engineers worldwide, we've crafted a solution that balances
+								advanced functionality with ease of use. Whether you're managing
+								a small office network or a large enterprise infrastructure, our
+								dashboard scales to meet your needs with comprehensive
+								monitoring, security analysis, and departmental insights.
+							</p>
+						</div>
+
+						<div class="mt-8 bg-blue-50 border border-blue-100 rounded-lg p-4">
+							<h3 class="text-lg font-semibold text-blue-800 mb-2">
+								Version Information
+							</h3>
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+								<div>
+									<p class="text-sm text-gray-600">Current Version</p>
+									<p class="font-medium">v3.2.1</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-600">Release Date</p>
+									<p class="font-medium">April 10, 2025</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-600">License</p>
+									<p class="font-medium">Enterprise Edition</p>
+								</div>
+								<div>
+									<p class="text-sm text-gray-600">API Version</p>
+									<p class="font-medium">v4.1</p>
+								</div>
+							</div>
+							<div class="mt-4 pt-3 border-t border-blue-100">
+								<p class="text-sm text-blue-800 font-medium">
+									New in this version:
+								</p>
+								<ul class="mt-1 text-sm text-gray-600 list-disc list-inside">
+									<li>Enhanced departmental analytics</li>
+									<li>Improved security scanning module</li>
+									<li>Mobile-responsive dashboard</li>
+									<li>Dark mode support</li>
+									<li>Interactive widget resizing</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Contact Tab - Responsive layout -->
+			<div id="contact-tab" class="tab-content">
+				<div
+					class="max-w-4xl mx-auto bg-white rounded-lg shadow overflow-hidden"
+				>
+					<div
+						class="bg-gradient-to-r from-primary-600 to-primary-700 p-6 text-white"
+					>
+						<h2 class="text-2xl font-bold">Contact Our Team</h2>
+						<p class="mt-2 opacity-90">
+							We're here to help with any questions about Enterprise Network
+							Dashboard
+						</p>
+					</div>
+					<div class="p-6">
+						<div class="contact-columns flex flex-col md:flex-row gap-8">
+							<div class="md:w-1/2">
+								<h3 class="text-xl font-semibold text-gray-800 mb-4">
+									Get in Touch
+								</h3>
+								<form id="contactForm" class="space-y-4">
+									<div>
+										<label
+											for="name"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Your Name</label
+										>
+										<input
+											type="text"
+											id="name"
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+										/>
+									</div>
+									<div>
+										<label
+											for="email"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Email Address</label
+										>
+										<input
+											type="email"
+											id="email"
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+										/>
+									</div>
+									<div>
+										<label
+											for="subject"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Subject</label
+										>
+										<select
+											id="subject"
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+										>
+											<option value="">Select a topic</option>
+											<option value="support">Technical Support</option>
+											<option value="sales">Sales Inquiry</option>
+											<option value="feedback">Product Feedback</option>
+											<option value="other">Other</option>
+										</select>
+									</div>
+									<div>
+										<label
+											for="message"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Message</label
+										>
+										<textarea
+											id="message"
+											rows="4"
+											class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary-500"
+										></textarea>
+									</div>
+									<button
+										type="submit"
+										class="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 px-4 rounded-md transition-colors"
+									>
+										Send Message
+									</button>
+								</form>
+							</div>
+							<div class="md:w-1/2">
+								<h3 class="text-xl font-semibold text-gray-800 mb-4">
+									Contact Information
+								</h3>
+								<div class="space-y-4">
+									<div class="flex items-start">
+										<div class="bg-primary-100 p-2 rounded-full mr-3">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-5 w-5 text-primary-600"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+												/>
+											</svg>
+										</div>
+										<div>
+											<h4 class="font-medium text-gray-800">Support Hotline</h4>
+											<p class="text-gray-600">+1 (800) 555-0199</p>
+											<p class="text-sm text-gray-500 mt-1">
+												24/7 technical support
+											</p>
+										</div>
+									</div>
+									<div class="flex items-start">
+										<div class="bg-primary-100 p-2 rounded-full mr-3">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-5 w-5 text-primary-600"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+												/>
+											</svg>
+										</div>
+										<div>
+											<h4 class="font-medium text-gray-800">Email</h4>
+											<p class="text-gray-600">support@enterprisenetwork.com</p>
+											<p class="text-sm text-gray-500 mt-1">
+												Typically responds within 1 business day
+											</p>
+										</div>
+									</div>
+									<div class="flex items-start">
+										<div class="bg-primary-100 p-2 rounded-full mr-3">
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												class="h-5 w-5 text-primary-600"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke="currentColor"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+												/>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													stroke-width="2"
+													d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+												/>
+											</svg>
+										</div>
+										<div>
+											<h4 class="font-medium text-gray-800">Headquarters</h4>
+											<p class="text-gray-600">123 Tech Park Drive</p>
+											<p class="text-gray-600">San Francisco, CA 94107</p>
+											<p class="text-sm text-gray-500 mt-1">
+												Open Mon-Fri, 9AM-5PM PST
+											</p>
+										</div>
+									</div>
+								</div>
+
+								<div class="mt-8">
+									<h4 class="font-medium text-gray-800 mb-3">Follow Us</h4>
+									<div class="flex space-x-4">
+										<a
+											href="#"
+											class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-700 transition-colors"
+										>
+											<i class="fab fa-twitter"></i>
+										</a>
+										<a
+											href="#"
+											class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-700 transition-colors"
+										>
+											<i class="fab fa-linkedin-in"></i>
+										</a>
+										<a
+											href="#"
+											class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-700 transition-colors"
+										>
+											<i class="fab fa-github"></i>
+										</a>
+										<a
+											href="#"
+											class="bg-gray-100 hover:bg-gray-200 p-2 rounded-full text-gray-700 transition-colors"
+										>
+											<i class="fab fa-facebook-f"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- Enhanced Footer -->
+		<footer
+			class="bg-gradient-to-t from-gray-100 via-white to-white mt-16 border-t border-gray-200"
+		>
+			<div
+				class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm text-gray-600"
+			>
+				<!-- Brand Info -->
+				<div>
+					<h3 class="text-lg font-semibold text-gray-800 mb-3">
+						Enterprise Network Dashboard
+					</h3>
+					<p class="text-gray-600 leading-relaxed">
+						Your all-in-one network intelligence tool. Monitor bandwidth,
+						devices, and alerts with real-time precision across all departments.
+					</p>
+				</div>
+
+				<!-- Quick Links -->
+				<div>
+					<h4 class="text-gray-800 font-semibold mb-3">Quick Links</h4>
+					<ul class="space-y-2">
+						<li>
+							<a
+								href="#"
+								onclick="showTab('dashboard'); return false;"
+								class="hover:text-primary-500 hover:pl-1 transition-all"
+								>Dashboard</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								onclick="showTab('security'); return false;"
+								class="hover:text-primary-500 hover:pl-1 transition-all"
+								>Security</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								onclick="showTab('departments'); return false;"
+								class="hover:text-primary-500 hover:pl-1 transition-all"
+								>Departments</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								onclick="showTab('about'); return false;"
+								class="hover:text-primary-500 hover:pl-1 transition-all"
+								>About</a
+							>
+						</li>
+					</ul>
+				</div>
+
+				<!-- Contact Info -->
+				<div>
+					<h4 class="text-gray-800 font-semibold mb-3">Contact Us</h4>
+					<p>
+						<span class="font-medium">Email:</span>
+						<a
+							href="mailto:support@enterprisenetwork.com"
+							class="text-primary-600 hover:underline"
+							>support@enterprisenetwork.com</a
+						>
+					</p>
+					<p><span class="font-medium">Phone:</span> +1 (800) 555-0199</p>
+					<p><span class="font-medium">Hours:</span> Mon–Fri, 9AM–5PM</p>
+				</div>
+
+				<!-- Social & Version -->
+				<div>
+					<h4 class="text-gray-800 font-semibold mb-3">Stay Connected</h4>
+					<div class="flex space-x-3 mb-3">
+						<a
+							href="#"
+							class="bg-gray-200 hover:bg-primary-500 hover:text-white text-gray-700 p-2 rounded-full transition-colors"
+						>
+							<i class="fab fa-twitter"></i>
+						</a>
+						<a
+							href="#"
+							class="bg-gray-200 hover:bg-primary-500 hover:text-white text-gray-700 p-2 rounded-full transition-colors"
+						>
+							<i class="fab fa-linkedin-in"></i>
+						</a>
+						<a
+							href="#"
+							class="bg-gray-200 hover:bg-primary-500 hover:text-white text-gray-700 p-2 rounded-full transition-colors"
+						>
+							<i class="fab fa-github"></i>
+						</a>
+					</div>
+					<p class="text-xs text-gray-500">
+						Version 3.2.1 • <span id="footerTime">Loading...</span>
+					</p>
+				</div>
+			</div>
+
+			<div
+				class="border-t border-gray-200 text-center py-4 text-xs text-gray-400"
+			>
+				&copy; 2025 Enterprise Network Dashboard. All rights reserved.
+			</div>
+		</footer>
+
+		<!-- Libraries -->
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+		<script>
+			const dashboardState = {
+				devices: [
+					{
+						name: "Core Switch",
+						ip: "192.168.1.1",
+						dept: "IT",
+						status: "Active",
+					},
+					{
+						name: "File Server",
+						ip: "192.168.1.2",
+						dept: "IT",
+						status: "Active",
+					},
+					{
+						name: "Mail Server",
+						ip: "192.168.1.3",
+						dept: "IT",
+						status: "Active",
+					},
+					{
+						name: "HR Workstation",
+						ip: "192.168.1.20",
+						dept: "HR",
+						status: "Active",
+					},
+					{
+						name: "Sales Laptop",
+						ip: "192.168.1.30",
+						dept: "Sales",
+						status: "Inactive",
+					},
+					{
+						name: "Marketing PC",
+						ip: "192.168.1.40",
+						dept: "Marketing",
+						status: "Active",
+					},
+					{
+						name: "Finance Server",
+						ip: "192.168.1.50",
+						dept: "Finance",
+						status: "Active",
+					},
+					{
+						name: "CEO Laptop",
+						ip: "192.168.1.60",
+						dept: "Executive",
+						status: "Active",
+					},
+					{
+						name: "Reception PC",
+						ip: "192.168.1.70",
+						dept: "HR",
+						status: "Active",
+					},
+					{
+						name: "Developer Station",
+						ip: "192.168.1.80",
+						dept: "IT",
+						status: "Active",
+					},
+					{
+						name: "Analytics Server",
+						ip: "192.168.1.90",
+						dept: "Marketing",
+						status: "Active",
+					},
+					{
+						name: "Accounting PC",
+						ip: "192.168.1.100",
+						dept: "Finance",
+						status: "Inactive",
+					},
+				],
+				threshold: 50,
+				bandwidthData: {
+					labels: Array(12).fill(""),
+					datasets: [
+						{
+							label: "MB/s",
+							data: Array(12).fill(0),
+							borderColor: "#0ea5e9",
+							backgroundColor: "rgba(14, 165, 233, 0.05)",
+							borderWidth: 1.5,
+							tension: 0.2,
+							fill: true,
+						},
+					],
+				},
+				historyData: {
+					labels: ["12am", "3am", "6am", "9am", "12pm", "3pm", "6pm", "9pm"],
+					datasets: [
+						{
+							label: "Usage",
+							data: [80, 120, 90, 150, 200, 180, 140, 100],
+							borderColor: "#0ea5e9",
+							backgroundColor: "rgba(13, 148, 136, 0.05)",
+							borderWidth: 1.5,
+							tension: 0.2,
+							fill: true,
+						},
+					],
+				},
+				deptData: {
+					labels: ["IT", "HR", "Sales", "Marketing", "Finance"],
+					datasets: [
+						{
+							data: [35, 15, 20, 22, 8],
+							backgroundColor: [
+								"#0ea5e9",
+								"#10b981",
+								"#f59e0b",
+								"#8b5cf6",
+								"#ef4444",
+							],
+							borderWidth: 0,
+							hoverOffset: 5,
+						},
+					],
+				},
+				securityData: {
+					threatTypes: {
+						labels: [
+							"Malware",
+							"Phishing",
+							"DDoS",
+							"Unauthorized Access",
+							"Data Breach",
+						],
+						datasets: [
+							{
+								data: [15, 25, 10, 18, 5],
+								backgroundColor: [
+									"#ef4444",
+									"#f59e0b",
+									"#8b5cf6",
+									"#10b981",
+									"#0ea5e9",
+								],
+								hoverOffset: 4,
+							},
+						],
+					},
+					blockedTraffic: {
+						labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+						datasets: [
+							{
+								label: "Blocked Attempts",
+								data: [120, 90, 110, 180, 150, 60, 80],
+								backgroundColor: "rgba(239, 68, 68, 0.5)",
+								borderColor: "#ef4444",
+								borderWidth: 1,
+								tension: 0.2,
+							},
+						],
+					},
+				},
+				trafficSources: {
+					labels: ["Web", "Email", "File Transfer", "VoIP", "Database", "VPN"],
+					datasets: [
+						{
+							data: [30, 20, 15, 10, 18, 7],
+							backgroundColor: [
+								"rgba(14, 165, 233, 0.8)",
+								"rgba(16, 185, 129, 0.8)",
+								"rgba(245, 158, 11, 0.8)",
+								"rgba(139, 92, 246, 0.8)",
+								"rgba(239, 68, 68, 0.8)",
+								"rgba(107, 114, 128, 0.8)",
+							],
+							borderWidth: 0,
+						},
+					],
+				},
+				departmentTrends: {
+					labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
+					datasets: [
+						{
+							label: "IT",
+							data: [420, 450, 410, 490, 510, 530, 550],
+							backgroundColor: "rgba(14, 165, 233, 0.2)",
+							borderColor: "#0ea5e9",
+							borderWidth: 2,
+							tension: 0.4,
+						},
+						{
+							label: "HR",
+							data: [200, 190, 210, 215, 190, 205, 230],
+							backgroundColor: "rgba(16, 185, 129, 0.2)",
+							borderColor: "#10b981",
+							borderWidth: 2,
+							tension: 0.4,
+						},
+						{
+							label: "Sales",
+							data: [250, 280, 290, 320, 310, 340, 360],
+							backgroundColor: "rgba(245, 158, 11, 0.2)",
+							borderColor: "#f59e0b",
+							borderWidth: 2,
+							tension: 0.4,
+						},
+						{
+							label: "Marketing",
+							data: [300, 310, 350, 380, 360, 390, 410],
+							backgroundColor: "rgba(139, 92, 246, 0.2)",
+							borderColor: "#8b5cf6",
+							borderWidth: 2,
+							tension: 0.4,
+						},
+						{
+							label: "Finance",
+							data: [150, 160, 140, 155, 170, 165, 175],
+							backgroundColor: "rgba(239, 68, 68, 0.2)",
+							borderColor: "#ef4444",
+							borderWidth: 2,
+							tension: 0.4,
+						},
+					],
+				},
+				topUsers: [
+					{ name: "Dev Team VMs", dept: "IT", usage: "240 GB" },
+					{ name: "Analytics Server", dept: "Marketing", usage: "180 GB" },
+					{ name: "Video Conference", dept: "All", usage: "145 GB" },
+					{ name: "Cloud Backups", dept: "IT", usage: "120 GB" },
+					{ name: "CRM System", dept: "Sales", usage: "95 GB" },
+					{ name: "CEO Laptop", dept: "Executive", usage: "85 GB" },
+					{ name: "Financial DB", dept: "Finance", usage: "70 GB" },
+					{ name: "Marketing PC", dept: "Marketing", usage: "65 GB" },
+					{ name: "HR Portal", dept: "HR", usage: "45 GB" },
+					{ name: "Email Server", dept: "IT", usage: "40 GB" },
+				],
+				deptInsights: [
+					"IT department bandwidth increased by 15% this month due to infrastructure upgrades.",
+					"Marketing shows higher usage during campaign launches around 10am-2pm.",
+					"Sales has consistent usage patterns with spikes during end-of-quarter periods.",
+					"HR bandwidth usage is lower than average but steady throughout the workday.",
+					"Finance department shows periodic spikes corresponding to accounting cycles.",
+				],
+				vulnerabilities: [
+					{
+						type: "Open Port",
+						description: "Port 25 exposed on Mail Server",
+						severity: "Medium",
+						action: "Restrict SMTP",
+					},
+					{
+						type: "Outdated Software",
+						description: "File Server running outdated OS version",
+						severity: "High",
+						action: "Update OS",
+					},
+					{
+						type: "Weak Password",
+						description: "Multiple accounts using simple passwords",
+						severity: "High",
+						action: "Enforce Policy",
+					},
+					{
+						type: "Unencrypted Traffic",
+						description: "Internal HTTP traffic not using HTTPS",
+						severity: "Medium",
+						action: "Enable SSL",
+					},
+					{
+						type: "Misconfiguration",
+						description: "Firewall allowing all outbound traffic",
+						severity: "Low",
+						action: "Review Rules",
+					},
+				],
+				scanning: false,
+				darkMode: false,
+				warnings: 0,
+				criticalAlerts: 0,
+				recentAlerts: [],
+				layout: ["bandwidth", "devices", "alerts", "history", "traffic"],
+			};
+
+			let bandwidthChart,
+				historyChart,
+				departmentsChart,
+				trafficSourcesChart,
+				threatTypesChart,
+				blockedTrafficChart,
+				departmentTrendsChart;
+
+			function initCharts() {
+				const getChartColors = () => {
+					return dashboardState.darkMode
+						? {
+								gridColor: "rgba(255, 255, 255, 0.1)",
+								textColor: "rgba(255, 255, 255, 0.7)",
+						  }
+						: {
+								gridColor: "rgba(0, 0, 0, 0.05)",
+								textColor: "rgba(0, 0, 0, 0.7)",
+						  };
+				};
+
+				const colors = getChartColors();
+				const fontFamily = "'Inter', 'Segoe UI', 'Roboto', sans-serif";
+
+				Chart.defaults.font.family = fontFamily;
+				Chart.defaults.font.size = 11;
+				Chart.defaults.color = colors.textColor;
+
+				bandwidthChart = new Chart(document.getElementById("bandwidthChart"), {
+					type: "line",
+					data: dashboardState.bandwidthData,
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						animation: false,
+						plugins: {
+							legend: { display: false },
+							tooltip: {
+								mode: "index",
+								intersect: false,
+								backgroundColor: dashboardState.darkMode
+									? "rgba(30, 41, 59, 0.9)"
+									: "rgba(255, 255, 255, 0.9)",
+								titleColor: dashboardState.darkMode ? "#e5e7eb" : "#1e293b",
+								bodyColor: dashboardState.darkMode ? "#e5e7eb" : "#1e293b",
+								borderColor: dashboardState.darkMode
+									? "rgba(255, 255, 255, 0.2)"
+									: "rgba(0, 0, 0, 0.1)",
+								borderWidth: 1,
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								grid: {
+									color: colors.gridColor,
+									drawBorder: false,
+								},
+								ticks: {
+									padding: 5,
+									color: colors.textColor,
+								},
+							},
+							x: {
+								grid: {
+									display: false,
+									drawBorder: false,
+								},
+								ticks: {
+									padding: 5,
+									color: colors.textColor,
+								},
+							},
+						},
+						elements: {
+							point: {
+								radius: 0,
+								hitRadius: 10,
+								hoverRadius: 4,
+							},
+						},
+					},
+				});
+
+				historyChart = new Chart(document.getElementById("historyChart"), {
+					type: "line",
+					data: dashboardState.historyData,
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						animation: false,
+						plugins: {
+							legend: { display: false },
+							tooltip: {
+								mode: "index",
+								intersect: false,
+								backgroundColor: dashboardState.darkMode
+									? "rgba(30, 41, 59, 0.9)"
+									: "rgba(255, 255, 255, 0.9)",
+								titleColor: dashboardState.darkMode ? "#e5e7eb" : "#1e293b",
+								bodyColor: dashboardState.darkMode ? "#e5e7eb" : "#1e293b",
+								borderColor: dashboardState.darkMode
+									? "rgba(255, 255, 255, 0.2)"
+									: "rgba(0, 0, 0, 0.1)",
+								borderWidth: 1,
+							},
+						},
+						scales: {
+							y: {
+								beginAtZero: true,
+								grid: {
+									color: colors.gridColor,
+									drawBorder: false,
+								},
+								ticks: {
+									padding: 5,
+									color: colors.textColor,
+								},
+							},
+							x: {
+								grid: {
+									display: false,
+									drawBorder: false,
+								},
+								ticks: {
+									padding: 5,
+									color: colors.textColor,
+								},
+							},
+						},
+						elements: {
+							point: {
+								radius: 2,
+								hitRadius: 10,
+								hoverRadius: 4,
+							},
+						},
+					},
+				});
+
+				departmentsChart = new Chart(
+					document.getElementById("departmentsChart"),
+					{
+						type: "doughnut",
+						data: dashboardState.deptData,
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									position: "right",
+									labels: {
+										padding: 15,
+										usePointStyle: true,
+										pointStyle: "circle",
+										font: {
+											size: 11,
+										},
+									},
+								},
+								tooltip: {
+									callbacks: {
+										label: function (context) {
+											const label = context.label || "";
+											const value = context.raw || 0;
+											const total = context.dataset.data.reduce(
+												(a, b) => a + b,
+												0
+											);
+											const percentage = ((value / total) * 100).toFixed(1);
+											return `${label}: ${percentage}% (${value} GB)`;
+										},
+									},
+								},
+							},
+							cutout: "70%",
+							animation: {
+								animateRotate: true,
+								animateScale: true,
+							},
+						},
+					}
+				);
+
+				trafficSourcesChart = new Chart(
+					document.getElementById("trafficSourcesChart"),
+					{
+						type: "pie",
+						data: dashboardState.trafficSources,
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									position: "right",
+									labels: {
+										padding: 15,
+										usePointStyle: true,
+										pointStyle: "circle",
+										font: {
+											size: 11,
+										},
+									},
+								},
+								tooltip: {
+									callbacks: {
+										label: function (context) {
+											const label = context.label || "";
+											const value = context.raw || 0;
+											const total = context.dataset.data.reduce(
+												(a, b) => a + b,
+												0
+											);
+											const percentage = ((value / total) * 100).toFixed(1);
+											return `${label}: ${percentage}%`;
+										},
+									},
+								},
+							},
+							animation: {
+								animateRotate: true,
+								animateScale: true,
+							},
+						},
+					}
+				);
+
+				threatTypesChart = new Chart(
+					document.getElementById("threatTypesChart"),
+					{
+						type: "doughnut",
+						data: dashboardState.securityData.threatTypes,
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									position: "right",
+									labels: {
+										padding: 15,
+										usePointStyle: true,
+										pointStyle: "circle",
+										font: {
+											size: 11,
+										},
+									},
+								},
+							},
+							cutout: "60%",
+							animation: {
+								animateRotate: true,
+								animateScale: true,
+							},
+						},
+					}
+				);
+
+				blockedTrafficChart = new Chart(
+					document.getElementById("blockedTrafficChart"),
+					{
+						type: "bar",
+						data: dashboardState.securityData.blockedTraffic,
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									display: false,
+								},
+							},
+							scales: {
+								y: {
+									beginAtZero: true,
+									grid: {
+										color: colors.gridColor,
+										drawBorder: false,
+									},
+									ticks: {
+										padding: 5,
+										color: colors.textColor,
+									},
+								},
+								x: {
+									grid: {
+										display: false,
+										drawBorder: false,
+									},
+									ticks: {
+										padding: 5,
+										color: colors.textColor,
+									},
+								},
+							},
+						},
+					}
+				);
+
+				departmentTrendsChart = new Chart(
+					document.getElementById("departmentTrendsChart"),
+					{
+						type: "line",
+						data: {
+							labels: dashboardState.departmentTrends.labels,
+							datasets: dashboardState.departmentTrends.datasets,
+						},
+						options: {
+							responsive: true,
+							maintainAspectRatio: false,
+							plugins: {
+								legend: {
+									position: "top",
+									labels: {
+										usePointStyle: true,
+										padding: 15,
+										boxWidth: 8,
+										font: {
+											size: 11,
+										},
+									},
+								},
+								tooltip: {
+									mode: "index",
+									intersect: false,
+								},
+							},
+							scales: {
+								y: {
+									beginAtZero: true,
+									grid: {
+										color: colors.gridColor,
+										drawBorder: false,
+									},
+									ticks: {
+										padding: 5,
+										color: colors.textColor,
+									},
+								},
+								x: {
+									grid: {
+										display: false,
+										drawBorder: false,
+									},
+									ticks: {
+										padding: 5,
+										color: colors.textColor,
+									},
+								},
+							},
+							elements: {
+								point: {
+									radius: 2,
+									hitRadius: 10,
+									hoverRadius: 4,
+								},
+								line: {
+									tension: 0.4,
+								},
+							},
+						},
+					}
+				);
+			}
+
+			function updateStats() {
+				const currentBW =
+					dashboardState.bandwidthData.datasets[0].data.slice(-1)[0];
+				document.getElementById("currentBandwidth").textContent =
+					currentBW.toFixed(1);
+
+				const activeDevices = dashboardState.devices.filter(
+					(d) => d.status === "Active"
+				).length;
+				document.getElementById("activeDevices").textContent = activeDevices;
+
+				document.getElementById("warningCount").textContent =
+					dashboardState.warnings;
+				document.getElementById("criticalCount").textContent =
+					dashboardState.criticalAlerts;
+
+				document.getElementById("threatCount").textContent =
+					Math.floor(Math.random() * 5) + dashboardState.warnings;
+
+				const now = new Date();
+				const timeString =
+					now.getHours().toString().padStart(2, "0") +
+					":" +
+					now.getMinutes().toString().padStart(2, "0") +
+					":" +
+					now.getSeconds().toString().padStart(2, "0");
+
+				document.getElementById("currentTime").textContent = timeString;
+				document.getElementById("footerTime").textContent =
+					timeString + " | " + now.toLocaleDateString();
+
+				const uptimeBase = 99.98;
+				const uptimeVar = Math.random() * 0.04 - 0.02;
+				document.getElementById("uptime").textContent = `Uptime: ${(
+					uptimeBase + uptimeVar
+				).toFixed(2)}%`;
+
+				const statusBanner = document.querySelector(".mb-6.bg-gradient-to-r");
+				if (dashboardState.criticalAlerts > 0) {
+					statusBanner.classList.remove(
+						"from-green-500",
+						"to-green-600",
+						"from-yellow-500",
+						"to-yellow-600"
+					);
+					statusBanner.classList.add("from-red-500", "to-red-600");
+					document.getElementById("networkStatus").textContent =
+						"Critical Issues";
+				} else if (dashboardState.warnings > 0) {
+					statusBanner.classList.remove(
+						"from-green-500",
+						"to-green-600",
+						"from-red-500",
+						"to-red-600"
+					);
+					statusBanner.classList.add("from-yellow-500", "to-yellow-600");
+					document.getElementById("networkStatus").textContent = "Warning";
+				} else {
+					statusBanner.classList.remove(
+						"from-yellow-500",
+						"to-yellow-600",
+						"from-red-500",
+						"to-red-600"
+					);
+					statusBanner.classList.add("from-green-500", "to-green-600");
+					document.getElementById("networkStatus").textContent = "Operational";
+				}
+			}
+
+			function renderDevices(search = "", deptFilter = "") {
+				const tbody = document.querySelector("#devicesTable tbody");
+				tbody.innerHTML = "";
+
+				dashboardState.devices
+					.filter((d) => {
+						const matchesSearch = `${d.name}${d.ip}${d.dept}`
+							.toLowerCase()
+							.includes(search.toLowerCase());
+						const matchesDept = deptFilter ? d.dept === deptFilter : true;
+						return matchesSearch && matchesDept;
+					})
+					.forEach((device) => {
+						const statusClass =
+							device.status === "Active"
+								? "bg-green-100 text-green-800"
+								: "bg-red-100 text-red-800";
+						const row = document.createElement("tr");
+						row.className = "hover:bg-gray-50 dark:hover:bg-gray-700";
+						row.innerHTML = `
+                        <td class="p-1.5 font-medium truncate" title="${device.name}">${device.name}</td>
+                        <td class="p-1.5 text-gray-600 dark:text-gray-400 truncate" title="${device.ip}">${device.ip}</td>
+                        <td class="p-1.5 text-gray-600 dark:text-gray-400">${device.dept}</td>
+                        <td class="p-1.5">
+                            <span class="text-xs px-2 py-0.5 rounded-full ${statusClass}">${device.status}</span>
+                        </td>
+                    `;
+						tbody.appendChild(row);
+					});
+			}
+
+			function renderDepartmentTable() {
+				const tbody = document.getElementById("departmentsList");
+				tbody.innerHTML = "";
+
+				const departments = ["IT", "HR", "Sales", "Marketing", "Finance"];
+				const usages = [350, 150, 200, 220, 80];
+				const devices = [5, 3, 2, 2, 2];
+				const trends = ["+15%", "+2%", "+7%", "+12%", "-3%"];
+
+				departments.forEach((dept, index) => {
+					const row = document.createElement("tr");
+					const trendClass = trends[index].startsWith("+")
+						? "text-green-600"
+						: "text-red-600";
+
+					row.innerHTML = `
+                    <td class="px-4 py-2 font-medium">${dept}</td>
+                    <td class="px-4 py-2">${usages[index]} GB</td>
+                    <td class="px-4 py-2">${devices[index]}</td>
+                    <td class="px-4 py-2 ${trendClass} font-medium">${trends[index]}</td>
+                `;
+					tbody.appendChild(row);
+				});
+
+				const insightsList = document.getElementById("usageInsights");
+				insightsList.innerHTML = "";
+
+				dashboardState.deptInsights.forEach((insight) => {
+					const li = document.createElement("li");
+					li.innerHTML = `<span class="inline-block w-2 h-2 bg-primary-500 rounded-full mr-2"></span> ${insight}`;
+					insightsList.appendChild(li);
+				});
+			}
+
+			function renderTopUsers() {
+				const tbody = document.getElementById("topUsersList");
+				tbody.innerHTML = "";
+
+				dashboardState.topUsers.forEach((user) => {
+					const row = document.createElement("tr");
+					row.innerHTML = `
+                    <td class="px-4 py-2 font-medium">${user.name}</td>
+                    <td class="px-4 py-2">${user.dept}</td>
+                    <td class="px-4 py-2">${user.usage}</td>
+                `;
+					tbody.appendChild(row);
+				});
+			}
+
+			function renderTrafficDetails() {
+				const table = document.getElementById("trafficDetailsList");
+				table.innerHTML = "";
+
+				const data = dashboardState.trafficSources;
+				const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+
+				data.labels.forEach((label, i) => {
+					const value = data.datasets[0].data[i];
+					const percent = ((value / total) * 100).toFixed(1);
+
+					const row = document.createElement("tr");
+					row.innerHTML = `
+                    <td class="p-1 font-medium">${label}</td>
+                    <td class="p-1 text-right">${value} GB</td>
+                    <td class="p-1 text-right">${percent}%</td>
+                `;
+					table.appendChild(row);
+				});
+			}
+
+			function toggleTrafficView() {
+				const detailsElement = document.getElementById("trafficDetails");
+				const buttonText = document.getElementById("trafficViewText");
+
+				if (detailsElement.classList.contains("hidden")) {
+					detailsElement.classList.remove("hidden");
+					buttonText.textContent = "Hide Details";
+				} else {
+					detailsElement.classList.add("hidden");
+					buttonText.textContent = "View Details";
+				}
+			}
+
+			function updateAlertsList() {
+				const alertsList = document.getElementById("alertsList");
+				alertsList.innerHTML = "";
+
+				if (dashboardState.recentAlerts.length === 0) {
+					alertsList.innerHTML =
+						'<p class="text-gray-400 dark:text-gray-500 italic">No recent alerts</p>';
+					return;
+				}
+
+				dashboardState.recentAlerts
+					.slice(-5)
+					.reverse()
+					.forEach((alert) => {
+						const alertEl = document.createElement("div");
+						alertEl.className = `flex items-start ${
+							alert.type === "critical"
+								? "text-red-600"
+								: alert.type === "warning"
+								? "text-yellow-600"
+								: alert.type === "success"
+								? "text-green-600"
+								: "text-blue-600"
+						}`;
+
+						let iconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />`;
+
+						if (alert.type === "success") {
+							iconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />`;
+						} else if (alert.type === "info") {
+							iconPath = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`;
+						}
+
+						alertEl.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mt-0.5 mr-1.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            ${iconPath}
+                        </svg>
+                        <div>
+                            <span class="font-medium">${alert.time}:</span> ${alert.message}
+                        </div>
+                    `;
+						alertsList.appendChild(alertEl);
+					});
+			}
+
+			function updateBandwidth() {
+				dashboardState.bandwidthData.labels.shift();
+				dashboardState.bandwidthData.datasets[0].data.shift();
+
+				const now = new Date();
+				const timeString =
+					now.getHours().toString().padStart(2, "0") +
+					":" +
+					now.getMinutes().toString().padStart(2, "0");
+
+				dashboardState.bandwidthData.labels.push(timeString);
+
+				let lastValue =
+					dashboardState.bandwidthData.datasets[0].data.slice(-1)[0] || 30;
+				let trend = Math.random() > 0.5 ? 1 : -1;
+				let change = Math.random() * 10 * trend;
+				let newValue = Math.max(5, Math.min(100, lastValue + change));
+
+				if (Math.random() > 0.9) {
+					newValue = Math.min(100, newValue * (Math.random() * 1.5 + 1));
+				}
+
+				dashboardState.bandwidthData.datasets[0].data.push(newValue);
+
+				bandwidthChart.update();
+
+				if (newValue > dashboardState.threshold * 1.5) {
+					dashboardState.criticalAlerts++;
+					const alert = {
+						type: "critical",
+						message: `Bandwidth critical (${newValue.toFixed(1)}MB/s)`,
+						time: timeString,
+					};
+					dashboardState.recentAlerts.push(alert);
+					showToast(alert.message, "critical");
+				} else if (newValue > dashboardState.threshold) {
+					dashboardState.warnings++;
+					const alert = {
+						type: "warning",
+						message: `Bandwidth warning (${newValue.toFixed(1)}MB/s)`,
+						time: timeString,
+					};
+					dashboardState.recentAlerts.push(alert);
+					showToast(alert.message, "warning");
+				}
+
+				if (Math.random() > 0.9) {
+					const randomDevice =
+						dashboardState.devices[
+							Math.floor(Math.random() * dashboardState.devices.length)
+						];
+					if (randomDevice.status === "Inactive") {
+						randomDevice.status = "Active";
+						const alert = {
+							type: "info",
+							message: `${randomDevice.name} (${randomDevice.ip}) connected`,
+							time: timeString,
+						};
+						dashboardState.recentAlerts.push(alert);
+						showToast(alert.message, "info");
+						renderDevices(
+							document.getElementById("deviceSearch").value,
+							document.getElementById("deptFilter").value
+						);
+					}
+				}
+
+				if (Math.random() > 0.95) {
+					const activeDevices = dashboardState.devices.filter(
+						(d) => d.status === "Active"
+					);
+					if (activeDevices.length > 3) {
+						const randomDevice =
+							activeDevices[Math.floor(Math.random() * activeDevices.length)];
+						randomDevice.status = "Inactive";
+						const alert = {
+							type: "warning",
+							message: `${randomDevice.name} (${randomDevice.ip}) disconnected`,
+							time: timeString,
+						};
+						dashboardState.recentAlerts.push(alert);
+						showToast(alert.message, "warning");
+						renderDevices(
+							document.getElementById("deviceSearch").value,
+							document.getElementById("deptFilter").value
+						);
+					}
+				}
+
+				updateStats();
+				updateAlertsList();
+			}
+
+			function setThreshold() {
+				dashboardState.threshold = parseInt(
+					document.getElementById("thresholdRange").value
+				);
+				document.getElementById("thresholdValue").textContent =
+					dashboardState.threshold;
+
+				const now = new Date();
+				const timeString =
+					now.getHours().toString().padStart(2, "0") +
+					":" +
+					now.getMinutes().toString().padStart(2, "0");
+
+				const alert = {
+					type: "success",
+					message: `Threshold set to ${dashboardState.threshold}MB/s`,
+					time: timeString,
+				};
+				dashboardState.recentAlerts.push(alert);
+
+				showToast(alert.message, "success");
+				updateAlertsList();
+			}
+
+			function clearAlerts() {
+				dashboardState.recentAlerts = [];
+				updateAlertsList();
+				showToast("All alerts cleared", "info");
+			}
+
+			function showToast(message, type = "info") {
+				const toast = document.createElement("div");
+
+				const bgColor =
+					type === "critical"
+						? "bg-red-500"
+						: type === "warning"
+						? "bg-yellow-500"
+						: type === "success"
+						? "bg-green-500"
+						: "bg-primary-500";
+
+				toast.className = `toast fixed bottom-4 right-4 px-4 py-2 rounded-md shadow-md text-sm text-white ${bgColor}`;
+				toast.textContent = message;
+				document.body.appendChild(toast);
+				setTimeout(() => toast.remove(), 5000);
+			}
+
+			function exportPDF(type) {
+				const { jsPDF } = window.jspdf;
+				const doc = new jsPDF();
+				const now = new Date();
+				const timestamp = now.toLocaleString();
+
+				doc.setFontSize(18);
+				doc.text("Network Dashboard Report", 14, 20);
+
+				doc.setFontSize(10);
+				doc.text(`Generated: ${timestamp}`, 14, 30);
+
+				doc.setFontSize(14);
+				doc.text(
+					`${type.charAt(0).toUpperCase() + type.slice(1)} Report`,
+					14,
+					40
+				);
+
+				doc.setFontSize(12);
+				if (type === "bandwidth") {
+					doc.text(
+						"Current Bandwidth: " +
+							document.getElementById("currentBandwidth").textContent +
+							" MB/s",
+						14,
+						50
+					);
+					doc.text("Threshold: " + dashboardState.threshold + " MB/s", 14, 60);
+				} else if (type === "devices") {
+					doc.text(
+						"Active Devices: " +
+							document.getElementById("activeDevices").textContent,
+						14,
+						50
+					);
+				} else if (type === "history") {
+					doc.text("Historical bandwidth data for the last 24 hours", 14, 50);
+				} else if (type === "departments") {
+					doc.text("Department Usage Breakdown:", 14, 50);
+					let y = 60;
+					const depts = dashboardState.deptData.labels;
+					const data = dashboardState.deptData.datasets[0].data;
+
+					depts.forEach((dept, i) => {
+						doc.text(`${dept}: ${data[i]} GB`, 14, y);
+						y += 10;
+					});
+				}
+
+				doc.setFontSize(10);
+				doc.text("Enterprise Network Dashboard - Confidential", 14, 280);
+
+				showToast(
+					`${
+						type.charAt(0).toUpperCase() + type.slice(1)
+					} report exported to PDF`,
+					"success"
+				);
+				doc.save(`network_${type}_report.pdf`);
+			}
+
+			function showTab(tabName) {
+				document.querySelectorAll(".tab-content").forEach((tab) => {
+					tab.classList.remove("active");
+				});
+
+				document.getElementById(`${tabName}-tab`).classList.add("active");
+
+				document.getElementById("mobileMenu").classList.remove("open");
+			}
+
+			function toggleMobileMenu() {
+				document.getElementById("mobileMenu").classList.toggle("open");
+			}
+
+			function toggleDarkMode() {
+				dashboardState.darkMode = !dashboardState.darkMode;
+
+				if (dashboardState.darkMode) {
+					document.body.classList.add("dark-mode");
+				} else {
+					document.body.classList.remove("dark-mode");
+				}
+
+				initCharts();
+				showToast(
+					`Dark mode ${dashboardState.darkMode ? "enabled" : "disabled"}`,
+					"info"
+				);
+			}
+
+			function toggleFullscreen(button) {
+				const widget = button.closest(".widget");
+				widget.classList.toggle("lg:col-span-3");
+				widget.classList.toggle("md:col-span-2");
+
+				const chartCanvas = widget.querySelector("canvas");
+				if (chartCanvas) {
+					const chart = Chart.getChart(chartCanvas);
+					if (chart) {
+						setTimeout(() => chart.resize(), 300);
+					}
+				}
+			}
+
+			function refreshDashboard() {
+				const button = document.getElementById("refreshBtn");
+
+				button.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+            `;
+
+				updateBandwidth();
+				renderDevices(
+					document.getElementById("deviceSearch").value,
+					document.getElementById("deptFilter").value
+				);
+
+				setTimeout(() => {
+					button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                `;
+					showToast("Dashboard refreshed", "success");
+				}, 500);
+			}
+
+			function startSecurityScan() {
+				if (dashboardState.scanning) return;
+
+				dashboardState.scanning = true;
+				document.getElementById("scanInstructions").classList.add("hidden");
+				document.getElementById("scanProgress").classList.remove("hidden");
+				document.getElementById("startScanBtn").textContent = "Scanning...";
+				document.getElementById("startScanBtn").disabled = true;
+
+				let progress = 0;
+				const scanInterval = setInterval(() => {
+					progress += Math.random() * 8 + 2;
+					if (progress >= 100) {
+						clearInterval(scanInterval);
+						progress = 100;
+						completeScan();
+					}
+
+					document.getElementById("scanPercentage").textContent = `${Math.floor(
+						progress
+					)}%`;
+					document.getElementById(
+						"scanProgressBar"
+					).style.width = `${progress}%`;
+
+					const now = new Date();
+					const timeString =
+						now.getHours().toString().padStart(2, "0") +
+						":" +
+						now.getMinutes().toString().padStart(2, "0");
+					document.getElementById("lastScanTime").textContent = "Scanning...";
+				}, 400);
+			}
+
+			function completeScan() {
+				document.getElementById("scanProgress").classList.add("hidden");
+				document.getElementById("scanResults").classList.remove("hidden");
+				document.getElementById("startScanBtn").textContent = "Start New Scan";
+				document.getElementById("startScanBtn").disabled = false;
+				dashboardState.scanning = false;
+
+				const now = new Date();
+				const timeString =
+					now.getHours().toString().padStart(2, "0") +
+					":" +
+					now.getMinutes().toString().padStart(2, "0");
+				document.getElementById("lastScanTime").textContent = "Just now";
+
+				renderVulnerabilities();
+
+				showToast("Security scan completed", "success");
+			}
+
+			function renderVulnerabilities() {
+				const vulnList = document.getElementById("vulnerabilityList");
+				vulnList.innerHTML = "";
+
+				dashboardState.vulnerabilities.forEach((vuln) => {
+					const row = document.createElement("tr");
+
+					const severityClass =
+						vuln.severity === "High"
+							? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+							: vuln.severity === "Medium"
+							? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+							: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+
+					row.innerHTML = `
+                    <td class="px-4 py-2">${vuln.type}</td>
+                    <td class="px-4 py-2">${vuln.description}</td>
+                    <td class="px-4 py-2">
+                        <span class="px-2 py-1 rounded-full text-xs ${severityClass}">
+                            ${vuln.severity}
+                        </span>
+                    </td>
+                    <td class="px-4 py-2">
+                        <button class="bg-primary-600 hover:bg-primary-700 text-white text-xs px-2 py-1 rounded">
+                            ${vuln.action}
+                        </button>
+                    </td>
+                `;
+					vulnList.appendChild(row);
+				});
+			}
+
+			function generateSecurityReport() {
+				const { jsPDF } = window.jspdf;
+				const doc = new jsPDF();
+				const now = new Date();
+				const timestamp = now.toLocaleString();
+
+				doc.setFontSize(18);
+				doc.text("Network Security Report", 14, 20);
+
+				doc.setFontSize(10);
+				doc.text(`Generated: ${timestamp}`, 14, 30);
+
+				doc.setFontSize(14);
+				doc.text("Vulnerability Summary", 14, 40);
+
+				doc.setFontSize(12);
+				let y = 50;
+
+				dashboardState.vulnerabilities.forEach((vuln) => {
+					doc.setTextColor(
+						vuln.severity === "High"
+							? 220
+							: vuln.severity === "Medium"
+							? 180
+							: 100,
+						0,
+						0
+					);
+					doc.text(`${vuln.severity}: ${vuln.type}`, 14, y);
+					y += 6;
+					doc.setTextColor(0, 0, 0);
+					doc.text(`Description: ${vuln.description}`, 20, y);
+					y += 6;
+					doc.text(`Recommendation: ${vuln.action}`, 20, y);
+					y += 10;
+				});
+
+				doc.setFontSize(10);
+				doc.text(
+					"Enterprise Network Dashboard - Security Report - Confidential",
+					14,
+					280
+				);
+
+				showToast("Security report exported to PDF", "success");
+				doc.save("network_security_report.pdf");
+			}
+
+			function setupDragAndDrop() {
+				const widgets = document.querySelectorAll(".widget");
+				let draggedWidget = null;
+
+				widgets.forEach((widget) => {
+					widget.addEventListener("dragstart", function (e) {
+						draggedWidget = this;
+						setTimeout(() => {
+							this.classList.add("dragging");
+						}, 0);
+					});
+
+					widget.addEventListener("dragend", function () {
+						this.classList.remove("dragging");
+					});
+
+					widget.addEventListener("dragover", function (e) {
+						e.preventDefault();
+						const thisWidget = this;
+						const bounding = this.getBoundingClientRect();
+						const offset = bounding.y + bounding.height / 2;
+
+						if (e.clientY < offset) {
+							this.parentNode.insertBefore(draggedWidget, this);
+						} else {
+							this.parentNode.insertBefore(draggedWidget, this.nextSibling);
+						}
+					});
+
+					widget.addEventListener("dragenter", function (e) {
+						e.preventDefault();
+					});
+
+					widget.addEventListener("dragleave", function () {});
+
+					widget.addEventListener("drop", function (e) {
+						e.preventDefault();
+
+						dashboardState.layout = [];
+						document.querySelectorAll(".widget").forEach((w) => {
+							dashboardState.layout.push(w.dataset.widget);
+						});
+
+						localStorage.setItem(
+							"dashboardLayout",
+							JSON.stringify(dashboardState.layout)
+						);
+					});
+				});
+			}
+
+			function setupResizableWidgets() {
+				const handles = document.querySelectorAll(".resizable-handle");
+
+				handles.forEach((handle) => {
+					const widget = handle.closest(".widget");
+					let startX, startY, startWidth, startHeight;
+
+					handle.addEventListener("mousedown", function (e) {
+						e.preventDefault();
+						startX = e.clientX;
+						startY = e.clientY;
+						startWidth = parseInt(
+							document.defaultView.getComputedStyle(widget).width,
+							10
+						);
+						startHeight = parseInt(
+							document.defaultView.getComputedStyle(widget).height,
+							10
+						);
+
+						document.documentElement.addEventListener(
+							"mousemove",
+							doDrag,
+							false
+						);
+						document.documentElement.addEventListener(
+							"mouseup",
+							stopDrag,
+							false
+						);
+					});
+
+					function doDrag(e) {
+						widget.style.width = startWidth + e.clientX - startX + "px";
+						widget.style.height = startHeight + e.clientY - startY + "px";
+
+						const chartCanvas = widget.querySelector("canvas");
+						if (chartCanvas) {
+							const chart = Chart.getChart(chartCanvas);
+							if (chart) {
+								chart.resize();
+							}
+						}
+					}
+
+					function stopDrag(e) {
+						document.documentElement.removeEventListener(
+							"mousemove",
+							doDrag,
+							false
+						);
+						document.documentElement.removeEventListener(
+							"mouseup",
+							stopDrag,
+							false
+						);
+					}
+				});
+			}
+
+			function restoreLayout() {
+				const savedLayout = localStorage.getItem("dashboardLayout");
+				if (savedLayout) {
+					try {
+						const layoutOrder = JSON.parse(savedLayout);
+						const dashboardGrid = document.getElementById("dashboardGrid");
+						const widgets = {};
+
+						document.querySelectorAll(".widget").forEach((widget) => {
+							widgets[widget.dataset.widget] = widget;
+						});
+
+						dashboardGrid.innerHTML = "";
+
+						layoutOrder.forEach((widgetId) => {
+							if (widgets[widgetId]) {
+								dashboardGrid.appendChild(widgets[widgetId]);
+							}
+						});
+
+						dashboardState.layout = layoutOrder;
+					} catch (e) {
+						console.error("Error restoring layout:", e);
+					}
+				}
+			}
+
+			document.addEventListener("DOMContentLoaded", function () {
+				initCharts();
+
+				renderDevices();
+				renderDepartmentTable();
+				renderTopUsers();
+				renderTrafficDetails();
+				updateStats();
+				updateAlertsList();
+
+				restoreLayout();
+
+				setupDragAndDrop();
+				setupResizableWidgets();
+
+				document
+					.getElementById("mobileMenuButton")
+					.addEventListener("click", toggleMobileMenu);
+
+				document
+					.getElementById("deviceSearch")
+					.addEventListener("input", (e) => {
+						renderDevices(
+							e.target.value,
+							document.getElementById("deptFilter").value
+						);
+					});
+
+				document
+					.getElementById("deptFilter")
+					.addEventListener("change", (e) => {
+						renderDevices(
+							document.getElementById("deviceSearch").value,
+							e.target.value
+						);
+					});
+
+				document
+					.getElementById("thresholdRange")
+					.addEventListener("input", (e) => {
+						document.getElementById("thresholdValue").textContent =
+							e.target.value;
+					});
+
+				document
+					.getElementById("clearAlerts")
+					.addEventListener("click", clearAlerts);
+
+				document
+					.getElementById("historyRange")
+					.addEventListener("change", (e) => {
+						const range = e.target.value;
+						if (range === "day") {
+							historyChart.data.labels = [
+								"12am",
+								"3am",
+								"6am",
+								"9am",
+								"12pm",
+								"3pm",
+								"6pm",
+								"9pm",
+							];
+						} else if (range === "week") {
+							historyChart.data.labels = [
+								"Mon",
+								"Tue",
+								"Wed",
+								"Thu",
+								"Fri",
+								"Sat",
+								"Sun",
+							];
+						} else if (range === "month") {
+							historyChart.data.labels = [
+								"Week 1",
+								"Week 2",
+								"Week 3",
+								"Week 4",
+							];
+						}
+						historyChart.update();
+					});
+
+				document
+					.getElementById("timeRangeSelect")
+					.addEventListener("change", (e) => {
+						showToast(
+							`Showing data for: ${
+								e.target.options[e.target.selectedIndex].text
+							}`,
+							"info"
+						);
+					});
+
+				document
+					.getElementById("trendDepartment")
+					.addEventListener("change", (e) => {
+						const selectedDept = e.target.value;
+
+						departmentTrendsChart.data.datasets.forEach((dataset) => {
+							if (selectedDept === "all" || dataset.label === selectedDept) {
+								dataset.hidden = false;
+							} else {
+								dataset.hidden = true;
+							}
+						});
+
+						departmentTrendsChart.update();
+					});
+
+				document
+					.getElementById("startScanBtn")
+					.addEventListener("click", startSecurityScan);
+
+				document
+					.getElementById("contactForm")
+					.addEventListener("submit", function (e) {
+						e.preventDefault();
+						showToast("Your message has been sent successfully!", "success");
+						this.reset();
+					});
+
+				setInterval(updateBandwidth, 2000);
+				setInterval(updateStats, 1000);
+
+				const now = new Date();
+				const timeString =
+					now.getHours().toString().padStart(2, "0") +
+					":" +
+					now.getMinutes().toString().padStart(2, "0");
+
+				dashboardState.recentAlerts.push({
+					type: "info",
+					message: "Dashboard initialized",
+					time: timeString,
+				});
+
+				dashboardState.recentAlerts.push({
+					type: "info",
+					message: "Network monitoring active",
+					time: timeString,
+				});
+
+				updateAlertsList();
+			});
+		</script>
+	</body>
+</html>
