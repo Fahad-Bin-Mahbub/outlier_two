@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PresentFlow - Interactive Presentation Platform</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			:root {
+				--primary: #4f46e5;
+				--primary-light: #818cf8;
+				--secondary: #3b82f6;
+				--accent: #7c3aed;
+				--background: #f9fafb;
+				--stage-bg: #ffffff;
+			}
+
+			body {
+				font-family: "Inter", sans-serif;
+				background-color: var(--background);
+				overflow-x: hidden;
+			}
+
+			.stage-container {
+				aspect-ratio: 16/9;
+			}
+
+			.glass-effect {
+				backdrop-filter: blur(8px);
+				background-color: rgba(255, 255, 255, 0.7);
+				border: 1px solid rgba(255, 255, 255, 0.3);
+			}
+
+			.attendee-gallery {
+				scrollbar-width: thin;
+				scrollbar-color: var(--primary-light) transparent;
+			}
+
+			.attendee-gallery::-webkit-scrollbar {
+				height: 6px;
+			}
+
+			.attendee-gallery::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			.attendee-gallery::-webkit-scrollbar-thumb {
+				background-color: var(--primary-light);
+				border-radius: 6px;
+			}
+
+			.progress-bar-fill {
+				transition: width 0.5s ease-in-out;
+			}
+
+			.action-button {
+				transition: all 0.2s ease;
+			}
+
+			.action-button:hover {
+				transform: translateY(-2px);
+			}
+
+			.action-button:active {
+				transform: translateY(0);
+			}
+
+			.toast {
+				animation: toast-in-out 3s forwards;
+				pointer-events: none;
+			}
+
+			@keyframes toast-in-out {
+				0% {
+					opacity: 0;
+					transform: translateY(20px);
+				}
+				10% {
+					opacity: 1;
+					transform: translateY(0);
+				}
+				90% {
+					opacity: 1;
+					transform: translateY(0);
+				}
+				100% {
+					opacity: 0;
+					transform: translateY(-20px);
+				}
+			}
+
+			.slide-in {
+				animation: slide-in 0.3s ease forwards;
+			}
+
+			@keyframes slide-in {
+				from {
+					transform: translateX(100%);
+				}
+				to {
+					transform: translateX(0);
+				}
+			}
+
+			.pulse {
+				animation: pulse 2s infinite;
+			}
+
+			@keyframes pulse {
+				0% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+				100% {
+					transform: scale(1);
+				}
+			}
+
+			.attendee-card {
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+
+			.attendee-card:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+			}
+
+			.network-status {
+				transition: background-color 0.3s ease;
+			}
+
+			/* Mobile Responsive Adjustments */
+			@media (max-width: 640px) {
+				.action-button {
+					width: 40px;
+					height: 40px;
+					font-size: 1rem;
+				}
+
+				.toast {
+					width: 80%;
+					left: 10%;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="min-h-screen grid grid-rows-[auto_1fr_auto] px-4 py-2 md:p-6">
+			<!-- Header with Logo and Status -->
+			<header class="flex justify-between items-center py-3">
+				<div class="flex items-center">
+					<h1 class="text-xl md:text-2xl font-bold text-indigo-600">
+						PresentFlow
+					</h1>
+					<span
+						class="ml-2 px-3 py-1 rounded-full text-xs bg-indigo-100 text-indigo-800"
+						>Live</span
+					>
+				</div>
+
+				<div class="flex items-center space-x-3">
+					<div
+						class="network-status flex items-center px-3 py-1 rounded-full glass-effect"
+					>
+						<div
+							id="network-indicator"
+							class="w-2 h-2 rounded-full bg-green-500 mr-2"
+						></div>
+						<span id="network-text" class="text-xs text-gray-700"
+							>Connected</span
+						>
+					</div>
+
+					<button
+						id="settings-btn"
+						class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5 text-gray-600"
+							viewBox="0 0 20 20"
+							fill="currentColor"
+						>
+							<path
+								fill-rule="evenodd"
+								d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
+								clip-rule="evenodd"
+							/>
+						</svg>
+					</button>
+				</div>
+			</header>
+
+			<!-- Main Content -->
+			<main class="grid grid-rows-[1fr_auto] gap-4 py-2">
+				<!-- Primary Stage Area (16:9) -->
+				<div
+					class="stage-container relative w-full rounded-2xl bg-white shadow-lg overflow-hidden"
+				>
+					<img
+						id="presentation-slide"
+						src="https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=1200&h=675&q=80"
+						alt="Presentation Slide"
+						class="w-full h-full object-cover"
+					/>
+
+					<!-- Slide Controls -->
+					<div
+						class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2"
+					>
+						<button
+							id="prev-slide"
+							class="p-2 rounded-full glass-effect hover:bg-white transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-gray-700"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						</button>
+
+						<div class="glass-effect px-4 py-2 rounded-full">
+							<div class="flex items-center">
+								<span
+									id="current-slide"
+									class="text-sm font-medium text-indigo-700"
+									>3</span
+								>
+								<span class="mx-1 text-sm text-gray-500">/</span>
+								<span id="total-slides" class="text-sm text-gray-500">12</span>
+							</div>
+						</div>
+
+						<button
+							id="next-slide"
+							class="p-2 rounded-full glass-effect hover:bg-white transition-colors"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 text-gray-700"
+								viewBox="0 0 20 20"
+								fill="currentColor"
+							>
+								<path
+									fill-rule="evenodd"
+									d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+									clip-rule="evenodd"
+								/>
+							</svg>
+						</button>
+					</div>
+
+					<!-- Progress Bar -->
+					<div class="absolute bottom-0 left-0 w-full h-1 bg-gray-200">
+						<div
+							id="progress-bar"
+							class="progress-bar-fill h-full bg-gradient-to-r from-indigo-500 to-purple-500"
+							style="width: 25%"
+						></div>
+					</div>
+				</div>
+
+				<!-- Attendee Gallery -->
+				<div class="relative">
+					<h2 class="text-sm font-medium text-gray-700 mb-2 ml-1">
+						Attendees (24)
+					</h2>
+					<div
+						class="attendee-gallery flex space-x-3 overflow-x-auto pb-4 px-1"
+					>
+						<!-- Attendee cards will be populated by JavaScript -->
+					</div>
+				</div>
+			</main>
+
+			<!-- Fixed Action Bar -->
+			<footer class="py-3">
+				<div class="flex justify-between items-center">
+					<div class="flex space-x-3">
+						<button
+							id="mic-btn"
+							class="action-button w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-md hover:shadow-lg"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6 text-gray-700"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"
+								/>
+							</svg>
+						</button>
+
+						<button
+							id="video-btn"
+							class="action-button w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-md hover:shadow-lg"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6 text-gray-700"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+								/>
+							</svg>
+						</button>
+
+						<button
+							id="share-btn"
+							class="action-button w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-md hover:shadow-lg"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-6 w-6 text-gray-700"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
+								/>
+							</svg>
+						</button>
+					</div>
+
+					<div class="flex space-x-3">
+						<button
+							id="heart-btn"
+							class="action-button w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-md hover:shadow-lg text-xl"
+						>
+							❤️
+						</button>
+
+						<button
+							id="clap-btn"
+							class="action-button w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-md hover:shadow-lg text-xl"
+						>
+							👏
+						</button>
+
+						<button
+							id="question-btn"
+							class="action-button w-10 h-10 rounded-full flex items-center justify-center bg-white shadow-md hover:shadow-lg text-xl"
+						>
+							❓
+						</button>
+					</div>
+
+					<button
+						id="leave-btn"
+						class="action-button px-4 py-2 rounded-full bg-red-500 text-white text-sm font-medium hover:bg-red-600 transition-colors"
+					>
+						Leave
+					</button>
+				</div>
+			</footer>
+		</div>
+
+		<!-- Toast Container -->
+		<div
+			id="toast-container"
+			class="fixed bottom-6 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2 pointer-events-none z-50"
+		></div>
+
+		<script>
+			// Mock Data
+			const slides = [
+				"https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=1200&h=675&q=80",
+				"https://images.unsplash.com/photo-1606857521015-7f9fcf423740?auto=format&fit=crop&w=1200&h=675&q=80",
+				"https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?auto=format&fit=crop&w=1200&h=675&q=80",
+				"https://images.unsplash.com/photo-1494059980473-813e73ee784b?auto=format&fit=crop&w=1200&h=675&q=80",
+				"https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1200&h=675&q=80",
+			];
+
+			const attendees = [
+				{
+					name: "Sarah Johnson",
+					avatar:
+						"https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "active",
+				},
+				{
+					name: "Michael Chen",
+					avatar:
+						"https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "active",
+				},
+				{
+					name: "Priya Patel",
+					avatar:
+						"https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "active",
+				},
+				{
+					name: "Alex Morgan",
+					avatar:
+						"https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "away",
+				},
+				{
+					name: "Olivia Wilson",
+					avatar:
+						"https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "active",
+				},
+				{
+					name: "James Lee",
+					avatar:
+						"https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "inactive",
+				},
+				{
+					name: "Emma Davis",
+					avatar:
+						"https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "active",
+				},
+				{
+					name: "Raj Kumar",
+					avatar:
+						"https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=150&h=150&q=80",
+					status: "active",
+				},
+			];
+
+			// Initialize Variables
+			let currentSlideIndex = 2; // Start at slide 3
+			const totalSlides = slides.length;
+
+			// DOM Elements
+			const currentSlideEl = document.getElementById("current-slide");
+			const totalSlidesEl = document.getElementById("total-slides");
+			const progressBarEl = document.getElementById("progress-bar");
+			const presentationSlideEl = document.getElementById("presentation-slide");
+			const prevSlideBtn = document.getElementById("prev-slide");
+			const nextSlideBtn = document.getElementById("next-slide");
+			const attendeeGallery = document.querySelector(".attendee-gallery");
+			const networkIndicator = document.getElementById("network-indicator");
+			const networkText = document.getElementById("network-text");
+			const toastContainer = document.getElementById("toast-container");
+
+			// Reaction Buttons
+			const heartBtn = document.getElementById("heart-btn");
+			const clapBtn = document.getElementById("clap-btn");
+			const questionBtn = document.getElementById("question-btn");
+			const micBtn = document.getElementById("mic-btn");
+			const videoBtn = document.getElementById("video-btn");
+			const shareBtn = document.getElementById("share-btn");
+			const leaveBtn = document.getElementById("leave-btn");
+			const settingsBtn = document.getElementById("settings-btn");
+
+			// Initialize the presentation
+			function initPresentation() {
+				updateSlideInfo();
+				populateAttendeeGallery();
+				setupEventListeners();
+				simulateNetworkChanges();
+			}
+
+			// Update slide information
+			function updateSlideInfo() {
+				currentSlideEl.textContent = currentSlideIndex + 1;
+				totalSlidesEl.textContent = totalSlides;
+				progressBarEl.style.width = `${
+					((currentSlideIndex + 1) / totalSlides) * 100
+				}%`;
+				presentationSlideEl.src = slides[currentSlideIndex];
+			}
+
+			// Populate attendee gallery
+			function populateAttendeeGallery() {
+				attendeeGallery.innerHTML = "";
+
+				attendees.forEach((attendee) => {
+					const statusColor =
+						attendee.status === "active"
+							? "bg-green-500"
+							: attendee.status === "away"
+							? "bg-yellow-500"
+							: "bg-gray-400";
+
+					const attendeeCard = document.createElement("div");
+					attendeeCard.className =
+						"attendee-card flex-shrink-0 w-16 md:w-20 relative";
+					attendeeCard.innerHTML = `
+                    <div class="aspect-square rounded-lg overflow-hidden shadow-md">
+                        <img src="${attendee.avatar}" alt="${
+						attendee.name
+					}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute -top-1 -right-1 w-3 h-3 rounded-full ${statusColor} border-2 border-white"></div>
+                    <p class="text-xs text-center mt-1 truncate">${
+											attendee.name.split(" ")[0]
+										}</p>
+                `;
+
+					attendeeGallery.appendChild(attendeeCard);
+				});
+			}
+
+			// Change slide
+			function changeSlide(direction) {
+				if (direction === "next" && currentSlideIndex < totalSlides - 1) {
+					currentSlideIndex++;
+					showToast("Next slide");
+				} else if (direction === "prev" && currentSlideIndex > 0) {
+					currentSlideIndex--;
+					showToast("Previous slide");
+				}
+
+				updateSlideInfo();
+			}
+
+			// Show toast notification
+			function showToast(message, type = "info") {
+				const toast = document.createElement("div");
+				let bgColor = "bg-gray-800";
+
+				if (type === "success") bgColor = "bg-green-600";
+				if (type === "error") bgColor = "bg-red-600";
+				if (type === "warning") bgColor = "bg-yellow-600";
+
+				toast.className = `toast ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg text-sm`;
+				toast.textContent = message;
+
+				toastContainer.appendChild(toast);
+
+				setTimeout(() => {
+					toast.remove();
+				}, 3000);
+			}
+
+			// Simulate network changes
+			function simulateNetworkChanges() {
+				const statuses = [
+					{ status: "Connected", color: "bg-green-500" },
+					{ status: "Weak connection", color: "bg-yellow-500" },
+					{ status: "Reconnecting...", color: "bg-red-500" },
+				];
+
+				setInterval(() => {
+					const randomStatus =
+						statuses[Math.floor(Math.random() * statuses.length)];
+
+					if (randomStatus.status !== networkText.textContent) {
+						networkIndicator.className = `w-2 h-2 rounded-full ${randomStatus.color} mr-2`;
+						networkText.textContent = randomStatus.status;
+
+						if (randomStatus.status === "Reconnecting...") {
+							networkIndicator.classList.add("pulse");
+							showToast("Connection issue detected", "warning");
+						} else {
+							networkIndicator.classList.remove("pulse");
+						}
+					}
+				}, 30000); // Change status randomly every 30 seconds
+			}
+
+			// Send reaction
+			function sendReaction(emoji) {
+				// Create floating emoji animation
+				const reactionEl = document.createElement("div");
+				reactionEl.className = "fixed text-2xl z-40 select-none";
+				reactionEl.style.left = `${Math.random() * 80 + 10}%`;
+				reactionEl.style.bottom = "20%";
+				reactionEl.textContent = emoji;
+				reactionEl.style.animation = `float-up 2s ease-out forwards`;
+				reactionEl.style.opacity = "0";
+
+				document.body.appendChild(reactionEl);
+
+				// Define the animation
+				const animation = `
+                @keyframes float-up {
+                    0% { transform: translateY(0); opacity: 1; }
+                    100% { transform: translateY(-100px); opacity: 0; }
+                }
+            `;
+
+				// Add the animation to the document
+				const styleEl = document.createElement("style");
+				styleEl.innerHTML = animation;
+				document.head.appendChild(styleEl);
+
+				// Remove after animation completes
+				setTimeout(() => {
+					reactionEl.remove();
+					styleEl.remove();
+				}, 2000);
+
+				showToast(`Sent ${emoji} reaction`);
+			}
+
+			// Setup event listeners
+			function setupEventListeners() {
+				prevSlideBtn.addEventListener("click", () => changeSlide("prev"));
+				nextSlideBtn.addEventListener("click", () => changeSlide("next"));
+
+				heartBtn.addEventListener("click", () => sendReaction("❤️"));
+				clapBtn.addEventListener("click", () => sendReaction("👏"));
+				questionBtn.addEventListener("click", () => sendReaction("❓"));
+
+				micBtn.addEventListener("click", () => {
+					micBtn.classList.toggle("bg-indigo-500");
+					micBtn.classList.toggle("text-white");
+					showToast(
+						micBtn.classList.contains("bg-indigo-500")
+							? "Microphone unmuted"
+							: "Microphone muted"
+					);
+				});
+
+				videoBtn.addEventListener("click", () => {
+					videoBtn.classList.toggle("bg-indigo-500");
+					videoBtn.classList.toggle("text-white");
+					showToast(
+						videoBtn.classList.contains("bg-indigo-500")
+							? "Camera turned on"
+							: "Camera turned off"
+					);
+				});
+
+				shareBtn.addEventListener("click", () => {
+					showToast("Screen sharing will be available soon", "info");
+				});
+
+				leaveBtn.addEventListener("click", () => {
+					if (confirm("Are you sure you want to leave the presentation?")) {
+						showToast("Leaving presentation...", "warning");
+						setTimeout(() => {
+							document.body.innerHTML = `
+                            <div class="h-screen flex flex-col items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center">
+                                <h1 class="text-3xl font-bold mb-4">You've left the presentation</h1>
+                                <p class="mb-6">Thank you for attending!</p>
+                                <button onclick="window.location.reload()" class="px-6 py-3 bg-white text-indigo-600 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                                    Rejoin Presentation
+                                </button>
+                            </div>
+                        `;
+						}, 1000);
+					}
+				});
+
+				settingsBtn.addEventListener("click", () => {
+					showToast("Settings will be available soon", "info");
+				});
+			}
+
+			// Initialize the presentation when the page loads
+			window.addEventListener("DOMContentLoaded", initPresentation);
+		</script>
+	</body>
+</html>
