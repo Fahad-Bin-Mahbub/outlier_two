@@ -1,0 +1,3451 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>LuxeCart Checkout</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								50: "#f5f3ff",
+								100: "#ede9fe",
+								200: "#ddd6fe",
+								300: "#c4b5fd",
+								400: "#a78bfa",
+								500: "#8b5cf6",
+								600: "#7c3aed",
+								700: "#6d28d9",
+								800: "#5b21b6",
+								900: "#4c1d95",
+							},
+							secondary: {
+								50: "#ecfdf5",
+								100: "#d1fae5",
+								200: "#a7f3d0",
+								300: "#6ee7b7",
+								400: "#34d399",
+								500: "#10b981",
+								600: "#059669",
+								700: "#047857",
+								800: "#065f46",
+								900: "#064e3b",
+							},
+							accent: {
+								50: "#f0f9ff",
+								100: "#e0f2fe",
+								200: "#bae6fd",
+								300: "#7dd3fc",
+								400: "#38bdf8",
+								500: "#0ea5e9",
+								600: "#0284c7",
+								700: "#0369a1",
+								800: "#075985",
+								900: "#0c4a6e",
+							},
+							gray: {
+								50: "#f9fafb",
+								100: "#f3f4f6",
+								200: "#e5e7eb",
+								300: "#d1d5db",
+								400: "#9ca3af",
+								500: "#6b7280",
+								600: "#4b5563",
+								700: "#374151",
+								800: "#1f2937",
+								900: "#111827",
+							},
+						},
+						fontFamily: {
+							sans: ["Poppins", "sans-serif"],
+							heading: ["Montserrat", "sans-serif"],
+						},
+						boxShadow: {
+							soft: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+							card: "0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+							hover:
+								"0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+							inner: "inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)",
+						},
+						backgroundImage: {
+							"gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+							"hero-pattern":
+								"url('https://images.unsplash.com/photo-1557821552-17105176677c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80')",
+						},
+					},
+				},
+			};
+		</script>
+		<style type="text/css">
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px);
+				}
+				to {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			}
+
+			@keyframes slideIn {
+				from {
+					opacity: 0;
+					transform: translateX(20px);
+				}
+				to {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			}
+
+			@keyframes pulse {
+				0%,
+				100% {
+					transform: scale(1);
+				}
+				50% {
+					transform: scale(1.05);
+				}
+			}
+
+			@keyframes shake {
+				0%,
+				100% {
+					transform: translateX(0);
+				}
+				25% {
+					transform: translateX(-5px);
+				}
+				75% {
+					transform: translateX(5px);
+				}
+			}
+
+			@keyframes shimmer {
+				0% {
+					background-position: -1000px 0;
+				}
+				100% {
+					background-position: 1000px 0;
+				}
+			}
+
+			@keyframes spin {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.animate-fade-in {
+				animation: fadeIn 0.5s ease-out forwards;
+			}
+
+			.animate-slide-in {
+				animation: slideIn 0.5s ease-out forwards;
+			}
+
+			.animate-pulse {
+				animation: pulse 2s ease-in-out infinite;
+			}
+
+			.animate-shake {
+				animation: shake 0.4s ease-in-out;
+			}
+
+			.animate-shimmer {
+				background: linear-gradient(
+					90deg,
+					rgba(255, 255, 255, 0) 0%,
+					rgba(255, 255, 255, 0.2) 50%,
+					rgba(255, 255, 255, 0) 100%
+				);
+				background-size: 1000px 100%;
+				animation: shimmer 2s infinite linear;
+			}
+
+			.animate-spin {
+				animation: spin 1s linear infinite;
+			}
+
+			body {
+				background-color: #f9fafb;
+				background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+			}
+
+			.form-input:focus {
+				box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+				border-color: #7c3aed;
+			}
+
+			.cc-format {
+				letter-spacing: 0.025em;
+			}
+
+			.progress-bar-animated {
+				transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+			}
+
+			.card {
+				background: white;
+				border-radius: 1rem;
+				box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08),
+					0 4px 6px -2px rgba(0, 0, 0, 0.05);
+				transition: all 0.3s ease;
+				border: 1px solid rgba(229, 231, 235, 0.5);
+				overflow: hidden;
+			}
+
+			.card:hover {
+				box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+					0 10px 10px -5px rgba(0, 0, 0, 0.04);
+				transform: translateY(-2px);
+			}
+
+			.product-image {
+				transition: all 0.4s ease;
+				transform-origin: center;
+			}
+
+			.product-image-container:hover .product-image {
+				transform: scale(1.08);
+			}
+
+			.product-image-container:hover .quick-view {
+				opacity: 1;
+			}
+
+			.quick-view {
+				opacity: 0;
+				transition: opacity 0.3s ease;
+			}
+
+			.btn {
+				@apply font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md;
+			}
+
+			.btn-primary {
+				@apply bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 text-white px-6 py-3 shadow-lg hover:shadow-xl;
+			}
+
+			.btn-secondary {
+				@apply bg-gray-100 hover:bg-gray-200 focus:ring-gray-400 text-gray-700 px-6 py-3 shadow-md hover:shadow-lg;
+			}
+
+			.btn-accent {
+				@apply bg-accent-500 hover:bg-accent-600 focus:ring-accent-400 text-white px-6 py-3 shadow-md hover:shadow-lg;
+			}
+
+			.btn:active {
+				transform: scale(0.98);
+			}
+
+			.badge {
+				@apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+			}
+
+			.badge-primary {
+				@apply bg-primary-100 text-primary-800;
+			}
+
+			.badge-success {
+				@apply bg-secondary-100 text-secondary-800;
+			}
+
+			.badge-info {
+				@apply bg-accent-100 text-accent-800;
+			}
+
+			.payment-method-card {
+				@apply border border-gray-200 rounded-lg p-4 transition-all duration-200;
+			}
+
+			.payment-method-card.active {
+				@apply border-primary-500 bg-primary-50;
+			}
+
+			.payment-method-card:hover:not(.active) {
+				@apply border-gray-300 bg-gray-50;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 10px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-thumb {
+				background: #c5c7d0;
+				border-radius: 10px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+				background: #a8abb6;
+			}
+
+			.footer-gradient {
+				background: linear-gradient(
+					180deg,
+					rgba(249, 250, 251, 0) 0%,
+					rgba(249, 250, 251, 1) 100%
+				);
+				height: 80px;
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			}
+
+			.toast {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				z-index: 9999;
+				min-width: 250px;
+				padding: 16px;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				transform: translateY(100px);
+				opacity: 0;
+				transition: all 0.3s ease;
+			}
+
+			.toast.show {
+				transform: translateY(0);
+				opacity: 1;
+			}
+
+			.modal-overlay {
+				position: fixed;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				z-index: 1000;
+				opacity: 0;
+				visibility: hidden;
+				transition: all 0.3s ease;
+			}
+
+			.modal-overlay.show {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-content {
+				background: white;
+				border-radius: 12px;
+				padding: 24px;
+				width: 90%;
+				max-width: 500px;
+				transform: scale(0.8);
+				transition: all 0.3s ease;
+				box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+					0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			}
+
+			.modal-overlay.show .modal-content {
+				transform: scale(1);
+			}
+
+			@media (max-width: 640px) {
+				.mobile-step-indicator {
+					display: flex;
+					overflow-x: hidden;
+					position: relative;
+				}
+
+				.mobile-step {
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					padding: 0 8px;
+					position: relative;
+					z-index: 10;
+				}
+
+				.mobile-step.active .step-circle {
+					background-color: #7c3aed;
+					color: white;
+				}
+
+				.mobile-step.completed .step-circle {
+					background-color: #10b981;
+					color: white;
+				}
+
+				.step-circle {
+					width: 32px;
+					height: 32px;
+					border-radius: 50%;
+					background-color: #e5e7eb;
+					color: #6b7280;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					font-weight: 600;
+					margin-bottom: 4px;
+				}
+
+				.step-line {
+					position: absolute;
+					top: 16px;
+					left: 0;
+					right: 0;
+					height: 2px;
+					background-color: #e5e7eb;
+					z-index: 1;
+				}
+
+				.step-line-progress {
+					position: absolute;
+					top: 16px;
+					left: 0;
+					height: 2px;
+					background-color: #10b981;
+					z-index: 1;
+					transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+				}
+
+				.step-label {
+					font-size: 0.75rem;
+					color: #6b7280;
+					text-align: center;
+					white-space: nowrap;
+				}
+
+				.mobile-step.active .step-label {
+					color: #7c3aed;
+					font-weight: 500;
+				}
+
+				.mobile-step.completed .step-label {
+					color: #10b981;
+					font-weight: 500;
+				}
+			}
+
+			.promo-badge {
+				display: inline-block;
+				padding: 4px 8px;
+				border-radius: 4px;
+				font-size: 0.75rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s ease;
+				margin: 0 4px 4px 0;
+			}
+		</style>
+	</head>
+	<body class="font-sans text-gray-800 min-h-screen">
+		<div class="relative">
+			<!-- Toast Notification Container -->
+			<div id="toast-container"></div>
+
+			<!-- Confirmation Modal -->
+			<div id="confirm-modal" class="modal-overlay">
+				<div class="modal-content">
+					<div class="text-center mb-4">
+						<div
+							class="w-12 h-12 rounded-full bg-red-100 text-red-500 mx-auto flex items-center justify-center mb-4"
+						>
+							<i class="fas fa-trash-alt text-xl"></i>
+						</div>
+						<h3 class="text-lg font-semibold text-gray-800">Remove Item</h3>
+						<p class="text-gray-600 mt-2">
+							Are you sure you want to remove this item from your cart?
+						</p>
+					</div>
+					<div class="flex space-x-3">
+						<button id="modal-cancel" class="btn btn-secondary flex-1">
+							Cancel
+						</button>
+						<button
+							id="modal-confirm"
+							class="btn btn-primary flex-1 bg-red-500 text-white hover:bg-red-600 focus:ring-red-400 rounded-lg py-2"
+						>
+							Remove
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Navigation -->
+			<nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+				<div class="container mx-auto px-4 max-w-6xl">
+					<div class="flex justify-between items-center h-16">
+						<a href="#" class="flex items-center space-x-2">
+							<div
+								class="w-10 h-10 rounded-full bg-gradient-to-r from-primary-600 to-primary-400 flex items-center justify-center overflow-hidden"
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 24 24"
+									fill="currentColor"
+									class="w-6 h-6 text-white"
+								>
+									<path
+										d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z"
+									/>
+								</svg>
+							</div>
+							<span class="text-xl font-heading font-bold"
+								>Luxe<span class="text-primary-600">Cart</span></span
+							>
+						</a>
+						<div class="hidden md:flex items-center space-x-8">
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium"
+								>Shop</a
+							>
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium"
+								>Collections</a
+							>
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium"
+								>Sale</a
+							>
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200 font-medium"
+								>About</a
+							>
+						</div>
+						<div class="flex items-center space-x-4">
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200"
+							>
+								<i class="fas fa-search"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200"
+							>
+								<i class="fas fa-user"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-600 hover:text-primary-600 transition-colors duration-200 relative"
+							>
+								<i class="fas fa-shopping-bag"></i>
+								<span
+									class="absolute -top-2 -right-2 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+									>2</span
+								>
+							</a>
+							<button
+								id="mobile-menu-toggle"
+								class="md:hidden text-gray-600 hover:text-primary-600 transition-colors duration-200"
+							>
+								<i class="fas fa-bars"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</nav>
+
+			<div class="container mx-auto px-4 py-8 max-w-6xl">
+				<!-- Header with logo and secure checkout badge -->
+				<header
+					class="flex flex-col md:flex-row justify-between items-center mb-8"
+				>
+					<div class="flex items-center mb-4 md:mb-0">
+						<h1 class="text-2xl md:text-3xl font-bold font-heading">
+							Secure Checkout
+						</h1>
+					</div>
+					<div class="flex items-center space-x-4">
+						<div
+							class="flex items-center text-gray-600 bg-white px-4 py-2 rounded-full shadow-soft"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								class="h-5 w-5 mr-2 text-secondary-500"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+								/>
+							</svg>
+							<span class="text-sm md:text-base font-medium"
+								>Secure Checkout</span
+							>
+						</div>
+						<div class="hidden md:flex items-center space-x-1">
+							<img
+								src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+								alt="Visa"
+								class="h-6"
+							/>
+							<img
+								src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+								alt="Mastercard"
+								class="h-6"
+							/>
+							<img
+								src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+								alt="PayPal"
+								class="h-6"
+							/>
+							<img
+								src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg"
+								alt="Apple Pay"
+								class="h-5"
+							/>
+						</div>
+					</div>
+				</header>
+
+				<!-- Progress bar - Desktop version -->
+				<div class="mb-8 card p-6 hidden sm:block">
+					<div
+						class="flex justify-between mb-3 text-xs md:text-sm text-gray-600"
+					>
+						<span class="step-indicator flex items-center" data-step="1">
+							<span
+								class="flex items-center justify-center w-6 h-6 bg-primary-600 text-white rounded-full mr-2"
+								>1</span
+							>
+							Cart
+						</span>
+						<span class="step-indicator flex items-center" data-step="2">
+							<span
+								class="flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-600 rounded-full mr-2"
+								>2</span
+							>
+							Shipping
+						</span>
+						<span class="step-indicator flex items-center" data-step="3">
+							<span
+								class="flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-600 rounded-full mr-2"
+								>3</span
+							>
+							Payment
+						</span>
+						<span class="step-indicator flex items-center" data-step="4">
+							<span
+								class="flex items-center justify-center w-6 h-6 bg-gray-200 text-gray-600 rounded-full mr-2"
+								>4</span
+							>
+							Confirmation
+						</span>
+					</div>
+					<div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+						<div
+							id="progress-bar"
+							class="progress-bar-animated h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full"
+							style="width: 25%"
+						></div>
+					</div>
+				</div>
+
+				<!-- Progress bar - Mobile version -->
+				<div class="mb-8 card p-4 sm:hidden">
+					<div class="mobile-step-indicator relative">
+						<div class="step-line"></div>
+						<div class="step-line-progress" style="width: 25%"></div>
+
+						<div class="mobile-step active flex-1" data-step="1">
+							<div class="step-circle">1</div>
+							<div class="step-label">Cart</div>
+						</div>
+
+						<div class="mobile-step flex-1" data-step="2">
+							<div class="step-circle">2</div>
+							<div class="step-label">Shipping</div>
+						</div>
+
+						<div class="mobile-step flex-1" data-step="3">
+							<div class="step-circle">3</div>
+							<div class="step-label">Payment</div>
+						</div>
+
+						<div class="mobile-step flex-1" data-step="4">
+							<div class="step-circle">4</div>
+							<div class="step-label">Done</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Main checkout container -->
+				<div class="flex flex-col lg:flex-row gap-8">
+					<!-- Left side - Form fields -->
+					<div class="w-full lg:w-2/3 order-2 lg:order-1">
+						<!-- Step containers - only one will be visible at a time -->
+						<div id="step-1" class="checkout-step card p-6 animate-fade-in">
+							<h2
+								class="text-xl md:text-2xl font-semibold mb-6 font-heading flex items-center"
+							>
+								<span
+									class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mr-3"
+								>
+									<i class="fas fa-shopping-cart text-sm"></i>
+								</span>
+								Review Your Cart
+							</h2>
+
+							<div
+								class="space-y-4 max-h-96 overflow-y-auto custom-scrollbar pr-2"
+							>
+								<!-- Cart Item 1 -->
+								<div
+									class="card p-4 hover:border-primary-200 hover:bg-gray-50 transition-colors duration-200"
+								>
+									<div
+										class="flex flex-col sm:flex-row items-start sm:items-center"
+									>
+										<div
+											class="relative w-24 h-24 mb-4 sm:mb-0 sm:mr-6 overflow-hidden rounded-md product-image-container border border-gray-100"
+										>
+											<img
+												src="https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+												alt="Smart Watch"
+												class="w-full h-full object-cover product-image"
+											/>
+											<div
+												class="quick-view absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center"
+											>
+												<button
+													class="text-white hover:text-primary-200 transition-colors"
+												>
+													<i class="fas fa-eye"></i>
+												</button>
+											</div>
+										</div>
+										<div class="flex-1">
+											<div class="flex justify-between">
+												<div>
+													<h3 class="font-medium text-gray-800">
+														Premium Smart Watch
+													</h3>
+													<p class="text-sm text-gray-500">Black | 44mm</p>
+													<span class="badge badge-primary mt-1">In Stock</span>
+												</div>
+												<div class="font-medium text-gray-800 sm:hidden">
+													$299.99
+												</div>
+											</div>
+											<div class="flex items-center mt-3 justify-between">
+												<div class="flex">
+													<div class="flex border rounded-lg shadow-sm">
+														<button
+															class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100 hover:text-primary-600 transition-colors"
+															data-action="decrease"
+															data-product-id="1"
+														>
+															-
+														</button>
+														<input
+															type="number"
+															min="1"
+															value="1"
+															class="quantity-input w-12 text-center border-x py-1"
+															data-product-id="1"
+														/>
+														<button
+															class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100 hover:text-primary-600 transition-colors"
+															data-action="increase"
+															data-product-id="1"
+														>
+															+
+														</button>
+													</div>
+													<button
+														class="remove-item ml-4 text-sm text-red-500 hover:text-red-700 transition-colors"
+														data-product-id="1"
+													>
+														<i class="fas fa-trash-alt mr-1"></i> Remove
+													</button>
+												</div>
+												<div class="font-medium text-gray-800 hidden sm:block">
+													$299.99
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Cart Item 2 -->
+								<div
+									class="card p-4 hover:border-primary-200 hover:bg-gray-50 transition-colors duration-200"
+								>
+									<div
+										class="flex flex-col sm:flex-row items-start sm:items-center"
+									>
+										<div
+											class="relative w-24 h-24 mb-4 sm:mb-0 sm:mr-6 overflow-hidden rounded-md product-image-container border border-gray-100"
+										>
+											<img
+												src="https://images.unsplash.com/photo-1546868871-7041f2a55e12"
+												alt="Wireless Headphones"
+												class="w-full h-full object-cover product-image"
+											/>
+											<div
+												class="quick-view absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center"
+											>
+												<button
+													class="text-white hover:text-primary-200 transition-colors"
+												>
+													<i class="fas fa-eye"></i>
+												</button>
+											</div>
+										</div>
+										<div class="flex-1">
+											<div class="flex justify-between">
+												<div>
+													<h3 class="font-medium text-gray-800">
+														Wireless Noise-Cancelling Headphones
+													</h3>
+													<p class="text-sm text-gray-500">Silver | Over-ear</p>
+													<span class="badge badge-primary mt-1">In Stock</span>
+												</div>
+												<div class="font-medium text-gray-800 sm:hidden">
+													$179.99
+												</div>
+											</div>
+											<div class="flex items-center mt-3 justify-between">
+												<div class="flex">
+													<div class="flex border rounded-lg shadow-sm">
+														<button
+															class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100 hover:text-primary-600 transition-colors"
+															data-action="decrease"
+															data-product-id="2"
+														>
+															-
+														</button>
+														<input
+															type="number"
+															min="1"
+															value="1"
+															class="quantity-input w-12 text-center border-x py-1"
+															data-product-id="2"
+														/>
+														<button
+															class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100 hover:text-primary-600 transition-colors"
+															data-action="increase"
+															data-product-id="2"
+														>
+															+
+														</button>
+													</div>
+													<button
+														class="remove-item ml-4 text-sm text-red-500 hover:text-red-700 transition-colors"
+														data-product-id="2"
+													>
+														<i class="fas fa-trash-alt mr-1"></i> Remove
+													</button>
+												</div>
+												<div class="font-medium text-gray-800 hidden sm:block">
+													$179.99
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Recommended products -->
+								<div class="mt-6 pt-6 border-t border-gray-200">
+									<h3 class="text-lg font-medium mb-4">You might also like</h3>
+									<div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+										<div
+											class="card p-2 hover:border-primary-200 cursor-pointer recommended-product"
+											data-product-id="3"
+											data-product-name="Charging Dock"
+											data-product-price="24.99"
+										>
+											<div
+												class="relative product-image-container rounded overflow-hidden mb-2"
+											>
+												<img
+													src="https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb"
+													alt="Smartwatch Charger"
+													class="w-full h-24 object-cover product-image"
+												/>
+												<div
+													class="quick-view absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center"
+												>
+													<button
+														class="text-white hover:text-primary-200 transition-colors text-sm add-recommended"
+														data-product-id="3"
+													>
+														<i class="fas fa-plus"></i> Add
+													</button>
+												</div>
+											</div>
+											<div class="text-center">
+												<h4 class="text-xs font-medium">Charging Dock</h4>
+												<p class="text-xs text-gray-500">$24.99</p>
+											</div>
+										</div>
+										<div
+											class="card p-2 hover:border-primary-200 cursor-pointer recommended-product"
+											data-product-id="4"
+											data-product-name="Wireless Earbuds"
+											data-product-price="89.99"
+										>
+											<div
+												class="relative product-image-container rounded overflow-hidden mb-2"
+											>
+												<img
+													src="https://images.unsplash.com/photo-1575695342320-d2d2d2f9b73f"
+													alt="Earbuds"
+													class="w-full h-24 object-cover product-image"
+												/>
+												<div
+													class="quick-view absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center"
+												>
+													<button
+														class="text-white hover:text-primary-200 transition-colors text-sm add-recommended"
+														data-product-id="4"
+													>
+														<i class="fas fa-plus"></i> Add
+													</button>
+												</div>
+											</div>
+											<div class="text-center">
+												<h4 class="text-xs font-medium">Wireless Earbuds</h4>
+												<p class="text-xs text-gray-500">$89.99</p>
+											</div>
+										</div>
+										<div
+											class="card p-2 hover:border-primary-200 cursor-pointer recommended-product"
+											data-product-id="5"
+											data-product-name="Screen Protector"
+											data-product-price="12.99"
+										>
+											<div
+												class="relative product-image-container rounded overflow-hidden mb-2"
+											>
+												<img
+													src="https://images.unsplash.com/photo-1600375226700-5ce19fbe1a6f"
+													alt="Screen Protector"
+													class="w-full h-24 object-cover product-image"
+												/>
+												<div
+													class="quick-view absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center"
+												>
+													<button
+														class="text-white hover:text-primary-200 transition-colors text-sm add-recommended"
+														data-product-id="5"
+													>
+														<i class="fas fa-plus"></i> Add
+													</button>
+												</div>
+											</div>
+											<div class="text-center">
+												<h4 class="text-xs font-medium">Screen Protector</h4>
+												<p class="text-xs text-gray-500">$12.99</p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mt-8 flex justify-end">
+								<button
+									id="to-step-2"
+									class="next-step btn btn-primary flex items-center"
+								>
+									Continue to Shipping
+									<i class="fas fa-arrow-right ml-2"></i>
+								</button>
+							</div>
+						</div>
+
+						<div id="step-2" class="checkout-step card p-6 hidden">
+							<h2
+								class="text-xl md:text-2xl font-semibold mb-6 font-heading flex items-center"
+							>
+								<span
+									class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mr-3"
+								>
+									<i class="fas fa-truck text-sm"></i>
+								</span>
+								Shipping Information
+							</h2>
+
+							<form id="shipping-form" class="space-y-6">
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+									<div>
+										<label
+											for="first-name"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>First Name<span class="text-red-500">*</span></label
+										>
+										<input
+											type="text"
+											id="first-name"
+											class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											required
+										/>
+										<p
+											class="validation-message text-red-500 text-xs mt-1 hidden"
+										></p>
+									</div>
+									<div>
+										<label
+											for="last-name"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Last Name<span class="text-red-500">*</span></label
+										>
+										<input
+											type="text"
+											id="last-name"
+											class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											required
+										/>
+										<p
+											class="validation-message text-red-500 text-xs mt-1 hidden"
+										></p>
+									</div>
+								</div>
+
+								<div>
+									<label
+										for="email"
+										class="block text-sm font-medium text-gray-700 mb-1"
+										>Email Address<span class="text-red-500">*</span></label
+									>
+									<input
+										type="email"
+										id="email"
+										class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+										required
+									/>
+									<p
+										class="validation-message text-red-500 text-xs mt-1 hidden"
+									></p>
+								</div>
+
+								<div>
+									<label
+										for="phone"
+										class="block text-sm font-medium text-gray-700 mb-1"
+										>Phone Number<span class="text-red-500">*</span></label
+									>
+									<div class="relative">
+										<input
+											type="tel"
+											id="phone"
+											class="form-input w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											required
+											pattern="[0-9]+"
+										/>
+										<div
+											class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none"
+										>
+											<span class="text-gray-500">+1</span>
+										</div>
+									</div>
+									<p
+										class="validation-message text-red-500 text-xs mt-1 hidden"
+									></p>
+								</div>
+
+								<div
+									class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4"
+								>
+									<h3 class="font-medium mb-2 flex items-center">
+										<i class="fas fa-map-marker-alt text-primary-600 mr-2"></i>
+										Shipping Address
+									</h3>
+
+									<div class="space-y-4">
+										<div>
+											<label
+												for="address"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>Street Address<span class="text-red-500"
+													>*</span
+												></label
+											>
+											<input
+												type="text"
+												id="address"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+												required
+											/>
+											<p
+												class="validation-message text-red-500 text-xs mt-1 hidden"
+											></p>
+										</div>
+
+										<div>
+											<label
+												for="address2"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>Apartment, Suite, etc. (optional)</label
+											>
+											<input
+												type="text"
+												id="address2"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											/>
+										</div>
+
+										<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+											<div>
+												<label
+													for="city"
+													class="block text-sm font-medium text-gray-700 mb-1"
+													>City<span class="text-red-500">*</span></label
+												>
+												<input
+													type="text"
+													id="city"
+													class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+													required
+												/>
+												<p
+													class="validation-message text-red-500 text-xs mt-1 hidden"
+												></p>
+											</div>
+											<div>
+												<label
+													for="state"
+													class="block text-sm font-medium text-gray-700 mb-1"
+													>State/Province<span class="text-red-500"
+														>*</span
+													></label
+												>
+												<select
+													id="state"
+													class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+													required
+												>
+													<option value="">Select...</option>
+													<option value="AL">Alabama</option>
+													<option value="AK">Alaska</option>
+													<option value="AZ">Arizona</option>
+													<!-- More states would be listed here -->
+													<option value="CA">California</option>
+													<option value="NY">New York</option>
+													<option value="TX">Texas</option>
+												</select>
+												<p
+													class="validation-message text-red-500 text-xs mt-1 hidden"
+												></p>
+											</div>
+											<div>
+												<label
+													for="zip"
+													class="block text-sm font-medium text-gray-700 mb-1"
+													>ZIP/Postal Code<span class="text-red-500"
+														>*</span
+													></label
+												>
+												<input
+													type="text"
+													id="zip"
+													class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+													required
+												/>
+												<p
+													class="validation-message text-red-500 text-xs mt-1 hidden"
+												></p>
+											</div>
+										</div>
+
+										<div>
+											<label
+												for="country"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>Country<span class="text-red-500">*</span></label
+											>
+											<select
+												id="country"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+												required
+											>
+												<option value="">Select...</option>
+												<option value="US">United States</option>
+												<option value="CA">Canada</option>
+												<option value="UK">United Kingdom</option>
+												<option value="AU">Australia</option>
+												<!-- More countries would be listed here -->
+											</select>
+											<p
+												class="validation-message text-red-500 text-xs mt-1 hidden"
+											></p>
+										</div>
+									</div>
+								</div>
+
+								<div class="flex items-center">
+									<input
+										type="checkbox"
+										id="different-billing"
+										class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+									/>
+									<label
+										for="different-billing"
+										class="ml-2 block text-sm text-gray-700"
+										>My billing address is different from shipping
+										address</label
+									>
+								</div>
+
+								<!-- Billing address fields (hidden by default) -->
+								<div
+									id="billing-fields"
+									class="space-y-6 hidden border-t border-gray-200 pt-6 mt-6"
+								>
+									<h3 class="font-medium text-gray-800 mb-4 flex items-center">
+										<i class="fas fa-credit-card text-primary-600 mr-2"></i>
+										Billing Address
+									</h3>
+
+									<!-- Billing address form fields would go here - similar structure to shipping fields -->
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+										<div>
+											<label
+												for="billing-first-name"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>First Name<span class="text-red-500">*</span></label
+											>
+											<input
+												type="text"
+												id="billing-first-name"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											/>
+										</div>
+										<div>
+											<label
+												for="billing-last-name"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>Last Name<span class="text-red-500">*</span></label
+											>
+											<input
+												type="text"
+												id="billing-last-name"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											/>
+										</div>
+									</div>
+
+									<div>
+										<label
+											for="billing-address"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Street Address<span class="text-red-500">*</span></label
+										>
+										<input
+											type="text"
+											id="billing-address"
+											class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+										/>
+									</div>
+
+									<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+										<div>
+											<label
+												for="billing-city"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>City<span class="text-red-500">*</span></label
+											>
+											<input
+												type="text"
+												id="billing-city"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											/>
+										</div>
+										<div>
+											<label
+												for="billing-state"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>State/Province<span class="text-red-500"
+													>*</span
+												></label
+											>
+											<select
+												id="billing-state"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											>
+												<option value="">Select...</option>
+												<option value="AL">Alabama</option>
+												<option value="AK">Alaska</option>
+												<!-- More states would be listed here -->
+												<option value="CA">California</option>
+												<option value="NY">New York</option>
+											</select>
+										</div>
+										<div>
+											<label
+												for="billing-zip"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>ZIP/Postal Code<span class="text-red-500"
+													>*</span
+												></label
+											>
+											<input
+												type="text"
+												id="billing-zip"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+											/>
+										</div>
+									</div>
+
+									<div>
+										<label
+											for="billing-country"
+											class="block text-sm font-medium text-gray-700 mb-1"
+											>Country<span class="text-red-500">*</span></label
+										>
+										<select
+											id="billing-country"
+											class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+										>
+											<option value="">Select...</option>
+											<option value="US">United States</option>
+											<option value="CA">Canada</option>
+											<option value="UK">United Kingdom</option>
+											<!-- More countries would be listed here -->
+										</select>
+									</div>
+								</div>
+
+								<div class="mt-4 flex flex-col sm:flex-row justify-between">
+									<button
+										type="button"
+										id="back-to-step-1"
+										class="back-step btn btn-secondary mb-4 sm:mb-0 flex items-center justify-center"
+									>
+										<i class="fas fa-arrow-left mr-2"></i> Back to Cart
+									</button>
+									<button
+										type="submit"
+										id="to-step-3"
+										class="next-step btn btn-primary flex items-center justify-center"
+									>
+										Continue to Payment
+										<i class="fas fa-arrow-right ml-2"></i>
+									</button>
+								</div>
+							</form>
+						</div>
+
+						<div id="step-3" class="checkout-step card p-6 hidden">
+							<h2
+								class="text-xl md:text-2xl font-semibold mb-6 font-heading flex items-center"
+							>
+								<span
+									class="w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center mr-3"
+								>
+									<i class="fas fa-credit-card text-sm"></i>
+								</span>
+								Payment Method
+							</h2>
+
+							<form id="payment-form" class="space-y-6">
+								<div class="mb-6">
+									<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+										<div
+											class="payment-method-card active cursor-pointer"
+											data-method="credit-card"
+										>
+											<input
+												type="radio"
+												name="payment-method"
+												value="credit-card"
+												class="hidden"
+												checked
+											/>
+											<div class="flex items-center">
+												<div
+													class="rounded-full bg-primary-600 text-white p-2 mr-3"
+												>
+													<i class="fas fa-credit-card"></i>
+												</div>
+												<div>
+													<h4 class="font-medium text-gray-800">Credit Card</h4>
+													<p class="text-xs text-gray-500">
+														Visa, Mastercard, Amex
+													</p>
+												</div>
+											</div>
+										</div>
+										<div
+											class="payment-method-card cursor-pointer"
+											data-method="paypal"
+										>
+											<input
+												type="radio"
+												name="payment-method"
+												value="paypal"
+												class="hidden"
+											/>
+											<div class="flex items-center">
+												<div
+													class="rounded-full bg-accent-500 text-white p-2 mr-3"
+												>
+													<i class="fab fa-paypal"></i>
+												</div>
+												<div>
+													<h4 class="font-medium text-gray-800">PayPal</h4>
+													<p class="text-xs text-gray-500">
+														Pay with your PayPal account
+													</p>
+												</div>
+											</div>
+										</div>
+										<div
+											class="payment-method-card cursor-pointer"
+											data-method="apple-pay"
+										>
+											<input
+												type="radio"
+												name="payment-method"
+												value="apple-pay"
+												class="hidden"
+											/>
+											<div class="flex items-center">
+												<div
+													class="rounded-full bg-gray-900 text-white p-2 mr-3"
+												>
+													<i class="fab fa-apple"></i>
+												</div>
+												<div>
+													<h4 class="font-medium text-gray-800">Apple Pay</h4>
+													<p class="text-xs text-gray-500">
+														Fast, secure payment
+													</p>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Credit card fields -->
+									<div
+										id="credit-card-fields"
+										class="space-y-6 animate-fade-in p-5 border border-gray-200 rounded-lg bg-white shadow-sm"
+									>
+										<div>
+											<label
+												for="card-holder"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>Cardholder Name<span class="text-red-500"
+													>*</span
+												></label
+											>
+											<input
+												type="text"
+												id="card-holder"
+												class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+												required
+											/>
+											<p
+												class="validation-message text-red-500 text-xs mt-1 hidden"
+											></p>
+										</div>
+
+										<div>
+											<label
+												for="card-number"
+												class="block text-sm font-medium text-gray-700 mb-1"
+												>Card Number<span class="text-red-500">*</span></label
+											>
+											<div class="relative">
+												<input
+													type="text"
+													id="card-number"
+													class="form-input cc-format w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+													placeholder="xxxx xxxx xxxx xxxx"
+													maxlength="19"
+													required
+												/>
+												<div
+													class="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-2"
+												>
+													<img
+														src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+														alt="visa"
+														class="h-6"
+													/>
+													<img
+														src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+														alt="mastercard"
+														class="h-6"
+													/>
+													<img
+														src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg"
+														alt="amex"
+														class="h-6"
+													/>
+												</div>
+											</div>
+											<p
+												class="validation-message text-red-500 text-xs mt-1 hidden"
+											></p>
+										</div>
+
+										<div class="grid grid-cols-2 gap-6">
+											<div>
+												<label
+													for="expiry-date"
+													class="block text-sm font-medium text-gray-700 mb-1"
+													>Expiration Date<span class="text-red-500"
+														>*</span
+													></label
+												>
+												<input
+													type="text"
+													id="expiry-date"
+													class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+													placeholder="MM/YY"
+													maxlength="5"
+													required
+												/>
+												<p
+													class="validation-message text-red-500 text-xs mt-1 hidden"
+												></p>
+											</div>
+											<div>
+												<label
+													for="cvv"
+													class="block text-sm font-medium text-gray-700 mb-1"
+													>CVV<span class="text-red-500">*</span></label
+												>
+												<div class="relative">
+													<input
+														type="text"
+														id="cvv"
+														class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+														placeholder="xxx"
+														maxlength="4"
+														required
+													/>
+													<div
+														class="absolute right-3 top-1/2 transform -translate-y-1/2"
+													>
+														<span
+															class="text-gray-400 cursor-help"
+															title="The 3 or 4 digit security code on the back of your card"
+														>
+															<i class="fas fa-question-circle"></i>
+														</span>
+													</div>
+												</div>
+												<p
+													class="validation-message text-red-500 text-xs mt-1 hidden"
+												></p>
+											</div>
+										</div>
+
+										<div class="flex items-center">
+											<input
+												type="checkbox"
+												id="save-card"
+												class="h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+											/>
+											<label
+												for="save-card"
+												class="ml-2 block text-sm text-gray-700"
+												>Save this card for future purchases</label
+											>
+										</div>
+									</div>
+
+									<!-- PayPal fields (hidden by default) -->
+									<div id="paypal-fields" class="hidden animate-fade-in">
+										<div
+											class="bg-accent-50 p-6 rounded-lg border border-accent-200 relative overflow-hidden"
+										>
+											<div class="flex items-center mb-4">
+												<img
+													src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"
+													alt="PayPal"
+													class="h-8 mr-3"
+												/>
+												<h3 class="font-medium text-gray-800">
+													Pay with PayPal
+												</h3>
+											</div>
+											<p class="text-sm text-gray-700 mb-6">
+												You'll be redirected to PayPal to complete your purchase
+												securely.
+											</p>
+											<button
+												type="button"
+												class="btn bg-accent-500 hover:bg-accent-600 focus:ring-accent-400 text-white px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-opacity-50 w-full shadow-md hover:shadow-lg"
+											>
+												<i class="fab fa-paypal mr-2"></i> Continue with PayPal
+											</button>
+											<div class="absolute top-0 right-0 p-4 opacity-10">
+												<i class="fab fa-paypal text-6xl text-accent-700"></i>
+											</div>
+										</div>
+									</div>
+
+									<!-- Apple Pay fields (hidden by default) -->
+									<div id="apple-pay-fields" class="hidden animate-fade-in">
+										<div
+											class="bg-gray-900 p-6 rounded-lg relative overflow-hidden"
+										>
+											<div class="flex items-center mb-4">
+												<i class="fab fa-apple text-white text-2xl mr-3"></i>
+												<h3 class="font-medium text-white">Apple Pay</h3>
+											</div>
+											<p class="text-sm text-gray-300 mb-6">
+												Complete your purchase with Apple Pay for fast and
+												secure checkout.
+											</p>
+											<button
+												type="button"
+												class="btn bg-white text-gray-900 px-6 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 w-full font-medium shadow-md hover:shadow-lg"
+											>
+												<i class="fab fa-apple mr-2"></i> Pay with Apple Pay
+											</button>
+											<div class="absolute top-0 right-0 p-4 opacity-10">
+												<i class="fab fa-apple text-6xl text-white"></i>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="border-t border-gray-200 pt-6">
+									<h3 class="font-medium text-gray-800 mb-4 flex items-center">
+										<i class="fas fa-receipt mr-2 text-primary-600"></i>
+										Billing Summary
+									</h3>
+									<div class="space-y-2">
+										<div class="flex justify-between text-sm">
+											<span class="text-gray-600">Subtotal</span>
+											<span class="font-medium" id="subtotal-amount"
+												>$479.98</span
+											>
+										</div>
+										<div class="flex justify-between text-sm">
+											<span class="text-gray-600">Shipping</span>
+											<span class="font-medium" id="shipping-amount"
+												>$9.99</span
+											>
+										</div>
+										<div class="flex justify-between text-sm">
+											<span class="text-gray-600">Tax</span>
+											<span class="font-medium" id="tax-amount">$39.60</span>
+										</div>
+										<div
+											class="flex justify-between font-semibold text-base mt-4 pt-4 border-t border-gray-200"
+										>
+											<span>Total</span>
+											<span id="total-amount" class="text-primary-600"
+												>$529.57</span
+											>
+										</div>
+									</div>
+								</div>
+
+								<div class="mt-4 flex flex-col sm:flex-row justify-between">
+									<button
+										type="button"
+										id="back-to-step-2"
+										class="back-step btn btn-secondary mb-4 sm:mb-0 flex items-center justify-center"
+									>
+										<i class="fas fa-arrow-left mr-2"></i> Back to Shipping
+									</button>
+									<button
+										type="submit"
+										id="place-order"
+										class="btn btn-primary flex items-center justify-center"
+									>
+										<i class="fas fa-lock mr-2"></i> Place Order
+									</button>
+								</div>
+							</form>
+						</div>
+
+						<div id="step-4" class="checkout-step card p-6 hidden text-center">
+							<div class="animate-fade-in py-8">
+								<div
+									class="relative w-24 h-24 rounded-full bg-gradient-to-r from-secondary-400 to-secondary-600 mx-auto flex items-center justify-center mb-6 animate-pulse"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										class="h-12 w-12 text-white"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											stroke-width="2"
+											d="M5 13l4 4L19 7"
+										/>
+									</svg>
+									<span class="absolute -right-2 -top-2 flex h-8 w-8">
+										<span
+											class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary-300 opacity-75"
+										></span>
+										<span
+											class="relative inline-flex rounded-full h-8 w-8 bg-secondary-500"
+										></span>
+									</span>
+								</div>
+								<h2
+									class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 font-heading"
+								>
+									Thank You For Your Order!
+								</h2>
+								<p class="text-gray-600 mb-8 max-w-md mx-auto">
+									Your order has been placed and is being processed. You will
+									receive an email confirmation shortly with tracking
+									information.
+								</p>
+
+								<div
+									class="bg-gray-50 rounded-lg p-6 max-w-md mx-auto mb-8 border border-gray-200 shadow-sm"
+								>
+									<h3 class="font-semibold text-gray-800 mb-4 text-left">
+										Order Summary
+									</h3>
+									<div class="flex justify-between mb-2">
+										<span class="text-gray-600">Order Number:</span>
+										<span class="font-medium" id="order-number"
+											>LX-7829342</span
+										>
+									</div>
+									<div class="flex justify-between mb-2">
+										<span class="text-gray-600">Order Date:</span>
+										<span class="font-medium" id="order-date"
+											>May 12, 2025</span
+										>
+									</div>
+									<div class="flex justify-between mb-2">
+										<span class="text-gray-600">Estimated Delivery:</span>
+										<span class="font-medium" id="delivery-date"
+											>May 16-18, 2025</span
+										>
+									</div>
+									<div class="flex justify-between mb-2">
+										<span class="text-gray-600">Total:</span>
+										<span class="font-medium" id="confirmation-total"
+											>$529.57</span
+										>
+									</div>
+									<div class="mt-4 pt-4 border-t border-gray-200">
+										<a
+											href="#"
+											class="text-primary-600 hover:text-primary-700 text-sm font-medium inline-flex items-center"
+										>
+											<i class="fas fa-file-invoice mr-2"></i> View Order
+											Details
+										</a>
+									</div>
+								</div>
+
+								<div class="space-y-4">
+									<div
+										class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4"
+									>
+										<button
+											id="continue-shopping"
+											class="btn btn-primary flex items-center justify-center"
+										>
+											<i class="fas fa-shopping-bag mr-2"></i> Continue Shopping
+										</button>
+										<a
+											href="#"
+											class="btn btn-secondary flex items-center justify-center"
+										>
+											<i class="fas fa-user mr-2"></i> My Account
+										</a>
+									</div>
+									<div class="text-sm text-gray-500 max-w-sm mx-auto mt-6">
+										<p>
+											Questions about your order?
+											<a
+												href="#"
+												class="text-primary-600 hover:text-primary-700"
+												>Contact our support team</a
+											>
+										</p>
+									</div>
+								</div>
+
+								<!-- Email subscription -->
+								<div
+									class="mt-12 border-t border-gray-200 pt-8 max-w-md mx-auto"
+								>
+									<h3 class="font-medium text-gray-800 mb-3">
+										Get 10% off your next order
+									</h3>
+									<p class="text-sm text-gray-600 mb-4">
+										Subscribe to our newsletter for exclusive deals and updates
+									</p>
+									<div class="flex">
+										<input
+											type="email"
+											placeholder="Your email address"
+											class="form-input w-full px-4 py-3 border border-gray-300 rounded-l-lg focus:outline-none shadow-sm"
+										/>
+										<button
+											class="btn btn-accent rounded-r-lg rounded-l-none px-4"
+										>
+											Subscribe
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right side - Order summary -->
+					<div class="w-full lg:w-1/3 order-1 lg:order-2">
+						<div class="card p-6 sticky top-24">
+							<h2
+								class="text-xl font-semibold mb-6 text-gray-800 font-heading flex items-center"
+							>
+								<i class="fas fa-shopping-cart text-primary-600 mr-3"></i>
+								Order Summary
+							</h2>
+
+							<div
+								class="space-y-4 mb-6 max-h-60 overflow-y-auto custom-scrollbar pr-2"
+								id="cart-summary-items"
+							>
+								<div class="flex items-start">
+									<div
+										class="w-16 h-16 rounded-lg overflow-hidden mr-4 flex-shrink-0 border border-gray-100 product-image-container"
+									>
+										<img
+											src="https://images.unsplash.com/photo-1523275335684-37898b6baf30"
+											alt="Smart Watch"
+											class="w-full h-full object-cover product-image"
+										/>
+									</div>
+									<div class="flex-1">
+										<h4 class="text-sm font-medium text-gray-800">
+											Premium Smart Watch
+										</h4>
+										<p class="text-xs text-gray-500">Black | 44mm</p>
+										<div class="flex justify-between items-center mt-1">
+											<span class="text-xs text-gray-500"
+												>Qty:
+												<span class="summary-qty" data-product-id="1"
+													>1</span
+												></span
+											>
+											<span class="text-sm font-medium">$299.99</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="flex items-start">
+									<div
+										class="w-16 h-16 rounded-lg overflow-hidden mr-4 flex-shrink-0 border border-gray-100 product-image-container"
+									>
+										<img
+											src="https://images.unsplash.com/photo-1546868871-7041f2a55e12"
+											alt="Wireless Headphones"
+											class="w-full h-full object-cover product-image"
+										/>
+									</div>
+									<div class="flex-1">
+										<h4 class="text-sm font-medium text-gray-800">
+											Wireless Noise-Cancelling Headphones
+										</h4>
+										<p class="text-xs text-gray-500">Silver | Over-ear</p>
+										<div class="flex justify-between items-center mt-1">
+											<span class="text-xs text-gray-500"
+												>Qty:
+												<span class="summary-qty" data-product-id="2"
+													>1</span
+												></span
+											>
+											<span class="text-sm font-medium">$179.99</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="border-t border-gray-200 pt-4 mb-6">
+								<div class="flex items-center justify-between mb-4">
+									<div class="relative flex-1 mr-2">
+										<input
+											type="text"
+											id="promo-code"
+											placeholder="Promo Code"
+											class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none shadow-sm"
+										/>
+									</div>
+									<button
+										id="apply-promo"
+										class="btn btn-accent whitespace-nowrap"
+									>
+										Apply
+									</button>
+								</div>
+
+								<!-- Available promo codes -->
+								<div class="text-sm text-gray-600 mb-4">
+									<p class="mb-2">Available promo codes:</p>
+									<div class="flex flex-wrap">
+										<span
+											class="promo-badge bg-primary-100 text-primary-800 hover:bg-primary-200"
+											data-code="WELCOME20"
+											>WELCOME20</span
+										>
+										<span
+											class="promo-badge bg-secondary-100 text-secondary-800 hover:bg-secondary-200"
+											data-code="FREESHIP"
+											>FREESHIP</span
+										>
+										<span
+											class="promo-badge bg-accent-100 text-accent-800 hover:bg-accent-200"
+											data-code="SAVE10"
+											>SAVE10</span
+										>
+									</div>
+								</div>
+
+								<!-- Promo code success message (hidden by default) -->
+								<div
+									id="promo-success"
+									class="hidden bg-green-50 text-green-800 text-sm p-3 rounded-lg mb-4"
+								>
+									<div class="flex items-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 mr-2"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M5 13l4 4L19 7"
+											/>
+										</svg>
+										<span
+											>Promo code
+											<span class="font-medium" id="applied-promo-code"
+												>WELCOME20</span
+											>
+											applied!</span
+										>
+										<button
+											id="remove-promo"
+											class="ml-auto text-green-700 hover:text-green-900"
+										>
+											<i class="fas fa-times"></i>
+										</button>
+									</div>
+								</div>
+
+								<!-- Promo code error message (hidden by default) -->
+								<div
+									id="promo-error"
+									class="hidden bg-red-50 text-red-800 text-sm p-3 rounded-lg mb-4"
+								>
+									<div class="flex items-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 mr-2"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M6 18L18 6M6 6l12 12"
+											/>
+										</svg>
+										<span>Invalid promo code. Please try again.</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="space-y-2">
+								<div class="flex justify-between text-sm">
+									<span class="text-gray-600">Subtotal</span>
+									<span class="font-medium" id="summary-subtotal">$479.98</span>
+								</div>
+								<div class="flex justify-between text-sm">
+									<span class="text-gray-600">Shipping</span>
+									<span class="font-medium" id="summary-shipping">$9.99</span>
+								</div>
+								<div class="flex justify-between text-sm">
+									<span class="text-gray-600">Tax</span>
+									<span class="font-medium" id="summary-tax">$39.60</span>
+								</div>
+								<div
+									id="discount-row"
+									class="flex justify-between text-sm hidden"
+								>
+									<span class="text-green-600">Discount</span>
+									<span class="font-medium text-green-600" id="summary-discount"
+										>-$0.00</span
+									>
+								</div>
+								<div
+									class="flex justify-between font-semibold text-base mt-4 pt-4 border-t border-gray-200"
+								>
+									<span>Total</span>
+									<span id="summary-total" class="text-primary-600"
+										>$529.57</span
+									>
+								</div>
+							</div>
+
+							<div class="mt-6 space-y-4">
+								<div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+									<h4 class="font-medium text-gray-800 mb-2">
+										Shipping Information
+									</h4>
+									<div class="text-sm text-gray-600 space-y-1">
+										<div class="flex items-center">
+											<i class="fas fa-truck text-primary-600 mr-2"></i>
+											<span>Free shipping on orders over $50</span>
+										</div>
+										<div class="flex items-center">
+											<i class="fas fa-calendar-alt text-primary-600 mr-2"></i>
+											<span>Estimated delivery: 3-5 business days</span>
+										</div>
+									</div>
+								</div>
+
+								<div class="space-y-2 text-sm text-gray-600">
+									<div class="flex items-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 mr-2 text-secondary-500"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+											/>
+										</svg>
+										<span>Secure Payment</span>
+									</div>
+									<div class="flex items-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 mr-2 text-secondary-500"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+											/>
+										</svg>
+										<span>Multiple Payment Options</span>
+									</div>
+									<div class="flex items-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 mr-2 text-secondary-500"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+											/>
+										</svg>
+										<span>Free Returns for 30 Days</span>
+									</div>
+								</div>
+
+								<!-- Trust badges -->
+								<div
+									class="flex flex-wrap justify-center items-center gap-4 pt-4 border-t border-gray-200"
+								>
+									<div class="flex items-center bg-white p-2 rounded-md">
+										<i class="fas fa-shield-alt text-gray-400 mr-1"></i>
+										<span class="text-xs text-gray-500">Secure</span>
+									</div>
+									<div class="flex items-center bg-white p-2 rounded-md">
+										<i class="fas fa-lock text-gray-400 mr-1"></i>
+										<span class="text-xs text-gray-500">SSL</span>
+									</div>
+									<div class="flex items-center bg-white p-2 rounded-md">
+										<i class="far fa-credit-card text-gray-400 mr-1"></i>
+										<span class="text-xs text-gray-500">PCI DSS</span>
+									</div>
+								</div>
+
+								<!-- Need help section -->
+								<div class="mt-6 text-center">
+									<p class="text-sm text-gray-500">
+										Need help with your order?
+									</p>
+									<a
+										href="#"
+										class="text-sm text-primary-600 hover:text-primary-700 font-medium"
+										>Contact Support</a
+									>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<footer class="bg-white border-t border-gray-200 mt-16">
+				<div class="container mx-auto px-4 py-8 max-w-6xl">
+					<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+						<div>
+							<h3 class="font-bold text-gray-800 mb-4">LuxeCart</h3>
+							<p class="text-gray-600 text-sm mb-4">
+								Premium shopping experience for the modern consumer.
+							</p>
+							<div class="flex space-x-4">
+								<a
+									href="#"
+									class="text-gray-400 hover:text-primary-600 transition-colors"
+								>
+									<i class="fab fa-facebook-f"></i>
+								</a>
+								<a
+									href="#"
+									class="text-gray-400 hover:text-primary-600 transition-colors"
+								>
+									<i class="fab fa-twitter"></i>
+								</a>
+								<a
+									href="#"
+									class="text-gray-400 hover:text-primary-600 transition-colors"
+								>
+									<i class="fab fa-instagram"></i>
+								</a>
+								<a
+									href="#"
+									class="text-gray-400 hover:text-primary-600 transition-colors"
+								>
+									<i class="fab fa-pinterest"></i>
+								</a>
+							</div>
+						</div>
+						<div>
+							<h3 class="font-medium text-gray-800 mb-4">Shop</h3>
+							<ul class="space-y-2 text-sm">
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>New Arrivals</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>Best Sellers</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>Sale</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>Collections</a
+									>
+								</li>
+							</ul>
+						</div>
+						<div>
+							<h3 class="font-medium text-gray-800 mb-4">Customer Service</h3>
+							<ul class="space-y-2 text-sm">
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>Contact Us</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>Shipping & Returns</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>FAQ</a
+									>
+								</li>
+								<li>
+									<a
+										href="#"
+										class="text-gray-600 hover:text-primary-600 transition-colors"
+										>Size Guide</a
+									>
+								</li>
+							</ul>
+						</div>
+						<div>
+							<h3 class="font-medium text-gray-800 mb-4">Stay Updated</h3>
+							<p class="text-sm text-gray-600 mb-4">
+								Subscribe to our newsletter for the latest products and deals.
+							</p>
+							<div class="flex">
+								<input
+									type="email"
+									placeholder="Your email"
+									class="form-input w-full px-4 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none shadow-sm"
+								/>
+								<button
+									class="bg-primary-600 text-white px-4 py-2 rounded-r-lg text-sm"
+								>
+									Sign Up
+								</button>
+							</div>
+						</div>
+					</div>
+					<div
+						class="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center"
+					>
+						<p class="text-xs text-gray-500">
+							&copy; 2025 LuxeCart. All rights reserved.
+						</p>
+						<div class="flex space-x-4 mt-4 md:mt-0">
+							<a
+								href="#"
+								class="text-xs text-gray-500 hover:text-primary-600 transition-colors"
+								>Privacy Policy</a
+							>
+							<a
+								href="#"
+								class="text-xs text-gray-500 hover:text-primary-600 transition-colors"
+								>Terms of Service</a
+							>
+							<a
+								href="#"
+								class="text-xs text-gray-500 hover:text-primary-600 transition-colors"
+								>Accessibility</a
+							>
+						</div>
+					</div>
+				</div>
+			</footer>
+		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				const products = [
+					{
+						id: 1,
+						name: "Premium Smart Watch",
+						price: 299.99,
+						quantity: 1,
+						image:
+							"https://images.unsplash.com/photo-1523275335684-37898b6baf30",
+					},
+					{
+						id: 2,
+						name: "Wireless Noise-Cancelling Headphones",
+						price: 179.99,
+						quantity: 1,
+						image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12",
+					},
+				];
+
+				let subtotal = calculateSubtotal();
+				let shipping = 9.99;
+				let taxRate = 0.0825;
+				let tax = subtotal * taxRate;
+				let discount = 0;
+				let total = subtotal + shipping + tax - discount;
+				let promoApplied = false;
+				let currentPromoCode = "";
+				let selectedPaymentMethod = "credit-card";
+				let toBeRemovedProductId = null;
+
+				const steps = document.querySelectorAll(".checkout-step");
+				const progressBar = document.getElementById("progress-bar");
+				const stepIndicators = document.querySelectorAll(".step-indicator");
+				const mobileSteps = document.querySelectorAll(".mobile-step");
+				const mobileStepLineProgress = document.querySelector(
+					".step-line-progress"
+				);
+
+				updateOrderSummary();
+
+				document
+					.getElementById("mobile-menu-toggle")
+					.addEventListener("click", function () {
+						showToast("Mobile menu toggled", "info");
+					});
+
+				function showToast(message, type = "success", duration = 3000) {
+					const toastContainer = document.getElementById("toast-container");
+
+					const toast = document.createElement("div");
+					toast.className = "toast";
+
+					let bgColor, textColor, icon;
+					switch (type) {
+						case "success":
+							bgColor = "bg-secondary-500";
+							textColor = "text-white";
+							icon = '<i class="fas fa-check-circle mr-2"></i>';
+							break;
+						case "error":
+							bgColor = "bg-red-500";
+							textColor = "text-white";
+							icon = '<i class="fas fa-exclamation-circle mr-2"></i>';
+							break;
+						case "info":
+							bgColor = "bg-accent-500";
+							textColor = "text-white";
+							icon = '<i class="fas fa-info-circle mr-2"></i>';
+							break;
+						case "warning":
+							bgColor = "bg-yellow-500";
+							textColor = "text-gray-900";
+							icon = '<i class="fas fa-exclamation-triangle mr-2"></i>';
+							break;
+					}
+
+					toast.className += ` ${bgColor} ${textColor}`;
+					toast.innerHTML = `
+        <div class="flex items-center">
+            ${icon}
+            <span>${message}</span>
+            <button class="ml-auto text-${
+							textColor === "text-white" ? "white" : "gray-900"
+						} opacity-70 hover:opacity-100 transition-opacity">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+
+					toastContainer.appendChild(toast);
+
+					setTimeout(() => {
+						toast.classList.add("show");
+					}, 10);
+
+					const closeBtn = toast.querySelector("button");
+					closeBtn.addEventListener("click", () => {
+						toast.classList.remove("show");
+						setTimeout(() => {
+							toast.remove();
+						}, 300);
+					});
+
+					setTimeout(() => {
+						if (toast.parentNode) {
+							toast.classList.remove("show");
+							setTimeout(() => {
+								if (toast.parentNode) {
+									toast.remove();
+								}
+							}, 300);
+						}
+					}, duration);
+				}
+
+				const confirmModal = document.getElementById("confirm-modal");
+				const modalCancel = document.getElementById("modal-cancel");
+				const modalConfirm = document.getElementById("modal-confirm");
+
+				function showConfirmModal(onConfirm) {
+					confirmModal.classList.add("show");
+
+					modalCancel.onclick = function () {
+						confirmModal.classList.remove("show");
+					};
+
+					modalConfirm.onclick = function () {
+						onConfirm();
+						confirmModal.classList.remove("show");
+					};
+				}
+
+				document.querySelectorAll(".payment-method-card").forEach((card) => {
+					card.addEventListener("click", function () {
+						document.querySelectorAll(".payment-method-card").forEach((c) => {
+							c.classList.remove("active");
+						});
+
+						this.classList.add("active");
+
+						const radioBtn = this.querySelector('input[type="radio"]');
+						radioBtn.checked = true;
+						selectedPaymentMethod = radioBtn.value;
+
+						const event = new Event("change");
+						radioBtn.dispatchEvent(event);
+
+						document
+							.getElementById("credit-card-fields")
+							.classList.add("hidden");
+						document.getElementById("paypal-fields").classList.add("hidden");
+						document.getElementById("apple-pay-fields").classList.add("hidden");
+
+						const methodValue = radioBtn.value;
+						document
+							.getElementById(`${methodValue}-fields`)
+							.classList.remove("hidden");
+					});
+				});
+
+				document.querySelectorAll(".quantity-btn").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						const action = this.getAttribute("data-action");
+						const productId = parseInt(this.getAttribute("data-product-id"));
+						const inputElement = document.querySelector(
+							`.quantity-input[data-product-id="${productId}"]`
+						);
+
+						let currentQty = parseInt(inputElement.value);
+
+						if (action === "increase") {
+							currentQty += 1;
+						} else if (action === "decrease" && currentQty > 1) {
+							currentQty -= 1;
+						}
+
+						inputElement.value = currentQty;
+
+						inputElement.classList.add("animate-pulse");
+						setTimeout(() => {
+							inputElement.classList.remove("animate-pulse");
+						}, 500);
+
+						const productIndex = products.findIndex((p) => p.id === productId);
+						if (productIndex !== -1) {
+							products[productIndex].quantity = currentQty;
+
+							document
+								.querySelectorAll(
+									`.summary-qty[data-product-id="${productId}"]`
+								)
+								.forEach((el) => {
+									el.textContent = currentQty;
+								});
+
+							updateOrderSummary(true);
+						}
+					});
+				});
+
+				document.querySelectorAll(".quantity-input").forEach((input) => {
+					input.addEventListener("change", function () {
+						const productId = parseInt(this.getAttribute("data-product-id"));
+						let newQty = parseInt(this.value);
+
+						if (isNaN(newQty) || newQty < 1) {
+							newQty = 1;
+							this.value = 1;
+						}
+
+						const productIndex = products.findIndex((p) => p.id === productId);
+						if (productIndex !== -1) {
+							products[productIndex].quantity = newQty;
+
+							document
+								.querySelectorAll(
+									`.summary-qty[data-product-id="${productId}"]`
+								)
+								.forEach((el) => {
+									el.textContent = newQty;
+								});
+
+							updateOrderSummary(true);
+						}
+					});
+				});
+
+				document.querySelectorAll(".remove-item").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						const productId = parseInt(this.getAttribute("data-product-id"));
+						toBeRemovedProductId = productId;
+
+						showConfirmModal(function () {
+							removeProduct(productId);
+						});
+					});
+				});
+
+				function handleQuantityButtonClick() {
+					const action = this.getAttribute("data-action");
+					const productId = parseInt(this.getAttribute("data-product-id"));
+					const inputElement = document.querySelector(
+						`.quantity-input[data-product-id="${productId}"]`
+					);
+
+					let currentQty = parseInt(inputElement.value);
+
+					if (action === "increase") {
+						currentQty += 1;
+					} else if (action === "decrease" && currentQty > 1) {
+						currentQty -= 1;
+					}
+
+					inputElement.value = currentQty;
+
+					inputElement.classList.add("animate-pulse");
+					setTimeout(() => {
+						inputElement.classList.remove("animate-pulse");
+					}, 500);
+
+					const productIndex = products.findIndex((p) => p.id === productId);
+					if (productIndex !== -1) {
+						products[productIndex].quantity = currentQty;
+
+						document
+							.querySelectorAll(`.summary-qty[data-product-id="${productId}"]`)
+							.forEach((el) => {
+								el.textContent = currentQty;
+							});
+
+						updateOrderSummary(true);
+					}
+				}
+
+				function removeProduct(productId) {
+					const productEl = document
+						.querySelector(`.remove-item[data-product-id="${productId}"]`)
+						.closest(".card");
+
+					if (productEl) {
+						productEl.style.transition = "all 0.5s ease-out";
+						productEl.style.opacity = "0";
+						productEl.style.transform = "translateX(20px)";
+
+						setTimeout(() => {
+							productEl.remove();
+
+							const productIndex = products.findIndex(
+								(p) => p.id === productId
+							);
+
+							if (productIndex !== -1) {
+								products.splice(productIndex, 1);
+
+								const summaryItem = document
+									.querySelector(`.summary-qty[data-product-id="${productId}"]`)
+									?.closest(".flex.items-start");
+
+								if (summaryItem) {
+									summaryItem.style.transition = "all 0.3s ease-out";
+									summaryItem.style.opacity = "0";
+									summaryItem.style.height = "0";
+									setTimeout(() => {
+										summaryItem.remove();
+									}, 300);
+								}
+
+								updateOrderSummary(true);
+
+								showToast("Item removed from cart", "info");
+
+								if (products.length === 0) {
+									const cartContainer =
+										document.querySelector("#step-1 .space-y-4");
+									const emptyCartMsg = document.createElement("div");
+									emptyCartMsg.className = "text-center py-8 animate-fade-in";
+									emptyCartMsg.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        <h3 class="text-lg font-medium text-gray-800 mb-2">Your cart is empty</h3>
+                        <p class="text-gray-600 mb-4">Looks like you haven't added any items to your cart yet.</p>
+                        <button class="btn btn-primary">
+                            Continue Shopping
+                        </button>
+                    `;
+									cartContainer.appendChild(emptyCartMsg);
+
+									document.getElementById("to-step-2").disabled = true;
+									document
+										.getElementById("to-step-2")
+										.classList.add("opacity-50", "cursor-not-allowed");
+								}
+							}
+						}, 300);
+					}
+				}
+
+				document.querySelectorAll(".add-recommended").forEach((btn) => {
+					btn.addEventListener("click", function (e) {
+						e.preventDefault();
+						e.stopPropagation();
+
+						const productId = parseInt(this.getAttribute("data-product-id"));
+						const productElement = document.querySelector(
+							`.recommended-product[data-product-id="${productId}"]`
+						);
+
+						if (productElement) {
+							const productName =
+								productElement.getAttribute("data-product-name");
+							const productPrice = parseFloat(
+								productElement.getAttribute("data-product-price")
+							);
+							const productImage = productElement
+								.querySelector(".product-image")
+								.getAttribute("src");
+
+							const existingProductIndex = products.findIndex(
+								(p) => p.id === productId
+							);
+
+							if (existingProductIndex !== -1) {
+								products[existingProductIndex].quantity += 1;
+
+								document
+									.querySelectorAll(
+										`.summary-qty[data-product-id="${productId}"]`
+									)
+									.forEach((el) => {
+										el.textContent = products[existingProductIndex].quantity;
+									});
+
+								showToast(
+									`Added another ${productName} to your cart`,
+									"success"
+								);
+							} else {
+								const newProduct = {
+									id: productId,
+									name: productName,
+									price: productPrice,
+									quantity: 1,
+									image: productImage,
+								};
+
+								products.push(newProduct);
+
+								const cartSummary =
+									document.getElementById("cart-summary-items");
+								const newItem = document.createElement("div");
+								newItem.className = "flex items-start animate-fade-in";
+								newItem.innerHTML = `
+                    <div class="w-16 h-16 rounded-lg overflow-hidden mr-4 flex-shrink-0 border border-gray-100 product-image-container">
+                        <img src="${productImage}" alt="${productName}" class="w-full h-full object-cover product-image">
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-medium text-gray-800">${productName}</h4>
+                        <div class="flex justify-between items-center mt-1">
+                            <span class="text-xs text-gray-500">Qty: <span class="summary-qty" data-product-id="${productId}">1</span></span>
+                            <span class="text-sm font-medium">$${productPrice.toFixed(
+															2
+														)}</span>
+                        </div>
+                    </div>
+                `;
+								cartSummary.appendChild(newItem);
+
+								const cartItemsContainer =
+									document.querySelector("#step-1 .space-y-4");
+								const newCartItem = document.createElement("div");
+								newCartItem.className =
+									"card p-4 hover:border-primary-200 hover:bg-gray-50 transition-colors duration-200 animate-fade-in";
+								newCartItem.innerHTML = `
+    <div class="flex flex-col sm:flex-row items-start sm:items-center">
+        <div class="relative w-24 h-24 mb-4 sm:mb-0 sm:mr-6 overflow-hidden rounded-md product-image-container border border-gray-100">
+            <img src="${productImage}" alt="${productName}" class="w-full h-full object-cover product-image">
+            <div class="quick-view absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+                <button class="text-white hover:text-primary-200 transition-colors">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+        </div>
+        <div class="flex-1">
+            <div class="flex justify-between">
+                <div>
+                    <h3 class="font-medium text-gray-800">${productName}</h3>
+                    <span class="badge badge-primary mt-1">In Stock</span>
+                </div>
+                <div class="font-medium text-gray-800 sm:hidden">$${productPrice.toFixed(
+									2
+								)}</div>
+            </div>
+            <div class="flex items-center mt-3 justify-between">
+                <div class="flex">
+                    <div class="flex border rounded-lg shadow-sm">
+                        <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100 hover:text-primary-600 transition-colors" 
+                                data-action="decrease" 
+                                data-product-id="${productId}">-</button>
+                        <input type="number" min="1" value="1" 
+                               class="quantity-input w-12 text-center border-x py-1" 
+                               data-product-id="${productId}">
+                        <button class="quantity-btn px-3 py-1 text-gray-600 hover:bg-gray-100 hover:text-primary-600 transition-colors" 
+                                data-action="increase" 
+                                data-product-id="${productId}">+</button>
+                    </div>
+                    <button class="remove-item ml-4 text-sm text-red-500 hover:text-red-700 transition-colors" 
+                            data-product-id="${productId}">
+                        <i class="fas fa-trash-alt mr-1"></i> Remove
+                    </button>
+                </div>
+                <div class="font-medium text-gray-800 hidden sm:block">$${productPrice.toFixed(
+									2
+								)}</div>
+            </div>
+        </div>
+    </div>
+`;
+
+								const recommendedSection =
+									cartItemsContainer.querySelector(".mt-6.pt-6");
+								if (recommendedSection) {
+									cartItemsContainer.insertBefore(
+										newCartItem,
+										recommendedSection
+									);
+								} else {
+									cartItemsContainer.appendChild(newCartItem);
+								}
+
+								const newQuantityBtns =
+									newCartItem.querySelectorAll(".quantity-btn");
+								newQuantityBtns.forEach((btn) => {
+									btn.addEventListener("click", handleQuantityButtonClick);
+								});
+
+								const newRemoveBtn = newCartItem.querySelector(".remove-item");
+								if (newRemoveBtn) {
+									newRemoveBtn.addEventListener("click", function () {
+										const productId = parseInt(
+											this.getAttribute("data-product-id")
+										);
+										toBeRemovedProductId = productId;
+
+										showConfirmModal(function () {
+											removeProduct(productId);
+										});
+									});
+								}
+
+								showToast(`${productName} added to your cart`, "success");
+							}
+
+							updateOrderSummary(true);
+						}
+					});
+				});
+
+				document.querySelectorAll(".promo-badge").forEach((badge) => {
+					badge.addEventListener("click", function () {
+						const code = this.getAttribute("data-code");
+						document.getElementById("promo-code").value = code;
+					});
+				});
+
+				document.querySelectorAll(".next-step").forEach((btn) => {
+					btn.addEventListener("click", function (e) {
+						e.preventDefault();
+
+						const formId = this.closest("form")?.id;
+						if (formId) {
+							const form = document.getElementById(formId);
+							if (!validateForm(form)) {
+								return;
+							}
+						}
+
+						this.innerHTML = `<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg> Processing...`;
+						this.disabled = true;
+
+						setTimeout(() => {
+							this.disabled = false;
+							const targetStep = parseInt(this.id.split("-")[2]);
+
+							if (this.id === "to-step-2") {
+								this.innerHTML =
+									'Continue to Shipping <i class="fas fa-arrow-right ml-2"></i>';
+							} else if (this.id === "to-step-3") {
+								this.innerHTML =
+									'Continue to Payment <i class="fas fa-arrow-right ml-2"></i>';
+							}
+
+							goToStep(targetStep);
+						}, 800);
+					});
+				});
+
+				document.querySelectorAll(".back-step").forEach((btn) => {
+					btn.addEventListener("click", function () {
+						const targetStep = parseInt(this.id.split("-")[3]);
+						goToStep(targetStep);
+					});
+				});
+
+				document
+					.getElementById("continue-shopping")
+					.addEventListener("click", function () {
+						goToStep(1);
+					});
+
+				document
+					.getElementById("place-order")
+					.addEventListener("click", function (e) {
+						e.preventDefault();
+
+						if (selectedPaymentMethod === "credit-card") {
+							const paymentForm = document.getElementById("payment-form");
+							if (!validateForm(paymentForm)) {
+								return;
+							}
+						}
+
+						this.disabled = true;
+						this.innerHTML =
+							'<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Processing Payment...';
+
+						setTimeout(() => {
+							if (selectedPaymentMethod === "paypal") {
+								const paypalBtn = document.querySelector(
+									"#paypal-fields button"
+								);
+								paypalBtn.innerHTML =
+									'<i class="fas fa-spinner fa-spin mr-2"></i> Redirecting to PayPal...';
+
+								setTimeout(() => {
+									simulatePaymentCompletion();
+								}, 1500);
+							} else if (selectedPaymentMethod === "apple-pay") {
+								const applePayBtn = document.querySelector(
+									"#apple-pay-fields button"
+								);
+								applePayBtn.innerHTML =
+									'<i class="fas fa-spinner fa-spin mr-2"></i> Processing with Apple Pay...';
+
+								setTimeout(() => {
+									simulatePaymentCompletion();
+								}, 1500);
+							} else {
+								setTimeout(() => {
+									simulatePaymentCompletion();
+								}, 2000);
+							}
+						}, 1500);
+
+						function simulatePaymentCompletion() {
+							const orderNumber =
+								"LX-" + Math.floor(1000000 + Math.random() * 9000000);
+							const orderDate = new Date().toLocaleDateString("en-US", {
+								year: "numeric",
+								month: "long",
+								day: "numeric",
+							});
+
+							const deliveryDate = new Date();
+							deliveryDate.setDate(deliveryDate.getDate() + 4);
+							const deliveryDateEnd = new Date();
+							deliveryDateEnd.setDate(deliveryDateEnd.getDate() + 6);
+							const formattedDeliveryDate = `${deliveryDate.toLocaleDateString(
+								"en-US",
+								{
+									month: "long",
+									day: "numeric",
+								}
+							)}-${deliveryDateEnd.getDate()}, ${deliveryDateEnd.getFullYear()}`;
+
+							document.getElementById("order-number").textContent = orderNumber;
+							document.getElementById("order-date").textContent = orderDate;
+							document.getElementById("delivery-date").textContent =
+								formattedDeliveryDate;
+							document.getElementById("confirmation-total").textContent =
+								formatCurrency(total);
+
+							goToStep(4);
+
+							document.getElementById("place-order").disabled = false;
+							document.getElementById("place-order").innerHTML =
+								'<i class="fas fa-lock mr-2"></i> Place Order';
+
+							const paypalBtn = document.querySelector("#paypal-fields button");
+							if (paypalBtn) {
+								paypalBtn.innerHTML =
+									'<i class="fab fa-paypal mr-2"></i> Continue with PayPal';
+							}
+
+							const applePayBtn = document.querySelector(
+								"#apple-pay-fields button"
+							);
+							if (applePayBtn) {
+								applePayBtn.innerHTML =
+									'<i class="fab fa-apple mr-2"></i> Pay with Apple Pay';
+							}
+
+							showToast(
+								"Order placed successfully! Thank you for your purchase.",
+								"success",
+								5000
+							);
+						}
+					});
+
+				document
+					.getElementById("phone")
+					.addEventListener("input", function (e) {
+						this.value = this.value.replace(/\D/g, "");
+					});
+
+				document
+					.getElementById("different-billing")
+					.addEventListener("change", function () {
+						const billingFields = document.getElementById("billing-fields");
+						if (this.checked) {
+							billingFields.classList.remove("hidden");
+
+							billingFields.classList.add("animate-fade-in");
+						} else {
+							billingFields.style.opacity = "0";
+							billingFields.style.transition = "opacity 0.3s ease-out";
+
+							setTimeout(() => {
+								billingFields.classList.add("hidden");
+								billingFields.style.opacity = "1";
+								billingFields.style.transition = "";
+							}, 300);
+						}
+					});
+
+				document
+					.getElementById("apply-promo")
+					.addEventListener("click", function () {
+						const promoCode = document
+							.getElementById("promo-code")
+							.value.trim()
+							.toUpperCase();
+						const promoSuccess = document.getElementById("promo-success");
+						const promoError = document.getElementById("promo-error");
+
+						promoSuccess.classList.add("hidden");
+						promoError.classList.add("hidden");
+
+						this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+						this.disabled = true;
+
+						setTimeout(() => {
+							this.innerHTML = "Apply";
+							this.disabled = false;
+
+							if (!promoCode) {
+								showValidationError(
+									document.getElementById("promo-code"),
+									"Please enter a promo code"
+								);
+								return;
+							}
+
+							let discountPercent = 0;
+							let freeShipping = false;
+
+							if (promoCode === "WELCOME20" && !promoApplied) {
+								discountPercent = 0.2;
+								promoApplied = true;
+								currentPromoCode = promoCode;
+							} else if (promoCode === "SAVE10" && !promoApplied) {
+								discountPercent = 0.1;
+								promoApplied = true;
+								currentPromoCode = promoCode;
+							} else if (promoCode === "FREESHIP" && !promoApplied) {
+								freeShipping = true;
+								promoApplied = true;
+								currentPromoCode = promoCode;
+							}
+
+							if (promoApplied) {
+								discount = freeShipping ? shipping : subtotal * discountPercent;
+
+								document.getElementById("applied-promo-code").textContent =
+									currentPromoCode;
+
+								promoSuccess.classList.remove("hidden");
+								promoSuccess.classList.add("animate-fade-in");
+								document
+									.getElementById("discount-row")
+									.classList.remove("hidden");
+								document
+									.getElementById("discount-row")
+									.classList.add("animate-fade-in");
+
+								updateOrderSummary(true);
+
+								showToast(
+									`Promo code ${currentPromoCode} applied successfully!`,
+									"success"
+								);
+							} else {
+								promoError.classList.remove("hidden");
+								promoError.classList.add("animate-fade-in");
+								document
+									.getElementById("promo-code")
+									.classList.add("animate-shake");
+
+								setTimeout(() => {
+									document
+										.getElementById("promo-code")
+										.classList.remove("animate-shake");
+								}, 500);
+
+								showToast("Invalid promo code. Please try again.", "error");
+							}
+						}, 800);
+					});
+
+				document
+					.getElementById("remove-promo")
+					.addEventListener("click", function () {
+						discount = 0;
+						promoApplied = false;
+						currentPromoCode = "";
+
+						document.getElementById("promo-code").value = "";
+
+						const promoSuccess = document.getElementById("promo-success");
+						const discountRow = document.getElementById("discount-row");
+
+						promoSuccess.style.opacity = "0";
+						promoSuccess.style.transition = "opacity 0.3s ease";
+						discountRow.style.opacity = "0";
+						discountRow.style.transition = "opacity 0.3s ease";
+
+						setTimeout(() => {
+							promoSuccess.classList.add("hidden");
+							discountRow.classList.add("hidden");
+							promoSuccess.style.opacity = "1";
+							discountRow.style.opacity = "1";
+							promoSuccess.style.transition = "";
+							discountRow.style.transition = "";
+
+							updateOrderSummary(true);
+
+							showToast("Promo code removed", "info");
+						}, 300);
+					});
+
+				document
+					.getElementById("card-number")
+					.addEventListener("input", function (e) {
+						let value = this.value.replace(/\D/g, "");
+
+						if (value.length > 0) {
+							value = value.match(new RegExp(".{1,4}", "g")).join(" ");
+						}
+
+						this.value = value;
+
+						const cardType = detectCardType(value.replace(/\s/g, ""));
+						highlightCardType(cardType);
+					});
+
+				function detectCardType(cardNumber) {
+					if (/^4/.test(cardNumber)) {
+						return "visa";
+					} else if (/^5[1-5]/.test(cardNumber)) {
+						return "mastercard";
+					} else if (/^3[47]/.test(cardNumber)) {
+						return "amex";
+					} else {
+						return "unknown";
+					}
+				}
+
+				function highlightCardType(cardType) {
+					const cardImages = document
+						.querySelector("#card-number")
+						.parentElement.querySelectorAll("img");
+					cardImages.forEach((img) => {
+						if (img.alt.toLowerCase() === cardType) {
+							img.style.opacity = "1";
+							img.style.transform = "scale(1.1)";
+						} else {
+							img.style.opacity = "0.5";
+							img.style.transform = "scale(1)";
+						}
+					});
+				}
+
+				document
+					.getElementById("expiry-date")
+					.addEventListener("input", function (e) {
+						let value = this.value.replace(/\D/g, "");
+
+						if (value.length > 0) {
+							if (value.length <= 2) {
+								if (value.length === 1 && parseInt(value) > 1) {
+									value = "0" + value;
+								}
+							} else {
+								const month = value.substring(0, 2);
+								const year = value.substring(2, 4);
+
+								if (parseInt(month) > 12) {
+									value = "12" + year;
+								} else {
+									value = month + year;
+								}
+
+								value = value.substring(0, 2) + "/" + value.substring(2, 4);
+							}
+						}
+
+						this.value = value;
+					});
+
+				function validateForm(form) {
+					let isValid = true;
+
+					const requiredInputs = form.querySelectorAll(
+						"input[required], select[required]"
+					);
+
+					requiredInputs.forEach((input) => {
+						clearValidationError(input);
+
+						if (!input.value.trim()) {
+							showValidationError(input, "This field is required");
+							isValid = false;
+						} else {
+							switch (input.id) {
+								case "email":
+									const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+									if (!emailRegex.test(input.value)) {
+										showValidationError(
+											input,
+											"Please enter a valid email address"
+										);
+										isValid = false;
+									}
+									break;
+
+								case "phone":
+									const phoneRegex = /^[0-9]{10,15}$/;
+									const phoneValue = input.value.replace(/\D/g, "");
+									if (!phoneRegex.test(phoneValue)) {
+										showValidationError(
+											input,
+											"Please enter a valid phone number"
+										);
+										isValid = false;
+									}
+									break;
+
+								case "zip":
+									const zipRegex = /^[0-9]{5}(-[0-9]{4})?$/;
+									if (!zipRegex.test(input.value)) {
+										showValidationError(input, "Please enter a valid ZIP code");
+										isValid = false;
+									}
+									break;
+
+								case "card-number":
+									const cardValue = input.value.replace(/\s/g, "");
+									if (cardValue.length < 13 || cardValue.length > 19) {
+										showValidationError(
+											input,
+											"Please enter a valid card number"
+										);
+										isValid = false;
+									}
+									break;
+
+								case "expiry-date":
+									const expiryRegex = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;
+									if (!expiryRegex.test(input.value)) {
+										showValidationError(
+											input,
+											"Please enter a valid expiry date (MM/YY)"
+										);
+										isValid = false;
+									} else {
+										const [month, year] = input.value.split("/");
+										const expiryDate = new Date(
+											2000 + parseInt(year),
+											parseInt(month) - 1,
+											1
+										);
+										const currentDate = new Date();
+
+										if (expiryDate < currentDate) {
+											showValidationError(input, "This card has expired");
+											isValid = false;
+										}
+									}
+									break;
+
+								case "cvv":
+									const cvvRegex = /^[0-9]{3,4}$/;
+									if (!cvvRegex.test(input.value)) {
+										showValidationError(input, "Please enter a valid CVV");
+										isValid = false;
+									}
+									break;
+							}
+						}
+					});
+
+					if (!isValid) {
+						const firstError = form.querySelector(
+							".validation-message:not(.hidden)"
+						);
+						if (firstError) {
+							const input = firstError.previousElementSibling;
+							input.focus();
+							input.scrollIntoView({ behavior: "smooth", block: "center" });
+						}
+					}
+
+					return isValid;
+				}
+
+				function showValidationError(input, message) {
+					input.classList.add("border-red-500");
+
+					const validationMessage = input.nextElementSibling;
+					if (
+						validationMessage &&
+						validationMessage.classList.contains("validation-message")
+					) {
+						validationMessage.textContent = message;
+						validationMessage.classList.remove("hidden");
+						validationMessage.classList.add("animate-fade-in");
+					}
+				}
+
+				function clearValidationError(input) {
+					input.classList.remove("border-red-500");
+
+					const validationMessage = input.nextElementSibling;
+					if (
+						validationMessage &&
+						validationMessage.classList.contains("validation-message")
+					) {
+						validationMessage.classList.add("hidden");
+					}
+				}
+
+				function calculateSubtotal() {
+					return products.reduce(
+						(total, product) => total + product.price * product.quantity,
+						0
+					);
+				}
+
+				function updateOrderSummary(animate = false) {
+					subtotal = calculateSubtotal();
+					tax = subtotal * taxRate;
+
+					if (promoApplied) {
+						if (currentPromoCode === "WELCOME20") {
+							discount = subtotal * 0.2;
+						} else if (currentPromoCode === "SAVE10") {
+							discount = subtotal * 0.1;
+						} else if (currentPromoCode === "FREESHIP") {
+							discount = shipping;
+						}
+					}
+
+					total = subtotal + shipping + tax - discount;
+
+					updateElement("subtotal-amount", formatCurrency(subtotal), animate);
+					updateElement("shipping-amount", formatCurrency(shipping), animate);
+					updateElement("tax-amount", formatCurrency(tax), animate);
+					updateElement("summary-discount", formatCurrency(-discount), animate);
+					updateElement("total-amount", formatCurrency(total), animate);
+					updateElement("summary-subtotal", formatCurrency(subtotal), animate);
+					updateElement("summary-shipping", formatCurrency(shipping), animate);
+					updateElement("summary-tax", formatCurrency(tax), animate);
+					updateElement("summary-total", formatCurrency(total), animate);
+				}
+
+				function updateElement(id, value, animate) {
+					const element = document.getElementById(id);
+					if (element) {
+						if (animate) {
+							element.classList.add("animate-pulse");
+							setTimeout(() => {
+								element.textContent = value;
+								setTimeout(() => {
+									element.classList.remove("animate-pulse");
+								}, 300);
+							}, 200);
+						} else {
+							element.textContent = value;
+						}
+					}
+				}
+
+				function formatCurrency(amount) {
+					return "$" + amount.toFixed(2);
+				}
+
+				function goToStep(step) {
+					steps.forEach((s) => {
+						s.classList.add("hidden");
+						s.classList.remove("animate-fade-in");
+					});
+
+					const targetStepEl = document.getElementById(`step-${step}`);
+					targetStepEl.classList.remove("hidden");
+
+					setTimeout(() => {
+						targetStepEl.classList.add("animate-fade-in");
+					}, 10);
+
+					const progressPercentage = ((step - 1) / 3) * 100;
+					progressBar.style.width = `${progressPercentage}%`;
+					mobileStepLineProgress.style.width = `${progressPercentage}%`;
+
+					stepIndicators.forEach((indicator) => {
+						const indicatorStep = parseInt(indicator.getAttribute("data-step"));
+						const stepCircle = indicator.querySelector("span");
+
+						if (indicatorStep < step) {
+							indicator.classList.add("text-secondary-600", "font-medium");
+							indicator.classList.remove("text-gray-600", "text-primary-600");
+							if (stepCircle) {
+								stepCircle.classList.add("bg-secondary-500", "text-white");
+								stepCircle.classList.remove(
+									"bg-gray-200",
+									"text-gray-600",
+									"bg-primary-600"
+								);
+							}
+						} else if (indicatorStep === step) {
+							indicator.classList.add("text-primary-600", "font-medium");
+							indicator.classList.remove("text-gray-600", "text-secondary-600");
+							if (stepCircle) {
+								stepCircle.classList.add("bg-primary-600", "text-white");
+								stepCircle.classList.remove(
+									"bg-gray-200",
+									"text-gray-600",
+									"bg-secondary-500"
+								);
+							}
+						} else {
+							indicator.classList.add("text-gray-600");
+							indicator.classList.remove(
+								"text-primary-600",
+								"text-secondary-600",
+								"font-medium"
+							);
+							if (stepCircle) {
+								stepCircle.classList.add("bg-gray-200", "text-gray-600");
+								stepCircle.classList.remove(
+									"bg-primary-600",
+									"text-white",
+									"bg-secondary-500"
+								);
+							}
+						}
+					});
+
+					mobileSteps.forEach((mobileStep) => {
+						const stepNumber = parseInt(mobileStep.getAttribute("data-step"));
+						mobileStep.classList.remove("active", "completed");
+
+						if (stepNumber < step) {
+							mobileStep.classList.add("completed");
+						} else if (stepNumber === step) {
+							mobileStep.classList.add("active");
+						}
+					});
+
+					currentStep = step;
+
+					if (window.innerWidth < 768) {
+						window.scrollTo({
+							top: targetStepEl.offsetTop - 80,
+							behavior: "smooth",
+						});
+					}
+				}
+
+				document
+					.getElementById("mobile-menu-toggle")
+					.addEventListener("click", function () {
+						const mobileMenuContent = `
+        <div class="p-4 bg-white shadow-lg rounded-lg animate-fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-lg">Menu</h3>
+                <button id="close-mobile-menu" class="text-gray-500 hover:text-primary-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="space-y-3">
+                <li><a href="#" class="block py-2 text-gray-700 hover:text-primary-600 border-b">Shop</a></li>
+                <li><a href="#" class="block py-2 text-gray-700 hover:text-primary-600 border-b">Collections</a></li>
+                <li><a href="#" class="block py-2 text-gray-700 hover:text-primary-600 border-b">Sale</a></li>
+                <li><a href="#" class="block py-2 text-gray-700 hover:text-primary-600">About</a></li>
+            </ul>
+        </div>
+    `;
+
+						showToast(mobileMenuContent, "menu", 0);
+
+						setTimeout(() => {
+							document
+								.getElementById("close-mobile-menu")
+								?.addEventListener("click", function () {
+									const toast = this.closest(".toast");
+									if (toast) {
+										toast.classList.remove("show");
+										setTimeout(() => toast.remove(), 300);
+									}
+								});
+						}, 100);
+					});
+			});
+		</script>
+	</body>
+</html>
