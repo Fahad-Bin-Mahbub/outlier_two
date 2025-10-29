@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>LearnFlow - Interactive E-Learning Portal</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							"ocean-blue": "#0077be",
+							"ocean-light": "#00a8cc",
+							"ocean-dark": "#004c6d",
+							"teal-primary": "#20b2aa",
+							"teal-light": "#5dddd3",
+							"teal-dark": "#008b8b",
+						},
+						backdropBlur: {
+							xs: "2px",
+						},
+					},
+				},
+			};
+		</script>
+		<link
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+			rel="stylesheet"
+		/>
+		<style>
+			.glass {
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(20px);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.glass-dark {
+				background: rgba(0, 119, 190, 0.1);
+				backdrop-filter: blur(20px);
+				border: 1px solid rgba(0, 119, 190, 0.2);
+			}
+
+			.gradient-bg {
+				background: linear-gradient(135deg, #0077be 0%, #20b2aa 100%);
+			}
+
+			.floating-animation {
+				animation: float 3s ease-in-out infinite;
+			}
+
+			.slide-up {
+				animation: slideUp 0.5s ease-out;
+			}
+
+			.fade-in {
+				animation: fadeIn 0.6s ease-out;
+			}
+
+			@keyframes float {
+				0%,
+				100% {
+					transform: translateY(0px);
+				}
+				50% {
+					transform: translateY(-10px);
+				}
+			}
+
+			@keyframes slideUp {
+				from {
+					transform: translateY(30px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			.hover-lift {
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+			}
+
+			.hover-lift:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 20px 40px rgba(0, 119, 190, 0.2);
+			}
+
+			.progress-bar {
+				transition: width 0.3s ease;
+			}
+
+			.toast {
+				animation: toast-slide 0.3s ease-out;
+			}
+
+			@keyframes toast-slide {
+				from {
+					transform: translateX(100%);
+					opacity: 0;
+				}
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			.video-thumbnail {
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.video-thumbnail:hover .play-overlay {
+				opacity: 1;
+				transform: scale(1.1);
+			}
+
+			.play-overlay {
+				opacity: 0;
+				transition: all 0.3s ease;
+				transform: scale(1);
+			}
+
+			.custom-scrollbar::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 10px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-thumb {
+				background: rgba(0, 119, 190, 0.5);
+				border-radius: 10px;
+			}
+
+			.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+				background: rgba(0, 119, 190, 0.7);
+			}
+
+			.note-item {
+				transition: all 0.2s ease;
+			}
+
+			.note-item:hover {
+				transform: translateX(5px);
+				background: rgba(32, 178, 170, 0.1);
+			}
+
+			@media (max-width: 640px) {
+				.text-4xl {
+					font-size: 1.8rem;
+				}
+				.text-3xl {
+					font-size: 1.5rem;
+				}
+				.text-2xl {
+					font-size: 1.25rem;
+				}
+				.text-xl {
+					font-size: 1.1rem;
+				}
+				.p-8 {
+					padding: 1rem;
+				}
+				.p-6 {
+					padding: 0.75rem;
+				}
+				.gap-8 {
+					gap: 1rem;
+				}
+				.gap-6 {
+					gap: 0.75rem;
+				}
+			}
+		</style>
+	</head>
+	<body class="min-h-screen gradient-bg overflow-x-hidden">
+		<!-- Toast Container -->
+		<div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+		<!-- Header -->
+		<header class="glass sticky top-0 z-40 px-4 py-3 sm:px-6 lg:px-8">
+			<div class="max-w-7xl mx-auto flex items-center justify-between">
+				<div class="flex items-center space-x-3">
+					<div
+						class="w-10 h-10 bg-gradient-to-r from-ocean-blue to-teal-primary rounded-xl flex items-center justify-center floating-animation"
+					>
+						<i class="fas fa-graduation-cap text-white text-lg"></i>
+					</div>
+					<h1 class="text-2xl sm:text-3xl font-bold text-white">LearnFlow</h1>
+				</div>
+
+				<!-- Search Bar -->
+				<div class="hidden sm:flex flex-1 max-w-md mx-8">
+					<div class="relative w-full">
+						<input
+							type="text"
+							id="searchInput"
+							placeholder="Search courses, topics, or instructors..."
+							class="w-full px-4 py-2 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-teal-primary transition-all"
+						/>
+						<i
+							class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70"
+						></i>
+					</div>
+				</div>
+
+				<!-- User Profile -->
+				<div class="flex items-center space-x-3">
+					<button
+						id="playlistToggle"
+						class="glass p-2 rounded-lg hover:bg-white/20 transition-all"
+					>
+						<i class="fas fa-list text-white"></i>
+					</button>
+					<div
+						class="w-10 h-10 bg-gradient-to-r from-teal-primary to-ocean-light rounded-full flex items-center justify-center"
+					>
+						<span class="text-white font-semibold text-sm">JD</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile Search -->
+			<div class="sm:hidden mt-3">
+				<div class="relative">
+					<input
+						type="text"
+						id="mobileSearchInput"
+						placeholder="Search courses..."
+						class="w-full px-4 py-2 pl-10 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-teal-primary transition-all text-sm"
+					/>
+					<i
+						class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/70"
+					></i>
+				</div>
+			</div>
+		</header>
+
+		<div class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+			<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+				<!-- Main Content -->
+				<div class="lg:col-span-3 space-y-6">
+					<!-- Hero Section -->
+					<div class="glass rounded-2xl p-6 sm:p-8 slide-up">
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+							<div>
+								<h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">
+									Master New Skills with Interactive Learning
+								</h2>
+								<p class="text-white/80 mb-6 text-sm sm:text-base">
+									Access thousands of expert-led courses, create personalized
+									playlists, and track your progress with our advanced learning
+									platform.
+								</p>
+								<div class="flex flex-wrap gap-3">
+									<button
+										class="bg-teal-primary hover:bg-teal-dark text-white px-4 py-2 rounded-lg font-semibold transition-all hover-lift text-sm sm:text-base"
+									>
+										<i class="fas fa-play mr-2"></i>Start Learning
+									</button>
+									<button
+										class="glass hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all text-sm sm:text-base"
+									>
+										Browse Library
+									</button>
+								</div>
+							</div>
+							<div class="relative">
+								<img
+									src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+									alt="Students learning"
+									class="rounded-xl w-full h-48 sm:h-64 object-cover floating-animation"
+								/>
+							</div>
+						</div>
+					</div>
+
+					<!-- Video Player Section -->
+					<div
+						id="videoPlayerSection"
+						class="glass rounded-2xl p-4 sm:p-6 hidden"
+					>
+						<div class="space-y-4">
+							<div class="flex items-center justify-between">
+								<h3
+									id="currentVideoTitle"
+									class="text-xl sm:text-2xl font-bold text-white"
+								>
+									Course Title
+								</h3>
+								<button
+									id="closePlayer"
+									class="text-white/70 hover:text-white transition-colors"
+								>
+									<i class="fas fa-times text-lg"></i>
+								</button>
+							</div>
+
+							<!-- Video Container -->
+							<div class="relative bg-black rounded-xl overflow-hidden">
+								<div
+									id="videoContainer"
+									class="aspect-video flex items-center justify-center bg-gradient-to-r from-ocean-dark to-teal-dark"
+								>
+									<div class="text-center text-white">
+										<i class="fas fa-play text-4xl mb-4"></i>
+										<p class="text-lg">Video Player Simulation</p>
+										<p class="text-sm opacity-75">
+											Click play to start learning
+										</p>
+									</div>
+								</div>
+
+								<!-- Video Controls -->
+								<div
+									class="absolute bottom-0 left-0 right-0 bg-black/50 backdrop-blur-sm p-3"
+								>
+									<div class="flex items-center space-x-3">
+										<button
+											id="playPauseBtn"
+											class="text-white hover:text-teal-primary transition-colors"
+										>
+											<i class="fas fa-play text-lg"></i>
+										</button>
+
+										<div class="flex-1">
+											<div class="bg-white/30 rounded-full h-2 relative">
+												<div
+													id="progressBar"
+													class="bg-teal-primary h-2 rounded-full progress-bar"
+													style="width: 0%"
+												></div>
+											</div>
+										</div>
+
+										<span id="timeDisplay" class="text-white text-sm"
+											>0:00 / 0:00</span
+										>
+
+										<select
+											id="speedControl"
+											class="bg-transparent text-white text-sm border-none outline-none"
+										>
+											<option value="0.5" class="bg-gray-800">0.5x</option>
+											<option value="1" selected class="bg-gray-800">1x</option>
+											<option value="1.25" class="bg-gray-800">1.25x</option>
+											<option value="1.5" class="bg-gray-800">1.5x</option>
+											<option value="2" class="bg-gray-800">2x</option>
+										</select>
+
+										<button
+											id="fullscreenBtn"
+											class="text-white hover:text-teal-primary transition-colors"
+										>
+											<i class="fas fa-expand text-lg"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+
+							<!-- Video Actions -->
+							<div class="flex flex-wrap gap-3">
+								<button
+									id="addToPlaylistBtn"
+									class="glass hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all text-sm"
+								>
+									<i class="fas fa-plus mr-2"></i>Add to Playlist
+								</button>
+								<button
+									id="downloadTranscriptBtn"
+									class="glass hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all text-sm"
+								>
+									<i class="fas fa-download mr-2"></i>Download Transcript
+								</button>
+								<button
+									id="bookmarkBtn"
+									class="glass hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all text-sm"
+								>
+									<i class="fas fa-bookmark mr-2"></i>Bookmark
+								</button>
+							</div>
+
+							<!-- Progress Info -->
+							<div class="glass-dark rounded-lg p-3">
+								<div class="flex items-center justify-between text-sm">
+									<span class="text-white/80">Progress</span>
+									<span
+										id="progressPercentage"
+										class="text-teal-primary font-semibold"
+										>0%</span
+									>
+								</div>
+								<div class="bg-white/20 rounded-full h-2 mt-2">
+									<div
+										id="courseProgressBar"
+										class="bg-teal-primary h-2 rounded-full progress-bar"
+										style="width: 0%"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Course Categories -->
+					<div class="glass rounded-2xl p-6 fade-in">
+						<h3 class="text-2xl font-bold text-white mb-6">
+							Popular Categories
+						</h3>
+						<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+							<div
+								class="glass-dark rounded-xl p-4 hover:bg-white/20 transition-all cursor-pointer hover-lift text-center"
+							>
+								<i class="fas fa-code text-2xl text-teal-primary mb-3"></i>
+								<h4 class="text-white font-semibold text-sm">Programming</h4>
+								<p class="text-white/60 text-xs mt-1">150+ courses</p>
+							</div>
+							<div
+								class="glass-dark rounded-xl p-4 hover:bg-white/20 transition-all cursor-pointer hover-lift text-center"
+							>
+								<i
+									class="fas fa-chart-line text-2xl text-teal-primary mb-3"
+								></i>
+								<h4 class="text-white font-semibold text-sm">Business</h4>
+								<p class="text-white/60 text-xs mt-1">200+ courses</p>
+							</div>
+							<div
+								class="glass-dark rounded-xl p-4 hover:bg-white/20 transition-all cursor-pointer hover-lift text-center"
+							>
+								<i
+									class="fas fa-paint-brush text-2xl text-teal-primary mb-3"
+								></i>
+								<h4 class="text-white font-semibold text-sm">Design</h4>
+								<p class="text-white/60 text-xs mt-1">100+ courses</p>
+							</div>
+							<div
+								class="glass-dark rounded-xl p-4 hover:bg-white/20 transition-all cursor-pointer hover-lift text-center"
+							>
+								<i class="fas fa-brain text-2xl text-teal-primary mb-3"></i>
+								<h4 class="text-white font-semibold text-sm">AI & ML</h4>
+								<p class="text-white/60 text-xs mt-1">75+ courses</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- Course Library -->
+					<div class="glass rounded-2xl p-6">
+						<div class="flex items-center justify-between mb-6">
+							<h3 class="text-2xl font-bold text-white">Featured Courses</h3>
+							<div class="flex space-x-2">
+								<button
+									class="glass hover:bg-white/20 text-white px-3 py-1 rounded-lg text-sm transition-all"
+								>
+									All
+								</button>
+								<button
+									class="glass hover:bg-white/20 text-white px-3 py-1 rounded-lg text-sm transition-all"
+								>
+									Recent
+								</button>
+								<button
+									class="glass hover:bg-white/20 text-white px-3 py-1 rounded-lg text-sm transition-all"
+								>
+									Popular
+								</button>
+							</div>
+						</div>
+
+						<div
+							id="courseGrid"
+							class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+						>
+							<!-- Courses will be populated by JavaScript -->
+						</div>
+					</div>
+				</div>
+
+				<!-- Sidebar -->
+				<div class="space-y-6">
+					<!-- Notes Panel -->
+					<div id="notesPanel" class="glass rounded-2xl p-4 sm:p-6">
+						<h3 class="text-xl font-bold text-white mb-4 flex items-center">
+							<i class="fas fa-sticky-note mr-2 text-teal-primary"></i>
+							Notes
+						</h3>
+						<div class="space-y-3">
+							<div class="flex gap-2">
+								<input
+									type="text"
+									id="noteInput"
+									placeholder="Add a note..."
+									class="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/70 text-sm focus:outline-none focus:ring-2 focus:ring-teal-primary"
+								/>
+								<button
+									id="addNoteBtn"
+									class="bg-teal-primary hover:bg-teal-dark text-white px-3 py-2 rounded-lg transition-all"
+								>
+									<i class="fas fa-plus text-sm"></i>
+								</button>
+							</div>
+							<div
+								id="notesList"
+								class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar"
+							>
+								<!-- Notes will be populated here -->
+							</div>
+						</div>
+					</div>
+
+					<!-- Playlist Panel -->
+					<div
+						id="playlistPanel"
+						class="glass rounded-2xl p-4 sm:p-6 hidden lg:block"
+					>
+						<h3 class="text-xl font-bold text-white mb-4 flex items-center">
+							<i class="fas fa-list-ul mr-2 text-teal-primary"></i>
+							My Playlist
+						</h3>
+						<div class="space-y-3">
+							<div class="flex gap-2">
+								<input
+									type="text"
+									id="playlistNameInput"
+									placeholder="Playlist name..."
+									class="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/70 text-sm focus:outline-none focus:ring-2 focus:ring-teal-primary"
+								/>
+								<button
+									id="createPlaylistBtn"
+									class="bg-teal-primary hover:bg-teal-dark text-white px-3 py-2 rounded-lg transition-all"
+								>
+									<i class="fas fa-plus text-sm"></i>
+								</button>
+							</div>
+							<div
+								id="playlistsList"
+								class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar"
+							>
+								<!-- Playlists will be populated here -->
+							</div>
+						</div>
+					</div>
+
+					<!-- Recent Activity -->
+					<div class="glass rounded-2xl p-4 sm:p-6">
+						<h3 class="text-xl font-bold text-white mb-4 flex items-center">
+							<i class="fas fa-clock mr-2 text-teal-primary"></i>
+							Recent Activity
+						</h3>
+						<div class="space-y-3" id="recentActivity">
+							<!-- Recent activities will be populated here -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Mobile Playlist Modal -->
+		<div
+			id="mobilePlaylistModal"
+			class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden"
+		>
+			<div
+				class="absolute bottom-0 left-0 right-0 bg-white/10 backdrop-blur-xl rounded-t-2xl p-6 max-h-96 overflow-y-auto"
+			>
+				<div class="flex items-center justify-between mb-4">
+					<h3 class="text-xl font-bold text-white">My Playlists</h3>
+					<button
+						id="closeMobilePlaylist"
+						class="text-white/70 hover:text-white"
+					>
+						<i class="fas fa-times text-lg"></i>
+					</button>
+				</div>
+				<div id="mobilePlaylistContent">
+					<!-- Mobile playlist content -->
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Application State
+			let currentVideo = null;
+			let isPlaying = false;
+			let currentTime = 0;
+			let duration = 300; // 5 minutes default
+			let playbackSpeed = 1;
+			let notes = JSON.parse(localStorage.getItem("learnflow_notes") || "[]");
+			let playlists = JSON.parse(
+				localStorage.getItem("learnflow_playlists") || "[]"
+			);
+			let recentActivity = JSON.parse(
+				localStorage.getItem("learnflow_activity") || "[]"
+			);
+			let videoProgress = {};
+
+			// Sample course data
+			const courses = [
+				{
+					id: 1,
+					title: "JavaScript Fundamentals",
+					instructor: "Sarah Johnson",
+					duration: "4h 30m",
+					thumbnail:
+						"https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+					category: "Programming",
+					description: "Master the basics of JavaScript programming",
+					progress: 45,
+				},
+				{
+					id: 2,
+					title: "React.js Complete Guide",
+					instructor: "Mike Chen",
+					duration: "8h 15m",
+					thumbnail:
+						"https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+					category: "Programming",
+					description: "Build modern web applications with React",
+					progress: 20,
+				},
+				{
+					id: 3,
+					title: "UI/UX Design Principles",
+					instructor: "Emma Wilson",
+					duration: "6h 45m",
+					thumbnail:
+						"https://images.unsplash.com/photo-1561070791-2526d30994b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+					category: "Design",
+					description: "Learn the fundamentals of user experience design",
+					progress: 80,
+				},
+				{
+					id: 4,
+					title: "Digital Marketing Strategy",
+					instructor: "David Brown",
+					duration: "5h 20m",
+					thumbnail:
+						"https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+					category: "Business",
+					description: "Master digital marketing techniques and strategies",
+					progress: 10,
+				},
+				{
+					id: 5,
+					title: "Machine Learning Basics",
+					instructor: "Dr. Lisa Park",
+					duration: "7h 10m",
+					thumbnail:
+						"https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+					category: "AI & ML",
+					description: "Introduction to machine learning concepts",
+					progress: 0,
+				},
+				{
+					id: 6,
+					title: "Python for Data Science",
+					instructor: "John Smith",
+					duration: "9h 30m",
+					thumbnail:
+						"https://images.unsplash.com/photo-1526379095098-d400fd0bf4d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+					category: "Programming",
+					description: "Learn Python programming for data analysis",
+					progress: 65,
+				},
+			];
+
+			// Initialize the application
+			document.addEventListener("DOMContentLoaded", function () {
+				renderCourses();
+				renderNotes();
+				renderPlaylists();
+				renderRecentActivity();
+				initializeEventListeners();
+				showToast("Welcome to LearnFlow! 🎓", "success");
+			});
+
+			// Event Listeners
+			function initializeEventListeners() {
+				// Search functionality
+				document
+					.getElementById("searchInput")
+					.addEventListener("input", handleSearch);
+				document
+					.getElementById("mobileSearchInput")
+					.addEventListener("input", handleSearch);
+
+				// Video player controls
+				document
+					.getElementById("playPauseBtn")
+					.addEventListener("click", togglePlayPause);
+				document
+					.getElementById("speedControl")
+					.addEventListener("change", changePlaybackSpeed);
+				document
+					.getElementById("closePlayer")
+					.addEventListener("click", closeVideoPlayer);
+
+				// Notes
+				document
+					.getElementById("addNoteBtn")
+					.addEventListener("click", addNote);
+				document
+					.getElementById("noteInput")
+					.addEventListener("keypress", function (e) {
+						if (e.key === "Enter") addNote();
+					});
+
+				// Playlists
+				document
+					.getElementById("createPlaylistBtn")
+					.addEventListener("click", createPlaylist);
+				document
+					.getElementById("playlistNameInput")
+					.addEventListener("keypress", function (e) {
+						if (e.key === "Enter") createPlaylist();
+					});
+
+				// Video actions
+				document
+					.getElementById("addToPlaylistBtn")
+					.addEventListener("click", showAddToPlaylistModal);
+				document
+					.getElementById("downloadTranscriptBtn")
+					.addEventListener("click", downloadTranscript);
+				document
+					.getElementById("bookmarkBtn")
+					.addEventListener("click", bookmarkVideo);
+
+				// Mobile playlist modal
+				document
+					.getElementById("playlistToggle")
+					.addEventListener("click", toggleMobilePlaylist);
+				document
+					.getElementById("closeMobilePlaylist")
+					.addEventListener("click", closeMobilePlaylist);
+
+				// Start video simulation timer
+				setInterval(updateVideoProgress, 1000);
+			}
+
+			// Render Functions
+			function renderCourses(filteredCourses = courses) {
+				const courseGrid = document.getElementById("courseGrid");
+				courseGrid.innerHTML = "";
+
+				filteredCourses.forEach((course) => {
+					const courseCard = createCourseCard(course);
+					courseGrid.appendChild(courseCard);
+				});
+			}
+
+			function createCourseCard(course) {
+				const card = document.createElement("div");
+				card.className =
+					"glass-dark rounded-xl overflow-hidden hover-lift cursor-pointer video-thumbnail";
+				card.innerHTML = `
+                <div class="relative">
+                    <img src="${course.thumbnail}" alt="${
+					course.title
+				}" class="w-full h-32 sm:h-40 object-cover">
+                    <div class="play-overlay absolute inset-0 bg-black/50 flex items-center justify-center">
+                        <div class="bg-teal-primary rounded-full w-12 h-12 flex items-center justify-center">
+                            <i class="fas fa-play text-white ml-1"></i>
+                        </div>
+                    </div>
+                    ${
+											course.progress > 0
+												? `
+                        <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/50">
+                            <div class="h-full bg-teal-primary progress-bar" style="width: ${course.progress}%"></div>
+                        </div>
+                    `
+												: ""
+										}
+                </div>
+                <div class="p-4">
+                    <h4 class="text-white font-semibold mb-2 text-sm sm:text-base">${
+											course.title
+										}</h4>
+                    <p class="text-white/70 text-xs sm:text-sm mb-2">${
+											course.instructor
+										}</p>
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-teal-primary">${
+													course.duration
+												}</span>
+                        <span class="bg-white/10 px-2 py-1 rounded text-white/80">${
+													course.category
+												}</span>
+                    </div>
+                </div>
+            `;
+
+				card.addEventListener("click", () => playVideo(course));
+				return card;
+			}
+
+			function renderNotes() {
+				const notesList = document.getElementById("notesList");
+				notesList.innerHTML = "";
+
+				if (notes.length === 0) {
+					notesList.innerHTML =
+						'<p class="text-white/50 text-sm text-center py-4">No notes yet. Start taking notes while watching videos!</p>';
+					return;
+				}
+
+				notes.forEach((note, index) => {
+					const noteElement = document.createElement("div");
+					noteElement.className = "glass-dark rounded-lg p-3 note-item";
+					noteElement.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <p class="text-white text-sm mb-1">${note.text}</p>
+                            <p class="text-white/50 text-xs">${
+															note.timestamp
+														}</p>
+                            ${
+															note.videoTitle
+																? `<p class="text-teal-primary text-xs mt-1">${note.videoTitle}</p>`
+																: ""
+														}
+                        </div>
+                        <button onclick="deleteNote(${index})" class="text-white/50 hover:text-red-400 transition-colors ml-2">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `;
+					notesList.appendChild(noteElement);
+				});
+			}
+
+			function renderPlaylists() {
+				const playlistsList = document.getElementById("playlistsList");
+				const mobileContent = document.getElementById("mobilePlaylistContent");
+
+				const content =
+					playlists.length === 0
+						? '<p class="text-white/50 text-sm text-center py-4">No playlists yet. Create your first playlist!</p>'
+						: playlists
+								.map(
+									(playlist, index) => `
+                    <div class="glass-dark rounded-lg p-3 hover:bg-white/10 transition-all cursor-pointer">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-white font-semibold text-sm">${playlist.name}</h4>
+                                <p class="text-white/50 text-xs">${playlist.videos.length} videos</p>
+                            </div>
+                            <button onclick="deletePlaylist(${index})" class="text-white/50 hover:text-red-400 transition-colors">
+                                <i class="fas fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `
+								)
+								.join("");
+
+				playlistsList.innerHTML = content;
+				mobileContent.innerHTML = content;
+			}
+
+			function renderRecentActivity() {
+				const activityContainer = document.getElementById("recentActivity");
+
+				if (recentActivity.length === 0) {
+					activityContainer.innerHTML =
+						'<p class="text-white/50 text-sm text-center py-4">No recent activity</p>';
+					return;
+				}
+
+				activityContainer.innerHTML = recentActivity
+					.slice(0, 5)
+					.map(
+						(activity) => `
+                <div class="flex items-center space-x-3 p-2 glass-dark rounded-lg">
+                    <i class="fas ${activity.icon} text-teal-primary text-sm"></i>
+                    <div class="flex-1">
+                        <p class="text-white text-sm">${activity.action}</p>
+                        <p class="text-white/50 text-xs">${activity.time}</p>
+                    </div>
+                </div>
+            `
+					)
+					.join("");
+			}
+
+			// Video Player Functions
+			function playVideo(course) {
+				currentVideo = course;
+				document.getElementById("currentVideoTitle").textContent = course.title;
+				document
+					.getElementById("videoPlayerSection")
+					.classList.remove("hidden");
+				document
+					.getElementById("videoPlayerSection")
+					.scrollIntoView({ behavior: "smooth" });
+
+				// Initialize progress
+				const progress = videoProgress[course.id] || 0;
+				currentTime = (progress / 100) * duration;
+				updateProgressDisplay();
+
+				// Add to recent activity
+				addToRecentActivity(`Started watching "${course.title}"`, "fa-play");
+				showToast(`Now playing: ${course.title}`, "success");
+			}
+
+			function togglePlayPause() {
+				isPlaying = !isPlaying;
+				const btn = document.getElementById("playPauseBtn");
+				btn.innerHTML = `<i class="fas fa-${
+					isPlaying ? "pause" : "play"
+				} text-lg"></i>`;
+
+				if (isPlaying) {
+					showToast("Video resumed", "info");
+				} else {
+					showToast("Video paused", "info");
+				}
+			}
+
+			function changePlaybackSpeed() {
+				playbackSpeed = parseFloat(
+					document.getElementById("speedControl").value
+				);
+				showToast(`Playback speed: ${playbackSpeed}x`, "info");
+			}
+
+			function updateVideoProgress() {
+				if (isPlaying && currentVideo) {
+					currentTime += playbackSpeed;
+					if (currentTime >= duration) {
+						currentTime = duration;
+						isPlaying = false;
+						document.getElementById("playPauseBtn").innerHTML =
+							'<i class="fas fa-play text-lg"></i>';
+						showToast("Video completed! 🎉", "success");
+						addToRecentActivity(
+							`Completed "${currentVideo.title}"`,
+							"fa-check"
+						);
+					}
+
+					updateProgressDisplay();
+
+					// Auto-bookmark every 30 seconds
+					if (Math.floor(currentTime) % 30 === 0 && isPlaying) {
+						autoBookmark();
+					}
+				}
+			}
+
+			function updateProgressDisplay() {
+				if (!currentVideo) return;
+
+				const progress = (currentTime / duration) * 100;
+				document.getElementById("progressBar").style.width = `${progress}%`;
+				document.getElementById(
+					"courseProgressBar"
+				).style.width = `${progress}%`;
+				document.getElementById(
+					"progressPercentage"
+				).textContent = `${Math.round(progress)}%`;
+				document.getElementById("timeDisplay").textContent = `${formatTime(
+					currentTime
+				)} / ${formatTime(duration)}`;
+
+				// Save progress
+				videoProgress[currentVideo.id] = progress;
+				localStorage.setItem(
+					"learnflow_progress",
+					JSON.stringify(videoProgress)
+				);
+			}
+
+			function formatTime(seconds) {
+				const mins = Math.floor(seconds / 60);
+				const secs = Math.floor(seconds % 60);
+				return `${mins}:${secs.toString().padStart(2, "0")}`;
+			}
+
+			function closeVideoPlayer() {
+				document.getElementById("videoPlayerSection").classList.add("hidden");
+				isPlaying = false;
+				currentVideo = null;
+				showToast("Video player closed", "info");
+			}
+
+			function autoBookmark() {
+				if (currentVideo) {
+					const bookmark = {
+						videoId: currentVideo.id,
+						videoTitle: currentVideo.title,
+						timestamp: currentTime,
+						createdAt: new Date().toISOString(),
+					};
+
+					let bookmarks = JSON.parse(
+						localStorage.getItem("learnflow_bookmarks") || "[]"
+					);
+					bookmarks.push(bookmark);
+					localStorage.setItem(
+						"learnflow_bookmarks",
+						JSON.stringify(bookmarks)
+					);
+				}
+			}
+
+			function bookmarkVideo() {
+				if (!currentVideo) return;
+
+				autoBookmark();
+				showToast(`Bookmarked at ${formatTime(currentTime)}`, "success");
+				addToRecentActivity(
+					`Bookmarked "${currentVideo.title}"`,
+					"fa-bookmark"
+				);
+			}
+
+			function downloadTranscript() {
+				if (!currentVideo) return;
+
+				const transcript = `Transcript for: ${currentVideo.title}
+Instructor: ${currentVideo.instructor}
+Duration: ${currentVideo.duration}
+
+[00:00] Welcome to this course on ${currentVideo.title}
+[00:30] In this lesson, we'll cover the fundamental concepts...
+[01:00] Let's start with the basics and build our understanding...
+[01:30] As we progress through this material, you'll learn...
+[02:00] Remember to take notes and practice what you learn...
+
+This is a simulated transcript. In a real implementation, 
+this would contain the actual video transcript content.`;
+
+				const blob = new Blob([transcript], { type: "text/plain" });
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = `${currentVideo.title.replace(
+					/\s+/g,
+					"_"
+				)}_transcript.txt`;
+				a.click();
+				URL.revokeObjectURL(url);
+
+				showToast("Transcript downloaded! 📄", "success");
+				addToRecentActivity(
+					`Downloaded transcript for "${currentVideo.title}"`,
+					"fa-download"
+				);
+			}
+
+			// Notes Functions
+			function addNote() {
+				const input = document.getElementById("noteInput");
+				const text = input.value.trim();
+
+				if (!text) return;
+
+				const note = {
+					text: text,
+					timestamp: new Date().toLocaleString(),
+					videoTitle: currentVideo ? currentVideo.title : null,
+					videoTime: currentVideo ? formatTime(currentTime) : null,
+				};
+
+				notes.unshift(note);
+				localStorage.setItem("learnflow_notes", JSON.stringify(notes));
+				input.value = "";
+				renderNotes();
+				showToast("Note added! 📝", "success");
+
+				if (currentVideo) {
+					addToRecentActivity(
+						`Added note while watching "${currentVideo.title}"`,
+						"fa-sticky-note"
+					);
+				}
+			}
+
+			function deleteNote(index) {
+				notes.splice(index, 1);
+				localStorage.setItem("learnflow_notes", JSON.stringify(notes));
+				renderNotes();
+				showToast("Note deleted", "info");
+			}
+
+			// Playlist Functions
+			function createPlaylist() {
+				const input = document.getElementById("playlistNameInput");
+				const name = input.value.trim();
+
+				if (!name) return;
+
+				const playlist = {
+					name: name,
+					videos: [],
+					createdAt: new Date().toISOString(),
+				};
+
+				playlists.push(playlist);
+				localStorage.setItem("learnflow_playlists", JSON.stringify(playlists));
+				input.value = "";
+				renderPlaylists();
+				showToast(`Playlist "${name}" created! 🎵`, "success");
+				addToRecentActivity(`Created playlist "${name}"`, "fa-list-ul");
+			}
+
+			function deletePlaylist(index) {
+				const playlistName = playlists[index].name;
+				playlists.splice(index, 1);
+				localStorage.setItem("learnflow_playlists", JSON.stringify(playlists));
+				renderPlaylists();
+				showToast(`Playlist "${playlistName}" deleted`, "info");
+			}
+
+			function showAddToPlaylistModal() {
+				if (!currentVideo) return;
+
+				if (playlists.length === 0) {
+					showToast("Create a playlist first!", "warning");
+					return;
+				}
+
+				// Simple implementation - add to first playlist
+				const playlist = playlists[0];
+				if (!playlist.videos.find((v) => v.id === currentVideo.id)) {
+					playlist.videos.push(currentVideo);
+					localStorage.setItem(
+						"learnflow_playlists",
+						JSON.stringify(playlists)
+					);
+					showToast(`Added to "${playlist.name}"! ✅`, "success");
+					addToRecentActivity(
+						`Added "${currentVideo.title}" to playlist`,
+						"fa-plus"
+					);
+				} else {
+					showToast("Already in playlist", "warning");
+				}
+			}
+
+			// Search Function
+			function handleSearch(e) {
+				const query = e.target.value.toLowerCase();
+				const filtered = courses.filter(
+					(course) =>
+						course.title.toLowerCase().includes(query) ||
+						course.instructor.toLowerCase().includes(query) ||
+						course.category.toLowerCase().includes(query) ||
+						course.description.toLowerCase().includes(query)
+				);
+				renderCourses(filtered);
+
+				if (query && filtered.length === 0) {
+					document.getElementById("courseGrid").innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <i class="fas fa-search text-4xl text-white/30 mb-4"></i>
+                        <p class="text-white/70">No courses found for "${query}"</p>
+                        <p class="text-white/50 text-sm">Try different keywords or browse categories</p>
+                    </div>
+                `;
+				}
+			}
+
+			// Mobile Functions
+			function toggleMobilePlaylist() {
+				document
+					.getElementById("mobilePlaylistModal")
+					.classList.toggle("hidden");
+			}
+
+			function closeMobilePlaylist() {
+				document.getElementById("mobilePlaylistModal").classList.add("hidden");
+			}
+
+			// Utility Functions
+			function addToRecentActivity(action, icon) {
+				const activity = {
+					action: action,
+					icon: icon,
+					time: new Date().toLocaleString(),
+				};
+
+				recentActivity.unshift(activity);
+				recentActivity = recentActivity.slice(0, 10); // Keep only last 10
+				localStorage.setItem(
+					"learnflow_activity",
+					JSON.stringify(recentActivity)
+				);
+				renderRecentActivity();
+			}
+
+			function showToast(message, type = "info") {
+				const toast = document.createElement("div");
+				const colors = {
+					success: "bg-green-500",
+					error: "bg-red-500",
+					warning: "bg-yellow-500",
+					info: "bg-blue-500",
+				};
+
+				toast.className = `toast ${colors[type]} text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2 mb-2`;
+				toast.innerHTML = `
+                <i class="fas fa-${
+									type === "success"
+										? "check"
+										: type === "error"
+										? "times"
+										: type === "warning"
+										? "exclamation"
+										: "info"
+								}-circle"></i>
+                <span class="text-sm">${message}</span>
+            `;
+
+				document.getElementById("toastContainer").appendChild(toast);
+
+				setTimeout(() => {
+					toast.style.transform = "translateX(100%)";
+					toast.style.opacity = "0";
+					setTimeout(() => toast.remove(), 300);
+				}, 3000);
+			}
+
+			// Initialize sample data if first visit
+			if (notes.length === 0 && playlists.length === 0) {
+				// Add sample note
+				notes.push({
+					text: "Remember to practice coding examples daily for better retention",
+					timestamp: new Date().toLocaleString(),
+					videoTitle: null,
+				});
+				localStorage.setItem("learnflow_notes", JSON.stringify(notes));
+
+				// Add sample playlist
+				playlists.push({
+					name: "My Learning Path",
+					videos: [],
+					createdAt: new Date().toISOString(),
+				});
+				localStorage.setItem("learnflow_playlists", JSON.stringify(playlists));
+
+				// Add sample activity
+				recentActivity.push({
+					action: "Welcome to LearnFlow! Start your learning journey",
+					icon: "fa-star",
+					time: new Date().toLocaleString(),
+				});
+				localStorage.setItem(
+					"learnflow_activity",
+					JSON.stringify(recentActivity)
+				);
+			}
+
+			// Keyboard shortcuts
+			document.addEventListener("keydown", function (e) {
+				if (currentVideo) {
+					switch (e.key) {
+						case " ":
+							e.preventDefault();
+							togglePlayPause();
+							break;
+						case "f":
+							// Toggle fullscreen (simulated)
+							showToast("Fullscreen toggled", "info");
+							break;
+						case "m":
+							// Mute/unmute (simulated)
+							showToast("Audio toggled", "info");
+							break;
+					}
+				}
+			});
+
+			// Responsive adjustments
+			function handleResize() {
+				if (window.innerWidth < 1024) {
+					document.getElementById("playlistPanel").classList.add("hidden");
+				} else {
+					document.getElementById("playlistPanel").classList.remove("hidden");
+				}
+			}
+
+			window.addEventListener("resize", handleResize);
+			handleResize(); // Initial check
+		</script>
+	</body>
+</html>

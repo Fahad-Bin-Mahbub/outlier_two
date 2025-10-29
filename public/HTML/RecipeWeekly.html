@@ -1,0 +1,2743 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Gourmet Weekly - Modern Recipe Planner</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<script>
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							primary: {
+								50: "#f0faf5",
+								100: "#dbf5e9",
+								200: "#b8ead6",
+								300: "#83d6b7",
+								400: "#4dba93",
+								500: "#2e9d78",
+								600: "#237d60",
+								700: "#1f6650",
+								800: "#1d5242",
+								900: "#1a4438",
+								950: "#0c261e",
+							},
+							secondary: {
+								50: "#fff8ed",
+								100: "#ffefd4",
+								200: "#ffdba8",
+								300: "#ffc070",
+								400: "#ff9c38",
+								500: "#ff7e10",
+								600: "#ff6c05",
+								700: "#cc4e02",
+								800: "#a13d08",
+								900: "#82350c",
+								950: "#461804",
+							},
+						},
+						animation: {
+							"fade-in": "fadeIn 0.5s ease-in-out",
+							"slide-up": "slideUp 0.5s ease-in-out",
+							"pulse-slow": "pulse 3s infinite",
+						},
+						keyframes: {
+							fadeIn: {
+								"0%": { opacity: "0" },
+								"100%": { opacity: "1" },
+							},
+							slideUp: {
+								"0%": { transform: "translateY(20px)", opacity: "0" },
+								"100%": { transform: "translateY(0)", opacity: "1" },
+							},
+						},
+					},
+				},
+			};
+		</script>
+		<link
+			href="https://fonts.googleapis.com/icon?family=Material+Icons"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			body {
+				font-family: "Inter", sans-serif;
+				scroll-behavior: smooth;
+			}
+
+			.drag-ghost {
+				transform: rotate(3deg);
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+			}
+
+			.recipe-card:hover .card-actions,
+			.meal-card:hover .meal-actions {
+				opacity: 1;
+			}
+
+			.day-meals::-webkit-scrollbar,
+			.details-body::-webkit-scrollbar,
+			.modal-body::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.day-meals::-webkit-scrollbar-track,
+			.details-body::-webkit-scrollbar-track,
+			.modal-body::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			.day-meals::-webkit-scrollbar-thumb,
+			.details-body::-webkit-scrollbar-thumb,
+			.modal-body::-webkit-scrollbar-thumb {
+				background-color: #cbd5e1;
+				border-radius: 20px;
+			}
+
+			@media print {
+				.no-print {
+					display: none !important;
+				}
+
+				.print-full-width {
+					width: 100% !important;
+					max-width: 100% !important;
+					margin: 0 !important;
+					padding: 0.5rem !important;
+				}
+
+				.print-col {
+					border: 1px solid #e2e8f0 !important;
+				}
+			}
+		</style>
+	</head>
+	<body class="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+		<!-- Header -->
+		<header
+			class="sticky top-0 z-50 bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md no-print"
+		>
+			<div
+				class="container mx-auto px-4 py-3 flex flex-col md:flex-row md:justify-between md:items-center gap-4"
+			>
+				<div class="flex items-center">
+					<div
+						class="w-10 h-10 flex items-center justify-center bg-white text-primary-600 rounded-full shadow-sm"
+					>
+						<i class="material-icons">restaurant_menu</i>
+					</div>
+					<h1 class="ml-3 text-xl md:text-2xl font-bold">Gourmet Weekly</h1>
+				</div>
+
+				<div class="flex items-center gap-4">
+					<button
+						id="shopping-list-btn"
+						class="flex items-center gap-1 px-3 py-1.5 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg transition-all"
+					>
+						<i class="material-icons text-sm">shopping_cart</i>
+						<span class="text-sm hidden md:inline">Shopping List</span>
+					</button>
+
+					<div
+						id="notifications-btn"
+						class="relative cursor-pointer p-1.5 hover:bg-white hover:bg-opacity-10 rounded-full transition-all"
+					>
+						<i class="material-icons">notifications</i>
+						<span
+							class="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full"
+							>3</span
+						>
+					</div>
+
+					<div
+						id="profile-btn"
+						class="flex items-center gap-2 px-2 py-1 bg-white bg-opacity-10 hover:bg-opacity-20 rounded-full cursor-pointer transition-all"
+					>
+						<div
+							class="w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center text-white font-medium"
+						>
+							A
+						</div>
+						<span class="hidden md:block">Alex Cook</span>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<div class="flex-grow">
+			<div class="container mx-auto px-4 py-6">
+				<!-- Banner -->
+				<div
+					class="relative overflow-hidden bg-gradient-to-r from-blue-800 to-teal-700 rounded-xl shadow-lg mb-8 animate-fade-in no-print"
+				>
+					<div class="p-6 md:p-8 md:w-3/5">
+						<h2 class="text-white text-xl md:text-2xl font-bold mb-2">
+							Welcome to Gourmet Weekly
+						</h2>
+						<p class="text-white text-opacity-90 mb-4">
+							Plan your meals efficiently, discover new recipes, and save time
+							grocery shopping with our all-in-one meal planning platform.
+						</p>
+						<button
+							id="start-tour-btn"
+							class="flex items-center gap-2 bg-white text-blue-800 px-4 py-2 rounded-lg shadow hover:bg-opacity-90 transition-all"
+						>
+							<i class="material-icons">play_circle_outline</i>
+							<span>Take a Quick Tour</span>
+						</button>
+					</div>
+					<img
+						src="/api/placeholder/400/320"
+						alt="Cooking"
+						class="absolute right-0 bottom-0 h-40 md:h-full w-auto opacity-20 md:opacity-70 object-cover"
+					/>
+				</div>
+
+				<!-- Main Layout -->
+				<div class="flex flex-col lg:flex-row gap-6">
+					<!-- Recipe Library -->
+					<!-- Recipe Library -->
+					<div class="bg-white rounded-xl shadow-sm p-6 no-print lg:w-2/5">
+						<div class="flex justify-between items-center mb-6">
+							<h2 class="text-xl font-semibold text-gray-800">
+								Recipe Library
+							</h2>
+							<div class="flex gap-2">
+								<button
+									id="new-recipe-btn"
+									class="flex items-center justify-center w-8 h-8 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-all"
+									title="Create new recipe"
+								>
+									<i class="material-icons text-sm">add</i>
+								</button>
+								<button
+									class="flex items-center justify-center w-8 h-8 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-all"
+									title="View favorites"
+								>
+									<i class="material-icons text-sm">favorite</i>
+								</button>
+							</div>
+						</div>
+
+						<div class="flex flex-col gap-3 mb-6">
+							<div class="relative">
+								<input
+									id="recipe-search"
+									type="text"
+									placeholder="Search recipes..."
+									class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+								/>
+								<i
+									class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+									>search</i
+								>
+							</div>
+
+							<div class="flex gap-3 flex-wrap">
+								<select
+									id="category-filter"
+									class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm flex-grow md:flex-grow-0"
+								>
+									<option value="all">All Categories</option>
+									<option value="breakfast">Breakfast</option>
+									<option value="lunch">Lunch</option>
+									<option value="dinner">Dinner</option>
+									<option value="snack">Snacks</option>
+								</select>
+
+								<select
+									id="diet-filter"
+									class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm flex-grow md:flex-grow-0"
+								>
+									<option value="all">All Diets</option>
+									<option value="vegetarian">Vegetarian</option>
+									<option value="gluten-free">Gluten-Free</option>
+									<option value="dairy-free">Dairy-Free</option>
+									<option value="low-carb">Low-Carb</option>
+								</select>
+							</div>
+						</div>
+
+						<div
+							id="recipe-list"
+							class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6"
+						>
+							<!-- Recipe cards will be dynamically added here -->
+						</div>
+
+						<div class="flex justify-center items-center">
+							<!-- Pagination will be dynamically updated here -->
+						</div>
+					</div>
+
+					<!-- Weekly Planner -->
+					<div
+						class="flex-grow bg-white rounded-xl shadow-sm p-6 print-full-width"
+					>
+						<div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+							<div class="flex items-center">
+								<button
+									id="prev-week-btn"
+									class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-all mr-3 no-print"
+								>
+									<i class="material-icons">chevron_left</i>
+								</button>
+								<span id="current-week" class="text-lg font-medium"
+									>April 1 - April 7, 2025</span
+								>
+								<button
+									id="next-week-btn"
+									class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-all ml-3 no-print"
+								>
+									<i class="material-icons">chevron_right</i>
+								</button>
+							</div>
+
+							<div class="flex items-center gap-2 no-print">
+								<button
+									id="print-plan-btn"
+									class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-all"
+									title="Print meal plan"
+								>
+									<i class="material-icons text-sm">print</i>
+								</button>
+								<button
+									class="w-9 h-9 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-all"
+									title="Export to PDF"
+								>
+									<i class="material-icons text-sm">picture_as_pdf</i>
+								</button>
+								<button
+									class="flex items-center gap-1 bg-primary-500 hover:bg-primary-600 text-white px-3 py-2 rounded-lg transition-all"
+								>
+									<i class="material-icons text-sm">save</i>
+									<span>Save Plan</span>
+								</button>
+							</div>
+						</div>
+
+						<div
+							id="calendar-grid"
+							class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8"
+						>
+							<!-- Day columns will be dynamically added here -->
+						</div>
+
+						<div class="bg-gray-50 rounded-xl p-6 no-print">
+							<div class="flex justify-between items-center mb-6">
+								<h2 class="text-xl font-semibold text-gray-800">
+									Weekly Nutrition Insights
+								</h2>
+								<button
+									class="flex items-center justify-center w-8 h-8 bg-primary-50 text-primary-600 rounded-lg hover:bg-primary-100 transition-all"
+									title="View detailed report"
+								>
+									<i class="material-icons text-sm">assessment</i>
+								</button>
+							</div>
+
+							<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+								<div
+									class="flex items-center gap-4 bg-white rounded-lg p-4 hover:shadow-md transition-all"
+								>
+									<div
+										class="w-12 h-12 rounded-lg bg-primary-500 text-white flex items-center justify-center"
+									>
+										<i class="material-icons">local_fire_department</i>
+									</div>
+									<div>
+										<h4 class="text-xs text-gray-500 mb-1">
+											Average Daily Calories
+										</h4>
+										<div class="text-xl font-semibold">1,850</div>
+									</div>
+								</div>
+
+								<div
+									class="flex items-center gap-4 bg-white rounded-lg p-4 hover:shadow-md transition-all"
+								>
+									<div
+										class="w-12 h-12 rounded-lg bg-blue-500 text-white flex items-center justify-center"
+									>
+										<i class="material-icons">fitness_center</i>
+									</div>
+									<div>
+										<h4 class="text-xs text-gray-500 mb-1">Total Protein</h4>
+										<div class="text-xl font-semibold">124g</div>
+									</div>
+								</div>
+
+								<div
+									class="flex items-center gap-4 bg-white rounded-lg p-4 hover:shadow-md transition-all"
+								>
+									<div
+										class="w-12 h-12 rounded-lg bg-amber-500 text-white flex items-center justify-center"
+									>
+										<i class="material-icons">spa</i>
+									</div>
+									<div>
+										<h4 class="text-xs text-gray-500 mb-1">
+											Vegetable Servings
+										</h4>
+										<div class="text-xl font-semibold">28</div>
+									</div>
+								</div>
+
+								<div
+									class="flex items-center gap-4 bg-white rounded-lg p-4 hover:shadow-md transition-all"
+								>
+									<div
+										class="w-12 h-12 rounded-lg bg-red-500 text-white flex items-center justify-center"
+									>
+										<i class="material-icons">monetization_on</i>
+									</div>
+									<div>
+										<h4 class="text-xs text-gray-500 mb-1">Estimated Cost</h4>
+										<div class="text-xl font-semibold">$87</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<footer class="bg-gray-900 text-white mt-8 no-print">
+			<div
+				class="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+			>
+				<div>
+					<h3
+						class="text-lg font-semibold mb-4 relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-2 after:w-10 after:h-1 after:bg-primary-500 after:rounded-full"
+					>
+						About Gourmet Weekly
+					</h3>
+					<p class="text-gray-400 mb-4">
+						Gourmet Weekly is a premium meal planning platform designed to help
+						you organize your recipes, plan weekly meals, and generate shopping
+						lists with ease.
+					</p>
+					<div class="flex gap-3">
+						<a
+							href="#"
+							class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition-all"
+						>
+							<i class="material-icons text-sm">facebook</i>
+						</a>
+						<a
+							href="#"
+							class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition-all"
+						>
+							<i class="material-icons text-sm">alternate_email</i>
+						</a>
+						<a
+							href="#"
+							class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition-all"
+						>
+							<i class="material-icons text-sm">camera_alt</i>
+						</a>
+						<a
+							href="#"
+							class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition-all"
+						>
+							<i class="material-icons text-sm">add_a_photo</i>
+						</a>
+					</div>
+				</div>
+
+				<div>
+					<h3
+						class="text-lg font-semibold mb-4 relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-2 after:w-10 after:h-1 after:bg-primary-500 after:rounded-full"
+					>
+						Quick Links
+					</h3>
+					<ul class="space-y-2">
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">home</i> Home</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">search</i> Recipe Search</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">calendar_today</i> Meal
+								Plans</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">shopping_cart</i> Shopping
+								Lists</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">settings</i> Account
+								Settings</a
+							>
+						</li>
+					</ul>
+				</div>
+
+				<div>
+					<h3
+						class="text-lg font-semibold mb-4 relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-2 after:w-10 after:h-1 after:bg-primary-500 after:rounded-full"
+					>
+						Resources
+					</h3>
+					<ul class="space-y-2">
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">help_outline</i> Help
+								Center</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">book</i> Cooking Guides</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">local_offer</i> Seasonal
+								Recipes</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">dining</i> Nutrition Tips</a
+							>
+						</li>
+						<li>
+							<a
+								href="#"
+								class="flex items-center gap-2 text-gray-400 hover:text-primary-500 transition-all"
+								><i class="material-icons text-sm">forum</i> Community</a
+							>
+						</li>
+					</ul>
+				</div>
+
+				<div>
+					<h3
+						class="text-lg font-semibold mb-4 relative inline-block after:content-[''] after:absolute after:left-0 after:-bottom-2 after:w-10 after:h-1 after:bg-primary-500 after:rounded-full"
+					>
+						Stay Updated
+					</h3>
+					<p class="text-gray-400 mb-4">
+						Subscribe to our newsletter for the latest recipes, meal planning
+						tips, and promotions.
+					</p>
+					<div class="flex">
+						<input
+							type="email"
+							placeholder="Your email address"
+							class="flex-grow px-4 py-2 bg-gray-800 border border-gray-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+						/>
+						<button
+							class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-r-lg transition-all"
+						>
+							Subscribe
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="bg-gray-950 py-4 text-center text-gray-500 text-sm">
+				<p>
+					&copy; 2025 Gourmet Weekly. All rights reserved.
+					<a href="#" class="hover:text-primary-500">Privacy Policy</a> |
+					<a href="#" class="hover:text-primary-500">Terms of Service</a>
+				</p>
+			</div>
+		</footer>
+
+		<!-- Recipe Details Modal -->
+		<div
+			id="recipe-details"
+			class="fixed inset-0 z-50 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+		>
+			<div
+				class="w-full max-w-3xl max-h-[90vh] bg-white rounded-xl overflow-hidden shadow-2xl transform translate-y-8 transition-transform duration-300"
+			>
+				<div id="details-header" class="relative h-64 bg-gray-200">
+					<!-- Recipe header will be dynamically added here -->
+				</div>
+
+				<div
+					id="details-body"
+					class="p-8 overflow-y-auto max-h-[calc(90vh-16rem)]"
+				>
+					<!-- Recipe details will be dynamically added here -->
+				</div>
+			</div>
+		</div>
+
+		<!-- Shopping List Modal -->
+		<div
+			id="shopping-dialog"
+			class="fixed inset-0 z-50 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+		>
+			<div
+				class="w-full max-w-xl max-h-[90vh] bg-white rounded-xl overflow-hidden shadow-2xl transform translate-y-8 transition-transform duration-300"
+			>
+				<div class="bg-primary-600 px-6 py-4 flex justify-between items-center">
+					<h2 class="text-xl font-semibold text-white">Shopping List</h2>
+					<button
+						id="close-shopping"
+						class="w-8 h-8 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 flex items-center justify-center text-white transition-all"
+					>
+						<i class="material-icons">close</i>
+					</button>
+				</div>
+
+				<div class="p-6 overflow-y-auto max-h-[calc(90vh-8rem)] modal-body">
+					<div class="mb-6">
+						<h3 class="text-lg font-medium pb-2 border-b border-gray-200 mb-2">
+							Produce
+						</h3>
+						<div class="space-y-1">
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Red Bell Peppers</div>
+								<div class="text-gray-500 text-sm">4 medium</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Carrots</div>
+								<div class="text-gray-500 text-sm">1 bunch</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Broccoli</div>
+								<div class="text-gray-500 text-sm">2 heads</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Avocados</div>
+								<div class="text-gray-500 text-sm">3 ripe</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-6">
+						<h3 class="text-lg font-medium pb-2 border-b border-gray-200 mb-2">
+							Dairy & Eggs
+						</h3>
+						<div class="space-y-1">
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Eggs</div>
+								<div class="text-gray-500 text-sm">1 dozen</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Greek Yogurt</div>
+								<div class="text-gray-500 text-sm">16 oz</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Feta Cheese</div>
+								<div class="text-gray-500 text-sm">8 oz</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-6">
+						<h3 class="text-lg font-medium pb-2 border-b border-gray-200 mb-2">
+							Protein
+						</h3>
+						<div class="space-y-1">
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Chicken Breast</div>
+								<div class="text-gray-500 text-sm">2 lbs</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Ground Turkey</div>
+								<div class="text-gray-500 text-sm">1 lb</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Tofu</div>
+								<div class="text-gray-500 text-sm">14 oz</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="mb-6">
+						<h3 class="text-lg font-medium pb-2 border-b border-gray-200 mb-2">
+							Pantry
+						</h3>
+						<div class="space-y-1">
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Quinoa</div>
+								<div class="text-gray-500 text-sm">2 cups</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Olive Oil</div>
+								<div class="text-gray-500 text-sm">1 bottle</div>
+							</div>
+							<div
+								class="flex items-center py-2 border-b border-dashed border-gray-100"
+							>
+								<div
+									class="w-6 h-6 border-2 border-primary-500 rounded mr-3 cursor-pointer flex items-center justify-center item-checkbox"
+								></div>
+								<div class="flex-grow">Soy Sauce</div>
+								<div class="text-gray-500 text-sm">8 oz</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div
+					class="px-6 py-4 border-t border-gray-200 flex justify-between items-center"
+				>
+					<div class="text-gray-500 text-sm">
+						<span class="font-semibold text-gray-900">15</span> items •
+						Estimated cost: <span class="font-semibold text-gray-900">$87</span>
+					</div>
+					<div class="flex gap-2">
+						<button
+							class="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all text-sm"
+						>
+							<i class="material-icons text-xs">print</i>
+							Print
+						</button>
+						<button
+							class="flex items-center gap-1 px-3 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all text-sm"
+						>
+							<i class="material-icons text-xs">email</i>
+							Email
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- User Profile Modal -->
+		<div
+			id="profile-dialog"
+			class="fixed inset-0 z-50 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+		>
+			<div
+				class="w-full max-w-md bg-white rounded-xl overflow-hidden shadow-2xl transform translate-y-8 transition-transform duration-300"
+			>
+				<div
+					class="relative bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-8 text-center text-white"
+				>
+					<button
+						id="close-profile"
+						class="absolute right-4 top-4 w-8 h-8 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 flex items-center justify-center transition-all"
+					>
+						<i class="material-icons">close</i>
+					</button>
+					<div
+						class="w-20 h-20 mx-auto bg-white rounded-full flex items-center justify-center text-primary-600 text-2xl font-bold mb-4"
+					>
+						A
+					</div>
+					<h2 class="text-xl font-semibold mb-1">Alex Cook</h2>
+					<p class="text-white text-opacity-90">alex.cook@example.com</p>
+				</div>
+
+				<div class="p-6">
+					<div class="mb-6">
+						<h3 class="text-lg font-medium mb-4">Account Settings</h3>
+
+						<div class="mb-6">
+							<h4 class="text-sm text-gray-500 mb-2">Preferences</h4>
+							<div class="space-y-3">
+								<div
+									class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+								>
+									<div class="flex items-center gap-3">
+										<i class="material-icons text-primary-600">dark_mode</i>
+										<span>Dark Mode</span>
+									</div>
+									<label
+										class="relative inline-flex items-center cursor-pointer"
+									>
+										<input type="checkbox" class="sr-only peer" />
+										<div
+											class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"
+										></div>
+									</label>
+								</div>
+								<div
+									class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+								>
+									<div class="flex items-center gap-3">
+										<i class="material-icons text-primary-600">notifications</i>
+										<span>Notifications</span>
+									</div>
+									<label
+										class="relative inline-flex items-center cursor-pointer"
+									>
+										<input type="checkbox" checked class="sr-only peer" />
+										<div
+											class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"
+										></div>
+									</label>
+								</div>
+							</div>
+						</div>
+
+						<div>
+							<h4 class="text-sm text-gray-500 mb-2">Dietary Preferences</h4>
+							<div class="space-y-3">
+								<div
+									class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+								>
+									<div class="flex items-center gap-3">
+										<i class="material-icons text-primary-600">no_meals</i>
+										<span>Vegetarian</span>
+									</div>
+									<label
+										class="relative inline-flex items-center cursor-pointer"
+									>
+										<input type="checkbox" class="sr-only peer" />
+										<div
+											class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"
+										></div>
+									</label>
+								</div>
+								<div
+									class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+								>
+									<div class="flex items-center gap-3">
+										<i class="material-icons text-primary-600">egg_alt</i>
+										<span>Dairy-Free</span>
+									</div>
+									<label
+										class="relative inline-flex items-center cursor-pointer"
+									>
+										<input type="checkbox" class="sr-only peer" />
+										<div
+											class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"
+										></div>
+									</label>
+								</div>
+								<div
+									class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+								>
+									<div class="flex items-center gap-3">
+										<i class="material-icons text-primary-600">bakery_dining</i>
+										<span>Gluten-Free</span>
+									</div>
+									<label
+										class="relative inline-flex items-center cursor-pointer"
+									>
+										<input type="checkbox" class="sr-only peer" />
+										<div
+											class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"
+										></div>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
+					<button
+						class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all"
+					>
+						Cancel
+					</button>
+					<button
+						class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all"
+					>
+						Save Changes
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Notifications Sidebar -->
+		<div
+			id="notifications-sidebar"
+			class="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-white shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col no-print"
+		>
+			<div
+				class="p-4 border-b border-gray-200 flex justify-between items-center"
+			>
+				<h2 class="text-xl font-semibold">Notifications</h2>
+				<button
+					id="close-notifications"
+					class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-all"
+				>
+					<i class="material-icons">close</i>
+				</button>
+			</div>
+
+			<div class="flex-grow overflow-y-auto py-2">
+				<div
+					class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer bg-blue-50"
+				>
+					<div class="flex gap-3">
+						<div
+							class="w-10 h-10 rounded-full bg-primary-500 text-white flex items-center justify-center shrink-0"
+						>
+							<i class="material-icons">note_add</i>
+						</div>
+						<div class="flex-grow">
+							<div class="font-medium mb-1">
+								New spring recipes have been added to your library!
+							</div>
+							<div class="text-sm text-gray-500">Just now</div>
+						</div>
+						<div class="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-2"></div>
+					</div>
+				</div>
+
+				<div
+					class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer bg-blue-50"
+				>
+					<div class="flex gap-3">
+						<div
+							class="w-10 h-10 rounded-full bg-amber-500 text-white flex items-center justify-center shrink-0"
+						>
+							<i class="material-icons">schedule</i>
+						</div>
+						<div class="flex-grow">
+							<div class="font-medium mb-1">
+								Reminder: Plan your meals for next week
+							</div>
+							<div class="text-sm text-gray-500">2 hours ago</div>
+						</div>
+						<div class="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-2"></div>
+					</div>
+				</div>
+
+				<div
+					class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer bg-blue-50"
+				>
+					<div class="flex gap-3">
+						<div
+							class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0"
+						>
+							<i class="material-icons">shopping_cart</i>
+						</div>
+						<div class="flex-grow">
+							<div class="font-medium mb-1">
+								Your shopping list for this week is ready
+							</div>
+							<div class="text-sm text-gray-500">Yesterday</div>
+						</div>
+						<div class="w-2 h-2 bg-blue-500 rounded-full shrink-0 mt-2"></div>
+					</div>
+				</div>
+
+				<div
+					class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+				>
+					<div class="flex gap-3">
+						<div
+							class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0"
+						>
+							<i class="material-icons">favorite</i>
+						</div>
+						<div>
+							<div class="mb-1">
+								Mediterranean Greek Salad was added to your favorites
+							</div>
+							<div class="text-sm text-gray-500">2 days ago</div>
+						</div>
+					</div>
+				</div>
+
+				<div
+					class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+				>
+					<div class="flex gap-3">
+						<div
+							class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0"
+						>
+							<i class="material-icons">verified</i>
+						</div>
+						<div>
+							<div class="mb-1">Your account has been upgraded to Premium</div>
+							<div class="text-sm text-gray-500">1 week ago</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="p-4 border-t border-gray-200 text-center">
+				<button
+					class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all w-full"
+				>
+					Mark All as Read
+				</button>
+			</div>
+		</div>
+
+		<!-- New Recipe Modal -->
+		<div
+			id="new-recipe-dialog"
+			class="fixed inset-0 z-50 bg-gray-900 bg-opacity-70 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 no-print"
+		>
+			<div
+				class="w-full max-w-3xl max-h-[90vh] bg-white rounded-xl overflow-hidden shadow-2xl transform translate-y-8 transition-transform duration-300"
+			>
+				<div class="bg-primary-600 px-6 py-4 flex justify-between items-center">
+					<h2 class="text-xl font-semibold text-white">Create New Recipe</h2>
+					<button
+						id="close-new-recipe"
+						class="w-8 h-8 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 flex items-center justify-center text-white transition-all"
+					>
+						<i class="material-icons">close</i>
+					</button>
+				</div>
+
+				<div class="p-6 overflow-y-auto max-h-[calc(90vh-8rem)] modal-body">
+					<div class="mb-4">
+						<label
+							for="recipe-name"
+							class="block text-sm font-medium text-gray-700 mb-1"
+							>Recipe Name</label
+						>
+						<input
+							type="text"
+							id="recipe-name"
+							placeholder="Enter recipe name"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+						/>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+						<div>
+							<label
+								for="recipe-category"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Category</label
+							>
+							<select
+								id="recipe-category"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							>
+								<option value="breakfast">Breakfast</option>
+								<option value="lunch">Lunch</option>
+								<option value="dinner">Dinner</option>
+								<option value="snack">Snack</option>
+							</select>
+						</div>
+						<div>
+							<label
+								for="recipe-time"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Cooking Time (minutes)</label
+							>
+							<input
+								type="number"
+								id="recipe-time"
+								min="1"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							/>
+						</div>
+						<div>
+							<label
+								for="recipe-servings"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Servings</label
+							>
+							<input
+								type="number"
+								id="recipe-servings"
+								min="1"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							/>
+						</div>
+					</div>
+
+					<div class="mb-4">
+						<label
+							for="recipe-description"
+							class="block text-sm font-medium text-gray-700 mb-1"
+							>Description</label
+						>
+						<textarea
+							id="recipe-description"
+							placeholder="Briefly describe your recipe"
+							rows="3"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+						></textarea>
+					</div>
+
+					<div class="mb-4">
+						<label class="block text-sm font-medium text-gray-700 mb-1"
+							>Ingredients</label
+						>
+						<div id="ingredients-list" class="space-y-2 mb-2">
+							<div class="flex gap-2">
+								<input
+									type="text"
+									class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+									placeholder="e.g. 2 tbsp olive oil"
+								/>
+								<button
+									class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-all"
+								>
+									<i class="material-icons">close</i>
+								</button>
+							</div>
+							<div class="flex gap-2">
+								<input
+									type="text"
+									class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+									placeholder="e.g. 1 onion, chopped"
+								/>
+								<button
+									class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-all"
+								>
+									<i class="material-icons">close</i>
+								</button>
+							</div>
+						</div>
+						<button
+							id="add-ingredient"
+							class="w-full py-2 border border-dashed border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-all"
+						>
+							<i class="material-icons">add</i>
+							<span>Add Ingredient</span>
+						</button>
+					</div>
+
+					<div class="mb-4">
+						<label class="block text-sm font-medium text-gray-700 mb-1"
+							>Instructions</label
+						>
+						<div id="instructions-list" class="space-y-2 mb-2">
+							<div class="flex gap-2">
+								<input
+									type="text"
+									class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+									placeholder="Step 1"
+								/>
+								<button
+									class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-all"
+								>
+									<i class="material-icons">close</i>
+								</button>
+							</div>
+							<div class="flex gap-2">
+								<input
+									type="text"
+									class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+									placeholder="Step 2"
+								/>
+								<button
+									class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-all"
+								>
+									<i class="material-icons">close</i>
+								</button>
+							</div>
+						</div>
+						<button
+							id="add-instruction"
+							class="w-full py-2 border border-dashed border-gray-300 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-all"
+						>
+							<i class="material-icons">add</i>
+							<span>Add Instruction</span>
+						</button>
+					</div>
+
+					<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+						<div>
+							<label
+								for="recipe-calories"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Calories</label
+							>
+							<input
+								type="number"
+								id="recipe-calories"
+								min="0"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							/>
+						</div>
+						<div>
+							<label
+								for="recipe-protein"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Protein (g)</label
+							>
+							<input
+								type="number"
+								id="recipe-protein"
+								min="0"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							/>
+						</div>
+						<div>
+							<label
+								for="recipe-carbs"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Carbs (g)</label
+							>
+							<input
+								type="number"
+								id="recipe-carbs"
+								min="0"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							/>
+						</div>
+						<div>
+							<label
+								for="recipe-fat"
+								class="block text-sm font-medium text-gray-700 mb-1"
+								>Fat (g)</label
+							>
+							<input
+								type="number"
+								id="recipe-fat"
+								min="0"
+								class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+							/>
+						</div>
+					</div>
+				</div>
+
+				<div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
+					<button
+						id="cancel-recipe"
+						class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-all"
+					>
+						Cancel
+					</button>
+					<button
+						id="save-recipe"
+						class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg transition-all"
+					>
+						Save Recipe
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Toast Notification -->
+		<div
+			id="toast"
+			class="fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-primary-600 text-white no-print"
+		>
+			<i class="material-icons">check_circle</i>
+			<span id="toast-message">Meal added to your plan!</span>
+		</div>
+
+		<script>
+			const recipesPerPage = 6;
+			let currentSearch = "";
+			let currentCategory = "all";
+			let currentDiet = "all";
+			let currentPage = 1;
+			// Enhanced recipe data with additional details
+			const recipes = [
+				{
+					id: 1,
+					name: "Vegetable Stir Fry with Ginger Sauce",
+					time: "25 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "dinner",
+					description:
+						"A quick and nutritious vegetable stir fry with a flavorful ginger sauce. Perfect for busy weeknights when you need a healthy meal in minutes.",
+					calories: 320,
+					protein: "12g",
+					carbs: "38g",
+					fat: "14g",
+					servings: 4,
+					ingredients: [
+						"2 tbsp sesame oil",
+						"1 red onion, thinly sliced",
+						"2 bell peppers, sliced",
+						"2 carrots, julienned",
+						"2 cups broccoli florets",
+						"1 cup snap peas",
+						"3 cloves garlic, minced",
+						"1 tbsp fresh ginger, grated",
+						"1/4 cup low-sodium soy sauce",
+						"1 tbsp honey",
+						"1 tsp rice vinegar",
+						"1 tsp cornstarch",
+						"2 tbsp water",
+						"1/4 cup green onions, chopped",
+						"1 tbsp sesame seeds",
+					],
+					instructions: [
+						"Heat sesame oil in a large pan or wok over medium-high heat.",
+						"Add onions and stir-fry for 2 minutes until slightly softened.",
+						"Add bell peppers, carrots, and broccoli. Cook for 5-6 minutes, stirring frequently, until vegetables begin to soften but remain crisp.",
+						"Add snap peas and cook for another 2 minutes.",
+						"Add garlic and ginger and cook for 30 seconds until fragrant.",
+						"In a small bowl, whisk together soy sauce, honey, and rice vinegar.",
+						"In another small bowl, mix cornstarch and water to create a slurry.",
+						"Pour the soy sauce mixture over the vegetables, then add the cornstarch slurry.",
+						"Stir-fry for another 2 minutes until sauce thickens and coats the vegetables.",
+						"Remove from heat and garnish with chopped green onions and sesame seeds.",
+						"Serve hot over rice or noodles.",
+					],
+					tags: ["vegetarian", "healthy", "quick", "asian"],
+				},
+				{
+					id: 2,
+					name: "Mediterranean Greek Salad",
+					time: "15 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "lunch",
+					description:
+						"A fresh and vibrant Greek salad with crisp vegetables, tangy feta cheese, and a simple olive oil dressing. The perfect light lunch or side dish.",
+					calories: 280,
+					protein: "8g",
+					carbs: "12g",
+					fat: "22g",
+					servings: 4,
+					ingredients: [
+						"1 English cucumber, diced",
+						"4 Roma tomatoes, diced",
+						"1 red onion, thinly sliced",
+						"1 green bell pepper, diced",
+						"1 cup kalamata olives, pitted",
+						"200g feta cheese, cubed",
+						"2 tbsp extra virgin olive oil",
+						"1 tbsp red wine vinegar",
+						"1 tsp dried oregano",
+						"1/2 tsp dried basil",
+						"1 clove garlic, minced (optional)",
+						"Salt and freshly ground black pepper to taste",
+						"1 tsp fresh lemon juice",
+						"2 tbsp fresh parsley, chopped",
+					],
+					instructions: [
+						"In a large bowl, combine cucumber, tomatoes, red onion, bell pepper, and olives.",
+						"Gently fold in the feta cheese cubes.",
+						"In a small bowl, whisk together olive oil, red wine vinegar, oregano, basil, garlic (if using), salt, black pepper, and lemon juice to make the dressing.",
+						"Pour the dressing over the salad and toss gently to combine.",
+						"Let the salad rest for about 10 minutes to allow the flavors to meld.",
+						"Sprinkle with fresh parsley before serving.",
+						"Serve with warm pita bread for a complete meal.",
+					],
+					tags: ["vegetarian", "mediterranean", "quick", "no-cook"],
+				},
+				{
+					id: 3,
+					name: "Fluffy Buttermilk Pancakes",
+					time: "20 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "breakfast",
+					description:
+						"Light and fluffy buttermilk pancakes that are perfect for a weekend breakfast. Serve with fresh berries and maple syrup for a delicious morning treat.",
+					calories: 420,
+					protein: "9g",
+					carbs: "58g",
+					fat: "18g",
+					servings: 4,
+					ingredients: [
+						"2 cups all-purpose flour",
+						"2 tbsp granulated sugar",
+						"2 tsp baking powder",
+						"1 tsp baking soda",
+						"1/2 tsp salt",
+						"2 cups buttermilk",
+						"2 large eggs",
+						"1/4 cup unsalted butter, melted",
+						"1 tsp vanilla extract",
+						"Cooking spray or butter for griddle",
+						"Fresh berries for serving",
+						"Maple syrup for serving",
+					],
+					instructions: [
+						"In a large bowl, whisk together flour, sugar, baking powder, baking soda, and salt.",
+						"In a separate bowl, whisk together buttermilk, eggs, melted butter, and vanilla extract.",
+						"Pour the wet ingredients into the dry ingredients and stir just until combined. Do not overmix; a few lumps are okay.",
+						"Let the batter rest for 5 minutes.",
+						"Heat a griddle or large non-stick pan over medium heat. Lightly grease with cooking spray or butter.",
+						"For each pancake, pour about 1/4 cup of batter onto the griddle.",
+						"Cook until bubbles form on the surface and the edges look set, about 2-3 minutes.",
+						"Flip the pancakes and cook until golden brown on the other side, about 1-2 minutes more.",
+						"Serve warm with fresh berries and maple syrup.",
+					],
+					tags: ["vegetarian", "breakfast", "sweet"],
+				},
+				{
+					id: 4,
+					name: "Classic Spaghetti Bolognese",
+					time: "45 min",
+					difficulty: "Medium",
+					image: "/api/placeholder/400/320",
+					category: "dinner",
+					description:
+						"A rich and hearty Italian classic with a savory meat sauce simmered to perfection. This comforting dish is perfect for family dinners.",
+					calories: 580,
+					protein: "28g",
+					carbs: "65g",
+					fat: "22g",
+					servings: 6,
+					ingredients: [
+						"400g spaghetti",
+						"2 tbsp olive oil",
+						"1 large onion, finely chopped",
+						"2 carrots, finely diced",
+						"2 celery stalks, finely diced",
+						"3 cloves garlic, minced",
+						"500g ground beef (or mix of beef and pork)",
+						"1/4 cup tomato paste",
+						"800g canned crushed tomatoes",
+						"1 cup beef stock",
+						"2 bay leaves",
+						"1 tsp dried oregano",
+						"1/2 tsp dried thyme",
+						"1/2 tsp dried rosemary",
+						"1/4 cup red wine (optional)",
+						"Salt and freshly ground black pepper to taste",
+						"Grated Parmesan cheese for serving",
+						"Fresh basil leaves for garnish",
+					],
+					instructions: [
+						"Heat olive oil in a large pot over medium heat.",
+						"Add onion, carrots, and celery. Cook for 5-7 minutes until softened, stirring occasionally.",
+						"Add garlic and cook for 1 minute until fragrant.",
+						"Increase heat to medium-high and add ground meat. Cook until browned, breaking it up with a wooden spoon, about 5-7 minutes.",
+						"Add tomato paste and cook for 2 minutes, stirring constantly.",
+						"If using, add red wine and simmer until mostly evaporated, about 2 minutes.",
+						"Add crushed tomatoes, beef stock, bay leaves, oregano, thyme, and rosemary.",
+						"Season with salt and pepper to taste.",
+						"Reduce heat to low and simmer uncovered for at least 30 minutes (or up to 1.5 hours for deeper flavor), stirring occasionally.",
+						"About 10 minutes before sauce is done, cook spaghetti according to package instructions until al dente.",
+						"Drain pasta, reserving 1/2 cup of pasta water.",
+						"Remove bay leaves from sauce. If sauce is too thick, add some reserved pasta water.",
+						"Serve sauce over cooked spaghetti and top with grated Parmesan and fresh basil.",
+					],
+					tags: ["italian", "meat", "family-friendly"],
+				},
+				{
+					id: 5,
+					name: "Avocado Toast with Poached Egg",
+					time: "15 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "breakfast",
+					description:
+						"Creamy avocado on toasted artisan bread topped with a perfectly poached egg. A nutritious and satisfying breakfast that's both simple and elegant.",
+					calories: 340,
+					protein: "14g",
+					carbs: "28g",
+					fat: "22g",
+					servings: 2,
+					ingredients: [
+						"2 slices artisan bread (sourdough or whole grain)",
+						"1 large ripe avocado",
+						"2 large eggs",
+						"1 tbsp white vinegar (for poaching)",
+						"1 tbsp fresh lemon juice",
+						"1/4 tsp red pepper flakes",
+						"Salt and freshly ground black pepper to taste",
+						"2 tsp extra virgin olive oil",
+						"Microgreens or fresh herbs for garnish (optional)",
+						"Cherry tomatoes, halved, for serving (optional)",
+					],
+					instructions: [
+						"Toast the bread slices until golden and crisp.",
+						"Fill a medium pot with about 3 inches of water. Add vinegar and bring to a gentle simmer over medium heat.",
+						"Meanwhile, cut the avocado in half, remove the pit, and scoop the flesh into a small bowl.",
+						"Add lemon juice, salt, and pepper to the avocado and mash with a fork to your desired consistency.",
+						"When water is simmering, create a gentle whirlpool with a spoon and carefully crack an egg into the center. Cook for 3 minutes for a runny yolk.",
+						"Remove poached egg with a slotted spoon and place on a paper towel to drain. Repeat with the second egg.",
+						"Spread the mashed avocado evenly on both toast slices.",
+						"Top each toast with a poached egg.",
+						"Drizzle with olive oil, sprinkle with red pepper flakes, and season with additional salt and pepper to taste.",
+						"Garnish with microgreens or fresh herbs if desired and serve with cherry tomatoes on the side.",
+					],
+					tags: ["vegetarian", "breakfast", "healthy", "high-protein"],
+				},
+				{
+					id: 6,
+					name: "Grilled Chicken Caesar Salad",
+					time: "30 min",
+					difficulty: "Medium",
+					image: "/api/placeholder/400/320",
+					category: "lunch",
+					description:
+						"A classic Caesar salad with juicy grilled chicken, crisp romaine lettuce, homemade croutons, and a creamy Caesar dressing. Perfect for a satisfying lunch.",
+					calories: 420,
+					protein: "32g",
+					carbs: "18g",
+					fat: "24g",
+					servings: 2,
+					ingredients: [
+						"2 boneless, skinless chicken breasts",
+						"2 tbsp olive oil, divided",
+						"1 tsp Italian seasoning",
+						"1 large head romaine lettuce, chopped",
+						"1/2 cup Parmesan cheese, freshly grated",
+						"1 cup croutons (homemade or store-bought)",
+						"For the dressing:",
+						"1/4 cup mayonnaise",
+						"2 tbsp lemon juice",
+						"1 tbsp Dijon mustard",
+						"2 anchovy fillets, minced (or 1 tsp anchovy paste)",
+						"1 clove garlic, minced",
+						"1/4 cup olive oil",
+						"2 tbsp grated Parmesan cheese",
+						"1/4 tsp Worcestershire sauce",
+						"Salt and freshly ground black pepper to taste",
+					],
+					instructions: [
+						"Season chicken breasts with 1 tbsp olive oil, Italian seasoning, salt, and pepper.",
+						"Preheat grill or grill pan to medium-high heat. Grill chicken for 5-7 minutes per side until cooked through and internal temperature reaches 165°F (74°C).",
+						"Let chicken rest for 5 minutes, then slice into strips.",
+						"While chicken is cooking, make the dressing: In a small bowl, whisk together mayonnaise, lemon juice, Dijon mustard, anchovy, and garlic.",
+						"Slowly stream in 1/4 cup olive oil while whisking constantly until emulsified.",
+						"Stir in grated Parmesan cheese and Worcestershire sauce. Season with salt and pepper to taste.",
+						"In a large bowl, toss chopped romaine lettuce with enough dressing to coat.",
+						"Transfer dressed lettuce to serving plates.",
+						"Top with grilled chicken strips, croutons, and additional grated Parmesan cheese.",
+						"Drizzle with remaining dressing if desired and serve immediately.",
+					],
+					tags: ["high-protein", "lunch", "salad", "meal-prep-friendly"],
+				},
+				{
+					id: 7,
+					name: "Thai Coconut Curry Soup",
+					time: "35 min",
+					difficulty: "Medium",
+					image: "/api/placeholder/400/320",
+					category: "dinner",
+					description:
+						"A fragrant and creamy Thai soup with coconut milk, vegetables, and your choice of protein. Warming, comforting, and full of authentic flavors.",
+					calories: 380,
+					protein: "18g",
+					carbs: "22g",
+					fat: "26g",
+					servings: 4,
+					ingredients: [
+						"1 tbsp coconut oil",
+						"1 onion, sliced",
+						"2 cloves garlic, minced",
+						"1 tbsp fresh ginger, grated",
+						"2 tbsp red curry paste",
+						"1 red bell pepper, sliced",
+						"1 cup mushrooms, sliced",
+						"1 carrot, julienned",
+						"1 can (14 oz) coconut milk",
+						"2 cups vegetable or chicken broth",
+						"2 tbsp fish sauce (or soy sauce for vegetarian)",
+						"1 tbsp brown sugar",
+						"8 oz protein of choice (tofu, chicken, or shrimp)",
+						"1 lime, juiced",
+						"1/4 cup fresh cilantro, chopped",
+						"2 green onions, sliced",
+						"1 cup bean sprouts",
+						"Red chili flakes, to taste",
+					],
+					instructions: [
+						"Heat coconut oil in a large pot over medium heat.",
+						"Add onion and sauté for 3-4 minutes until softened.",
+						"Add garlic and ginger, cook for 1 minute until fragrant.",
+						"Stir in red curry paste and cook for 1 minute.",
+						"Add bell pepper, mushrooms, and carrot. Cook for 3-4 minutes.",
+						"Pour in coconut milk and broth, then add fish sauce and brown sugar.",
+						"Bring to a simmer and cook for 10 minutes.",
+						"Add your protein of choice: If using chicken, add now and simmer for 10 minutes until cooked through. If using shrimp or tofu, add during the last 3-5 minutes of cooking.",
+						"Remove from heat and stir in lime juice.",
+						"Serve garnished with cilantro, green onions, bean sprouts, and red chili flakes.",
+					],
+					tags: ["asian", "soup", "dairy-free", "gluten-free"],
+				},
+				{
+					id: 8,
+					name: "Quinoa Veggie Power Bowl",
+					time: "25 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "lunch",
+					description:
+						"A nutrient-packed bowl with fluffy quinoa, roasted vegetables, avocado, and a zesty dressing. Perfect for a healthy, balanced lunch that will keep you energized.",
+					calories: 420,
+					protein: "14g",
+					carbs: "58g",
+					fat: "16g",
+					servings: 2,
+					ingredients: [
+						"1 cup quinoa, rinsed",
+						"2 cups water or vegetable broth",
+						"1 sweet potato, diced",
+						"1 red bell pepper, diced",
+						"1 zucchini, diced",
+						"1 red onion, sliced",
+						"2 tbsp olive oil",
+						"1 tsp cumin",
+						"1 tsp paprika",
+						"1/2 tsp garlic powder",
+						"Salt and pepper to taste",
+						"1 avocado, sliced",
+						"1/4 cup pumpkin seeds",
+						"1/4 cup feta cheese, crumbled (optional)",
+						"For the dressing:",
+						"3 tbsp olive oil",
+						"2 tbsp lemon juice",
+						"1 tsp honey or maple syrup",
+						"1 clove garlic, minced",
+						"1 tbsp fresh herbs (such as parsley, cilantro, or basil)",
+						"Salt and pepper to taste",
+					],
+					instructions: [
+						"Preheat oven to 425°F (220°C). Line a baking sheet with parchment paper.",
+						"In a medium saucepan, combine quinoa and water or broth. Bring to a boil, then reduce heat to low, cover, and simmer for 15 minutes until water is absorbed and quinoa is fluffy.",
+						"Meanwhile, toss sweet potato, bell pepper, zucchini, and red onion with olive oil, cumin, paprika, garlic powder, salt, and pepper.",
+						"Spread vegetables on the prepared baking sheet and roast for 20-25 minutes, stirring halfway through, until tender and slightly caramelized.",
+						"Make the dressing: Whisk together olive oil, lemon juice, honey, garlic, herbs, salt, and pepper.",
+						"To assemble bowls, divide quinoa between two bowls. Top with roasted vegetables, avocado slices, pumpkin seeds, and feta cheese if using.",
+						"Drizzle with dressing and serve.",
+					],
+					tags: [
+						"vegetarian",
+						"gluten-free",
+						"grain-bowl",
+						"meal-prep-friendly",
+					],
+				},
+				{
+					id: 9,
+					name: "Berry Protein Smoothie Bowl",
+					time: "10 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "breakfast",
+					description:
+						"A vibrant and nutritious smoothie bowl packed with antioxidants, protein, and healthy fats. The perfect breakfast to kickstart your day with energy and nutrients.",
+					calories: 380,
+					protein: "24g",
+					carbs: "45g",
+					fat: "12g",
+					servings: 1,
+					ingredients: [
+						"1 cup frozen mixed berries",
+						"1 frozen banana",
+						"1 scoop (25g) vanilla protein powder",
+						"1/4 cup Greek yogurt",
+						"1/4 cup almond milk (or milk of choice)",
+						"1 tsp chia seeds",
+						"For toppings:",
+						"1/4 cup granola",
+						"1 tbsp sliced almonds",
+						"1 tbsp hemp seeds",
+						"Fresh berries",
+						"1 tsp honey or maple syrup (optional)",
+					],
+					instructions: [
+						"Place frozen berries, banana, protein powder, Greek yogurt, almond milk, and chia seeds in a blender.",
+						"Blend until smooth, stopping to scrape down the sides as needed. Add a splash more milk if the mixture is too thick.",
+						"Pour the smoothie into a bowl.",
+						"Top with granola, sliced almonds, hemp seeds, fresh berries, and a drizzle of honey if desired.",
+						"Enjoy immediately with a spoon.",
+					],
+					tags: ["vegetarian", "high-protein", "breakfast", "quick"],
+				},
+				{
+					id: 10,
+					name: "Lemon Garlic Roasted Salmon",
+					time: "25 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "dinner",
+					description:
+						"Perfectly roasted salmon fillets with a bright lemon garlic butter sauce. A quick and elegant dinner option that's both healthy and delicious.",
+					calories: 350,
+					protein: "34g",
+					carbs: "2g",
+					fat: "22g",
+					servings: 4,
+					ingredients: [
+						"4 salmon fillets (about 6 oz each)",
+						"2 tbsp olive oil",
+						"3 cloves garlic, minced",
+						"1 lemon, zested and juiced",
+						"2 tbsp fresh dill, chopped (plus more for garnish)",
+						"2 tbsp butter, melted",
+						"1 tsp Dijon mustard",
+						"Salt and freshly ground black pepper to taste",
+						"Lemon slices for garnish",
+					],
+					instructions: [
+						"Preheat oven to 400°F (200°C).",
+						"Pat salmon fillets dry with paper towels and place them on a parchment-lined baking sheet.",
+						"In a small bowl, combine olive oil, minced garlic, lemon zest, lemon juice, dill, melted butter, and Dijon mustard.",
+						"Season the salmon fillets with salt and pepper, then brush the lemon garlic mixture over the top of each fillet.",
+						"Roast in the preheated oven for 12-15 minutes, or until salmon is cooked through and flakes easily with a fork.",
+						"Garnish with additional fresh dill and lemon slices before serving.",
+					],
+					tags: ["seafood", "high-protein", "low-carb", "gluten-free"],
+				},
+				{
+					id: 11,
+					name: "Chocolate Chia Pudding",
+					time: "5 min + 4 hrs setting",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "snack",
+					description:
+						"A rich and creamy chocolate chia pudding that makes a perfect healthy dessert or snack. Prep it the night before for a delicious grab-and-go breakfast.",
+					calories: 220,
+					protein: "7g",
+					carbs: "26g",
+					fat: "12g",
+					servings: 2,
+					ingredients: [
+						"1/4 cup chia seeds",
+						"1 cup unsweetened almond milk",
+						"2 tbsp unsweetened cocoa powder",
+						"1-2 tbsp maple syrup or honey",
+						"1/2 tsp vanilla extract",
+						"Pinch of salt",
+						"Optional toppings: fresh berries, banana slices, chopped nuts, cacao nibs",
+					],
+					instructions: [
+						"In a medium bowl, whisk together almond milk, cocoa powder, maple syrup, vanilla extract, and salt until well combined and cocoa powder is fully dissolved.",
+						"Add chia seeds and whisk again to combine.",
+						"Let the mixture sit for 5-10 minutes, then whisk again to break up any clumps.",
+						"Cover and refrigerate for at least 4 hours or overnight to allow the pudding to set.",
+						"Before serving, give the pudding a good stir. If it's too thick, add a splash more almond milk.",
+						"Divide into serving bowls and add your favorite toppings.",
+					],
+					tags: [
+						"vegetarian",
+						"vegan",
+						"dairy-free",
+						"gluten-free",
+						"make-ahead",
+					],
+				},
+				{
+					id: 12,
+					name: "Roasted Vegetable & Hummus Wrap",
+					time: "30 min",
+					difficulty: "Easy",
+					image: "/api/placeholder/400/320",
+					category: "lunch",
+					description:
+						"A satisfying vegetarian wrap filled with flavorful roasted vegetables, creamy hummus, and fresh greens. Perfect for a nutritious lunch on the go.",
+					calories: 330,
+					protein: "10g",
+					carbs: "45g",
+					fat: "14g",
+					servings: 2,
+					ingredients: [
+						"1 zucchini, sliced into strips",
+						"1 bell pepper, sliced",
+						"1 red onion, sliced",
+						"1 tbsp olive oil",
+						"1 tsp dried Italian herbs",
+						"Salt and pepper to taste",
+						"2 large whole wheat tortillas or wraps",
+						"1/2 cup hummus",
+						"1 cup baby spinach or mixed greens",
+						"1/4 cup crumbled feta cheese (optional)",
+						"2 tbsp balsamic glaze",
+						"2 tbsp pine nuts or sunflower seeds (optional)",
+					],
+					instructions: [
+						"Preheat oven to 425°F (220°C). Line a baking sheet with parchment paper.",
+						"Toss zucchini, bell pepper, and red onion with olive oil, Italian herbs, salt, and pepper.",
+						"Spread vegetables on the prepared baking sheet and roast for 20-25 minutes, stirring halfway through, until tender and slightly caramelized.",
+						"Warm the tortillas slightly to make them more pliable.",
+						"Spread a generous layer of hummus down the center of each tortilla.",
+						"Top with roasted vegetables, spinach or mixed greens, and feta cheese if using.",
+						"Drizzle with balsamic glaze and sprinkle with pine nuts or sunflower seeds if desired.",
+						"Fold in the sides of the tortilla, then roll up tightly from the bottom.",
+						"Cut in half and serve immediately, or wrap in parchment paper for lunch on the go.",
+					],
+					tags: ["vegetarian", "lunch", "meal-prep-friendly", "portable"],
+				},
+			];
+
+			// DOM Elements
+			const recipeList = document.getElementById("recipe-list");
+			const calendarGrid = document.getElementById("calendar-grid");
+			const recipeDetails = document.getElementById("recipe-details");
+			const detailsHeader = document.getElementById("details-header");
+			const detailsBody = document.getElementById("details-body");
+			const recipeSearch = document.getElementById("recipe-search");
+			const categoryFilter = document.getElementById("category-filter");
+			const dietFilter = document.getElementById("diet-filter");
+			const toast = document.getElementById("toast");
+			const toastMessage = document.getElementById("toast-message");
+			const currentWeekDisplay = document.getElementById("current-week");
+			const shoppingDialog = document.getElementById("shopping-dialog");
+			const profileDialog = document.getElementById("profile-dialog");
+			const notificationsSidebar = document.getElementById(
+				"notifications-sidebar"
+			);
+			const newRecipeDialog = document.getElementById("new-recipe-dialog");
+
+			// Toggle UI elements
+			document
+				.getElementById("shopping-list-btn")
+				.addEventListener("click", () => {
+					shoppingDialog.classList.add("opacity-100", "pointer-events-auto");
+					shoppingDialog
+						.querySelector(".shopping-content")
+						.classList.add("translate-y-0");
+				});
+
+			document
+				.getElementById("close-shopping")
+				.addEventListener("click", () => {
+					shoppingDialog.classList.remove("opacity-100", "pointer-events-auto");
+					shoppingDialog
+						.querySelector(".shopping-content")
+						.classList.remove("translate-y-0");
+				});
+
+			document.getElementById("profile-btn").addEventListener("click", () => {
+				profileDialog.classList.add("opacity-100", "pointer-events-auto");
+				profileDialog
+					.querySelector(".profile-content")
+					.classList.add("translate-y-0");
+			});
+
+			document.getElementById("close-profile").addEventListener("click", () => {
+				profileDialog.classList.remove("opacity-100", "pointer-events-auto");
+				profileDialog
+					.querySelector(".profile-content")
+					.classList.remove("translate-y-0");
+			});
+
+			document
+				.getElementById("notifications-btn")
+				.addEventListener("click", () => {
+					notificationsSidebar.classList.remove("translate-x-full");
+				});
+
+			document
+				.getElementById("close-notifications")
+				.addEventListener("click", () => {
+					notificationsSidebar.classList.add("translate-x-full");
+				});
+
+			document
+				.getElementById("new-recipe-btn")
+				.addEventListener("click", () => {
+					newRecipeDialog.classList.add("opacity-100", "pointer-events-auto");
+					newRecipeDialog
+						.querySelector(".new-recipe-content")
+						.classList.add("translate-y-0");
+				});
+
+			document
+				.getElementById("close-new-recipe")
+				.addEventListener("click", () => {
+					newRecipeDialog.classList.remove(
+						"opacity-100",
+						"pointer-events-auto"
+					);
+					newRecipeDialog
+						.querySelector(".new-recipe-content")
+						.classList.remove("translate-y-0");
+				});
+
+			document.getElementById("cancel-recipe").addEventListener("click", () => {
+				newRecipeDialog.classList.remove("opacity-100", "pointer-events-auto");
+				newRecipeDialog
+					.querySelector(".new-recipe-content")
+					.classList.remove("translate-y-0");
+			});
+
+			document.getElementById("save-recipe").addEventListener("click", () => {
+				// In a real app, this would save the new recipe
+				newRecipeDialog.classList.remove("opacity-100", "pointer-events-auto");
+				newRecipeDialog
+					.querySelector(".new-recipe-content")
+					.classList.remove("translate-y-0");
+				showToast("Recipe saved successfully!", "success");
+			});
+
+			document
+				.getElementById("print-plan-btn")
+				.addEventListener("click", () => {
+					window.print();
+				});
+
+			document
+				.getElementById("start-tour-btn")
+				.addEventListener("click", () => {
+					showToast("Tour feature coming soon!", "info");
+				});
+
+			// Dynamic item lists in the recipe form
+			document
+				.getElementById("add-ingredient")
+				.addEventListener("click", () => {
+					const ingredientsList = document.getElementById("ingredients-list");
+					const newItem = document.createElement("div");
+					newItem.className = "flex gap-2";
+					newItem.innerHTML = `
+        <input type="text" class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="e.g. 1 cup flour">
+        <button class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-all remove-btn">
+          <i class="material-icons">close</i>
+        </button>
+      `;
+					ingredientsList.appendChild(newItem);
+
+					// Add event listener to the new remove button
+					attachRemoveButtonListeners();
+				});
+
+			document
+				.getElementById("add-instruction")
+				.addEventListener("click", () => {
+					const instructionsList = document.getElementById("instructions-list");
+					const newItem = document.createElement("div");
+					newItem.className = "flex gap-2";
+					newItem.innerHTML = `
+        <input type="text" class="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Step instruction">
+        <button class="w-10 h-10 bg-red-500 text-white rounded-lg flex items-center justify-center hover:bg-red-600 transition-all remove-btn">
+          <i class="material-icons">close</i>
+        </button>
+      `;
+					instructionsList.appendChild(newItem);
+
+					// Add event listener to the new remove button
+					attachRemoveButtonListeners();
+				});
+
+			// Attach event listeners to remove buttons
+			function attachRemoveButtonListeners() {
+				document.querySelectorAll(".remove-btn").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						const listItem = btn.closest(".flex");
+						listItem.remove();
+					});
+				});
+			}
+			function renderRecipes() {
+				const searchTerm = currentSearch.toLowerCase().trim();
+				const category = currentCategory;
+				const diet = currentDiet;
+
+				// Filter recipes
+				const filteredRecipes = recipes.filter((recipe) => {
+					const matchesSearch =
+						searchTerm === "" ||
+						recipe.name.toLowerCase().includes(searchTerm) ||
+						recipe.description.toLowerCase().includes(searchTerm);
+					const matchesCategory =
+						category === "all" || recipe.category === category;
+					const matchesDiet =
+						diet === "all" || (recipe.tags && recipe.tags.includes(diet));
+					return matchesSearch && matchesCategory && matchesDiet;
+				});
+
+				// Calculate start and end indices for the current page
+				const startIndex = (currentPage - 1) * recipesPerPage;
+				const endIndex = Math.min(
+					startIndex + recipesPerPage,
+					filteredRecipes.length
+				);
+
+				// Get recipes for the current page
+				const pageRecipes = filteredRecipes.slice(startIndex, endIndex);
+
+				// Clear recipe list
+				recipeList.innerHTML = "";
+
+				if (pageRecipes.length === 0) {
+					recipeList.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center p-8 text-center">
+                    <i class="material-icons text-gray-300 text-5xl mb-3">search_off</i>
+                    <p class="text-gray-500">No recipes found. Try adjusting your filters.</p>
+                </div>
+            `;
+					// Clear pagination when no recipes are found
+					document.querySelector(
+						".flex.justify-center.items-center"
+					).innerHTML = "";
+				} else {
+					pageRecipes.forEach((recipe) => {
+						const recipeCard = createRecipeCard(recipe);
+						recipeList.appendChild(recipeCard);
+					});
+					// Update pagination with filtered recipes
+					updatePagination(filteredRecipes);
+				}
+			}
+
+			// Update pagination based on the provided recipes array
+			function updatePagination(recipesToPaginate) {
+				const paginationElement = document.querySelector(
+					".flex.justify-center.items-center"
+				);
+				const totalPages = Math.ceil(recipesToPaginate.length / recipesPerPage);
+
+				let paginationHTML = `
+            <div class="flex gap-1">
+                <button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 hover:bg-gray-200 transition-all" ${
+									currentPage === 1 ? "disabled" : ""
+								} id="prev-page">
+                    <i class="material-icons text-sm">chevron_left</i>
+                </button>
+        `;
+
+				for (let i = 1; i <= totalPages; i++) {
+					paginationHTML += `
+                <button class="w-8 h-8 flex items-center justify-center rounded-md ${
+									currentPage === i
+										? "bg-primary-500 text-white"
+										: "bg-gray-100 hover:bg-gray-200 transition-all"
+								}" data-page="${i}">${i}</button>
+            `;
+				}
+
+				paginationHTML += `
+                <button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 hover:bg-gray-200 transition-all" ${
+									currentPage === totalPages ? "disabled" : ""
+								} id="next-page">
+                    <i class="material-icons text-sm">chevron_right</i>
+                </button>
+            </div>
+        `;
+
+				paginationElement.innerHTML = paginationHTML;
+
+				// Add event listeners to pagination buttons
+				document.querySelectorAll("[data-page]").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						currentPage = parseInt(btn.dataset.page);
+						renderRecipes();
+					});
+				});
+
+				const prevBtn = document.getElementById("prev-page");
+				const nextBtn = document.getElementById("next-page");
+
+				if (prevBtn) {
+					prevBtn.addEventListener("click", () => {
+						if (currentPage > 1) {
+							currentPage--;
+							renderRecipes();
+						}
+					});
+				}
+
+				if (nextBtn) {
+					nextBtn.addEventListener("click", () => {
+						if (currentPage < totalPages) {
+							currentPage++;
+							renderRecipes();
+						}
+					});
+				}
+			}
+			// Initialize remove button listeners
+			attachRemoveButtonListeners();
+
+			// Add click events to shopping list checkboxes
+			document.querySelectorAll(".item-checkbox").forEach((checkbox) => {
+				checkbox.addEventListener("click", () => {
+					checkbox.classList.toggle('after:content-["✓"]');
+					const itemName = checkbox.nextElementSibling;
+					itemName.classList.toggle("line-through");
+					itemName.classList.toggle("text-gray-400");
+				});
+			});
+
+			function initializeRecipes() {
+				recipeList.innerHTML = "";
+
+				// Calculate start and end indices for the current page
+				const startIndex = (currentPage - 1) * recipesPerPage;
+				const endIndex = Math.min(startIndex + recipesPerPage, recipes.length);
+
+				// Get only the recipes for the current page
+				const currentPageRecipes = recipes.slice(startIndex, endIndex);
+
+				// Display the current page recipes
+				currentPageRecipes.forEach((recipe) => {
+					const recipeCard = createRecipeCard(recipe);
+					recipeList.appendChild(recipeCard);
+				});
+
+				// Update pagination UI
+				updatePagination();
+			}
+
+			function updatePagination() {
+				const paginationElement = document.querySelector(
+					".flex.justify-center.items-center"
+				);
+				const totalPages = Math.ceil(recipes.length / recipesPerPage);
+
+				let paginationHTML = `
+        <div class="flex gap-1">
+          <button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 hover:bg-gray-200 transition-all" ${
+						currentPage === 1 ? "disabled" : ""
+					} id="prev-page">
+            <i class="material-icons text-sm">chevron_left</i>
+          </button>
+      `;
+
+				for (let i = 1; i <= totalPages; i++) {
+					paginationHTML += `
+          <button class="w-8 h-8 flex items-center justify-center rounded-md ${
+						currentPage === i
+							? "bg-primary-500 text-white"
+							: "bg-gray-100 hover:bg-gray-200 transition-all"
+					}" data-page="${i}">${i}</button>
+        `;
+				}
+
+				paginationHTML += `
+          <button class="w-8 h-8 flex items-center justify-center rounded-md bg-gray-100 hover:bg-gray-200 transition-all" ${
+						currentPage === totalPages ? "disabled" : ""
+					} id="next-page">
+            <i class="material-icons text-sm">chevron_right</i>
+          </button>
+        </div>
+      `;
+
+				paginationElement.innerHTML = paginationHTML;
+
+				// Add event listeners to pagination buttons
+				document.querySelectorAll("[data-page]").forEach((btn) => {
+					btn.addEventListener("click", () => {
+						currentPage = parseInt(btn.dataset.page);
+						initializeRecipes();
+					});
+				});
+
+				// Add event listeners for previous and next buttons
+				const prevBtn = document.getElementById("prev-page");
+				const nextBtn = document.getElementById("next-page");
+
+				if (prevBtn) {
+					prevBtn.addEventListener("click", () => {
+						if (currentPage > 1) {
+							currentPage--;
+							initializeRecipes();
+						}
+					});
+				}
+
+				if (nextBtn) {
+					nextBtn.addEventListener("click", () => {
+						if (currentPage < totalPages) {
+							currentPage++;
+							initializeRecipes();
+						}
+					});
+				}
+			}
+
+			// Create recipe card element
+			function createRecipeCard(recipe) {
+				const card = document.createElement("div");
+				card.className =
+					"recipe-card bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer transition-all hover:-translate-y-1 hover:shadow-md border border-gray-100 relative animate-slide-up";
+				card.draggable = true;
+				card.dataset.id = recipe.id;
+				card.dataset.category = recipe.category;
+
+				card.innerHTML = `
+        <div class="absolute top-2 right-2 z-10 w-8 h-8 bg-white bg-opacity-80 rounded-full flex items-center justify-center recipe-favorite text-gray-400 hover:scale-110 transition-all" data-recipe-id="${recipe.id}">
+          <i class="material-icons text-sm">favorite_border</i>
+        </div>
+        <div class="h-24 bg-gray-200 overflow-hidden">
+          <img src="${recipe.image}" alt="${recipe.name}" class="w-full h-full object-cover">
+        </div>
+        <div class="p-3">
+          <h3 class="text-sm font-medium line-clamp-2 mb-1">${recipe.name}</h3>
+          <div class="flex flex-wrap items-center gap-1 mt-auto">
+            <span class="text-xs px-2 py-0.5 bg-gray-100 rounded-full flex items-center gap-0.5">
+              <i class="material-icons text-[10px]">schedule</i>
+              ${recipe.time}
+            </span>
+            <span class="text-xs px-2 py-0.5 bg-primary-100 text-primary-800 rounded-full capitalize">
+              ${recipe.category}
+            </span>
+          </div>
+        </div>
+      `;
+
+				// Add event listeners for drag operations
+				card.addEventListener("dragstart", handleDragStart);
+
+				// Add click event to show recipe details
+				card.addEventListener("click", (e) => {
+					// Don't show details if clicking on the favorite button
+					if (!e.target.closest(".recipe-favorite")) {
+						showRecipeDetails(recipe);
+					}
+				});
+
+				// Add favorite button functionality
+				const favoriteBtn = card.querySelector(".recipe-favorite");
+				favoriteBtn.addEventListener("click", (e) => {
+					e.stopPropagation();
+					const icon = favoriteBtn.querySelector("i");
+					if (icon.textContent === "favorite_border") {
+						icon.textContent = "favorite";
+						favoriteBtn.classList.remove("text-gray-400");
+						favoriteBtn.classList.add("text-red-500");
+						showToast("Added to favorites", "success");
+					} else {
+						icon.textContent = "favorite_border";
+						favoriteBtn.classList.add("text-gray-400");
+						favoriteBtn.classList.remove("text-red-500");
+						showToast("Removed from favorites", "info");
+					}
+				});
+
+				return card;
+			}
+
+			// Initialize calendar grid with dates
+			function initializeCalendar() {
+				calendarGrid.innerHTML = "";
+
+				// Generate dates for the current week
+				const today = new Date();
+				const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+				const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay; // Calculate days until Monday (or from last Monday)
+
+				const monday = new Date(today);
+				monday.setDate(today.getDate() + mondayOffset);
+
+				// Update week display
+				updateWeekDisplay(monday);
+
+				// Create columns for each day
+				for (let i = 0; i < 7; i++) {
+					const date = new Date(monday);
+					date.setDate(monday.getDate() + i);
+
+					const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+					const dayNumber = date.getDate();
+					const month = date.toLocaleDateString("en-US", { month: "short" });
+
+					const dayColumn = document.createElement("div");
+					dayColumn.className =
+						"print-col bg-white border border-gray-100 rounded-xl overflow-hidden flex flex-col h-72 md:h-96";
+
+					// Highlight today
+					if (date.toDateString() === today.toDateString()) {
+						dayColumn.classList.add(
+							"border-primary-500",
+							"border-2",
+							"shadow-sm"
+						);
+					}
+
+					dayColumn.innerHTML = `
+          <div class="bg-white p-3 text-center border-b border-gray-100">
+            <div class="font-medium">${dayName}</div>
+            <div class="text-xs text-gray-500">${month} ${dayNumber}</div>
+          </div>
+          <div class="day-meals flex-grow p-3 overflow-y-auto" data-day="${dayName.toLowerCase()}">
+            <div class="flex flex-col items-center justify-center h-full text-gray-400 text-center empty-day-message">
+              <i class="material-icons mb-2">restaurant</i>
+              <p class="text-sm">Drag recipes here to plan your meals</p>
+            </div>
+          </div>
+        `;
+
+					const mealsContainer = dayColumn.querySelector(".day-meals");
+
+					// Add event listeners for drop operations
+					mealsContainer.addEventListener("dragover", handleDragOver);
+					mealsContainer.addEventListener("dragleave", handleDragLeave);
+					mealsContainer.addEventListener("drop", handleDrop);
+
+					calendarGrid.appendChild(dayColumn);
+				}
+			}
+
+			// Update week display
+			function updateWeekDisplay(monday) {
+				const sunday = new Date(monday);
+				sunday.setDate(monday.getDate() + 6);
+
+				const mondayStr = monday.toLocaleDateString("en-US", {
+					month: "long",
+					day: "numeric",
+				});
+				const sundayStr = sunday.toLocaleDateString("en-US", {
+					month: "long",
+					day: "numeric",
+					year: "numeric",
+				});
+
+				currentWeekDisplay.textContent = `${mondayStr} - ${sundayStr}`;
+			}
+
+			// Handle week navigation
+			document.getElementById("prev-week-btn").addEventListener("click", () => {
+				// In a real app, this would navigate to the previous week
+				showToast("Navigated to previous week", "info");
+			});
+
+			document.getElementById("next-week-btn").addEventListener("click", () => {
+				// In a real app, this would navigate to the next week
+				showToast("Navigated to next week", "info");
+			});
+
+			// Drag and drop functionality
+			let draggedRecipe = null;
+
+			function handleDragStart(e) {
+				draggedRecipe = this;
+				e.dataTransfer.effectAllowed = "copy";
+				e.dataTransfer.setData("text/plain", this.dataset.id);
+
+				// Add dragging class for visual feedback
+				this.classList.add("opacity-50");
+
+				// Create a custom drag image (optional)
+				const dragImage = this.cloneNode(true);
+				dragImage.style.width = "100px";
+				dragImage.style.height = "100px";
+				dragImage.style.opacity = "0.8";
+				dragImage.classList.add("drag-ghost");
+				document.body.appendChild(dragImage);
+				e.dataTransfer.setDragImage(dragImage, 50, 50);
+
+				// Remove the temporary element after a delay
+				setTimeout(() => {
+					document.body.removeChild(dragImage);
+				}, 0);
+			}
+
+			function handleDragOver(e) {
+				e.preventDefault();
+				this.classList.add(
+					"bg-primary-50",
+					"border-dashed",
+					"border-primary-300"
+				);
+
+				// Remove empty message if it exists
+				const emptyMessage = this.querySelector(".empty-day-message");
+				if (emptyMessage) {
+					emptyMessage.style.display = "none";
+				}
+
+				return false;
+			}
+
+			function handleDragLeave(e) {
+				this.classList.remove(
+					"bg-primary-50",
+					"border-dashed",
+					"border-primary-300"
+				);
+
+				// If no meal cards, show empty message again
+				const mealCards = this.querySelectorAll(".meal-card");
+				const emptyMessage = this.querySelector(".empty-day-message");
+
+				if (mealCards.length === 0 && emptyMessage) {
+					emptyMessage.style.display = "flex";
+				}
+			}
+
+			function handleDrop(e) {
+				e.preventDefault();
+				this.classList.remove(
+					"bg-primary-50",
+					"border-dashed",
+					"border-primary-300"
+				);
+
+				const recipeId = e.dataTransfer.getData("text/plain");
+				const recipe = recipes.find((r) => r.id == recipeId);
+
+				if (recipe) {
+					// Remove empty message if it exists
+					const emptyMessage = this.querySelector(".empty-day-message");
+					if (emptyMessage) {
+						emptyMessage.remove();
+					}
+
+					// Create meal card
+					const mealCard = document.createElement("div");
+					mealCard.className =
+						"meal-card bg-white rounded-lg p-3 shadow-sm mb-2 border-l-4 relative animate-fade-in cursor-pointer hover:shadow-md transition-all";
+					mealCard.dataset.id = recipe.id;
+
+					// Choose a meal time based on recipe category
+					let mealTime = "Dinner";
+					let mealType = "dinner";
+					let colorClass = "border-red-500";
+					let badgeClass = "bg-red-500";
+
+					if (recipe.category === "breakfast") {
+						mealTime = "Breakfast";
+						mealType = "breakfast";
+						colorClass = "border-blue-500";
+						badgeClass = "bg-blue-500";
+					} else if (recipe.category === "lunch") {
+						mealTime = "Lunch";
+						mealType = "lunch";
+						colorClass = "border-amber-500";
+						badgeClass = "bg-amber-500";
+					} else if (recipe.category === "snack") {
+						mealTime = "Snack";
+						mealType = "snack";
+						colorClass = "border-green-500";
+						badgeClass = "bg-green-500";
+					}
+
+					mealCard.dataset.mealType = mealType;
+					mealCard.classList.add(colorClass);
+
+					mealCard.innerHTML = `
+          <span class="absolute -top-2 right-2 ${badgeClass} text-white text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">${mealTime}</span>
+          <h4 class="font-medium text-sm mt-2 mb-1">${recipe.name}</h4>
+          <div class="flex items-center text-xs text-gray-500">
+            <span>${recipe.time}</span>
+            <span class="mx-1">•</span>
+            <span>${recipe.calories} cal</span>
+          </div>
+          <div class="meal-actions absolute bottom-2 right-2 flex gap-1 opacity-0 transition-opacity">
+            <button class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all" title="Edit time">
+              <i class="material-icons text-xs">schedule</i>
+            </button>
+            <button class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-all delete-meal" title="Remove">
+              <i class="material-icons text-xs">delete</i>
+            </button>
+          </div>
+        `;
+
+					// Add click event to show recipe details
+					mealCard.addEventListener("click", (e) => {
+						// Don't show details if clicking on action buttons
+						if (!e.target.closest(".meal-actions")) {
+							showRecipeDetails(recipe);
+						}
+					});
+
+					// Add delete functionality
+					const deleteBtn = mealCard.querySelector(".delete-meal");
+					deleteBtn.addEventListener("click", (e) => {
+						e.stopPropagation();
+						mealCard.remove();
+
+						// If no meal cards left, show empty message
+						const mealCards = this.querySelectorAll(".meal-card");
+						if (mealCards.length === 0) {
+							this.innerHTML = `
+              <div class="flex flex-col items-center justify-center h-full text-gray-400 text-center empty-day-message">
+                <i class="material-icons mb-2">restaurant</i>
+                <p class="text-sm">Drag recipes here to plan your meals</p>
+              </div>
+            `;
+						}
+
+						showToast("Meal removed from plan", "info");
+					});
+
+					// Add to the day column
+					this.appendChild(mealCard);
+
+					// Show success toast
+					showToast("Meal added to your plan!", "success");
+				}
+
+				// Reset dragged recipe
+				if (draggedRecipe) {
+					draggedRecipe.classList.remove("opacity-50");
+					draggedRecipe = null;
+				}
+
+				return false;
+			}
+
+			// Show recipe details
+			function showRecipeDetails(recipe) {
+				// Populate header
+				detailsHeader.innerHTML = `
+        <img src="${recipe.image}" alt="${
+					recipe.name
+				}" class="absolute inset-0 w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent flex flex-col justify-end p-6">
+          <h2 class="text-white text-2xl font-bold mb-2">${recipe.name}</h2>
+          <div class="flex flex-wrap gap-4">
+            <div class="flex items-center gap-1 text-white/90 text-sm">
+              <i class="material-icons text-sm">schedule</i>
+              <span>${recipe.time}</span>
+            </div>
+            <div class="flex items-center gap-1 text-white/90 text-sm">
+              <i class="material-icons text-sm">restaurant_menu</i>
+              <span>${
+								recipe.category.charAt(0).toUpperCase() +
+								recipe.category.slice(1)
+							}</span>
+            </div>
+            <div class="flex items-center gap-1 text-white/90 text-sm">
+              <i class="material-icons text-sm">people</i>
+              <span>${recipe.servings} servings</span>
+            </div>
+            <div class="flex items-center gap-1 text-white/90 text-sm">
+              <i class="material-icons text-sm">fitness_center</i>
+              <span>${recipe.difficulty}</span>
+            </div>
+          </div>
+        </div>
+        <button id="close-details" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70 transition-all">
+          <i class="material-icons">close</i>
+        </button>
+      `;
+
+				// Populate body
+				detailsBody.innerHTML = `
+        <div class="mb-6">
+          <p class="text-gray-700">${recipe.description}</p>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-4 pb-2 border-b border-gray-200">Nutrition Facts</h3>
+          <div class="flex flex-wrap gap-4">
+            <div class="bg-gray-50 p-3 rounded-lg min-w-[110px] text-center">
+              <div class="text-xl font-semibold">${recipe.calories}</div>
+              <div class="text-xs text-gray-500">Calories</div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg min-w-[110px] text-center">
+              <div class="text-xl font-semibold">${recipe.protein}</div>
+              <div class="text-xs text-gray-500">Protein</div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg min-w-[110px] text-center">
+              <div class="text-xl font-semibold">${recipe.carbs}</div>
+              <div class="text-xs text-gray-500">Carbs</div>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg min-w-[110px] text-center">
+              <div class="text-xl font-semibold">${recipe.fat}</div>
+              <div class="text-xs text-gray-500">Fat</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-4 pb-2 border-b border-gray-200">Ingredients</h3>
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            ${recipe.ingredients
+							.map(
+								(ingredient) => `
+              <li class="flex items-start gap-2 py-2 border-b border-dashed border-gray-100">
+                <i class="material-icons text-primary-500 shrink-0">fiber_manual_record</i>
+                <span>${ingredient}</span>
+              </li>
+            `
+							)
+							.join("")}
+          </ul>
+        </div>
+        
+        <div class="mb-6">
+          <h3 class="text-lg font-semibold mb-4 pb-2 border-b border-gray-200">Instructions</h3>
+          <ol class="list-decimal pl-5 space-y-3">
+            ${recipe.instructions
+							.map(
+								(instruction) => `
+              <li>${instruction}</li>
+            `
+							)
+							.join("")}
+          </ol>
+        </div>
+        
+        <div class="flex justify-end gap-2">
+          <button class="flex items-center gap-1 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all">
+            <i class="material-icons text-sm">print</i>
+            <span>Print Recipe</span>
+          </button>
+          <button class="flex items-center gap-1 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all">
+            <i class="material-icons text-sm">share</i>
+            <span>Share</span>
+          </button>
+          <button class="flex items-center gap-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-all">
+            <i class="material-icons text-sm">add</i>
+            <span>Add to Meal Plan</span>
+          </button>
+        </div>
+      `;
+
+				// Show the modal
+				recipeDetails.classList.add("opacity-100", "pointer-events-auto");
+				recipeDetails
+					.querySelector(".max-w-3xl")
+					.classList.add("translate-y-0");
+
+				// Add close button functionality
+				document
+					.getElementById("close-details")
+					.addEventListener("click", () => {
+						recipeDetails.classList.remove(
+							"opacity-100",
+							"pointer-events-auto"
+						);
+						recipeDetails
+							.querySelector(".max-w-3xl")
+							.classList.remove("translate-y-0");
+					});
+
+				// Close when clicking outside the content
+				recipeDetails.addEventListener("click", (e) => {
+					if (e.target === recipeDetails) {
+						recipeDetails.classList.remove(
+							"opacity-100",
+							"pointer-events-auto"
+						);
+						recipeDetails
+							.querySelector(".max-w-3xl")
+							.classList.remove("translate-y-0");
+					}
+				});
+			}
+
+			// Filter recipes
+			function filterRecipes() {
+				currentSearch = recipeSearch.value;
+				currentCategory = categoryFilter.value;
+				currentDiet = dietFilter.value;
+				currentPage = 1; // Reset to first page on filter change
+				renderRecipes();
+			}
+
+			// Show toast notification
+			function showToast(message, type = "default") {
+				toastMessage.textContent = message;
+
+				// Set toast type
+				toast.className =
+					"fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transform translate-y-0 opacity-100 transition-all duration-300 z-50 no-print";
+
+				if (type === "success") {
+					toast.classList.add("bg-green-600", "text-white");
+					toast.querySelector(".material-icons").textContent = "check_circle";
+				} else if (type === "error") {
+					toast.classList.add("bg-red-600", "text-white");
+					toast.querySelector(".material-icons").textContent = "error";
+				} else if (type === "info") {
+					toast.classList.add("bg-blue-600", "text-white");
+					toast.querySelector(".material-icons").textContent = "info";
+				} else {
+					toast.classList.add("bg-primary-600", "text-white");
+				}
+
+				// Show toast
+				toast.classList.remove("translate-y-20", "opacity-0");
+
+				// Hide toast after 3 seconds
+				setTimeout(() => {
+					toast.classList.add("translate-y-20", "opacity-0");
+				}, 3000);
+			}
+
+			// Add event listeners for filtering
+			recipeSearch.addEventListener("input", filterRecipes);
+			categoryFilter.addEventListener("change", filterRecipes);
+			dietFilter.addEventListener("change", filterRecipes);
+
+			// Initialize the app
+			function initApp() {
+				renderRecipes(); // Replace initializeRecipes with renderRecipes
+				initializeCalendar();
+
+				// Attach remove button listeners
+				attachRemoveButtonListeners();
+			}
+
+			// Run the app
+			document.addEventListener("DOMContentLoaded", initApp);
+		</script>
+	</body>
+</html>
+
+.nav-tooltip { display: none; } .section-title::after { width: 40px; }
+.section-title:hover::after { width: 60px; } .neumorph-nav { position: fixed;
+top: 0; left: 0; width: 280px; height: 100vh; z-index: 50; transform:
+translateX(-100%); transition: transform 0.3s ease; overflow-y: auto;
+padding-top: 3rem; } .neumorph-nav.mobile-nav-open { transform: translateX(0); }
