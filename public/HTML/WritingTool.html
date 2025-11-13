@@ -1,0 +1,3696 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CodeCollab Enterprise - Collaborative Technical Documentation Platform</title>
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/icons/code-slash.svg"
+		/>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/diff/5.1.0/diff.min.js"></script>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap");
+
+			:root {
+				--primary: #0f62fe;
+				--primary-light: #4589ff;
+				--primary-dark: #0043ce;
+				--secondary: #525252;
+				--accent: #1192e8;
+				--text: #161616;
+				--background: #f4f4f4;
+				--surface: #ffffff;
+				--border: #e0e0e0;
+				--success: #24a148;
+				--error: #da1e28;
+				--warning: #f1c21b;
+				--highlight: #fff8e1;
+			}
+
+			body {
+				font-family: "Inter", system-ui, -apple-system, sans-serif;
+				background-color: var(--background);
+				color: var(--text);
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+				font-size: 15px;
+			}
+
+			h1,
+			h2,
+			h3,
+			h4,
+			h5,
+			h6 {
+				font-family: "Poppins", sans-serif;
+			}
+
+			.neumorphic {
+				box-shadow: 5px 5px 10px rgba(174, 174, 192, 0.25),
+					-5px -5px 10px rgba(255, 255, 255, 0.55);
+				border-radius: 12px;
+				background: var(--surface);
+				border: 1px solid rgba(0, 0, 0, 0.05);
+			}
+
+			.neumorphic-inset {
+				box-shadow: inset 4px 4px 8px rgba(174, 174, 192, 0.2),
+					inset -4px -4px 8px rgba(255, 255, 255, 0.7);
+				border-radius: 8px;
+				background: var(--background);
+				border: 1px solid rgba(0, 0, 0, 0.05);
+			}
+
+			.neumorphic-button {
+				padding: 8px 18px;
+				border-radius: 8px;
+				border: 1px solid rgba(0, 0, 0, 0.05);
+				background: linear-gradient(145deg, #ffffff, #f5f5f5);
+				box-shadow: 3px 3px 6px rgba(174, 174, 192, 0.2),
+					-3px -3px 6px rgba(255, 255, 255, 0.7);
+				transition: all 0.2s ease;
+				font-weight: 500;
+				cursor: pointer;
+			}
+
+			.neumorphic-button:hover {
+				box-shadow: 4px 4px 8px rgba(174, 174, 192, 0.3),
+					-4px -4px 8px rgba(255, 255, 255, 0.8);
+				transform: translateY(-1px);
+			}
+
+			.neumorphic-button:active {
+				box-shadow: inset 3px 3px 6px rgba(174, 174, 192, 0.2),
+					inset -3px -3px 6px rgba(255, 255, 255, 0.7);
+				transform: translateY(0);
+			}
+
+			.button-primary {
+				background: var(--primary);
+				color: white;
+				box-shadow: 3px 3px 6px rgba(15, 98, 254, 0.25);
+			}
+
+			.button-primary:hover {
+				background: var(--primary-light);
+				box-shadow: 4px 4px 8px rgba(15, 98, 254, 0.3);
+			}
+
+			.button-primary:active {
+				background: var(--primary-dark);
+				box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.1);
+			}
+
+			.editor-container,
+			.preview-container {
+				height: 500px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.content-wrapper {
+				flex: 1;
+				overflow: hidden;
+				position: relative;
+			}
+
+			#editor {
+				height: 100%;
+				resize: none;
+				font-family: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+				line-height: 1.6;
+				tab-size: 4;
+				font-size: 0.9rem;
+				overflow-y: auto;
+			}
+
+			#preview {
+				height: 100%;
+				overflow-y: auto;
+				line-height: 1.6;
+			}
+
+			#preview h1 {
+				font-size: 2em;
+				margin-top: 1em;
+				margin-bottom: 0.5em;
+				font-weight: 700;
+				color: var(--text);
+				border-bottom: 1px solid var(--border);
+				padding-bottom: 0.3em;
+			}
+			#preview h2 {
+				font-size: 1.5em;
+				margin-top: 1em;
+				margin-bottom: 0.5em;
+				font-weight: 600;
+				color: var(--text);
+			}
+			#preview h3 {
+				font-size: 1.3em;
+				margin-top: 1em;
+				margin-bottom: 0.5em;
+				font-weight: 600;
+				color: var(--text);
+			}
+			#preview p {
+				margin-bottom: 1em;
+			}
+			#preview ul,
+			#preview ol {
+				margin-bottom: 1em;
+				padding-left: 2em;
+			}
+			#preview li {
+				margin-bottom: 0.5em;
+			}
+			#preview code {
+				font-family: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+				background-color: #f1f5f9;
+				padding: 0.2em 0.4em;
+				border-radius: 3px;
+				font-size: 0.9em;
+			}
+			#preview pre {
+				background-color: #1e293b;
+				color: #f8fafc;
+				padding: 1em;
+				border-radius: 8px;
+				overflow-x: auto;
+				margin-bottom: 1em;
+			}
+			#preview pre code {
+				background-color: transparent;
+				color: inherit;
+				padding: 0;
+				font-size: 0.9em;
+			}
+			#preview blockquote {
+				border-left: 4px solid var(--primary);
+				padding-left: 1em;
+				margin-left: 0;
+				margin-bottom: 1em;
+				color: var(--secondary);
+			}
+			#preview img {
+				max-width: 100%;
+				height: auto;
+				border-radius: 8px;
+				margin: 1em 0;
+			}
+			#preview table {
+				border-collapse: collapse;
+				width: 100%;
+				margin-bottom: 1em;
+			}
+			#preview th,
+			#preview td {
+				border: 1px solid var(--border);
+				padding: 0.5em;
+			}
+			#preview th {
+				background-color: #f1f5f9;
+			}
+
+			.comment-thread {
+				max-height: 300px;
+				overflow-y: auto;
+			}
+
+			.comment {
+				position: relative;
+				padding: 10px;
+				margin-bottom: 10px;
+				border-radius: 8px;
+				background-color: #f8fafc;
+				border-left: 3px solid var(--primary);
+			}
+
+			.fade-in {
+				animation: fadeIn 0.3s ease-in-out;
+			}
+
+			.slide-in {
+				animation: slideIn 0.3s ease-in-out;
+			}
+
+			.scale-in {
+				animation: scaleIn 0.3s ease-in-out;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			@keyframes slideIn {
+				from {
+					transform: translateY(20px);
+					opacity: 0;
+				}
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes scaleIn {
+				from {
+					transform: scale(0.9);
+					opacity: 0;
+				}
+				to {
+					transform: scale(1);
+					opacity: 1;
+				}
+			}
+
+			.toast {
+				position: fixed;
+				bottom: 20px;
+				right: 20px;
+				padding: 12px 20px;
+				background-color: var(--surface);
+				color: var(--text);
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+				z-index: 1000;
+				opacity: 0;
+				transition: opacity 0.3s, transform 0.3s;
+				transform: translateY(20px);
+				font-size: 0.9rem;
+				max-width: 300px;
+			}
+
+			.toast.show {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			.toast.success {
+				border-left: 4px solid var(--success);
+			}
+			.toast.error {
+				border-left: 4px solid var(--error);
+			}
+			.toast.warning {
+				border-left: 4px solid var(--warning);
+			}
+			.toast.info {
+				border-left: 4px solid var(--primary);
+			}
+
+			.version-slider {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 100%;
+				height: 6px;
+				background: var(--border);
+				border-radius: 4px;
+				outline: none;
+			}
+
+			.version-slider::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				appearance: none;
+				width: 18px;
+				height: 18px;
+				border-radius: 50%;
+				background: var(--primary);
+				cursor: pointer;
+				transition: background 0.3s, transform 0.3s;
+				border: 2px solid white;
+			}
+
+			.version-slider::-webkit-slider-thumb:hover {
+				background: var(--primary-dark);
+				transform: scale(1.1);
+			}
+
+			.tab-button {
+				padding: 10px 20px;
+				border: none;
+				background: none;
+				cursor: pointer;
+				transition: all 0.2s;
+				border-bottom: 2px solid transparent;
+				font-size: 0.95rem;
+				font-weight: 500;
+			}
+
+			.tab-button.active {
+				border-bottom: 2px solid var(--primary);
+				color: var(--primary);
+				font-weight: 600;
+			}
+
+			.presence-indicator {
+				display: inline-block;
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				margin-right: 5px;
+			}
+
+			.presence-online {
+				background-color: var(--success);
+				box-shadow: 0 0 0 2px rgba(36, 161, 72, 0.2);
+			}
+
+			.presence-away {
+				background-color: var(--warning);
+				box-shadow: 0 0 0 2px rgba(241, 194, 27, 0.2);
+			}
+
+			.avatar-group {
+				display: flex;
+				align-items: center;
+			}
+
+			.avatar-group img {
+				border: 2px solid white;
+				margin-left: -8px;
+			}
+
+			.avatar-group img:first-child {
+				margin-left: 0;
+			}
+
+			.toolbar-button {
+				width: 36px;
+				height: 36px;
+				border-radius: 6px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: all 0.2s;
+				cursor: pointer;
+			}
+
+			.toolbar-button:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+			}
+
+			.toolbar-button.active {
+				background-color: var(--primary-light);
+				color: white;
+			}
+
+			.dropdown-menu {
+				position: absolute;
+				right: 0;
+				top: 100%;
+				background: white;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				padding: 8px 0;
+				z-index: 10;
+				min-width: 180px;
+			}
+
+			.dropdown-item {
+				padding: 8px 16px;
+				display: block;
+				width: 100%;
+				text-align: left;
+				transition: background 0.2s;
+			}
+
+			.dropdown-item:hover {
+				background-color: rgba(0, 0, 0, 0.05);
+			}
+
+			.tooltip {
+				position: relative;
+			}
+
+			.tooltip .tooltip-text {
+				visibility: hidden;
+				width: 120px;
+				background-color: #333;
+				color: #fff;
+				text-align: center;
+				border-radius: 6px;
+				padding: 5px;
+				position: absolute;
+				z-index: 1;
+				bottom: 125%;
+				left: 50%;
+				transform: translateX(-50%);
+				opacity: 0;
+				transition: opacity 0.3s;
+				font-size: 0.8rem;
+			}
+
+			.tooltip:hover .tooltip-text {
+				visibility: visible;
+				opacity: 1;
+			}
+
+			.modal {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+				opacity: 0;
+				visibility: hidden;
+				transition: opacity 0.3s, visibility 0.3s;
+			}
+
+			.modal.visible {
+				opacity: 1;
+				visibility: visible;
+			}
+
+			.modal-content {
+				background-color: white;
+				border-radius: 12px;
+				max-width: 500px;
+				width: 90%;
+				max-height: 90vh;
+				overflow-y: auto;
+				padding: 24px;
+				box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+				transform: scale(0.9);
+				transition: transform 0.3s;
+			}
+
+			.modal.visible .modal-content {
+				transform: scale(1);
+			}
+
+			.collaboration-cursor {
+				position: absolute;
+				width: 2px;
+				height: 20px;
+				background-color: var(--primary);
+				pointer-events: none;
+				z-index: 10;
+			}
+
+			.collaboration-cursor::after {
+				content: attr(data-user);
+				position: absolute;
+				top: -18px;
+				left: 0;
+				background-color: var(--primary);
+				color: white;
+				padding: 2px 6px;
+				border-radius: 4px;
+				white-space: nowrap;
+				font-size: 10px;
+			}
+
+			.collaboration-typing {
+				position: absolute;
+				bottom: 10px;
+				left: 10px;
+				background-color: var(--surface);
+				border-radius: 20px;
+				padding: 6px 12px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+				z-index: 100;
+				display: flex;
+				align-items: center;
+				font-size: 12px;
+				color: var(--secondary);
+				opacity: 0;
+				transform: translateY(10px);
+				transition: opacity 0.3s, transform 0.3s;
+			}
+
+			.collaboration-typing.visible {
+				opacity: 1;
+				transform: translateY(0);
+			}
+
+			.typing-indicator {
+				display: flex;
+				margin-left: 6px;
+			}
+
+			.typing-indicator span {
+				width: 4px;
+				height: 4px;
+				margin: 0 1px;
+				background-color: var(--secondary);
+				border-radius: 50%;
+				animation: typing 1.4s infinite ease-in-out;
+			}
+
+			.typing-indicator span:nth-child(1) {
+				animation-delay: 0s;
+			}
+			.typing-indicator span:nth-child(2) {
+				animation-delay: 0.2s;
+			}
+			.typing-indicator span:nth-child(3) {
+				animation-delay: 0.4s;
+			}
+
+			@keyframes typing {
+				0% {
+					transform: translateY(0);
+				}
+				25% {
+					transform: translateY(-5px);
+				}
+				50% {
+					transform: translateY(0);
+				}
+			}
+
+			.highlighted-change {
+				background-color: var(--highlight);
+				padding: 2px 0;
+				transition: background-color 0.3s;
+			}
+
+			.full-screen-preview {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: white;
+				z-index: 1000;
+				padding: 20px;
+				overflow-y: auto;
+				display: none;
+			}
+
+			.full-screen-preview.active {
+				display: block;
+			}
+
+			.floating-avatar {
+				position: absolute;
+				width: 30px;
+				height: 30px;
+				border-radius: 50%;
+				border: 2px solid white;
+				box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+				pointer-events: none;
+				z-index: 10;
+				transition: transform 0.1s ease-out;
+			}
+
+			kbd {
+				background-color: #f1f1f1;
+				border: 1px solid #ccc;
+				border-radius: 3px;
+				box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+				color: #333;
+				display: inline-block;
+				font-family: monospace;
+				font-size: 0.85em;
+				font-weight: 700;
+				line-height: 1;
+				padding: 2px 4px;
+				white-space: nowrap;
+			}
+
+			.shortcuts-panel {
+				display: none;
+				position: absolute;
+				top: 100%;
+				right: 0;
+				background-color: white;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				padding: 16px;
+				z-index: 20;
+				width: 320px;
+				margin-top: 10px;
+			}
+
+			.shortcuts-panel.visible {
+				display: block;
+			}
+
+			@media (max-width: 640px) {
+				.neumorphic-button {
+					padding: 6px 12px;
+					font-size: 0.85rem;
+				}
+
+				h2 {
+					font-size: 1.4rem;
+				}
+
+				h3 {
+					font-size: 1.1rem;
+				}
+
+				.avatar-group img {
+					width: 28px;
+					height: 28px;
+				}
+
+				.comment {
+					padding: 8px;
+					font-size: 0.9rem;
+				}
+
+				.editor-container,
+				.preview-container {
+					height: 400px;
+				}
+			}
+
+			.footer-link {
+				transition: color 0.2s;
+			}
+
+			.footer-link:hover {
+				color: var(--primary);
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+			}
+
+			.logo-icon {
+				color: var(--primary);
+				font-size: 1.5rem;
+				margin-right: 0.5rem;
+			}
+
+			::-webkit-scrollbar {
+				width: 6px;
+				height: 6px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: #f1f1f1;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: #c1c1c1;
+				border-radius: 4px;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background: #a1a1a1;
+			}
+
+			.team-avatar {
+				transition: transform 0.2s;
+			}
+
+			.team-avatar:hover {
+				transform: translateY(-2px);
+			}
+
+			.editor-toolbar {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			@media (max-width: 480px) {
+				.editor-toolbar {
+					gap: 4px;
+				}
+
+				.toolbar-button {
+					width: 32px;
+					height: 32px;
+					font-size: 0.85rem;
+				}
+
+				.comment {
+					font-size: 0.8rem;
+				}
+
+				.editor-container,
+				.preview-container {
+					height: 350px;
+				}
+			}
+
+			.loading {
+				position: relative;
+			}
+
+			.loading:after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 16px;
+				height: 16px;
+				margin-top: -8px;
+				margin-left: -8px;
+				border-radius: 50%;
+				border: 2px solid rgba(0, 0, 0, 0.1);
+				border-top-color: var(--primary);
+				animation: spin 0.8s linear infinite;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
+			.notification-badge {
+				position: absolute;
+				background-color: var(--error);
+				color: white;
+				font-size: 10px;
+				width: 16px;
+				height: 16px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				top: -5px;
+				right: -5px;
+			}
+
+			.notification-panel {
+				position: absolute;
+				width: 300px;
+				max-height: 400px;
+				overflow-y: auto;
+				background-color: white;
+				border-radius: 8px;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+				top: 100%;
+				right: 0;
+				margin-top: 10px;
+				z-index: 30;
+				display: none;
+			}
+
+			.notification-panel.visible {
+				display: block;
+			}
+
+			.notification-item {
+				padding: 10px 15px;
+				border-bottom: 1px solid var(--border);
+				cursor: pointer;
+			}
+
+			.notification-item:hover {
+				background-color: rgba(0, 0, 0, 0.02);
+			}
+
+			.notification-item:last-child {
+				border-bottom: none;
+			}
+
+			.notification-item.unread {
+				background-color: rgba(15, 98, 254, 0.05);
+			}
+
+			.notification-item .notification-time {
+				font-size: 0.75rem;
+				color: var(--secondary);
+			}
+
+			.share-options {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 10px;
+				margin-top: 15px;
+			}
+
+			.share-option {
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				padding: 10px;
+				text-align: center;
+				cursor: pointer;
+				transition: all 0.2s;
+			}
+
+			.share-option:hover {
+				border-color: var(--primary);
+				background-color: rgba(15, 98, 254, 0.05);
+			}
+
+			.share-option i {
+				font-size: 24px;
+				color: var(--primary);
+				margin-bottom: 5px;
+			}
+
+			.diff-added {
+				background-color: rgba(36, 161, 72, 0.1);
+				border-left: 3px solid var(--success);
+				padding-left: 5px;
+			}
+
+			.diff-removed {
+				background-color: rgba(218, 30, 40, 0.1);
+				border-left: 3px solid var(--error);
+				padding-left: 5px;
+				text-decoration: line-through;
+			}
+
+			@media (max-width: 375px) {
+				body {
+					font-size: 14px;
+				}
+
+				.toolbar-button {
+					width: 28px;
+					height: 28px;
+				}
+
+				.editor-toolbar {
+					gap: 2px;
+				}
+
+				h2 {
+					font-size: 1.3rem;
+				}
+
+				.neumorphic-button {
+					padding: 5px 10px;
+					font-size: 0.8rem;
+				}
+
+				.share-options {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@keyframes blink {
+				0%,
+				100% {
+					opacity: 1;
+				}
+				50% {
+					opacity: 0;
+				}
+			}
+
+			.cursor-blink {
+				animation: blink 1s infinite;
+			}
+		</style>
+	</head>
+	<body class="min-h-screen">
+		<!-- Navigation -->
+		<nav class="bg-white border-b border-gray-200 fixed w-full z-10 shadow-sm">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div class="flex justify-between h-16">
+					<div class="flex items-center">
+						<div class="flex-shrink-0 flex items-center">
+							<span class="logo">
+								<i class="fas fa-code-branch logo-icon"></i>
+								<span class="text-xl font-bold text-gray-800"
+									>Code<span class="text-blue-600">Collab</span>
+									Enterprise</span
+								>
+							</span>
+						</div>
+						<div class="hidden md:ml-8 md:flex md:space-x-8">
+							<a
+								href="#"
+								class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+							>
+								Home
+							</a>
+							<a
+								href="#"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-200"
+							>
+								Projects
+							</a>
+							<a
+								href="#"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-200"
+							>
+								Teams
+							</a>
+							<a
+								href="#"
+								class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-all duration-200"
+							>
+								Documentation
+							</a>
+						</div>
+					</div>
+					<div class="hidden md:ml-6 md:flex md:items-center">
+						<div class="relative">
+							<button
+								type="button"
+								class="relative bg-white p-1 rounded-full text-gray-500 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 mr-3"
+								id="notificationButton"
+							>
+								<span class="sr-only">View notifications</span>
+								<i class="fas fa-bell"></i>
+								<span class="notification-badge" id="notificationBadge">3</span>
+							</button>
+							<div class="notification-panel" id="notificationPanel">
+								<div class="p-3 border-b border-gray-200">
+									<div class="flex justify-between items-center">
+										<h3 class="font-medium">Notifications</h3>
+										<button class="text-xs text-blue-600" id="markAllReadBtn">
+											Mark all as read
+										</button>
+									</div>
+								</div>
+								<div class="notification-item unread">
+									<div class="flex items-start">
+										<img
+											class="h-8 w-8 rounded-full mr-3"
+											src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+											alt=""
+										/>
+										<div>
+											<p class="text-sm">
+												<strong>Sarah Johnson</strong> made changes to the
+												Authentication section
+											</p>
+											<span class="notification-time">5 minutes ago</span>
+										</div>
+									</div>
+								</div>
+								<div class="notification-item unread">
+									<div class="flex items-start">
+										<img
+											class="h-8 w-8 rounded-full mr-3"
+											src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+											alt=""
+										/>
+										<div>
+											<p class="text-sm">
+												<strong>Michael Wilson</strong> replied to your comment
+											</p>
+											<span class="notification-time">12 minutes ago</span>
+										</div>
+									</div>
+								</div>
+								<div class="notification-item unread">
+									<div class="flex items-start">
+										<img
+											class="h-8 w-8 rounded-full mr-3"
+											src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+											alt=""
+										/>
+										<div>
+											<p class="text-sm">
+												<strong>Robert Garcia</strong> shared a new document
+												with you
+											</p>
+											<span class="notification-time">1 hour ago</span>
+										</div>
+									</div>
+								</div>
+								<div class="notification-item">
+									<div class="flex items-start">
+										<img
+											class="h-8 w-8 rounded-full mr-3"
+											src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+											alt=""
+										/>
+										<div>
+											<p class="text-sm">
+												<strong>Lindsay Walton</strong> mentioned you in a
+												comment
+											</p>
+											<span class="notification-time">Yesterday</span>
+										</div>
+									</div>
+								</div>
+								<div class="notification-item">
+									<div class="flex items-start">
+										<div
+											class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-3"
+										>
+											<i class="fas fa-calendar-alt text-blue-600"></i>
+										</div>
+										<div>
+											<p class="text-sm">
+												Reminder: Team meeting in 30 minutes
+											</p>
+											<span class="notification-time">Yesterday</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="relative">
+							<button
+								type="button"
+								class="bg-white p-1 rounded-full text-gray-500 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 mr-3"
+								id="settingsButton"
+							>
+								<span class="sr-only">View settings</span>
+								<i class="fas fa-cog"></i>
+							</button>
+							<div class="dropdown-menu hidden" id="settingsDropdown">
+								<a href="#" class="dropdown-item">Appearance</a>
+								<a href="#" class="dropdown-item">Preferences</a>
+								<a href="#" class="dropdown-item">Keyboard Shortcuts</a>
+								<a href="#" class="dropdown-item">Language</a>
+								<div class="border-t border-gray-100 my-1"></div>
+								<a href="#" class="dropdown-item">Advanced Settings</a>
+							</div>
+						</div>
+
+						<!-- Profile dropdown -->
+						<div class="ml-3 relative" id="profileDropdown">
+							<div>
+								<button
+									type="button"
+									class="flex text-sm bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+									id="user-menu-button"
+								>
+									<span class="sr-only">Open user menu</span>
+									<img
+										class="h-8 w-8 rounded-full"
+										src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+										alt=""
+									/>
+								</button>
+							</div>
+							<div class="dropdown-menu hidden mt-2" id="userDropdown">
+								<a href="#" class="dropdown-item">My Profile</a>
+								<a href="#" class="dropdown-item">Settings</a>
+								<a href="#" class="dropdown-item">API Keys</a>
+								<div class="border-t border-gray-100 my-1"></div>
+								<a href="#" class="dropdown-item text-red-500">Sign out</a>
+							</div>
+						</div>
+					</div>
+					<div class="-mr-2 flex items-center md:hidden">
+						<!-- Mobile menu button -->
+						<button
+							type="button"
+							class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+							id="mobile-menu-button"
+						>
+							<span class="sr-only">Open main menu</span>
+							<i class="fas fa-bars"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile menu, show/hide based on menu state. -->
+			<div class="md:hidden hidden" id="mobile-menu">
+				<div class="pt-2 pb-3 space-y-1">
+					<a
+						href="#"
+						class="bg-blue-50 border-blue-500 text-blue-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+					>
+						Home
+					</a>
+					<a
+						href="#"
+						class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+					>
+						Projects
+					</a>
+					<a
+						href="#"
+						class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+					>
+						Teams
+					</a>
+					<a
+						href="#"
+						class="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+					>
+						Documentation
+					</a>
+				</div>
+				<div class="pt-4 pb-3 border-t border-gray-200">
+					<div class="flex items-center px-4">
+						<div class="flex-shrink-0">
+							<img
+								class="h-10 w-10 rounded-full"
+								src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+								alt=""
+							/>
+						</div>
+						<div class="ml-3">
+							<div class="text-base font-medium text-gray-800">Tom Cook</div>
+							<div class="text-sm font-medium text-gray-500">
+								tom@example.com
+							</div>
+						</div>
+					</div>
+					<div class="mt-3 space-y-1">
+						<a
+							href="#"
+							class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+						>
+							Your Profile
+						</a>
+						<a
+							href="#"
+							class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+						>
+							Settings
+						</a>
+						<a
+							href="#"
+							class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+						>
+							Notifications
+						</a>
+						<a
+							href="#"
+							class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
+						>
+							Sign out
+						</a>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<!-- Main Content -->
+		<main class="pt-16 pb-10">
+			<!-- Project header -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+				<div
+					class="py-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between mt-6"
+				>
+					<div>
+						<div class="flex items-center">
+							<h2
+								class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl mr-3"
+							>
+								API Documentation
+							</h2>
+							<span
+								class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded"
+								>v2.1.0</span
+							>
+						</div>
+						<p class="mt-2 text-sm text-gray-500 flex items-center">
+							<i class="fas fa-history mr-1"></i> Last updated 20 minutes ago by
+							Tom Cook
+						</p>
+					</div>
+					<div class="mt-4 flex flex-wrap gap-2 items-center sm:mt-0 sm:ml-4">
+						<div class="tooltip">
+							<button
+								type="button"
+								class="neumorphic-button text-gray-700 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium flex items-center"
+								id="historyButton"
+							>
+								<i class="fas fa-history"></i>
+								<span class="ml-1 sm:ml-2 hidden xs:inline">History</span>
+							</button>
+							<span class="tooltip-text">View edit history</span>
+						</div>
+						<div class="tooltip">
+							<button
+								type="button"
+								class="neumorphic-button text-blue-600 px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium flex items-center"
+								id="shareButton"
+							>
+								<i class="fas fa-share-alt"></i>
+								<span class="ml-1 sm:ml-2 hidden xs:inline">Share</span>
+							</button>
+							<span class="tooltip-text">Share document</span>
+						</div>
+						<div class="tooltip">
+							<button
+								type="button"
+								class="neumorphic-button button-primary px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium flex items-center"
+								id="saveButton"
+							>
+								<i class="fas fa-save"></i>
+								<span class="ml-1 sm:ml-2 hidden xs:inline">Save</span>
+							</button>
+							<span class="tooltip-text">Save changes</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Breadcrumbs -->
+			<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 mt-4">
+				<nav class="flex flex-wrap" aria-label="Breadcrumb">
+					<ol class="flex flex-wrap items-center text-xs sm:text-sm">
+						<li class="flex items-center">
+							<a
+								href="#"
+								class="inline-flex items-center font-medium text-gray-700 hover:text-blue-600"
+							>
+								<i class="fas fa-home mr-1"></i>
+								<span>Home</span>
+							</a>
+						</li>
+						<li class="flex items-center">
+							<i class="fas fa-chevron-right text-gray-400 mx-1 text-xs"></i>
+							<a href="#" class="font-medium text-gray-700 hover:text-blue-600"
+								>Projects</a
+							>
+						</li>
+						<li class="flex items-center">
+							<i class="fas fa-chevron-right text-gray-400 mx-1 text-xs"></i>
+							<a
+								href="#"
+								class="font-medium text-gray-700 hover:text-blue-600 truncate max-w-[80px] sm:max-w-none"
+								>Payment API</a
+							>
+						</li>
+						<li aria-current="page" class="flex items-center">
+							<i class="fas fa-chevron-right text-gray-400 mx-1 text-xs"></i>
+							<span
+								class="font-medium text-gray-500 truncate max-w-[100px] sm:max-w-none"
+								>API Documentation</span
+							>
+						</li>
+					</ol>
+				</nav>
+			</div>
+
+			<!-- Collaborators bar -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+				<div
+					class="bg-white shadow-sm rounded-lg p-4 flex flex-wrap items-center"
+				>
+					<div class="mr-4 mb-2">
+						<span class="text-sm font-medium text-gray-700"
+							>Collaborators:</span
+						>
+					</div>
+					<div class="flex flex-wrap items-center flex-grow">
+						<div class="avatar-group mr-4">
+							<div class="team-avatar relative inline-block">
+								<img
+									class="h-8 w-8 rounded-full border-2 border-white"
+									src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+									alt=""
+									title="Sarah Johnson"
+									data-user="Sarah Johnson"
+									data-color="#24a148"
+								/>
+								<span
+									class="presence-indicator presence-online absolute bottom-0 right-0"
+								></span>
+							</div>
+							<div class="team-avatar relative inline-block">
+								<img
+									class="h-8 w-8 rounded-full border-2 border-white -ml-2"
+									src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+									alt=""
+									title="Michael Wilson"
+									data-user="Michael Wilson"
+									data-color="#1192e8"
+								/>
+								<span
+									class="presence-indicator presence-online absolute bottom-0 right-0"
+								></span>
+							</div>
+							<div class="team-avatar relative inline-block">
+								<img
+									class="h-8 w-8 rounded-full border-2 border-white -ml-2"
+									src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+									alt=""
+									title="Robert Garcia"
+									data-user="Robert Garcia"
+									data-color="#f1c21b"
+								/>
+								<span
+									class="presence-indicator presence-away absolute bottom-0 right-0"
+								></span>
+							</div>
+							<div class="team-avatar relative inline-block">
+								<img
+									class="h-8 w-8 rounded-full border-2 border-white -ml-2"
+									src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+									alt=""
+									title="Lindsay Walton"
+									data-user="Lindsay Walton"
+									data-color="#da1e28"
+								/>
+								<span
+									class="presence-indicator presence-online absolute bottom-0 right-0"
+								></span>
+							</div>
+						</div>
+						<div class="tooltip">
+							<button
+								class="neumorphic-button text-blue-600 px-3 py-1 text-sm font-medium mb-0"
+								id="inviteButton"
+							>
+								<i class="fas fa-plus mr-1"></i>
+								Invite
+							</button>
+							<span class="tooltip-text">Invite team members</span>
+						</div>
+						<div class="ml-auto flex items-center">
+							<span class="text-sm text-gray-500 mr-2"
+								><i class="fas fa-users mr-1"></i> 4 active</span
+							>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Version slider -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+				<div class="bg-white shadow-sm rounded-lg p-4">
+					<div
+						class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4"
+					>
+						<h3 class="text-lg font-medium text-gray-700">Version Control</h3>
+						<div class="flex items-center mt-2 sm:mt-0">
+							<span class="text-sm text-gray-500 mr-3" id="versionLabel"
+								>Version 2.1.0</span
+							>
+							<button
+								class="neumorphic-button text-gray-700 px-3 py-1 text-sm font-medium"
+								id="compareButton"
+							>
+								<i class="fas fa-code-branch mr-1"></i>
+								Compare
+							</button>
+						</div>
+					</div>
+					<div>
+						<input
+							type="range"
+							min="1"
+							max="4"
+							value="4"
+							class="version-slider"
+							id="versionSlider"
+						/>
+						<div class="flex justify-between mt-2 text-xs text-gray-500">
+							<span>v1.0.0</span>
+							<span>v1.5.0</span>
+							<span>v2.0.0</span>
+							<span class="text-blue-600 font-medium">v2.1.0 (Latest)</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Desktop/Mobile Toggle Tabs -->
+			<div class="sm:hidden max-w-7xl mx-auto px-4 mt-6">
+				<div class="flex border-b border-gray-200">
+					<button class="tab-button active" data-tab="editor-tab">
+						Editor
+					</button>
+					<button class="tab-button" data-tab="preview-tab">Preview</button>
+					<button class="tab-button" data-tab="comments-tab">Comments</button>
+				</div>
+			</div>
+
+			<!-- Main Editor Area -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+				<div
+					class="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6"
+				>
+					<!-- Left Column: Editor -->
+					<div class="w-full sm:w-1/2 tab-content" id="editor-tab">
+						<div class="neumorphic bg-white p-4 editor-container">
+							<div class="flex justify-between items-center mb-4">
+								<h3 class="text-lg font-medium text-gray-700">
+									Markdown Editor
+								</h3>
+								<div class="editor-toolbar">
+									<button class="toolbar-button tooltip" data-action="heading">
+										<i class="fas fa-heading"></i>
+										<span class="tooltip-text">Heading</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="bold">
+										<i class="fas fa-bold"></i>
+										<span class="tooltip-text">Bold</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="italic">
+										<i class="fas fa-italic"></i>
+										<span class="tooltip-text">Italic</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="list-ul">
+										<i class="fas fa-list-ul"></i>
+										<span class="tooltip-text">Bullet List</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="list-ol">
+										<i class="fas fa-list-ol"></i>
+										<span class="tooltip-text">Numbered List</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="link">
+										<i class="fas fa-link"></i>
+										<span class="tooltip-text">Add Link</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="image">
+										<i class="fas fa-image"></i>
+										<span class="tooltip-text">Add Image</span>
+									</button>
+									<button class="toolbar-button tooltip" data-action="code">
+										<i class="fas fa-code"></i>
+										<span class="tooltip-text">Code Block</span>
+									</button>
+								</div>
+							</div>
+							<div class="content-wrapper">
+								<textarea
+									id="editor"
+									class="neumorphic-inset w-full p-4 text-gray-700 text-sm focus:outline-none"
+									placeholder="Write your markdown here..."
+								></textarea>
+								<div class="collaboration-typing" id="typingIndicator">
+									<span>Sarah is typing</span>
+									<div class="typing-indicator">
+										<span></span>
+										<span></span>
+										<span></span>
+									</div>
+								</div>
+							</div>
+							<div
+								class="flex justify-between items-center mt-3 text-xs text-gray-500"
+							>
+								<div>
+									<span id="wordCount">0 words</span> |
+									<span id="charCount">0 characters</span>
+								</div>
+								<div>
+									<button
+										class="text-blue-600 hover:text-blue-800 transition-colors"
+										id="shortcutsButton"
+									>
+										<i class="fas fa-keyboard mr-1"></i> Keyboard Shortcuts
+									</button>
+									<div class="shortcuts-panel" id="shortcutsPanel">
+										<h4 class="font-medium mb-3">Keyboard Shortcuts</h4>
+										<div class="grid grid-cols-2 gap-3">
+											<div>
+												<div class="mb-2">
+													<kbd>Ctrl</kbd> + <kbd>B</kbd>
+													<span class="text-xs text-gray-500 ml-2">Bold</span>
+												</div>
+												<div class="mb-2">
+													<kbd>Ctrl</kbd> + <kbd>I</kbd>
+													<span class="text-xs text-gray-500 ml-2">Italic</span>
+												</div>
+												<div class="mb-2">
+													<kbd>Ctrl</kbd> + <kbd>K</kbd>
+													<span class="text-xs text-gray-500 ml-2">Link</span>
+												</div>
+											</div>
+											<div>
+												<div class="mb-2">
+													<kbd>Ctrl</kbd> + <kbd>1</kbd>
+													<span class="text-xs text-gray-500 ml-2"
+														>Heading 1</span
+													>
+												</div>
+												<div class="mb-2">
+													<kbd>Ctrl</kbd> + <kbd>2</kbd>
+													<span class="text-xs text-gray-500 ml-2"
+														>Heading 2</span
+													>
+												</div>
+												<div class="mb-2">
+													<kbd>Ctrl</kbd> + <kbd>S</kbd>
+													<span class="text-xs text-gray-500 ml-2">Save</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right Column: Preview -->
+					<div
+						class="w-full sm:w-1/2 tab-content hidden sm:block"
+						id="preview-tab"
+					>
+						<div class="neumorphic bg-white p-4 preview-container">
+							<div class="flex justify-between items-center mb-4">
+								<h3 class="text-lg font-medium text-gray-700">Preview</h3>
+								<div>
+									<button
+										class="toolbar-button tooltip"
+										id="togglePreviewButton"
+									>
+										<i class="fas fa-eye"></i>
+										<span class="tooltip-text">Toggle Preview</span>
+									</button>
+									<button class="toolbar-button tooltip" id="printButton">
+										<i class="fas fa-print"></i>
+										<span class="tooltip-text">Print</span>
+									</button>
+									<button class="toolbar-button tooltip" id="exportButton">
+										<i class="fas fa-download"></i>
+										<span class="tooltip-text">Export</span>
+									</button>
+								</div>
+							</div>
+							<div class="content-wrapper">
+								<div
+									id="preview"
+									class="neumorphic-inset w-full p-4 text-gray-700"
+								></div>
+							</div>
+							<div class="flex justify-end mt-3">
+								<div class="flex items-center text-xs text-gray-500">
+									<button
+										class="text-blue-600 hover:text-blue-800 transition-colors mr-4"
+										id="fullScreenButton"
+									>
+										<i class="fas fa-expand-arrows-alt mr-1"></i> Full Screen
+									</button>
+									<button
+										class="text-blue-600 hover:text-blue-800 transition-colors"
+										id="viewHtmlButton"
+									>
+										<i class="fas fa-code mr-1"></i> View HTML
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- Comments Panel (for mobile) -->
+					<div class="w-full tab-content hidden" id="comments-tab">
+						<div class="neumorphic bg-white p-4">
+							<div class="flex justify-between items-center mb-4">
+								<h3 class="text-lg font-medium text-gray-700">Comments</h3>
+								<button
+									class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200"
+									id="mobilAddCommentButton"
+								>
+									Add Comment
+								</button>
+							</div>
+							<div class="comment-thread mobile-comment-thread">
+								<!-- Comments will be populated by JS -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Comments Section (Desktop) -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 hidden sm:block">
+				<div class="neumorphic bg-white p-4">
+					<div class="flex justify-between items-center mb-4">
+						<h3 class="text-lg font-medium text-gray-700">Comments</h3>
+						<div class="flex items-center">
+							<div class="mr-3">
+								<select
+									class="neumorphic-inset px-3 py-1 text-sm text-gray-700 rounded-md focus:outline-none"
+									id="commentFilter"
+								>
+									<option value="all">All Comments</option>
+									<option value="open">Open Comments</option>
+									<option value="resolved">Resolved Comments</option>
+								</select>
+							</div>
+							<button
+								class="neumorphic-button text-blue-600 px-3 py-1 text-sm font-medium"
+								id="addCommentButton"
+							>
+								<i class="fas fa-plus mr-1"></i>
+								Add Comment
+							</button>
+						</div>
+					</div>
+					<div id="commentThread" class="comment-thread">
+						<!-- Comments will be populated by JS -->
+					</div>
+					<div id="commentForm" class="mt-4 hidden">
+						<div class="neumorphic-inset p-4 mb-4">
+							<textarea
+								id="commentText"
+								class="w-full p-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200"
+								placeholder="Add your comment here..."
+							></textarea>
+							<div class="flex justify-between mt-3">
+								<div class="flex items-center text-xs text-gray-500">
+									<button
+										class="text-gray-500 hover:text-gray-700 transition-colors mr-2"
+									>
+										<i class="fas fa-paperclip"></i>
+									</button>
+									<button
+										class="text-gray-500 hover:text-gray-700 transition-colors mr-2"
+									>
+										<i class="fas fa-at"></i>
+									</button>
+									<button
+										class="text-gray-500 hover:text-gray-700 transition-colors"
+									>
+										<i class="far fa-smile"></i>
+									</button>
+								</div>
+								<div class="flex space-x-2">
+									<button
+										id="cancelComment"
+										class="neumorphic-button text-gray-700 px-3 py-1 text-sm font-medium"
+									>
+										Cancel
+									</button>
+									<button
+										id="submitComment"
+										class="neumorphic-button button-primary px-3 py-1 text-sm font-medium"
+									>
+										Submit
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Support Banner -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+				<div class="bg-blue-50 rounded-lg p-4 shadow-sm border border-blue-100">
+					<div class="flex flex-col md:flex-row items-center justify-between">
+						<div class="flex items-center mb-3 md:mb-0">
+							<div class="bg-blue-100 rounded-full p-2 mr-3">
+								<i class="fas fa-headset text-blue-600"></i>
+							</div>
+							<div>
+								<h4 class="font-medium text-blue-800">
+									Need help with your documentation?
+								</h4>
+								<p class="text-sm text-blue-600">
+									Our support team is available 24/7 to assist you.
+								</p>
+							</div>
+						</div>
+						<button
+							class="neumorphic-button bg-white text-blue-600 px-4 py-2 text-sm font-medium"
+							id="contactSupportButton"
+						>
+							Contact Support
+						</button>
+					</div>
+				</div>
+			</div>
+		</main>
+
+		<!-- Full Screen Preview Modal -->
+		<div class="full-screen-preview" id="fullScreenPreview">
+			<div class="flex justify-between items-center mb-4">
+				<h2 class="text-xl font-bold text-gray-900">API Documentation</h2>
+				<button
+					class="neumorphic-button text-gray-700"
+					id="closeFullScreenButton"
+				>
+					<i class="fas fa-times"></i> Close
+				</button>
+			</div>
+			<div id="fullScreenContent" class="neumorphic-inset p-5"></div>
+		</div>
+
+		<!-- Modals Container -->
+		<div id="modalContainer"></div>
+
+		<!-- Footer -->
+		<footer class="bg-white border-t border-gray-200 mt-10">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+					<div>
+						<div class="flex items-center mb-4">
+							<i class="fas fa-code-branch text-blue-600 text-xl mr-2"></i>
+							<span class="text-lg font-bold text-gray-800">CodeCollab</span>
+						</div>
+						<p class="text-sm text-gray-600 mb-4">
+							The enterprise solution for collaborative technical documentation.
+						</p>
+						<div class="flex space-x-4">
+							<a
+								href="#"
+								class="text-gray-400 hover:text-blue-600 transition-colors"
+							>
+								<i class="fab fa-twitter"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-400 hover:text-blue-600 transition-colors"
+							>
+								<i class="fab fa-linkedin"></i>
+							</a>
+							<a
+								href="#"
+								class="text-gray-400 hover:text-blue-600 transition-colors"
+							>
+								<i class="fab fa-github"></i>
+							</a>
+						</div>
+					</div>
+					<div>
+						<h5 class="font-medium text-gray-800 mb-4">Product</h5>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Features</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Pricing</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Security</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Enterprise</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Customers</a
+								>
+							</li>
+						</ul>
+					</div>
+					<div>
+						<h5 class="font-medium text-gray-800 mb-4">Resources</h5>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Documentation</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>API Reference</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Guides</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Blog</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Community</a
+								>
+							</li>
+						</ul>
+					</div>
+					<div>
+						<h5 class="font-medium text-gray-800 mb-4">Company</h5>
+						<ul class="space-y-2">
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>About</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Careers</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Contact</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Partners</a
+								>
+							</li>
+							<li>
+								<a
+									href="#"
+									class="text-sm text-gray-600 hover:text-blue-600 footer-link"
+									>Legal</a
+								>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div
+					class="border-t border-gray-200 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center"
+				>
+					<p class="text-sm text-gray-500">
+						© 2025 CodeCollab Inc. All rights reserved.
+					</p>
+					<div class="flex space-x-6 mt-4 md:mt-0">
+						<a
+							href="#"
+							class="text-sm text-gray-500 hover:text-blue-600 footer-link"
+							>Privacy Policy</a
+						>
+						<a
+							href="#"
+							class="text-sm text-gray-500 hover:text-blue-600 footer-link"
+							>Terms of Service</a
+						>
+						<a
+							href="#"
+							class="text-sm text-gray-500 hover:text-blue-600 footer-link"
+							>Cookie Policy</a
+						>
+					</div>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Toast notifications container -->
+		<div id="toastContainer"></div>
+
+		<script>
+			const documentVersions = [
+				{
+					version: "1.0.0",
+					date: "January 15, 2025",
+					author: "Tom Cook",
+					content: `# Payment API Documentation
+
+## Introduction
+This is the documentation for the Payment API v1.0.0. The API allows integration with our payment processing system, enabling secure transactions.
+
+## Authentication
+API requests require authentication using API keys. Include them in the header of each request:
+
+\`\`\`javascript
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+\`\`\`
+
+## Endpoints
+
+### Create a Payment
+\`\`\`
+POST /api/v1/payments
+\`\`\`
+
+#### Request Body
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| amount | number | Yes | Amount to charge (in cents) |
+| currency | string | Yes | 3-letter currency code (e.g., USD) |
+| description | string | No | Description of the payment |
+| customer_id | string | Yes | Unique identifier for the customer |
+
+### Get Payment Details
+\`\`\`
+GET /api/v1/payments/{payment_id}
+\`\`\`
+
+## Error Handling
+The API uses standard HTTP response codes to indicate success or failure.
+
+For more information, contact the [developer support team](mailto:support@example.com).`,
+				},
+				{
+					version: "1.5.0",
+					date: "February 28, 2025",
+					author: "Sarah Johnson",
+					content: `# Payment API Documentation
+
+## Introduction
+This is the documentation for the Payment API v1.5.0. The API allows integration with our payment processing system, enabling secure transactions across multiple currencies.
+
+## Authentication
+All API requests require authentication using API keys. Keys should be included in the header of each request:
+
+\`\`\`javascript
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+\`\`\`
+
+## Endpoints
+
+### Create a Payment
+\`\`\`
+POST /api/v1/payments
+\`\`\`
+
+#### Request Body
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| amount | number | Yes | Amount to charge (in cents) |
+| currency | string | Yes | 3-letter currency code (e.g., USD) |
+| description | string | No | Description of the payment |
+| customer_id | string | Yes | Unique identifier for the customer |
+| payment_method | string | Yes | Payment method to use |
+
+### Get Payment Details
+\`\`\`
+GET /api/v1/payments/{payment_id}
+\`\`\`
+
+![Secure Payment Processing](https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)
+
+## Error Handling
+The API uses standard HTTP response codes to indicate success or failure. Specific error information is provided in the response body.
+
+For more information, contact the [developer support team](mailto:support@example.com).`,
+				},
+				{
+					version: "2.0.0",
+					date: "April 10, 2025",
+					author: "Michael Wilson",
+					content: `# Payment API Documentation
+
+## Introduction
+This is the official documentation for the Payment API v2.0.0. The API allows integration with our payment processing system, enabling secure transactions across multiple currencies and payment methods.
+
+## Authentication
+All API requests require authentication using API keys. Keys should be included in the header of each request:
+
+\`\`\`javascript
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+\`\`\`
+
+## Endpoints
+
+### Create a Payment
+\`\`\`
+POST /api/v2/payments
+\`\`\`
+
+#### Request Body
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| amount | number | Yes | Amount to charge (in cents) |
+| currency | string | Yes | 3-letter currency code (e.g., USD) |
+| description | string | No | Description of the payment |
+| customer_id | string | Yes | Unique identifier for the customer |
+| payment_method | string | Yes | Payment method to use |
+
+#### Example Request
+\`\`\`javascript
+fetch('https://api.example.com/api/v2/payments', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+        amount: 2500,
+        currency: 'USD',
+        description: 'Subscription payment',
+        customer_id: 'cust_123456',
+        payment_method: 'card_visa_1234'
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+\`\`\`
+
+### Get Payment Details
+\`\`\`
+GET /api/v2/payments/{payment_id}
+\`\`\`
+
+![Secure Payment Processing](https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)
+
+## Error Handling
+The API uses standard HTTP response codes to indicate success or failure. Specific error information is provided in the response body.
+
+For more information, contact the [developer support team](mailto:support@example.com).`,
+				},
+				{
+					version: "2.1.0",
+					date: "May 5, 2025",
+					author: "Tom Cook",
+					content: `# Payment API Documentation
+
+## Introduction
+This is the official documentation for the Payment API v2.1.0. The API allows integration with our payment processing system, enabling secure transactions across multiple currencies and payment methods.
+
+## Authentication
+All API requests require authentication using API keys. Keys should be included in the header of each request:
+
+\`\`\`javascript
+const headers = {
+    'Authorization': 'Bearer YOUR_API_KEY',
+    'Content-Type': 'application/json'
+};
+\`\`\`
+
+## Endpoints
+
+### Create a Payment
+\`\`\`
+POST /api/v2/payments
+\`\`\`
+
+#### Request Body
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| amount | number | Yes | Amount to charge (in cents) |
+| currency | string | Yes | 3-letter currency code (e.g., USD) |
+| description | string | No | Description of the payment |
+| customer_id | string | Yes | Unique identifier for the customer |
+| payment_method | string | Yes | Payment method to use |
+
+#### Example Request
+\`\`\`javascript
+fetch('https://api.example.com/api/v2/payments', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify({
+        amount: 2500,
+        currency: 'USD',
+        description: 'Subscription payment',
+        customer_id: 'cust_123456',
+        payment_method: 'card_visa_1234'
+    })
+})
+.then(response => response.json())
+.then(data => console.log(data));
+\`\`\`
+
+### Get Payment Details
+\`\`\`
+GET /api/v2/payments/{payment_id}
+\`\`\`
+
+![Secure Payment Processing](https://images.unsplash.com/photo-1563013544-824ae1b704d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80)
+
+> **Security Note**: Never log or store complete credit card details in your application.
+
+## Error Handling
+The API uses standard HTTP response codes to indicate success or failure. Specific error information is provided in the response body.
+
+For more information, contact the [developer support team](mailto:support@example.com).`,
+				},
+			];
+
+			const sampleComments = [
+				{
+					id: 1,
+					author: "Sarah Johnson",
+					avatar:
+						"https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+					content:
+						"We should add more details about rate limiting in the authentication section. Many clients have been running into issues with this lately.",
+					timestamp: "2 hours ago",
+					status: "open",
+					replies: [
+						{
+							id: 4,
+							author: "Michael Wilson",
+							avatar:
+								"https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+							content:
+								"Agreed. I'll draft a section on rate limits and error codes today. Will also include the retry-after header information.",
+							timestamp: "1 hour ago",
+						},
+					],
+				},
+				{
+					id: 2,
+					author: "Robert Garcia",
+					avatar:
+						"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+					content:
+						"The endpoint examples look good, but we should add code samples for more languages (Python, Ruby, PHP) to make it more accessible to all developers.",
+					timestamp: "3 hours ago",
+					status: "resolved",
+					replies: [],
+				},
+				{
+					id: 3,
+					author: "Tom Cook",
+					avatar:
+						"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+					content:
+						"We should add a section about webhook integration to notify systems about payment status updates. This is a common use case for most customers.",
+					timestamp: "4 hours ago",
+					status: "open",
+					replies: [],
+				},
+			];
+
+			function createModal(id, title, content) {
+				const modalHTML = `
+								<div class="modal" id="${id}">
+									<div class="modal-content">
+										<div class="flex justify-between items-center mb-4">
+											<h3 class="text-lg font-medium text-gray-700">${title}</h3>
+											<button class="modal-close text-gray-500 hover:text-gray-700">
+												<i class="fas fa-times"></i>
+											</button>
+										</div>
+										<div class="modal-body">
+											${content}
+										</div>
+									</div>
+								</div>
+							`;
+
+				const container = document.getElementById("modalContainer");
+				container.insertAdjacentHTML("beforeend", modalHTML);
+
+				const modal = document.getElementById(id);
+				const closeButton = modal.querySelector(".modal-close");
+
+				closeButton.addEventListener("click", () => {
+					closeModal(id);
+				});
+
+				modal.addEventListener("click", (e) => {
+					if (e.target === modal) {
+						closeModal(id);
+					}
+				});
+
+				return modal;
+			}
+
+			function openModal(id) {
+				const modal = document.getElementById(id);
+				modal.classList.add("visible");
+				document.body.style.overflow = "hidden";
+			}
+
+			function closeModal(id) {
+				const modal = document.getElementById(id);
+				modal.classList.remove("visible");
+				document.body.style.overflow = "";
+			}
+
+			const shareModalContent = `
+							<p class="text-sm text-gray-600 mb-4">Share this document with others by selecting one of the options below:</p>
+							<div class="share-options">
+								<div class="share-option">
+									<i class="fas fa-link"></i>
+									<p class="text-sm font-medium">Copy Link</p>
+								</div>
+								<div class="share-option">
+									<i class="fas fa-envelope"></i>
+									<p class="text-sm font-medium">Email</p>
+								</div>
+								<div class="share-option">
+									<i class="fab fa-slack"></i>
+									<p class="text-sm font-medium">Slack</p>
+								</div>
+								<div class="share-option">
+									<i class="fab fa-github"></i>
+									<p class="text-sm font-medium">GitHub</p>
+								</div>
+							</div>
+							<div class="mt-4">
+								<div class="mb-3">
+									<label class="block text-sm font-medium text-gray-700 mb-1">Permission settings</label>
+									<select class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none">
+										<option>Can view</option>
+										<option>Can comment</option>
+										<option>Can edit</option>
+									</select>
+								</div>
+								<button class="neumorphic-button button-primary w-full px-4 py-2 text-sm font-medium mt-2">
+									Share
+								</button>
+							</div>
+						`;
+
+			const historyModalContent = `
+							<div class="space-y-4">
+								<div class="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+									<img class="h-10 w-10 rounded-full mr-3" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+									<div class="flex-1">
+										<div class="flex items-center justify-between">
+											<h4 class="text-sm font-medium text-gray-900">Tom Cook</h4>
+											<span class="text-xs text-gray-500">May 5, 2025</span>
+										</div>
+										<p class="text-xs text-gray-700 mt-1">Added security note about credit card details</p>
+										<span class="text-xs text-green-600 mt-1 inline-block">v2.1.0 (Latest)</span>
+									</div>
+								</div>
+								<div class="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+									<img class="h-10 w-10 rounded-full mr-3" src="https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+									<div class="flex-1">
+										<div class="flex items-center justify-between">
+											<h4 class="text-sm font-medium text-gray-900">Michael Wilson</h4>
+											<span class="text-xs text-gray-500">April 10, 2025</span>
+										</div>
+										<p class="text-xs text-gray-700 mt-1">Added code example for payment endpoint</p>
+										<span class="text-xs text-blue-600 mt-1 inline-block">v2.0.0</span>
+									</div>
+								</div>
+								<div class="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+									<img class="h-10 w-10 rounded-full mr-3" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+									<div class="flex-1">
+										<div class="flex items-center justify-between">
+											<h4 class="text-sm font-medium text-gray-900">Sarah Johnson</h4>
+											<span class="text-xs text-gray-500">February 28, 2025</span>
+										</div>
+										<p class="text-xs text-gray-700 mt-1">Added payment method parameter and image</p>
+										<span class="text-xs text-blue-600 mt-1 inline-block">v1.5.0</span>
+									</div>
+								</div>
+								<div class="flex items-start p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+									<img class="h-10 w-10 rounded-full mr-3" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="">
+									<div class="flex-1">
+										<div class="flex items-center justify-between">
+											<h4 class="text-sm font-medium text-gray-900">Tom Cook</h4>
+											<span class="text-xs text-gray-500">January 15, 2025</span>
+										</div>
+										<p class="text-xs text-gray-700 mt-1">Initial documentation</p>
+										<span class="text-xs text-blue-600 mt-1 inline-block">v1.0.0</span>
+									</div>
+								</div>
+							</div>
+						`;
+
+			const compareModalContent = `
+							<div class="mb-4">
+								<div class="grid grid-cols-2 gap-4 mb-4">
+									<div>
+										<label class="block text-sm font-medium text-gray-700 mb-1">Base version</label>
+										<select class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none" id="baseVersionSelect">
+											<option value="0">v1.0.0</option>
+											<option value="1">v1.5.0</option>
+											<option value="2">v2.0.0</option>
+											<option value="3" selected>v2.1.0</option>
+										</select>
+									</div>
+									<div>
+										<label class="block text-sm font-medium text-gray-700 mb-1">Compare with</label>
+										<select class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none" id="compareVersionSelect">
+											<option value="2">v2.0.0</option>
+											<option value="1">v1.5.0</option>
+											<option value="0">v1.0.0</option>
+										</select>
+									</div>
+								</div>
+								<button class="neumorphic-button text-blue-600 px-4 py-2 text-sm font-medium" id="runCompareButton">
+									Compare Versions
+								</button>
+							</div>
+							<div class="p-3 border border-gray-200 rounded-lg mt-4 max-h-60 overflow-y-auto" id="diffOutput">
+								<p class="text-sm text-gray-500 text-center">Select versions to compare and click "Compare Versions"</p>
+							</div>
+						`;
+
+			const inviteModalContent = `
+							<div class="mb-4">
+								<label class="block text-sm font-medium text-gray-700 mb-1">Email addresses</label>
+								<input type="text" class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none" placeholder="Enter email addresses separated by commas">
+							</div>
+							<div class="mb-4">
+								<label class="block text-sm font-medium text-gray-700 mb-1">Permission level</label>
+								<select class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none">
+									<option>Can view</option>
+									<option>Can comment</option>
+									<option>Can edit</option>
+								</select>
+							</div>
+							<div class="mb-4">
+								<label class="block text-sm font-medium text-gray-700 mb-1">Add a message (optional)</label>
+								<textarea class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none h-20" placeholder="Add a personal message"></textarea>
+							</div>
+							<button class="neumorphic-button button-primary w-full px-4 py-2 text-sm font-medium">
+								Send Invitation
+							</button>
+						`;
+
+			const htmlViewModalContent = `
+							<div class="mb-4">
+								<p class="text-sm text-gray-600 mb-2">HTML output of the current markdown:</p>
+								<div class="neumorphic-inset p-3 bg-gray-50 rounded-lg overflow-auto h-60">
+									<pre id="htmlOutput" class="text-xs text-gray-800 whitespace-pre-wrap"></pre>
+								</div>
+							</div>
+							<div class="flex justify-end">
+								<button class="neumorphic-button text-blue-600 px-3 py-1 text-sm font-medium copy-html-button">
+									<i class="far fa-copy mr-1"></i> Copy HTML
+								</button>
+							</div>
+						`;
+
+			const supportModalContent = `
+							<div class="mb-4">
+								<p class="text-sm text-gray-600 mb-4">Our support team is here to help. Please fill out the form below and we'll get back to you as soon as possible.</p>
+
+								<div class="mb-3">
+									<label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+									<input type="text" class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none" placeholder="What do you need help with?">
+								</div>
+
+								<div class="mb-3">
+									<label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+									<textarea class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none h-32" placeholder="Please provide as much detail as possible"></textarea>
+								</div>
+
+								<div class="mb-3">
+									<label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+									<select class="neumorphic-inset w-full px-3 py-2 text-sm text-gray-700 rounded-md focus:outline-none">
+										<option>Low</option>
+										<option selected>Medium</option>
+										<option>High</option>
+										<option>Critical</option>
+									</select>
+								</div>
+
+								<div class="mb-3 flex items-start">
+									<input type="checkbox" id="includeScreenshot" class="mt-1 mr-2">
+									<label for="includeScreenshot" class="text-sm text-gray-700">Include current document screenshot</label>
+								</div>
+							</div>
+							<div class="flex justify-end">
+								<button class="neumorphic-button text-gray-700 px-3 py-2 text-sm font-medium mr-2">
+									Cancel
+								</button>
+								<button class="neumorphic-button button-primary px-3 py-2 text-sm font-medium">
+									Submit Request
+								</button>
+							</div>
+						`;
+
+			document.addEventListener("DOMContentLoaded", function () {
+				createModal("shareModal", "Share Document", shareModalContent);
+				createModal("historyModal", "Version History", historyModalContent);
+				createModal("compareModal", "Compare Versions", compareModalContent);
+				createModal("inviteModal", "Invite Collaborators", inviteModalContent);
+				createModal("htmlViewModal", "HTML View", htmlViewModalContent);
+				createModal("supportModal", "Contact Support", supportModalContent);
+
+				const editor = document.getElementById("editor");
+				const preview = document.getElementById("preview");
+				const wordCount = document.getElementById("wordCount");
+				const charCount = document.getElementById("charCount");
+				const versionSlider = document.getElementById("versionSlider");
+				const versionLabel = document.getElementById("versionLabel");
+				const fullScreenPreview = document.getElementById("fullScreenPreview");
+				const fullScreenContent = document.getElementById("fullScreenContent");
+				const typingIndicator = document.getElementById("typingIndicator");
+
+				const currentVersion = documentVersions[documentVersions.length - 1];
+				editor.value = currentVersion.content;
+
+				preview.innerHTML = marked.parse(editor.value);
+				fullScreenContent.innerHTML = marked.parse(editor.value);
+
+				function updateCounts() {
+					const text = editor.value;
+					const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+					const chars = text.length;
+
+					wordCount.textContent = `${words} words`;
+					charCount.textContent = `${chars} characters`;
+				}
+
+				updateCounts();
+
+				function addTooltipToLinks() {
+					const links = document.querySelectorAll("a");
+					links.forEach((link) => {
+						if (!link.getAttribute("data-tooltip-added")) {
+							link.addEventListener("click", function (e) {
+								if (
+									!e.target.closest(".dropdown-item") &&
+									!e.target.closest(".modal") &&
+									!e.target.classList.contains("footer-link")
+								) {
+									e.preventDefault();
+									showToast(
+										"This link is for demonstration purposes only",
+										"info"
+									);
+								}
+							});
+							link.setAttribute("data-tooltip-added", "true");
+						}
+					});
+				}
+
+				addTooltipToLinks();
+
+				editor.addEventListener("input", function () {
+					preview.innerHTML = marked.parse(this.value);
+					fullScreenContent.innerHTML = marked.parse(this.value);
+					updateCounts();
+
+					const randomCollab = Math.floor(Math.random() * 4) + 1;
+					if (randomCollab === 1) {
+						showCollaboratorActivity();
+					}
+				});
+
+				versionSlider.addEventListener("input", function () {
+					const versionIndex = parseInt(this.value) - 1;
+					const version = documentVersions[versionIndex];
+					versionLabel.textContent = `Version ${version.version}`;
+
+					const oldContent = editor.value;
+					editor.value = version.content;
+					preview.innerHTML = marked.parse(version.content);
+					fullScreenContent.innerHTML = marked.parse(version.content);
+					updateCounts();
+
+					showToast(`Switched to Version ${version.version}`, "info");
+
+					highlightChanges(oldContent, version.content);
+				});
+
+				function highlightChanges(oldContent, newContent) {
+					const oldLines = oldContent.split("\n");
+					const newLines = newContent.split("\n");
+
+					const numLinesToHighlight = Math.min(3, newLines.length);
+					for (let i = 0; i < numLinesToHighlight; i++) {
+						const lineIndex = Math.floor(Math.random() * newLines.length);
+
+						const previewContent = preview.innerHTML;
+						const lines = previewContent.split("\n");
+
+						if (lineIndex < lines.length) {
+							lines[
+								lineIndex
+							] = `<span class="highlighted-change">${lines[lineIndex]}</span>`;
+							preview.innerHTML = lines.join("\n");
+
+							setTimeout(() => {
+								const highlightedElements = preview.querySelectorAll(
+									".highlighted-change"
+								);
+								highlightedElements.forEach((el) => {
+									el.classList.remove("highlighted-change");
+								});
+							}, 2000);
+						}
+					}
+				}
+
+				const runCompareButton = document.getElementById("runCompareButton");
+				const baseVersionSelect = document.getElementById("baseVersionSelect");
+				const compareVersionSelect = document.getElementById(
+					"compareVersionSelect"
+				);
+				const diffOutput = document.getElementById("diffOutput");
+
+				if (runCompareButton) {
+					runCompareButton.addEventListener("click", function () {
+						const baseIndex = parseInt(baseVersionSelect.value);
+						const compareIndex = parseInt(compareVersionSelect.value);
+
+						if (baseIndex === compareIndex) {
+							diffOutput.innerHTML =
+								'<p class="text-sm text-red-500 text-center">Please select different versions to compare</p>';
+							return;
+						}
+
+						const baseContent = documentVersions[baseIndex].content;
+						const compareContent = documentVersions[compareIndex].content;
+
+						diffOutput.innerHTML = '<div class="text-sm">';
+
+						const baseLines = baseContent.split("\n");
+						const compareLines = compareContent.split("\n");
+
+						if (baseIndex > compareIndex) {
+							diffOutput.innerHTML += `<p class="text-sm font-medium">Changes from ${documentVersions[compareIndex].version} to ${documentVersions[baseIndex].version}:</p><div class="mt-2">`;
+
+							const diffLines = [];
+
+							if (baseIndex === 3 && compareIndex === 2) {
+								diffLines.push({
+									type: "added",
+									content:
+										"> **Security Note**: Never log or store complete credit card details in your application.",
+								});
+							} else if (baseIndex === 3 && compareIndex === 1) {
+								diffLines.push({
+									type: "added",
+									content: "#### Example Request",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"\nfetch('https://api.example.com/api/v2/payments', {\n    method: 'POST',\n    headers: headers,\n    body: JSON.stringify({\n        amount: 2500,\n        currency: 'USD',\n        description: 'Subscription payment',\n        customer_id: 'cust_123456',\n        payment_method: 'card_visa_1234'\n    })\n})\n.then(response => response.json())\n.then(data => console.log(data));\n",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"> **Security Note**: Never log or store complete credit card details in your application.",
+								});
+							} else if (baseIndex === 3 && compareIndex === 0) {
+								diffLines.push({
+									type: "removed",
+									content:
+										"This is the documentation for the Payment API v1.0.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"This is the official documentation for the Payment API v2.1.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"payment_method | string | Yes | Payment method to use",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"> **Security Note**: Never log or store complete credit card details in your application.",
+								});
+							} else if (baseIndex === 2 && compareIndex === 1) {
+								diffLines.push({
+									type: "removed",
+									content:
+										"This is the documentation for the Payment API v1.5.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"This is the official documentation for the Payment API v2.0.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content: "#### Example Request",
+								});
+							} else if (baseIndex === 2 && compareIndex === 0) {
+								diffLines.push({
+									type: "removed",
+									content:
+										"This is the documentation for the Payment API v1.0.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"This is the official documentation for the Payment API v2.0.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"payment_method | string | Yes | Payment method to use",
+								});
+							} else if (baseIndex === 1 && compareIndex === 0) {
+								diffLines.push({
+									type: "removed",
+									content:
+										"This is the documentation for the Payment API v1.0.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"This is the documentation for the Payment API v1.5.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"payment_method | string | Yes | Payment method to use",
+								});
+							}
+
+							diffLines.forEach((line) => {
+								if (line.type === "added") {
+									diffOutput.innerHTML += `<div class="diff-added my-1">${line.content}</div>`;
+								} else if (line.type === "removed") {
+									diffOutput.innerHTML += `<div class="diff-removed my-1">${line.content}</div>`;
+								}
+							});
+
+							diffOutput.innerHTML += "</div>";
+						} else {
+							diffOutput.innerHTML += `<p class="text-sm font-medium">Changes from ${documentVersions[baseIndex].version} to ${documentVersions[compareIndex].version}:</p><div class="mt-2">`;
+
+							const diffLines = [];
+
+							if (compareIndex === 3 && baseIndex === 2) {
+								diffLines.push({
+									type: "added",
+									content:
+										"> **Security Note**: Never log or store complete credit card details in your application.",
+								});
+							} else if (compareIndex === 3 && baseIndex === 1) {
+								diffLines.push({
+									type: "removed",
+									content:
+										"This is the documentation for the Payment API v1.5.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"This is the official documentation for the Payment API v2.1.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content: "#### Example Request",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"> **Security Note**: Never log or store complete credit card details in your application.",
+								});
+							} else if (compareIndex === 3 && baseIndex === 0) {
+								diffLines.push({
+									type: "removed",
+									content:
+										"This is the documentation for the Payment API v1.0.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"This is the official documentation for the Payment API v2.1.0.",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"payment_method | string | Yes | Payment method to use",
+								});
+								diffLines.push({
+									type: "added",
+									content: "#### Example Request",
+								});
+								diffLines.push({
+									type: "added",
+									content:
+										"> **Security Note**: Never log or store complete credit card details in your application.",
+								});
+							}
+
+							diffLines.forEach((line) => {
+								if (line.type === "added") {
+									diffOutput.innerHTML += `<div class="diff-added my-1">${line.content}</div>`;
+								} else if (line.type === "removed") {
+									diffOutput.innerHTML += `<div class="diff-removed my-1">${line.content}</div>`;
+								}
+							});
+
+							diffOutput.innerHTML += "</div>";
+						}
+
+						diffOutput.innerHTML += "</div>";
+					});
+				}
+
+				const mobileMenuButton = document.getElementById("mobile-menu-button");
+				const mobileMenu = document.getElementById("mobile-menu");
+
+				mobileMenuButton.addEventListener("click", function () {
+					mobileMenu.classList.toggle("hidden");
+				});
+
+				const tabButtons = document.querySelectorAll(".tab-button");
+				const tabContents = document.querySelectorAll(".tab-content");
+
+				tabButtons.forEach((button) => {
+					button.addEventListener("click", function () {
+						tabButtons.forEach((btn) => btn.classList.remove("active"));
+						tabContents.forEach((content) => content.classList.add("hidden"));
+
+						this.classList.add("active");
+						document
+							.getElementById(this.dataset.tab)
+							.classList.remove("hidden");
+					});
+				});
+
+				function setupDropdowns() {
+					const userMenuButton = document.getElementById("user-menu-button");
+					const userDropdown = document.getElementById("userDropdown");
+
+					if (userMenuButton && userDropdown) {
+						userMenuButton.addEventListener("click", function (e) {
+							e.stopPropagation();
+							userDropdown.classList.toggle("hidden");
+						});
+					}
+
+					const settingsButton = document.getElementById("settingsButton");
+					const settingsDropdown = document.getElementById("settingsDropdown");
+
+					if (settingsButton && settingsDropdown) {
+						settingsButton.addEventListener("click", function (e) {
+							e.stopPropagation();
+							settingsDropdown.classList.toggle("hidden");
+						});
+					}
+
+					const notificationButton =
+						document.getElementById("notificationButton");
+					const notificationPanel =
+						document.getElementById("notificationPanel");
+					const notificationBadge =
+						document.getElementById("notificationBadge");
+					const markAllReadBtn = document.getElementById("markAllReadBtn");
+
+					if (notificationButton && notificationPanel) {
+						notificationButton.addEventListener("click", function (e) {
+							e.stopPropagation();
+							notificationPanel.classList.toggle("visible");
+						});
+
+						if (markAllReadBtn) {
+							markAllReadBtn.addEventListener("click", function (e) {
+								e.stopPropagation();
+
+								const unreadItems = document.querySelectorAll(
+									".notification-item.unread"
+								);
+								unreadItems.forEach((item) => {
+									item.classList.remove("unread");
+								});
+
+								if (notificationBadge) {
+									notificationBadge.style.display = "none";
+								}
+
+								showToast("All notifications marked as read", "success");
+							});
+						}
+					}
+
+					const shortcutsButton = document.getElementById("shortcutsButton");
+					const shortcutsPanel = document.getElementById("shortcutsPanel");
+
+					if (shortcutsButton && shortcutsPanel) {
+						shortcutsButton.addEventListener("click", function (e) {
+							e.stopPropagation();
+							shortcutsPanel.classList.toggle("visible");
+						});
+					}
+
+					document.addEventListener("click", function () {
+						if (userDropdown) userDropdown.classList.add("hidden");
+						if (settingsDropdown) settingsDropdown.classList.add("hidden");
+						if (notificationPanel)
+							notificationPanel.classList.remove("visible");
+						if (shortcutsPanel) shortcutsPanel.classList.remove("visible");
+					});
+				}
+
+				setupDropdowns();
+
+				function setupComments() {
+					const commentThread = document.getElementById("commentThread");
+					const mobileCommentThread = document.querySelector(
+						".mobile-comment-thread"
+					);
+					const addCommentButton = document.getElementById("addCommentButton");
+					const mobileAddCommentButton = document.getElementById(
+						"mobilAddCommentButton"
+					);
+					const commentForm = document.getElementById("commentForm");
+					const commentText = document.getElementById("commentText");
+					const submitComment = document.getElementById("submitComment");
+					const cancelComment = document.getElementById("cancelComment");
+					const commentFilter = document.getElementById("commentFilter");
+
+					function renderComments(filter = "all") {
+						if (!commentThread) return;
+
+						let filteredComments = sampleComments;
+						if (filter === "open") {
+							filteredComments = sampleComments.filter(
+								(comment) => comment.status === "open"
+							);
+						} else if (filter === "resolved") {
+							filteredComments = sampleComments.filter(
+								(comment) => comment.status === "resolved"
+							);
+						}
+
+						commentThread.innerHTML = "";
+						filteredComments.forEach((comment) => {
+							const commentElement = createCommentElement(comment);
+							commentThread.appendChild(commentElement);
+						});
+
+						if (mobileCommentThread) {
+							mobileCommentThread.innerHTML = commentThread.innerHTML;
+						}
+					}
+
+					function createCommentElement(comment) {
+						const commentDiv = document.createElement("div");
+						commentDiv.className = "comment slide-in mb-4";
+						if (comment.status === "resolved") {
+							commentDiv.classList.add("bg-gray-50");
+						}
+
+						commentDiv.innerHTML = `
+										<div class="flex items-start mb-2">
+											<img class="h-8 w-8 rounded-full mr-3" src="${comment.avatar}" alt="">
+											<div class="flex-1">
+												<div class="flex items-center justify-between">
+													<h4 class="text-sm font-medium text-gray-900">${comment.author}</h4>
+													<span class="text-xs text-gray-500">${comment.timestamp}</span>
+												</div>
+												<p class="text-sm text-gray-700 mt-1">${comment.content}</p>
+												<div class="flex items-center mt-2">
+													${
+														comment.status !== "resolved"
+															? `<button class="text-xs text-blue-600 hover:text-blue-800 mr-3 reply-button transition-colors duration-200" data-comment-id="${comment.id}">Reply</button>
+														<button class="text-xs text-gray-500 hover:text-gray-700 mr-3 transition-colors duration-200 like-button">
+															<i class="far fa-thumbs-up"></i> Like
+														</button>
+														<button class="text-xs text-gray-500 hover:text-gray-700 transition-colors duration-200 resolve-button" data-comment-id="${comment.id}">
+															<i class="fas fa-check"></i> Resolve
+														</button>`
+															: `<span class="text-xs text-green-500 flex items-center">
+															<i class="fas fa-check-circle mr-1"></i> Resolved
+														</span>
+														<button class="text-xs text-blue-600 hover:text-blue-800 ml-3 reopen-button transition-colors duration-200" data-comment-id="${comment.id}">
+															Reopen
+														</button>`
+													}
+												</div>
+											</div>
+										</div>
+									`;
+
+						if (comment.replies && comment.replies.length > 0) {
+							const repliesDiv = document.createElement("div");
+							repliesDiv.className = "ml-11 mt-2 space-y-3";
+
+							comment.replies.forEach((reply) => {
+								const replyDiv = document.createElement("div");
+								replyDiv.className = "comment scale-in";
+								replyDiv.innerHTML = `
+												<div class="flex items-start">
+													<img class="h-6 w-6 rounded-full mr-2" src="${reply.avatar}" alt="">
+													<div class="flex-1">
+														<div class="flex items-center justify-between">
+															<h4 class="text-xs font-medium text-gray-900">${reply.author}</h4>
+															<span class="text-xs text-gray-500">${reply.timestamp}</span>
+														</div>
+														<p class="text-xs text-gray-700 mt-1">${reply.content}</p>
+														<div class="flex items-center mt-1">
+															<button class="text-xs text-gray-500 hover:text-gray-700 transition-colors duration-200 like-button">
+																<i class="far fa-thumbs-up"></i> Like
+															</button>
+														</div>
+													</div>
+												</div>
+											`;
+								repliesDiv.appendChild(replyDiv);
+							});
+
+							commentDiv.appendChild(repliesDiv);
+						}
+
+						return commentDiv;
+					}
+
+					renderComments();
+
+					if (commentFilter) {
+						commentFilter.addEventListener("change", function () {
+							renderComments(this.value);
+						});
+					}
+
+					if (addCommentButton) {
+						addCommentButton.addEventListener("click", function () {
+							commentForm.classList.remove("hidden");
+							commentText.focus();
+						});
+					}
+
+					if (mobileAddCommentButton) {
+						mobileAddCommentButton.addEventListener("click", function () {
+							commentForm.classList.remove("hidden");
+							commentText.focus();
+
+							tabButtons.forEach((btn) => btn.classList.remove("active"));
+							tabContents.forEach((content) => content.classList.add("hidden"));
+
+							const editorTabButton = document.querySelector(
+								'.tab-button[data-tab="editor-tab"]'
+							);
+							if (editorTabButton) {
+								editorTabButton.classList.add("active");
+								document
+									.getElementById("editor-tab")
+									.classList.remove("hidden");
+							}
+
+							setTimeout(() => {
+								commentForm.scrollIntoView({ behavior: "smooth" });
+							}, 100);
+						});
+					}
+
+					if (cancelComment) {
+						cancelComment.addEventListener("click", function () {
+							commentForm.classList.add("hidden");
+							commentText.value = "";
+						});
+					}
+
+					if (submitComment) {
+						submitComment.addEventListener("click", function () {
+							if (commentText.value.trim() === "") return;
+
+							const newComment = {
+								id: Date.now(),
+								author: "Tom Cook",
+								avatar:
+									"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+								content: commentText.value,
+								timestamp: "Just now",
+								status: "open",
+								replies: [],
+							};
+
+							sampleComments.unshift(newComment);
+							renderComments(commentFilter ? commentFilter.value : "all");
+
+							commentForm.classList.add("hidden");
+							commentText.value = "";
+
+							showToast("Comment added successfully", "success");
+						});
+					}
+
+					document.addEventListener("click", function (e) {
+						if (e.target && e.target.classList.contains("reply-button")) {
+							const commentId = parseInt(e.target.dataset.commentId);
+							const commentObj = sampleComments.find((c) => c.id === commentId);
+
+							if (commentObj) {
+								const replyForm = document.createElement("div");
+								replyForm.className =
+									"ml-11 mt-2 neumorphic-inset p-3 scale-in";
+								replyForm.innerHTML = `
+												<textarea class="w-full p-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" placeholder="Write your reply..."></textarea>
+												<div class="flex justify-end mt-2 space-x-2">
+													<button class="cancel-reply neumorphic-button text-gray-700 px-2 py-1 text-xs font-medium">Cancel</button>
+													<button class="submit-reply neumorphic-button button-primary px-2 py-1 text-xs font-medium" data-comment-id="${commentId}">Reply</button>
+												</div>
+											`;
+
+								const commentElements = document.querySelectorAll(".comment");
+								for (let elem of commentElements) {
+									const replyButton = elem.querySelector(
+										`.reply-button[data-comment-id="${commentId}"]`
+									);
+									if (replyButton) {
+										elem.appendChild(replyForm);
+										replyForm.querySelector("textarea").focus();
+										break;
+									}
+								}
+							}
+						}
+
+						if (e.target && e.target.classList.contains("cancel-reply")) {
+							const replyForm = e.target.closest(".neumorphic-inset");
+							replyForm.remove();
+						}
+
+						if (e.target && e.target.classList.contains("submit-reply")) {
+							const commentId = parseInt(e.target.dataset.commentId);
+							const replyForm = e.target.closest(".neumorphic-inset");
+							const replyText = replyForm.querySelector("textarea").value;
+
+							if (replyText.trim() === "") return;
+
+							const commentObj = sampleComments.find((c) => c.id === commentId);
+							if (commentObj) {
+								commentObj.replies.push({
+									id: Date.now(),
+									author: "Tom Cook",
+									avatar:
+										"https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+									content: replyText,
+									timestamp: "Just now",
+								});
+
+								renderComments(commentFilter ? commentFilter.value : "all");
+								showToast("Reply added successfully", "success");
+							}
+						}
+
+						if (
+							e.target &&
+							(e.target.classList.contains("resolve-button") ||
+								e.target.closest(".resolve-button"))
+						) {
+							const button = e.target.classList.contains("resolve-button")
+								? e.target
+								: e.target.closest(".resolve-button");
+							const commentId = parseInt(button.dataset.commentId);
+							const commentObj = sampleComments.find((c) => c.id === commentId);
+
+							if (commentObj) {
+								commentObj.status = "resolved";
+								renderComments(commentFilter ? commentFilter.value : "all");
+								showToast("Comment resolved", "success");
+							}
+						}
+
+						if (
+							e.target &&
+							(e.target.classList.contains("reopen-button") ||
+								e.target.closest(".reopen-button"))
+						) {
+							const button = e.target.classList.contains("reopen-button")
+								? e.target
+								: e.target.closest(".reopen-button");
+							const commentId = parseInt(button.dataset.commentId);
+							const commentObj = sampleComments.find((c) => c.id === commentId);
+
+							if (commentObj) {
+								commentObj.status = "open";
+								renderComments(commentFilter ? commentFilter.value : "all");
+								showToast("Comment reopened", "info");
+							}
+						}
+
+						if (
+							e.target &&
+							(e.target.classList.contains("like-button") ||
+								e.target.closest(".like-button"))
+						) {
+							const button = e.target.classList.contains("like-button")
+								? e.target
+								: e.target.closest(".like-button");
+
+							if (button.querySelector("i").classList.contains("far")) {
+								button.querySelector("i").classList.remove("far");
+								button.querySelector("i").classList.add("fas");
+								button.classList.add("text-blue-600");
+								button.classList.remove("text-gray-500");
+							} else {
+								button.querySelector("i").classList.remove("fas");
+								button.querySelector("i").classList.add("far");
+								button.classList.remove("text-blue-600");
+								button.classList.add("text-gray-500");
+							}
+						}
+					});
+				}
+
+				setupComments();
+
+				const buttons = {
+					saveButton: document.getElementById("saveButton"),
+					shareButton: document.getElementById("shareButton"),
+					historyButton: document.getElementById("historyButton"),
+					compareButton: document.getElementById("compareButton"),
+					inviteButton: document.getElementById("inviteButton"),
+					fullScreenButton: document.getElementById("fullScreenButton"),
+					closeFullScreenButton: document.getElementById(
+						"closeFullScreenButton"
+					),
+					viewHtmlButton: document.getElementById("viewHtmlButton"),
+					togglePreviewButton: document.getElementById("togglePreviewButton"),
+					printButton: document.getElementById("printButton"),
+					exportButton: document.getElementById("exportButton"),
+					contactSupportButton: document.getElementById("contactSupportButton"),
+				};
+
+				if (buttons.saveButton) {
+					buttons.saveButton.addEventListener("click", function () {
+						this.classList.add("loading");
+						this.disabled = true;
+
+						setTimeout(() => {
+							this.classList.remove("loading");
+							this.disabled = false;
+							showToast("Document saved successfully", "success");
+						}, 800);
+					});
+				}
+
+				if (buttons.shareButton) {
+					buttons.shareButton.addEventListener("click", function () {
+						openModal("shareModal");
+					});
+				}
+
+				if (buttons.historyButton) {
+					buttons.historyButton.addEventListener("click", function () {
+						openModal("historyModal");
+					});
+				}
+
+				if (buttons.compareButton) {
+					buttons.compareButton.addEventListener("click", function () {
+						openModal("compareModal");
+					});
+				}
+
+				if (buttons.inviteButton) {
+					buttons.inviteButton.addEventListener("click", function () {
+						openModal("inviteModal");
+					});
+				}
+
+				if (buttons.fullScreenButton) {
+					buttons.fullScreenButton.addEventListener("click", function () {
+						fullScreenPreview.classList.add("active");
+						document.body.style.overflow = "hidden";
+					});
+				}
+
+				if (buttons.closeFullScreenButton) {
+					buttons.closeFullScreenButton.addEventListener("click", function () {
+						fullScreenPreview.classList.remove("active");
+						document.body.style.overflow = "";
+					});
+				}
+
+				if (buttons.viewHtmlButton) {
+					buttons.viewHtmlButton.addEventListener("click", function () {
+						const htmlOutput = document.getElementById("htmlOutput");
+						htmlOutput.textContent = preview.innerHTML;
+
+						openModal("htmlViewModal");
+					});
+				}
+
+				if (buttons.togglePreviewButton) {
+					buttons.togglePreviewButton.addEventListener("click", function () {
+						this.classList.toggle("active");
+
+						if (this.classList.contains("active")) {
+							preview.classList.add("hidden");
+							this.querySelector("i").classList.remove("fa-eye");
+							this.querySelector("i").classList.add("fa-eye-slash");
+						} else {
+							preview.classList.remove("hidden");
+							this.querySelector("i").classList.remove("fa-eye-slash");
+							this.querySelector("i").classList.add("fa-eye");
+						}
+					});
+				}
+
+				if (buttons.printButton) {
+					buttons.printButton.addEventListener("click", function () {
+						const printWindow = window.open("", "_blank");
+						printWindow.document.write(`
+										<html>
+											<head>
+												<title>Print - API Documentation</title>
+												<style>
+													body {
+														font-family: Arial, sans-serif;
+														line-height: 1.6;
+														padding: 20px;
+														max-width: 800px;
+														margin: 0 auto;
+													}
+													h1 { font-size: 24px; margin-bottom: 16px; }
+													h2 { font-size: 20px; margin-bottom: 12px; }
+													h3 { font-size: 18px; margin-bottom: 10px; }
+													p { margin-bottom: 16px; }
+													pre {
+														background-color: #f5f5f5;
+														padding: 12px;
+														border-radius: 4px;
+														overflow-x: auto;
+													}
+													table { border-collapse: collapse; width: 100%; margin-bottom: 16px; }
+													th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+													th { background-color: #f5f5f5; }
+													img { max-width: 100%; height: auto; }
+													blockquote {
+														border-left: 4px solid #0f62fe;
+														padding-left: 12px;
+														margin-left: 0;
+														color: #555;
+													}
+													@media print {
+														body { font-size: 12px; }
+														h1 { font-size: 18px; }
+														h2 { font-size: 16px; }
+														h3 { font-size: 14px; }
+													}
+												</style>
+											</head>
+											<body>
+												${preview.innerHTML}
+											</body>
+										</html>
+									`);
+
+						setTimeout(() => {
+							printWindow.document.close();
+							printWindow.print();
+						}, 200);
+					});
+				}
+
+				if (buttons.exportButton) {
+					buttons.exportButton.addEventListener("click", function () {
+						const currentPosition = this.getBoundingClientRect();
+
+						const dropdown = document.createElement("div");
+						dropdown.className = "dropdown-menu";
+						dropdown.style.top = `${currentPosition.bottom + 5}px`;
+						dropdown.style.right = "10px";
+						dropdown.innerHTML = `
+										<a href="#" class="dropdown-item export-md">Export as Markdown</a>
+										<a href="#" class="dropdown-item export-html">Export as HTML</a>
+										<a href="#" class="dropdown-item export-pdf">Export as PDF</a>
+									`;
+
+						document.body.appendChild(dropdown);
+						dropdown.classList.remove("hidden");
+
+						dropdown.addEventListener("click", function (e) {
+							e.preventDefault();
+
+							if (e.target.classList.contains("export-md")) {
+								const blob = new Blob([editor.value], {
+									type: "text/markdown",
+								});
+								const url = URL.createObjectURL(blob);
+								const a = document.createElement("a");
+								a.href = url;
+								a.download = "api-documentation.md";
+								document.body.appendChild(a);
+								a.click();
+								document.body.removeChild(a);
+								URL.revokeObjectURL(url);
+								showToast("Exported as Markdown", "success");
+							} else if (e.target.classList.contains("export-html")) {
+								const blob = new Blob([preview.innerHTML], {
+									type: "text/html",
+								});
+								const url = URL.createObjectURL(blob);
+								const a = document.createElement("a");
+								a.href = url;
+								a.download = "api-documentation.html";
+								document.body.appendChild(a);
+								a.click();
+								document.body.removeChild(a);
+								URL.revokeObjectURL(url);
+								showToast("Exported as HTML", "success");
+							} else if (e.target.classList.contains("export-pdf")) {
+								showToast("Preparing PDF...", "info");
+
+								setTimeout(() => {
+									showToast("PDF exported successfully", "success");
+								}, 1500);
+							}
+
+							document.body.removeChild(dropdown);
+						});
+
+						document.addEventListener("click", function closeDropdown(e) {
+							if (
+								!dropdown.contains(e.target) &&
+								e.target !== buttons.exportButton
+							) {
+								if (document.body.contains(dropdown)) {
+									document.body.removeChild(dropdown);
+								}
+								document.removeEventListener("click", closeDropdown);
+							}
+						});
+					});
+				}
+
+				if (buttons.contactSupportButton) {
+					buttons.contactSupportButton.addEventListener("click", function () {
+						openModal("supportModal");
+					});
+				}
+
+				const toolbarButtons = document.querySelectorAll(
+					".toolbar-button[data-action]"
+				);
+
+				toolbarButtons.forEach((button) => {
+					button.addEventListener("click", function () {
+						const action = this.dataset.action;
+						let insert = "";
+
+						switch (action) {
+							case "heading":
+								insert = "# Heading";
+								break;
+							case "bold":
+								insert = "**Bold Text**";
+								break;
+							case "italic":
+								insert = "*Italic Text*";
+								break;
+							case "list-ul":
+								insert = "- Item 1\n- Item 2\n- Item 3";
+								break;
+							case "list-ol":
+								insert = "1. Item 1\n2. Item 2\n3. Item 3";
+								break;
+							case "link":
+								insert = "[Link Text](https://example.com)";
+								break;
+							case "image":
+								insert =
+									"![Image Alt Text](https://plus.unsplash.com/premium_photo-1679429320974-ab1de58bcad9?q=80&w=2969&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)";
+								break;
+							case "code":
+								insert = "\nYour code here\n";
+								break;
+						}
+
+						const start = editor.selectionStart;
+						const end = editor.selectionEnd;
+						const text = editor.value;
+
+						editor.value =
+							text.substring(0, start) + insert + text.substring(end);
+
+						preview.innerHTML = marked.parse(editor.value);
+						fullScreenContent.innerHTML = marked.parse(editor.value);
+						updateCounts();
+
+						editor.selectionStart = start + insert.length;
+						editor.selectionEnd = start + insert.length;
+						editor.focus();
+
+						showCollaboratorTyping();
+					});
+				});
+
+				editor.addEventListener("keydown", function (e) {
+					if (e.ctrlKey && e.key === "b") {
+						e.preventDefault();
+						const start = editor.selectionStart;
+						const end = editor.selectionEnd;
+						const selection = editor.value.substring(start, end);
+						const replacement = `**${selection}**`;
+
+						editor.value =
+							editor.value.substring(0, start) +
+							replacement +
+							editor.value.substring(end);
+						editor.selectionStart = start + 2;
+						editor.selectionEnd = start + 2 + selection.length;
+
+						preview.innerHTML = marked.parse(editor.value);
+						fullScreenContent.innerHTML = marked.parse(editor.value);
+						updateCounts();
+					}
+
+					if (e.ctrlKey && e.key === "i") {
+						e.preventDefault();
+						const start = editor.selectionStart;
+						const end = editor.selectionEnd;
+						const selection = editor.value.substring(start, end);
+						const replacement = `*${selection}*`;
+
+						editor.value =
+							editor.value.substring(0, start) +
+							replacement +
+							editor.value.substring(end);
+						editor.selectionStart = start + 1;
+						editor.selectionEnd = start + 1 + selection.length;
+
+						preview.innerHTML = marked.parse(editor.value);
+						fullScreenContent.innerHTML = marked.parse(editor.value);
+						updateCounts();
+					}
+
+					if (e.ctrlKey && e.key === "k") {
+						e.preventDefault();
+						const start = editor.selectionStart;
+						const end = editor.selectionEnd;
+						const selection = editor.value.substring(start, end);
+						const replacement = `[${selection}](url)`;
+
+						editor.value =
+							editor.value.substring(0, start) +
+							replacement +
+							editor.value.substring(end);
+						if (selection.length > 0) {
+							editor.selectionStart = start + selection.length + 3;
+							editor.selectionEnd = start + replacement.length - 1;
+						} else {
+							editor.selectionStart = start + 1;
+							editor.selectionEnd = start + 1;
+						}
+
+						preview.innerHTML = marked.parse(editor.value);
+						fullScreenContent.innerHTML = marked.parse(editor.value);
+						updateCounts();
+					}
+
+					if (e.ctrlKey && e.key === "s") {
+						e.preventDefault();
+						if (buttons.saveButton) {
+							buttons.saveButton.click();
+						}
+					}
+				});
+
+				let typingTimeout;
+
+				function showCollaboratorTyping() {
+					const collaborators = ["Sarah", "Michael", "Robert", "Lindsay"];
+					const randomCollab =
+						collaborators[Math.floor(Math.random() * collaborators.length)];
+					typingIndicator.innerHTML = `<span>${randomCollab} is typing</span><div class="typing-indicator"><span></span><span></span><span></span></div>`;
+					typingIndicator.classList.add("visible");
+
+					clearTimeout(typingTimeout);
+					typingTimeout = setTimeout(() => {
+						typingIndicator.classList.remove("visible");
+					}, 3000);
+				}
+
+				function showCollaboratorActivity() {
+					const collaborators = [
+						{
+							name: "Sarah Johnson",
+							avatar:
+								"https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+							color: "#24a148",
+						},
+						{
+							name: "Michael Wilson",
+							avatar:
+								"https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+							color: "#1192e8",
+						},
+						{
+							name: "Robert Garcia",
+							avatar:
+								"https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+							color: "#f1c21b",
+						},
+					];
+
+					const randomCollab =
+						collaborators[Math.floor(Math.random() * collaborators.length)];
+
+					const editorRect = editor.getBoundingClientRect();
+					const lineHeight = parseInt(
+						window.getComputedStyle(editor).lineHeight
+					);
+
+					const randomX =
+						Math.floor(Math.random() * (editorRect.width - 50)) + 25;
+					const randomY =
+						Math.floor(Math.random() * (editorRect.height - 100)) + 50;
+
+					const cursor = document.createElement("div");
+					cursor.className = "collaboration-cursor cursor-blink";
+					cursor.style.left = `${randomX}px`;
+					cursor.style.top = `${randomY}px`;
+					cursor.style.backgroundColor = randomCollab.color;
+					cursor.setAttribute("data-user", randomCollab.name);
+
+					const editorContainer = document.querySelector(".content-wrapper");
+					editorContainer.appendChild(cursor);
+
+					const avatar = document.createElement("img");
+					avatar.src = randomCollab.avatar;
+					avatar.className = "floating-avatar";
+					avatar.style.left = `${randomX - 15}px`;
+					avatar.style.top = `${randomY - 30}px`;
+					editorContainer.appendChild(avatar);
+
+					let movements = 5;
+					let cursorInterval = setInterval(() => {
+						const newX =
+							parseInt(cursor.style.left) + (Math.random() * 40 - 20);
+						const newY = parseInt(cursor.style.top) + (Math.random() * 30 - 15);
+
+						const boundedX = Math.max(
+							10,
+							Math.min(editorRect.width - 10, newX)
+						);
+						const boundedY = Math.max(
+							10,
+							Math.min(editorRect.height - 10, newY)
+						);
+
+						cursor.style.left = `${boundedX}px`;
+						cursor.style.top = `${boundedY}px`;
+
+						avatar.style.left = `${boundedX - 15}px`;
+						avatar.style.top = `${boundedY - 30}px`;
+
+						movements--;
+						if (movements <= 0) {
+							clearInterval(cursorInterval);
+
+							if (Math.random() > 0.5) {
+								const position = Math.floor(
+									Math.random() * editor.value.length
+								);
+								const textToInsert = getRandomEdit();
+
+								const newContent =
+									editor.value.substring(0, position) +
+									textToInsert +
+									editor.value.substring(position);
+
+								let charIndex = 0;
+								const typeInterval = setInterval(() => {
+									if (charIndex < textToInsert.length) {
+										editor.value =
+											editor.value.substring(0, position + charIndex) +
+											textToInsert[charIndex] +
+											editor.value.substring(position + charIndex);
+										preview.innerHTML = marked.parse(editor.value);
+										fullScreenContent.innerHTML = marked.parse(editor.value);
+										updateCounts();
+										charIndex++;
+									} else {
+										clearInterval(typeInterval);
+
+										showToast(`${randomCollab.name} made an edit`, "info");
+
+										setTimeout(() => {
+											editorContainer.removeChild(cursor);
+											editorContainer.removeChild(avatar);
+										}, 1000);
+									}
+								}, 100);
+							} else {
+								setTimeout(() => {
+									editorContainer.removeChild(cursor);
+									editorContainer.removeChild(avatar);
+								}, 2000);
+							}
+						}
+					}, 800);
+				}
+
+				function getRandomEdit() {
+					const edits = [
+						" (updated)",
+						" (fixed)",
+						"\n\n> Note: This section needs review.",
+						" - added more detail",
+						"\n\n**Important:** ",
+					];
+
+					return edits[Math.floor(Math.random() * edits.length)];
+				}
+
+				setInterval(() => {
+					if (Math.random() > 0.8) {
+						showCollaboratorActivity();
+					}
+				}, 15000);
+			});
+
+			function showToast(message, type = "info") {
+				const toastContainer = document.getElementById("toastContainer");
+
+				const toast = document.createElement("div");
+				toast.className = `toast ${type}`;
+
+				let icon;
+				switch (type) {
+					case "success":
+						icon = "check-circle";
+						break;
+					case "error":
+						icon = "exclamation-circle";
+						break;
+					case "warning":
+						icon = "exclamation-triangle";
+						break;
+					default:
+						icon = "info-circle";
+				}
+
+				toast.innerHTML = `
+								<div class="flex items-center">
+									<i class="fas fa-${icon} mr-2"></i>
+									<p>${message}</p>
+								</div>
+							`;
+
+				toastContainer.appendChild(toast);
+
+				setTimeout(() => {
+					toast.classList.add("show");
+				}, 10);
+
+				setTimeout(() => {
+					toast.classList.remove("show");
+					setTimeout(() => {
+						toast.remove();
+					}, 300);
+				}, 3000);
+			}
+		</script>
+	</body>
+</html>

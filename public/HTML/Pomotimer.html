@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chili Pomodoro | Professional Time Management</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            chili: {
+              50: '#FFF5F5',
+              100: '#FFE3E3',
+              200: '#FFC9C9',
+              300: '#FFA8A8',
+              400: '#FF8787',
+              500: '#FF6B6B',
+              600: '#FA5252',
+              700: '#F03E3E',
+              800: '#E03131',
+              900: '#C92A2A',
+            },
+            spice: {
+              50: '#FFF4E6',
+              100: '#FFE8CC',
+              200: '#FFD8A8',
+              300: '#FFC078',
+              400: '#FFA94D',
+              500: '#FF922B',
+              600: '#FD7E14',
+              700: '#F76707',
+              800: '#E8590C',
+              900: '#D9480F',
+            },
+          },
+          animation: {
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-slow': 'bounce 2s infinite',
+          },
+          boxShadow: {
+            'inner-lg': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
+            'chili': '0 4px 14px -2px rgba(250, 82, 82, 0.25)',
+            'spice': '0 4px 14px -2px rgba(253, 126, 20, 0.25)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @keyframes progress {
+      0% { stroke-dasharray: 0 100; }
+      100% { stroke-dasharray: 100 100; }
+    }
+    
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.1s;
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    
+    .shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .slide-in-right {
+      animation: slideInRight 0.3s ease-out;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    
+    .bg-gradient-chili {
+      background: linear-gradient(135deg, #FF6B6B 0%, #F03E3E 100%);
+    }
+    
+    .bg-gradient-spice {
+      background: linear-gradient(135deg, #FF922B 0%, #F76707 100%);
+    }
+    
+    
+    .timer-pulse {
+      animation: timerPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes timerPulse {
+      0% { box-shadow: 0 0 0 0 rgba(250, 82, 82, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(250, 82, 82, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(250, 82, 82, 0); }
+    }
+    
+    
+    .stat-counter {
+      transition: all 0.8s ease-out;
+    }
+    
+    
+    .firework {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      transform-origin: center;
+      animation: firework-animation 0.6s ease-out;
+      opacity: 0;
+    }
+    
+    @keyframes firework-animation {
+      0% {
+        width: 0.5rem;
+        height: 0.5rem;
+        opacity: 1;
+      }
+      100% {
+        width: 10rem;
+        height: 10rem;
+        opacity: 0;
+      }
+    }
+    
+    
+    input[type=range] {
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 5px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #FF6B6B;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: all 0.15s ease;
+    }
+    
+    input[type=range]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #FF6B6B;
+      cursor: pointer;
+      border: 2px solid white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: all 0.15s ease;
+    }
+    
+    input[type=range]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 6px rgba(255, 107, 107, 0.2);
+    }
+    
+    input[type=range]::-moz-range-thumb:hover {
+      box-shadow: 0 0 0 6px rgba(255, 107, 107, 0.2);
+    }
+    
+    
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltip-text {
+      visibility: hidden;
+      width: 120px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
+  <div id="app" class="min-h-screen flex flex-col overflow-hidden">
+    <!-- Header -->
+    <header class="bg-gradient-chili text-white p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold flex items-center">
+          <div class="mr-3 bg-white text-chili-600 rounded-lg p-1 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          Chili Pomodoro
+
+        </h1>
+        <div class="flex items-center">
+          
+          <button id="settingsBtn" class="p-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto p-4 md:p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Timer Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center fade-in order-1 card-hover border border-gray-100">
+          <div class="text-center mb-4">
+            <h2 id="timerMode" class="text-2xl font-bold text-chili-700 mb-2 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+              </svg>
+              Focus Time
+            </h2>
+            <div id="pomodoroCount" class="text-sm bg-chili-50 text-chili-700 px-3 py-1 rounded-full inline-block">Pomodoro #3</div>
+          </div>
+          
+          <div class="relative w-64 h-64 my-4">
+            <!-- Timer Circle -->
+            <svg class="w-full h-full" viewBox="0 0 100 100">
+              <!-- Background Circle -->
+              <circle 
+                cx="50" cy="50" r="45" 
+                fill="none" 
+                stroke="#F1F1F1" 
+                stroke-width="8"
+              />
+              <!-- Progress Circle -->
+              <circle 
+                id="progressRing"
+                class="progress-ring__circle" 
+                cx="50" cy="50" r="45" 
+                fill="none" 
+                stroke="#FF6B6B" 
+                stroke-width="8"
+                stroke-dasharray="60 283" 
+                stroke-linecap="round"
+              />
+            </svg>
+            <!-- Timer Display -->
+            <div class="absolute inset-0 flex items-center justify-center flex-col">
+              <span id="timeDisplay" class="text-5xl font-bold">00:00</span>
+
+            </div>
+          </div>
+          
+          <div class="flex space-x-4 mt-6">
+            <button id="startBtn" class="px-6 py-3 bg-chili-600 hover:bg-chili-700 text-white rounded-lg shadow-lg transition-all transform hover:scale-105 active:scale-95 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              Pause
+            </button>
+            <button id="resetBtn" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg shadow-md transition-all transform hover:scale-105 active:scale-95 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+              </svg>
+              Reset
+            </button>
+          </div>
+          
+          <div class="mt-8 w-full">
+            <button id="distractionBtn" class="w-full px-4 py-3 bg-spice-500 hover:bg-spice-600 text-white rounded-lg shadow-md transition-colors flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+              Log Distraction
+            </button>
+          </div>
+          
+          <div class="mt-6 w-full">
+            <div class="flex justify-between items-center mb-2">
+              <p class="text-sm text-gray-500">Today's Goal: 8 Pomodoros</p>
+              <p class="text-sm font-medium">37% Complete</p>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+              <div class="bg-chili-500 h-2.5 rounded-full" style="width: 37%"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Stats Section -->
+        <div class="bg-white rounded-xl shadow-lg p-6 order-2 fade-in card-hover border border-gray-100">
+          <h2 class="text-xl font-bold text-chili-800 mb-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3a1 1 0 000 2h10a1 1 0 100-2H3zm0 4a1 1 0 000 2h6a1 1 0 100-2H3zm0 4a1 1 0 100 2h10a1 1 0 100-2H3z" clip-rule="evenodd" />
+            </svg>
+            Today's Progress
+          </h2>
+          
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-chili-50 p-4 rounded-lg shadow-sm card-hover">
+              <div class="flex justify-between items-start">
+                <p class="text-sm text-gray-500">Focus Time</p>
+                <div class="tooltip">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="tooltip-text text-xs">Total time spent focusing</span>
+                </div>
+              </div>
+              <p id="totalFocusTime" class="text-2xl font-bold text-chili-700 mt-1">75m</p>
+              <p class="text-xs text-chili-600 mt-1">+25m from yesterday</p>
+            </div>
+            <div class="bg-spice-50 p-4 rounded-lg shadow-sm card-hover">
+              <div class="flex justify-between items-start">
+                <p class="text-sm text-gray-500">Break Time</p>
+                <div class="tooltip">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="tooltip-text text-xs">Total break time</span>
+                </div>
+              </div>
+              <p id="totalBreakTime" class="text-2xl font-bold text-spice-700 mt-1">20m</p>
+              <p class="text-xs text-spice-600 mt-1">Perfect break balance</p>
+            </div>
+            <div class="bg-gray-100 p-4 rounded-lg shadow-sm card-hover">
+              <div class="flex justify-between items-start">
+                <p class="text-sm text-gray-500">Completed</p>
+                <div class="tooltip">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="tooltip-text text-xs">Pomodoros completed</span>
+                </div>
+              </div>
+              <p id="completedPomodoros" class="text-2xl font-bold text-gray-700 mt-1">3</p>
+              <p class="text-xs text-gray-600 mt-1">5 more to reach daily goal</p>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg shadow-sm card-hover">
+              <div class="flex justify-between items-start">
+                <p class="text-sm text-gray-500">Distractions</p>
+                <div class="tooltip">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd" />
+                  </svg>
+                  <span class="tooltip-text text-xs">Time lost to distractions</span>
+                </div>
+              </div>
+              <p id="distractionTime" class="text-2xl font-bold text-red-700 mt-1">12m</p>
+              <p class="text-xs text-red-600 mt-1">2 distractions logged</p>
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-semibold text-gray-700">Session Timeline</h3>
+              <div class="text-xs bg-chili-100 text-chili-700 px-2 py-1 rounded-full">
+                Last 8 intervals
+              </div>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-3 h-48 shadow-inner-lg border border-gray-100">
+              <div id="sessionChart" class="h-full w-full"></div>
+            </div>
+            <div class="flex justify-center mt-2 space-x-6 text-xs text-gray-500">
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-chili-500 mr-1"></div>
+                <span>Focus</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-spice-500 mr-1"></div>
+                <span>Break</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full bg-red-500 mr-1"></div>
+                <span>Distraction</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Session History -->
+        <div class="bg-white rounded-xl shadow-lg p-6 order-3 col-span-1 md:col-span-2 fade-in card-hover border border-gray-100">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-chili-800 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+              </svg>
+              Recent Sessions
+            </h2>
+            <a href="#" class="text-chili-600 hover:text-chili-700 text-sm font-medium">View All History</a>
+          </div>
+          
+          <div id="sessionHistory" class="overflow-x-auto hide-scrollbar">
+            <div class="flex space-x-4 pb-2">
+              <!-- Session cards -->
+              <div class="bg-gradient-to-br from-chili-50 to-white rounded-lg p-4 shadow-sm min-w-[200px] h-36 card-hover border border-chili-100">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Today</p>
+                    <p class="text-xs text-gray-500">9:30 AM</p>
+                  </div>
+                  <span class="bg-chili-100 text-chili-700 text-xs px-2 py-1 rounded-full">3 sessions</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-chili-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">75m focus</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-spice-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">20m break</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-red-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">12m distracted</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">86% efficient</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Productivity</span>
+                    <span class="text-xs font-medium text-gray-700">High</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 86%"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 shadow-sm min-w-[200px] h-36 card-hover border border-gray-200">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Yesterday</p>
+                    <p class="text-xs text-gray-500">3:15 PM</p>
+                  </div>
+                  <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">6 sessions</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-chili-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">150m focus</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-spice-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">35m break</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-red-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">8m distracted</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">95% efficient</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Productivity</span>
+                    <span class="text-xs font-medium text-gray-700">Very High</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 95%"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 shadow-sm min-w-[200px] h-36 card-hover border border-gray-200">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Jul 5</p>
+                    <p class="text-xs text-gray-500">10:00 AM</p>
+                  </div>
+                  <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">4 sessions</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-chili-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">100m focus</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-spice-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">25m break</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-red-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">15m distracted</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-yellow-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">87% efficient</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Productivity</span>
+                    <span class="text-xs font-medium text-gray-700">High</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 87%"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-gray-50 to-white rounded-lg p-4 shadow-sm min-w-[200px] h-36 card-hover border border-gray-200">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-sm font-medium text-gray-700">Jul 4</p>
+                    <p class="text-xs text-gray-500">2:30 PM</p>
+                  </div>
+                  <span class="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">8 sessions</span>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-2 mt-3">
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-chili-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">200m focus</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-spice-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">45m break</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-red-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">5m distracted</span>
+                  </div>
+                  <div class="flex items-center">
+                    <div class="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                    <span class="text-xs text-gray-700">98% efficient</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2 border-t border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Productivity</span>
+                    <span class="text-xs font-medium text-gray-700">Very High</span>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 98%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden ">
+      <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in shadow-xl h-[80vh] overflow-scroll">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-chili-800 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-chili-600" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" />
+            </svg>
+            Timer Settings
+          </h2>
+          <button id="closeSettingsBtn" class="text-gray-500 hover:text-gray-800 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="focusDuration">
+              Focus Duration (minutes)
+            </label>
+            <input type="range" id="focusDuration" min="5" max="60" step="5" value="25" 
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>5m</span>
+              <span id="focusDurationValue" class="font-medium text-chili-700">25m</span>
+              <span>60m</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="shortBreakDuration">
+              Short Break Duration (minutes)
+            </label>
+            <input type="range" id="shortBreakDuration" min="1" max="15" step="1" value="5" 
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>1m</span>
+              <span id="shortBreakDurationValue" class="font-medium text-spice-700">5m</span>
+              <span>15m</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="longBreakDuration">
+              Long Break Duration (minutes)
+            </label>
+            <input type="range" id="longBreakDuration" min="5" max="30" step="5" value="15" 
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>5m</span>
+              <span id="longBreakDurationValue" class="font-medium text-spice-700">15m</span>
+              <span>30m</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="pomodorosUntilLongBreak">
+              Pomodoros Until Long Break
+            </label>
+            <input type="range" id="pomodorosUntilLongBreak" min="2" max="6" step="1" value="4" 
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>2</span>
+              <span id="pomodorosUntilLongBreakValue" class="font-medium text-gray-700">4</span>
+              <span>6</span>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2" for="dailyGoal">
+              Daily Pomodoro Goal
+            </label>
+            <input type="range" id="dailyGoal" min="2" max="16" step="2" value="8" 
+                  class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+              <span>2</span>
+              <span id="dailyGoalValue" class="font-medium text-gray-700">8</span>
+              <span>16</span>
+            </div>
+          </div>
+          
+          <div class="flex flex-col space-y-3 pt-2">
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-gray-700" for="vibrationEnabled">
+                Enable Vibration
+              </label>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="vibrationEnabled" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chili-600"></div>
+              </label>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-gray-700" for="notificationsEnabled">
+                Enable Notifications
+              </label>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="notificationsEnabled" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chili-600"></div>
+              </label>
+            </div>
+            
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-gray-700" for="soundEnabled">
+                Enable Sound
+              </label>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="soundEnabled" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-chili-600"></div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="pt-4 border-t border-gray-200 flex space-x-3">
+            <button id="resetSettingsBtn" class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg shadow transition-colors">
+              Reset to Default
+            </button>
+            <button id="saveSettingsBtn" class="flex-1 py-3 bg-chili-600 hover:bg-chili-700 text-white rounded-lg shadow-chili transition-colors">
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- First-time welcome modal -->
+    <div id="welcomeModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in shadow-xl">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-chili-100 text-chili-600 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Welcome to Chili Pomodoro!</h2>
+          <p class="text-gray-600">Boost your productivity with focused work sessions and smart breaks.</p>
+        </div>
+        
+        <div class="space-y-4 mb-6">
+          <div class="flex p-3 bg-gray-50 rounded-lg">
+            <div class="flex-shrink-0 text-chili-600 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">Focus in 25-minute intervals</h3>
+              <p class="text-sm text-gray-600">Short, focused work sessions help maintain high productivity</p>
+            </div>
+          </div>
+          
+          <div class="flex p-3 bg-gray-50 rounded-lg">
+            <div class="flex-shrink-0 text-spice-600 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">Take regular breaks</h3>
+              <p class="text-sm text-gray-600">Short 5-minute breaks between sessions, longer breaks after 4 pomodoros</p>
+            </div>
+          </div>
+          
+          <div class="flex p-3 bg-gray-50 rounded-lg">
+            <div class="flex-shrink-0 text-green-600 mr-3">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-800">Track your progress</h3>
+              <p class="text-sm text-gray-600">Monitor your productivity and see your improvement over time</p>
+            </div>
+          </div>
+        </div>
+        
+        <button id="startUsingAppBtn" class="w-full py-3 bg-gradient-chili text-white rounded-lg shadow-chili transition-all transform hover:scale-105 font-medium">
+          Start Using Chili Pomodoro
+        </button>
+      </div>
+    </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      const startBtn = document.getElementById('startBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const distractionBtn = document.getElementById('distractionBtn');
+      const timeDisplay = document.getElementById('timeDisplay');
+
+      const timerMode = document.getElementById('timerMode');
+      const pomodoroCount = document.getElementById('pomodoroCount');
+      const progressRing = document.getElementById('progressRing');
+      const totalFocusTime = document.getElementById('totalFocusTime');
+      const totalBreakTime = document.getElementById('totalBreakTime');
+      const completedPomodoros = document.getElementById('completedPomodoros');
+      const distractionTime = document.getElementById('distractionTime');
+      const sessionHistory = document.getElementById('sessionHistory');
+      const welcomeModal = document.getElementById('welcomeModal');
+      const startUsingAppBtn = document.getElementById('startUsingAppBtn');
+      
+      
+      const settingsBtn = document.getElementById('settingsBtn');
+      const settingsModal = document.getElementById('settingsModal');
+      const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+      const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+      const resetSettingsBtn = document.getElementById('resetSettingsBtn');
+      const focusDuration = document.getElementById('focusDuration');
+      const shortBreakDuration = document.getElementById('shortBreakDuration');
+      const longBreakDuration = document.getElementById('longBreakDuration');
+      const pomodorosUntilLongBreak = document.getElementById('pomodorosUntilLongBreak');
+      const dailyGoal = document.getElementById('dailyGoal');
+      const vibrationEnabled = document.getElementById('vibrationEnabled');
+      const notificationsEnabled = document.getElementById('notificationsEnabled');
+      const soundEnabled = document.getElementById('soundEnabled');
+      
+      const focusDurationValue = document.getElementById('focusDurationValue');
+      const shortBreakDurationValue = document.getElementById('shortBreakDurationValue');
+      const longBreakDurationValue = document.getElementById('longBreakDurationValue');
+      const pomodorosUntilLongBreakValue = document.getElementById('pomodorosUntilLongBreakValue');
+      const dailyGoalValue = document.getElementById('dailyGoalValue');
+      
+      
+      let timer;
+      let minutes = 25;
+      let seconds = 0;
+      let isRunning = false;
+      let mode = 'focus'; 
+      let currentPomodoro = 1;
+      let totalPomodorosCompleted = 0;
+      let sessionStartTime = null;
+      let currentSessionTimes = [];
+      let distractions = [];
+      let distractionStartTime = null;
+      
+      
+      let settings = {
+        focusDuration: 25,
+        shortBreakDuration: 5,
+        longBreakDuration: 15,
+        pomodorosUntilLongBreak: 4,
+        dailyGoal: 8,
+        vibrationEnabled: true,
+        notificationsEnabled: true,
+        soundEnabled: true
+      };
+      
+      
+      let stats = {
+        focusTime: 0, 
+        breakTime: 0, 
+        distractionTime: 0, 
+        completedPomodoros: 0,
+        sessions: []
+      };
+      
+      
+      function loadSavedData() {
+        const savedSettings = localStorage.getItem('pomodoroSettings');
+        const savedStats = localStorage.getItem('pomodoroStats');
+        
+        if (savedSettings) {
+          settings = JSON.parse(savedSettings);
+          
+          
+          focusDuration.value = settings.focusDuration;
+          shortBreakDuration.value = settings.shortBreakDuration;
+          longBreakDuration.value = settings.longBreakDuration;
+          pomodorosUntilLongBreak.value = settings.pomodorosUntilLongBreak;
+          dailyGoal.value = settings.dailyGoal || 8;
+          vibrationEnabled.checked = settings.vibrationEnabled;
+          notificationsEnabled.checked = settings.notificationsEnabled !== undefined ? settings.notificationsEnabled : true;
+          soundEnabled.checked = settings.soundEnabled !== undefined ? settings.soundEnabled : true;
+          
+          focusDurationValue.textContent = `${settings.focusDuration}m`;
+          shortBreakDurationValue.textContent = `${settings.shortBreakDuration}m`;
+          longBreakDurationValue.textContent = `${settings.longBreakDuration}m`;
+          pomodorosUntilLongBreakValue.textContent = settings.pomodorosUntilLongBreak;
+          dailyGoalValue.textContent = settings.dailyGoal || 8;
+        }
+        
+        if (savedStats) {
+          stats = JSON.parse(savedStats);
+        } else {
+          
+          setTimeout(() => {
+            welcomeModal.classList.remove('hidden');
+          }, 1000);
+          
+          
+          createDemoData();
+        }
+        
+        updateStatsDisplay();
+        renderSessionHistory();
+        
+        
+        minutes = 18;
+        seconds = 45;
+        updateTimerDisplay();
+        updateProgressRing();
+      }
+      
+      
+      function createDemoData() {
+        stats = {
+          focusTime: 75,
+          breakTime: 20,
+          distractionTime: 12,
+          completedPomodoros: 3,
+          sessions: []
+        };
+        
+        
+        currentSessionTimes = [
+          {
+            type: 'focus',
+            duration: 25,
+            timestamp: new Date(new Date().getTime() - 90 * 60000) 
+          },
+          {
+            type: 'shortBreak',
+            duration: 5,
+            timestamp: new Date(new Date().getTime() - 65 * 60000) 
+          },
+          {
+            type: 'focus',
+            duration: 25,
+            timestamp: new Date(new Date().getTime() - 60 * 60000) 
+          },
+          {
+            type: 'shortBreak',
+            duration: 5,
+            timestamp: new Date(new Date().getTime() - 35 * 60000) 
+          },
+          {
+            type: 'focus',
+            duration: 25,
+            timestamp: new Date(new Date().getTime() - 30 * 60000) 
+          },
+          {
+            type: 'shortBreak',
+            duration: 10,
+            timestamp: new Date(new Date().getTime() - 5 * 60000) 
+          }
+        ];
+        
+        
+        distractions = [
+          {
+            startTime: new Date(new Date().getTime() - 50 * 60000), 
+            endTime: new Date(new Date().getTime() - 45 * 60000), 
+            duration: 5
+          },
+          {
+            startTime: new Date(new Date().getTime() - 20 * 60000), 
+            endTime: new Date(new Date().getTime() - 13 * 60000), 
+            duration: 7
+          }
+        ];
+        
+        
+        sessionStartTime = new Date(new Date().getTime() - 120 * 60000); 
+        
+        
+        stats.sessions = [
+          {
+            date: new Date(new Date().setHours(0, 0, 0, 0)), 
+            duration: 2,
+            pomodorosCompleted: 3,
+            focusTime: 75,
+            breakTime: 20,
+            distractionTime: 12,
+            timeline: currentSessionTimes,
+            distractions: distractions
+          },
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 1)), 
+            duration: 4,
+            pomodorosCompleted: 6,
+            focusTime: 150,
+            breakTime: 35,
+            distractionTime: 8,
+            timeline: [],
+            distractions: []
+          },
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 2)), 
+            duration: 3,
+            pomodorosCompleted: 4,
+            focusTime: 100,
+            breakTime: 25,
+            distractionTime: 15,
+            timeline: [],
+            distractions: []
+          },
+          {
+            date: new Date(new Date().setDate(new Date().getDate() - 3)), 
+            duration: 5,
+            pomodorosCompleted: 8,
+            focusTime: 200,
+            breakTime: 45,
+            distractionTime: 5,
+            timeline: [],
+            distractions: []
+          }
+        ];
+        
+        saveStats();
+        updateSessionChart();
+      }
+      
+      
+      function saveSettings() {
+        settings = {
+          focusDuration: parseInt(focusDuration.value),
+          shortBreakDuration: parseInt(shortBreakDuration.value),
+          longBreakDuration: parseInt(longBreakDuration.value),
+          pomodorosUntilLongBreak: parseInt(pomodorosUntilLongBreak.value),
+          dailyGoal: parseInt(dailyGoal.value),
+          vibrationEnabled: vibrationEnabled.checked,
+          notificationsEnabled: notificationsEnabled.checked,
+          soundEnabled: soundEnabled.checked
+        };
+        
+        localStorage.setItem('pomodoroSettings', JSON.stringify(settings));
+        
+        
+        if (!isRunning) {
+          resetTimer();
+        }
+        
+        settingsModal.classList.add('hidden');
+      }
+      
+      
+      function resetSettings() {
+        focusDuration.value = 25;
+        shortBreakDuration.value = 5;
+        longBreakDuration.value = 15;
+        pomodorosUntilLongBreak.value = 4;
+        dailyGoal.value = 8;
+        vibrationEnabled.checked = true;
+        notificationsEnabled.checked = true;
+        soundEnabled.checked = true;
+        
+        focusDurationValue.textContent = '25m';
+        shortBreakDurationValue.textContent = '5m';
+        longBreakDurationValue.textContent = '15m';
+        pomodorosUntilLongBreakValue.textContent = '4';
+        dailyGoalValue.textContent = '8';
+      }
+      
+      
+      function saveStats() {
+        localStorage.setItem('pomodoroStats', JSON.stringify(stats));
+      }
+      
+      
+      function startTimer() {
+        if (isRunning) {
+          clearInterval(timer);
+          startBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            Start
+          `;
+          isRunning = false;
+          return;
+        }
+        
+        
+        if (!sessionStartTime) {
+          sessionStartTime = new Date();
+        }
+        
+        startBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          Pause
+        `;
+        
+        isRunning = true;
+        
+        timer = setInterval(() => {
+          if (seconds > 0) {
+            seconds--;
+          } else if (minutes > 0) {
+            minutes--;
+            seconds = 59;
+          } else {
+            
+            clearInterval(timer);
+            timerCompleted();
+            return;
+          }
+          
+          updateTimerDisplay();
+          updateProgressRing();
+        }, 1000);
+      }
+      
+      function resetTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        
+        startBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+          </svg>
+          Start
+        `;
+        
+        if (mode === 'focus') {
+          minutes = settings.focusDuration;
+        } else if (mode === 'shortBreak') {
+          minutes = settings.shortBreakDuration;
+        } else {
+          minutes = settings.longBreakDuration;
+        }
+        
+        seconds = 0;
+        updateTimerDisplay();
+        updateProgressRing();
+      }
+      
+      function updateTimerDisplay() {
+        timeDisplay.textContent = `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+      }
+      
+      function updateProgressRing() {
+        let totalSeconds;
+        let elapsedSeconds;
+        
+        if (mode === 'focus') {
+          totalSeconds = settings.focusDuration * 60;
+          elapsedSeconds = (settings.focusDuration - minutes - 1) * 60 + (60 - seconds);
+        } else if (mode === 'shortBreak') {
+          totalSeconds = settings.shortBreakDuration * 60;
+          elapsedSeconds = (settings.shortBreakDuration - minutes - 1) * 60 + (60 - seconds);
+        } else {
+          totalSeconds = settings.longBreakDuration * 60;
+          elapsedSeconds = (settings.longBreakDuration - minutes - 1) * 60 + (60 - seconds);
+        }
+        
+        if (elapsedSeconds < 0) elapsedSeconds = 0;
+        
+        const circumference = 2 * Math.PI * 45;
+        const progressPercentage = (elapsedSeconds / totalSeconds) * 100;
+        const dashArray = `${(circumference * progressPercentage) / 100} ${circumference}`;
+        
+        progressRing.style.strokeDasharray = dashArray;
+        
+        
+        if (mode === 'focus') {
+          progressRing.style.stroke = '#FF6B6B'; 
+        } else if (mode === 'shortBreak') {
+          progressRing.style.stroke = '#FF922B'; 
+        } else {
+          progressRing.style.stroke = '#FFA94D'; 
+        }
+      }
+      
+      function timerCompleted() {
+        
+        if (settings.vibrationEnabled && navigator.vibrate) {
+          navigator.vibrate([200, 100, 200]);
+        }
+        
+        
+        if (settings.soundEnabled) {
+          const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-software-interface-remove-2576.mp3');
+          audio.play();
+        }
+        
+        
+        const firework = document.createElement('div');
+        firework.className = 'firework';
+        firework.style.backgroundColor = mode === 'focus' ? '#FF6B6B' : '#FF922B';
+        document.querySelector('.progress-ring__circle').parentNode.appendChild(firework);
+        
+        setTimeout(() => {
+          firework.remove();
+        }, 600);
+        
+        
+        if (mode === 'focus') {
+          stats.focusTime += settings.focusDuration;
+          stats.completedPomodoros++;
+          totalPomodorosCompleted++;
+          
+          
+          currentSessionTimes.push({
+            type: 'focus',
+            duration: settings.focusDuration,
+            timestamp: new Date()
+          });
+          
+          
+          if (currentPomodoro % settings.pomodorosUntilLongBreak === 0) {
+            switchMode('longBreak');
+          } else {
+            switchMode('shortBreak');
+          }
+          
+          currentPomodoro++;
+        } else {
+          if (mode === 'shortBreak') {
+            stats.breakTime += settings.shortBreakDuration;
+            
+            
+            currentSessionTimes.push({
+              type: 'shortBreak',
+              duration: settings.shortBreakDuration,
+              timestamp: new Date()
+            });
+          } else {
+            stats.breakTime += settings.longBreakDuration;
+            
+            
+            currentSessionTimes.push({
+              type: 'longBreak',
+              duration: settings.longBreakDuration,
+              timestamp: new Date()
+            });
+          }
+          
+          switchMode('focus');
+        }
+        
+        saveStats();
+        updateStatsDisplay();
+        updateSessionChart();
+        
+        
+        if (settings.notificationsEnabled && Notification.permission === "granted") {
+          new Notification("Chili Pomodoro", {
+            body: `Time's up! ${mode === 'focus' ? 'Take a break' : 'Back to work'}`,
+            icon: "https://via.placeholder.com/128/FF6B6B/FFFFFF?text=P"
+          });
+        }
+        
+        
+        document.querySelector('.progress-ring__circle').classList.add('shake');
+        setTimeout(() => {
+          document.querySelector('.progress-ring__circle').classList.remove('shake');
+        }, 500);
+      }
+      
+      function switchMode(newMode) {
+        mode = newMode;
+        
+        if (mode === 'focus') {
+          timerMode.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+            </svg>
+            Focus Time
+          `;
+          timerMode.classList.remove('text-spice-700');
+          timerMode.classList.add('text-chili-700');
+          document.body.classList.remove('bg-spice-50');
+          document.body.classList.add('bg-gray-50');
+          minutes = settings.focusDuration;
+          pomodoroCount.textContent = `Pomodoro #${currentPomodoro}`;
+          pomodoroCount.classList.remove('bg-spice-50', 'text-spice-700');
+          pomodoroCount.classList.add('bg-chili-50', 'text-chili-700');
+        } else if (mode === 'shortBreak') {
+          timerMode.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            Short Break
+          `;
+          timerMode.classList.remove('text-chili-700');
+          timerMode.classList.add('text-spice-700');
+          document.body.classList.remove('bg-gray-50');
+          document.body.classList.add('bg-spice-50');
+          minutes = settings.shortBreakDuration;
+          pomodoroCount.classList.remove('bg-chili-50', 'text-chili-700');
+          pomodoroCount.classList.add('bg-spice-50', 'text-spice-700');
+        } else {
+          timerMode.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" />
+            </svg>
+            Long Break
+          `;
+          timerMode.classList.remove('text-chili-700');
+          timerMode.classList.add('text-spice-700');
+          document.body.classList.remove('bg-gray-50');
+          document.body.classList.add('bg-spice-50');
+          minutes = settings.longBreakDuration;
+          pomodoroCount.classList.remove('bg-chili-50', 'text-chili-700');
+          pomodoroCount.classList.add('bg-spice-50', 'text-spice-700');
+        }
+        
+        seconds = 0;
+        updateTimerDisplay();
+        updateProgressRing();
+      }
+      
+      function logDistraction() {
+        if (mode !== 'focus' || !isRunning) return;
+        
+        if (!distractionStartTime) {
+          
+          distractionStartTime = new Date();
+          distractionBtn.textContent = 'End Distraction';
+          distractionBtn.classList.remove('bg-spice-500', 'hover:bg-spice-600');
+          distractionBtn.classList.add('bg-red-500', 'hover:bg-red-600');
+          distractionBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+            End Distraction
+          `;
+        } else {
+          
+          const distractionEndTime = new Date();
+          const distractionDuration = (distractionEndTime - distractionStartTime) / (1000 * 60); 
+          
+          distractions.push({
+            startTime: distractionStartTime,
+            endTime: distractionEndTime,
+            duration: distractionDuration
+          });
+          
+          stats.distractionTime += distractionDuration;
+          distractionStartTime = null;
+          
+          distractionBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+            Log Distraction
+          `;
+          distractionBtn.classList.remove('bg-red-500', 'hover:bg-red-600');
+          distractionBtn.classList.add('bg-spice-500', 'hover:bg-spice-600');
+          
+          updateStatsDisplay();
+          saveStats();
+          updateSessionChart();
+        }
+      }
+      
+      function endSession() {
+        if (currentSessionTimes.length === 0) return;
+        
+        const sessionEndTime = new Date();
+        const sessionDuration = (sessionEndTime - sessionStartTime) / (1000 * 60 * 60); 
+        
+        const newSession = {
+          date: sessionStartTime,
+          duration: sessionDuration,
+          pomodorosCompleted: totalPomodorosCompleted,
+          focusTime: stats.focusTime,
+          breakTime: stats.breakTime,
+          distractionTime: stats.distractionTime,
+          timeline: currentSessionTimes,
+          distractions: distractions
+        };
+        
+        stats.sessions.unshift(newSession);
+        
+        
+        if (stats.sessions.length > 10) {
+          stats.sessions = stats.sessions.slice(0, 10);
+        }
+        
+        saveStats();
+        renderSessionHistory();
+        
+        
+        sessionStartTime = null;
+        currentSessionTimes = [];
+        distractions = [];
+        distractionStartTime = null;
+        totalPomodorosCompleted = 0;
+      }
+      
+      function updateStatsDisplay() {
+        
+        animateCounter(totalFocusTime, Math.round(stats.focusTime) + 'm');
+        animateCounter(totalBreakTime, Math.round(stats.breakTime) + 'm');
+        animateCounter(completedPomodoros, stats.completedPomodoros);
+        animateCounter(distractionTime, Math.round(stats.distractionTime) + 'm');
+        
+        
+        const progressPercent = (stats.completedPomodoros / settings.dailyGoal) * 100;
+        document.querySelector('.bg-chili-500.h-2\\.5').style.width = `${Math.min(progressPercent, 100)}%`;
+        
+        
+        document.querySelector('.text-sm.text-gray-500').textContent = `Today's Goal: ${settings.dailyGoal} Pomodoros`;
+        document.querySelector('.text-sm.font-medium').textContent = `${Math.round(progressPercent)}% Complete`;
+      }
+      
+      function animateCounter(element, newValue) {
+        element.classList.add('stat-counter');
+        setTimeout(() => {
+          element.textContent = newValue;
+        }, 100);
+      }
+      
+      function renderSessionHistory() {
+        
+        
+      }
+      
+      
+      let sessionChart;
+      
+      function initializeChart() {
+    const options = {
+      series: [{
+        name: 'Focus',
+        data: [25, 0, 25, 0, 25, 0]
+      }, {
+        name: 'Break',
+        data: [0, 5, 0, 5, 0, 10]
+      }, {
+        name: 'Distraction',
+        data: [5, 0, 2, 0, 5, 0]
+      }],
+      chart: {
+        type: 'bar',
+        height: '100%',
+        stacked: true,
+        toolbar: {
+          show: false
+        }
+      },
+      colors: ['#FF6B6B', '#FF922B', '#FA5252'],
+      xaxis: {
+        categories: ['9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'],
+        labels: {
+          style: {
+            fontSize: '10px'
+          }
+        }
+      },
+      legend: {
+        show: false
+      },
+      fill: {
+        opacity: 1
+      }
+    };
+
+    const chart = new ApexCharts(document.querySelector("#sessionChart"), options);
+    chart.render();
+    
+    
+    window.sessionChart = chart;
+  }
+      function updateSessionChart() {
+        if (!sessionChart) return;
+        
+        const timeLabels = [];
+        const focusData = [];
+        const breakData = [];
+        const distractionData = [];
+        
+        
+        const timesToShow = currentSessionTimes.slice(-8);
+        
+        timesToShow.forEach(timeEntry => {
+          const time = new Date(timeEntry.timestamp);
+          const timeLabel = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          
+          timeLabels.push(timeLabel);
+          
+          if (timeEntry.type === 'focus') {
+            focusData.push(timeEntry.duration);
+            breakData.push(0);
+          } else {
+            focusData.push(0);
+            breakData.push(timeEntry.duration);
+          }
+          
+          
+          let distractionSum = 0;
+          distractions.forEach(d => {
+            const distStart = new Date(d.startTime);
+            const entryTime = new Date(timeEntry.timestamp);
+            const entryEndTime = new Date(entryTime.getTime() + timeEntry.duration * 60 * 1000);
+            
+            if (distStart >= entryTime && distStart < entryEndTime) {
+              distractionSum += d.duration;
+            }
+          });
+          
+          distractionData.push(distractionSum);
+        });
+        
+        sessionChart.data.labels = timeLabels;
+        sessionChart.data.datasets[0].data = focusData;
+        sessionChart.data.datasets[1].data = breakData;
+        sessionChart.data.datasets[2].data = distractionData;
+        
+        sessionChart.update();
+      }
+      
+      
+      startBtn.addEventListener('click', startTimer);
+      resetBtn.addEventListener('click', resetTimer);
+      distractionBtn.addEventListener('click', logDistraction);
+      
+      settingsBtn.addEventListener('click', () => {
+        settingsModal.classList.remove('hidden');
+      });
+      
+      closeSettingsBtn.addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+      });
+      
+      saveSettingsBtn.addEventListener('click', saveSettings);
+      resetSettingsBtn.addEventListener('click', resetSettings);
+      
+      startUsingAppBtn.addEventListener('click', () => {
+        welcomeModal.classList.add('hidden');
+      });
+      
+      
+      focusDuration.addEventListener('input', () => {
+        focusDurationValue.textContent = `${focusDuration.value}m`;
+      });
+      
+      shortBreakDuration.addEventListener('input', () => {
+        shortBreakDurationValue.textContent = `${shortBreakDuration.value}m`;
+      });
+      
+      longBreakDuration.addEventListener('input', () => {
+        longBreakDurationValue.textContent = `${longBreakDuration.value}m`;
+      });
+      
+      pomodorosUntilLongBreak.addEventListener('input', () => {
+        pomodorosUntilLongBreakValue.textContent = pomodorosUntilLongBreak.value;
+      });
+      
+      dailyGoal.addEventListener('input', () => {
+        dailyGoalValue.textContent = dailyGoal.value;
+      });
+      
+      
+      window.addEventListener('click', (event) => {
+        if (event.target === settingsModal) {
+          settingsModal.classList.add('hidden');
+        }
+        if (event.target === welcomeModal) {
+          welcomeModal.classList.add('hidden');
+        }
+      });
+      
+      
+      if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+      }
+      
+      
+      window.addEventListener('beforeunload', () => {
+        if (isRunning || currentSessionTimes.length > 0) {
+          endSession();
+        }
+      });
+      
+      
+      loadSavedData();
+      initializeChart();
+      updateProgressRing();
+      updateSessionChart();
+      
+      
+      isRunning = true;
+      startBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        Pause
+      `;
+      
+      
+      window.addEventListener('orientationchange', () => {
+        setTimeout(() => {
+          updateProgressRing();
+          if (sessionChart) {
+            sessionChart.resize();
+          }
+        }, 300);
+      });
+      
+      
+      window.addEventListener('resize', () => {
+        if (sessionChart) {
+          sessionChart.resize();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
