@@ -20,7 +20,7 @@ export default function ProjectPage({ params: paramsPromise }: { params: Promise
   if (type === 'html') {
     Content = (
       <iframe
-        src={`/HTML/${slug}.html`}
+        src={`/api/projects/html/${slug}`}
         className="w-full h-[calc(100vh-60px)] border-none bg-white"
         title={(project as any).title}
         allow="fullscreen"
