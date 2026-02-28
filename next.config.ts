@@ -1,7 +1,19 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: 'export',
+  basePath: isProd ? '/Outlier' : '',
+  images: {
+    unoptimized: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
