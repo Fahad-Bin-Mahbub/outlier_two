@@ -939,14 +939,7 @@
     "category": "React/Next",
     "description": "This may take a few moments"
   },
-  {
-    "id": "react-BacklogBuster",
-    "title": "Backlog Buster",
-    "type": "react",
-    "slug": "BacklogBuster",
-    "category": "React/Next",
-    "description": "Drag games from above to schedule on the timeline."
-  },
+  
   {
     "id": "react-BikeCompare",
     "title": "Bike Compare",
@@ -987,14 +980,7 @@
     "category": "React/Next",
     "description": "Explore thousands of books, find your favorites, and build your personal library with ease."
   },
-  {
-    "id": "react-BreakingNews",
-    "title": "Breaking News",
-    "type": "react",
-    "slug": "BreakingNews",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
+  
   {
     "id": "react-BudgetDashboard",
     "title": "Budget Analytics",

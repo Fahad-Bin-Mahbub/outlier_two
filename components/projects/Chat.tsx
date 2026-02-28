@@ -547,7 +547,7 @@ const Chat = () => {
 	if (!isLoaded) {
 		return (
 			<div
-				className={`h-screen flex items-center justify-center ${
+				className={`h-screen overflow-hidden flex items-center justify-center ${
 					isDark ? "bg-gray-900" : "bg-gradient-to-br from-gray-50 to-gray-100"
 				}`}
 			>
@@ -899,7 +899,7 @@ const Chat = () => {
 				}
 			`}</style>
 			<div
-				className={`h-screen flex flex-col md:flex-row ${
+				className={`h-screen overflow-hidden flex flex-col md:flex-row ${
 					isDark
 						? "bg-gray-900 text-gray-100"
 						: "bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900"
@@ -1143,7 +1143,7 @@ const Chat = () => {
 					</div>
 				</div>
 
-				<div className="flex-1 flex flex-col h-full">
+				<div className="flex-1 min-h-0 flex flex-col h-full overflow-hidden">
 					<div
 						className={`h-16 px-6 flex items-center justify-between ${
 							isDark ? "bg-gray-800/95" : "bg-white/95"
@@ -1200,7 +1200,7 @@ const Chat = () => {
 
 					<div
 						ref={chatRef}
-						className="flex-1 p-6 overflow-y-auto scrollbar-thin relative"
+						className="flex-1 min-h-0 p-6 overflow-y-auto scrollbar-thin relative"
 						style={{
 							backgroundImage: isDark
 								? "url('https://i.pinimg.com/736x/d5/5d/fe/d55dfe6820a275b74f00de0a824ab9e0.jpg')"
@@ -1210,7 +1210,7 @@ const Chat = () => {
 							opacity: isDark ? "0.85" : "1",
 						}}
 					>
-						<div className="space-y-4 relative z-10">
+						<div className="space-y-4 relative">
 							{messagesByContact[currentFriend].map((message, index) => {
 								const showDateDivider =
 									index === 0 ||
@@ -1536,7 +1536,8 @@ const Chat = () => {
 									<Smile className="w-5 h-5" />
 								</button>
 								{showEmojis && (
-									<div className="absolute bottom-12 left-0 z-[9999] transform -translate-x-1/2">
+									<div className="absolute bottom-full mb-2 left-0 z-[9999]">
+										{" "}
 										<EmojiPicker
 											onEmojiClick={handleEmojiSelect}
 											theme={isDark ? Theme.DARK : Theme.LIGHT}
@@ -1553,7 +1554,6 @@ const Chat = () => {
 												borderRadius: "16px",
 												boxShadow:
 													"0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-												position: "absolute",
 											}}
 										/>
 									</div>
