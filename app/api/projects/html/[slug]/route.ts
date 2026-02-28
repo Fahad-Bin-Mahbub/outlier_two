@@ -21,10 +21,12 @@ export async function GET(
     let htmlContent = fs.readFileSync(filePath, 'utf8');
 
     // Inject API Keys from environment variables
-    // Look for YOUR_API_KEY_HERE or similar placeholders
     const googleMapsKey = process.env.GOOGLE_MAPS_API_KEY || 'YOUR_API_KEY_HERE';
+    const firebaseKey = process.env.FIREBASE_API_KEY || 'YOUR_FIREBASE_API_KEY_HERE';
     
-    htmlContent = htmlContent.replace(/YOUR_API_KEY_HERE/g, googleMapsKey);
+    htmlContent = htmlContent
+      .replace(/YOUR_API_KEY_HERE/g, googleMapsKey)
+      .replace(/YOUR_FIREBASE_API_KEY_HERE/g, firebaseKey);
 
     // Return the modified HTML
     return new NextResponse(htmlContent, {

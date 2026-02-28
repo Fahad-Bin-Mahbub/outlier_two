@@ -132,7 +132,7 @@ const HomePage: React.FC = () => {
 
 	const getMapUrl = () => {
 		const location = locations[activeLocation];
-		return `https://www.google.com/maps/embed/v1/place?key=YOUR_TRAVEL_API_KEY_HERE&q=${location.coordinates.lat},${location.coordinates.lng}&zoom=${mapZoom}`;
+		return `https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_TRAVEL_MAPS_API_KEY}&q=${location.coordinates.lat},${location.coordinates.lng}&zoom=${mapZoom}`;
 	};
 
 	const services: Service[] = [
