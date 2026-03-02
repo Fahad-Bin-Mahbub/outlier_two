@@ -1,1315 +1,314 @@
 [
-  {
-    "id": "react-APIBuilder",
-    "title": "API Builder",
-    "type": "react",
-    "slug": "APIBuilder",
-    "category": "React/Next",
-    "description": "A modern, intuitive tool for crafting and testing API requests. Build, validate, and export your API calls with ease.",
-    "featured": true
-  },
-  {
-    "id": "react-APIConnectionBuilder",
-    "title": "API Connection Builder",
-    "type": "react",
-    "slug": "APIConnectionBuilder",
-    "category": "React/Next",
-    "description": "Connect your API endpoints and customize easily"
-  },
-  {
-    "id": "react-ActivityTimeline",
-    "title": "Activity Timeline",
-    "type": "react",
-    "slug": "ActivityTimeline",
-    "category": "React/Next",
-    "description": "User Interaction Platform"
-  },
-  {
-    "id": "react-ArtistHub",
-    "title": "CreativePro",
-    "type": "react",
-    "slug": "ArtistHub",
-    "category": "React/Next",
-    "description": "I think it looks great! Just a few tweaks needed on the typography."
-  },
-  {
-    "id": "react-AssistantAI",
-    "title": "AI Debugger",
-    "type": "react",
-    "slug": "AssistantAI",
-    "category": "React/Next",
-    "description": "This may take a few moments"
-  },
-  {
-    "id": "react-BikeCompare",
-    "title": "Bike Compare",
-    "type": "react",
-    "slug": "BikeCompare",
-    "category": "React/Next",
-    "description": "You haven't added any bikes to your collection yet. Start comparing and select the ones you like!"
-  },
-  {
-    "id": "react-BinarySimulator",
-    "title": "BinaryStar",
-    "type": "react",
-    "slug": "BinarySimulator",
-    "category": "React/Next",
-    "description": "Save your current simulation state"
-  },
-  {
-    "id": "react-Blog",
-    "title": "Insights for the Curious Mind",
-    "type": "react",
-    "slug": "Blog",
-    "category": "React/Next",
-    "description": "React Hooks were introduced in React 16.8 as a way to use state and other React features without writing a class. They allow you to hook into React state and li"
-  },
-  {
-    "id": "react-BookClub",
-    "title": "Book Club",
-    "type": "react",
-    "slug": "BookClub",
-    "category": "React/Next",
-    "description": "Welcome to Literati Book Club!"
-  },
-  {
-    "id": "react-BookSearch",
-    "title": "Book Search",
-    "type": "react",
-    "slug": "BookSearch",
-    "category": "React/Next",
-    "description": "Explore thousands of books, find your favorites, and build your personal library with ease."
-  },
-  {
-    "id": "react-BudgetDashboard",
-    "title": "Budget Analytics",
-    "type": "react",
-    "slug": "BudgetDashboard",
-    "category": "React/Next",
-    "description": "Track your spending with ease"
-  },
-  {
-    "id": "react-Chat",
-    "title": "ChatWithBuddy",
-    "type": "react",
-    "slug": "Chat",
-    "category": "React/Next",
-    "description": "Try adjusting your search or add new contacts to start chatting"
-  },
-  {
-    "id": "react-ChatApp",
-    "title": "Chat App",
-    "type": "react",
-    "slug": "ChatApp",
-    "category": "React/Next",
-    "description": "Select a conversation from the list to start chatting or create a new one"
-  },
-  {
-    "id": "react-ChromaSync",
-    "title": "Chroma Sync",
-    "type": "react",
-    "slug": "ChromaSync",
-    "category": "React/Next",
-    "description": "Intelligent Palette Generator"
-  },
-  {
-    "id": "react-CodeDiff",
-    "title": "Code Diff Viewer",
-    "type": "react",
-    "slug": "CodeDiff",
-    "category": "React/Next",
-    "description": "Professional code comparison and analysis"
-  },
-  {
-    "id": "react-CodeDifference",
-    "title": "Code Difference",
-    "type": "react",
-    "slug": "CodeDifference",
-    "category": "React/Next",
-    "description": "Advanced code review platform designed for development teams to collaborate, compare changes, and ensure code quality."
-  },
-  {
-    "id": "react-CodeEditor",
-    "title": "Code Editor",
-    "type": "react",
-    "slug": "CodeEditor",
-    "category": "React/Next",
-    "description": "Failed to save files. This might be due to:"
-  },
-  {
-    "id": "react-ColorPalette",
-    "title": "ChromaHive",
-    "type": "react",
-    "slug": "ColorPalette",
-    "category": "React/Next",
-    "description": "No palettes match your filters."
-  },
-  {
-    "id": "react-CommerceScreening",
-    "title": "Commerce Screening",
-    "type": "react",
-    "slug": "CommerceScreening",
-    "category": "React/Next",
-    "description": "Handpicked items that define our brand aesthetic. Each piece tells a story of craftsmanship and timeless appeal."
-  },
-  {
-    "id": "react-ConferenceWaitingRoom",
-    "title": "Virtual Waiting Room",
-    "type": "react",
-    "slug": "ConferenceWaitingRoom",
-    "category": "React/Next",
-    "description": "We've saved your settings and moved you to the front of the queue."
-  },
-  {
-    "id": "react-ContactForm",
-    "title": "MythForm",
-    "type": "react",
-    "slug": "ContactForm",
-    "category": "React/Next",
-    "description": "Thank you for reaching out. We'll get back to you within 24 hours."
-  },
-  {
-    "id": "react-ContentPlatform",
-    "title": "ContentFlow",
-    "type": "react",
-    "slug": "ContentPlatform",
-    "category": "React/Next",
-    "description": "(mockContent) const likedItems, setLikedItems  useState"
-  },
-  {
-    "id": "react-DJPRactice",
-    "title": "DJ Practice Studio",
-    "type": "react",
-    "slug": "DJPRactice",
-    "category": "React/Next",
-    "description": "(false) const audioData, setAudioData  useState"
-  },
-  {
-    "id": "react-DailyGoalTrackerApp",
-    "title": "Transform Your Daily Goals",
-    "type": "react",
-    "slug": "DailyGoalTrackerApp",
-    "category": "React/Next",
-    "description": "Achieve more with intelligent goal tracking, powerful analytics, and seamless device sync. Join thousands who've revolutionized their productivity."
-  },
-  {
-    "id": "react-DataVis",
-    "title": "Sales Analytics Dashboard",
-    "type": "react",
-    "slug": "DataVis",
-    "category": "React/Next",
-    "description": "Upload sales data with columns: Date, Product Category, Region, Revenue, Units Sold"
-  },
-  {
-    "id": "react-DisasterResponse",
-    "title": "Choose Your Scenario",
-    "type": "react",
-    "slug": "DisasterResponse",
-    "category": "React/Next",
-    "description": "Follow these steps to create your own disaster response scenario:"
-  },
-  {
-    "id": "react-Donation",
-    "title": "Make a Difference Today",
-    "type": "react",
-    "slug": "Donation",
-    "category": "React/Next",
-    "description": "Choose a cause you'd like to support"
-  },
-  {
-    "id": "react-DonorList",
-    "title": "DonorHub",
-    "type": "react",
-    "slug": "DonorList",
-    "category": "React/Next",
-    "description": "Track contributions, celebrate milestones, and visualize your community's impact. Reward your supporters with achievements that acknowledge their generosity."
-  },
-  {
-    "id": "react-DraftPulse",
-    "title": "DraftPulse",
-    "type": "react",
-    "slug": "DraftPulse",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-Drilling",
-    "title": "Deep Diggers Mining Corp.",
-    "type": "react",
-    "slug": "Drilling",
-    "category": "React/Next",
-    "description": "Advanced Resource Extraction Operations"
-  },
-  {
-    "id": "react-Dummy",
-    "title": "SuspensionLab Pro",
-    "type": "react",
-    "slug": "Dummy",
-    "category": "React/Next",
-    "description": "Advanced Vehicle Dynamics Simulator"
-  },
-  {
-    "id": "react-EMagazine",
-    "title": "Discover The World Through Our Pages",
-    "type": "react",
-    "slug": "EMagazine",
-    "category": "React/Next",
-    "description": "Immerse yourself in thought-provoking content with our weekly magazine releases. Stay informed about the latest developments across technology, business, health"
-  },
-  {
-    "id": "react-EcoSystem",
-    "title": "🌿 Ecosystem Dynamics",
-    "type": "react",
-    "slug": "EcoSystem",
-    "category": "React/Next",
-    "description": "Predator-Prey Population Simulation"
-  },
-  {
-    "id": "react-EisenhowerDashboard",
-    "title": "Eisenhower Matrix",
-    "type": "react",
-    "slug": "EisenhowerDashboard",
-    "category": "React/Next",
-    "description": "Drag tasks here or add new ones"
-  },
-  {
-    "id": "react-ElectricFieldSimulation",
-    "title": "How It Works",
-    "type": "react",
-    "slug": "ElectricFieldSimulation",
-    "category": "React/Next",
-    "description": "Explore the beauty of electromagnetic physics through interactive visualization. Perfect for students, educators, and physics enthusiasts."
-  },
-  {
-    "id": "react-ElectroSIm",
-    "title": "ElectroSim",
-    "type": "react",
-    "slug": "ElectroSIm",
-    "category": "React/Next",
-    "description": "Select a charge to edit its properties"
-  },
-  {
-    "id": "react-EmWaveAnalyzer",
-    "title": "WaveViz Pro",
-    "type": "react",
-    "slug": "EmWaveAnalyzer",
-    "category": "React/Next",
-    "description": "Electromagnetic Wave Analyzer"
-  },
-  {
-    "id": "react-EmailEncryption",
-    "title": "Email Encryption",
-    "type": "react",
-    "slug": "EmailEncryption",
-    "category": "React/Next",
-    "description": "Please wait while we set up your secure environment"
-  },
-  {
-    "id": "react-Event",
-    "title": "TaskMaster",
-    "type": "react",
-    "slug": "Event",
-    "category": "React/Next",
-    "description": "Your ultimate productivity companion"
-  },
-  {
-    "id": "react-EventBook",
-    "title": "Eventbook",
-    "type": "react",
-    "slug": "EventBook",
-    "category": "React/Next",
-    "description": "Maximum 10 tickets per booking"
-  },
-  {
-    "id": "react-EventCalener",
-    "title": "THIS Connect",
-    "type": "react",
-    "slug": "EventCalener",
-    "category": "React/Next",
-    "description": "Try changing your filters or add a new event"
-  },
-  {
-    "id": "react-EventFeedbackDashboard",
-    "title": "Feedback Insights",
-    "type": "react",
-    "slug": "EventFeedbackDashboard",
-    "category": "React/Next",
-    "description": "A powerful data visualization dashboard featuring real-time monitoring, filtered analytics, and comprehensive reporting tools."
-  },
-  {
-    "id": "react-EventHorizon",
-    "title": "EventHorizon",
-    "type": "react",
-    "slug": "EventHorizon",
-    "category": "React/Next",
-    "description": "This application uses features that may be restricted on some servers."
-  },
-  {
-    "id": "react-EventHubPro",
-    "title": "EventHubPro",
-    "type": "react",
-    "slug": "EventHubPro",
-    "category": "React/Next",
-    "description": "Your input helps us improve future sessions."
-  },
-  {
-    "id": "react-EventPlatformPage",
-    "title": "EventHub",
-    "type": "react",
-    "slug": "EventPlatformPage",
-    "category": "React/Next",
-    "description": "Professional hybrid event platform for seamless virtual experiences"
-  },
-  {
-    "id": "react-EventScheduler",
-    "title": "Collaborative Event Planner",
-    "type": "react",
-    "slug": "EventScheduler",
-    "category": "React/Next",
-    "description": "Please enter your name to collaborate with your team"
-  },
-  {
-    "id": "react-FamilyPlanning",
-    "title": "Family Planning",
-    "type": "react",
-    "slug": "FamilyPlanning",
-    "category": "React/Next",
-    "description": "No tasks yet. Add one below!"
-  },
-  {
-    "id": "react-FileConverter",
-    "title": "File Converter",
-    "type": "react",
-    "slug": "FileConverter",
-    "category": "React/Next",
-    "description": "Convert between document, image, audio, and video formats with just a few clicks. No software installation required."
-  },
-  {
-    "id": "react-FilePortal",
-    "title": "File Portal",
-    "type": "react",
-    "slug": "FilePortal",
-    "category": "React/Next",
-    "description": "Add confidential watermark to preview"
-  },
-  {
-    "id": "react-Finance",
-    "title": "FinancePro",
-    "type": "react",
-    "slug": "Finance",
-    "category": "React/Next",
-    "description": "Track expenses, set limits, and get real-time budget insights"
-  },
-  {
-    "id": "react-FinancialDashboard",
-    "title": "Financial Dashboard",
-    "type": "react",
-    "slug": "FinancialDashboard",
-    "category": "React/Next",
-    "description": "Real-time market insights"
-  },
-  {
-    "id": "react-Fitness",
-    "title": "Sports Activity Tracker Pro",
-    "type": "react",
-    "slug": "Fitness",
-    "category": "React/Next",
-    "description": "Your goal progress will automatically update based on your tracked activities."
-  },
-  {
-    "id": "react-GameDash",
-    "title": "Game Dash",
-    "type": "react",
-    "slug": "GameDash",
-    "category": "React/Next",
-    "description": "No players found matching your search"
-  },
-  {
-    "id": "react-GamingDashModel",
-    "title": "Gaming Dashboard",
-    "type": "react",
-    "slug": "GamingDashModel",
-    "category": "React/Next",
-    "description": "A powerful data visualization dashboard featuring real-time monitoring, filtered analytics, and comprehensive reporting tools."
-  },
-  {
-    "id": "react-GoalDashboard",
-    "title": "Goal Dashboard",
-    "type": "react",
-    "slug": "GoalDashboard",
-    "category": "React/Next",
-    "description": "Loading your dashboard..."
-  },
-  {
-    "id": "react-GradeTrack",
-    "title": "GradeTrack",
-    "type": "react",
-    "slug": "GradeTrack",
-    "category": "React/Next",
-    "description": "Student Performance Dashboard"
-  },
-  {
-    "id": "react-GravitationalSimulation",
-    "title": "Cosmic Orbit Simulator",
-    "type": "react",
-    "slug": "GravitationalSimulation",
-    "category": "React/Next",
-    "description": "This simulator demonstrates gravitational orbits based on Newton&aposs law of universal gravitation. Watch how planets orbit around a central star under the inf"
-  },
-  {
-    "id": "react-GyotakuApp",
-    "title": "Gyotaku App",
-    "type": "react",
-    "slug": "GyotakuApp",
-    "category": "React/Next",
-    "description": "Gyotaku involves creating detailed impressions of fish using ink and paper. The process captures the intricate details of the fish's scales, fins, and form. The"
-  },
-  {
-    "id": "react-HabitModel1",
-    "title": "Habit Streak",
-    "type": "react",
-    "slug": "HabitModel1",
-    "category": "React/Next",
-    "description": "(initialGoals) // Progress per day per goal const progress, setProgress  useState"
-  },
-  {
-    "id": "react-HabitTracker",
-    "title": "Habit Tracker",
-    "type": "react",
-    "slug": "HabitTracker",
-    "category": "React/Next",
-    "description": "Try adjusting your search or filters to find what you're looking for."
-  },
-  {
-    "id": "react-HabitTrackerMobile",
-    "title": "HabitFlow",
-    "type": "react",
-    "slug": "HabitTrackerMobile",
-    "category": "React/Next",
-    "description": "A robust management system for monitoring progress, resources, and performance metrics over time."
-  },
-  {
-    "id": "react-HairSaloonApp",
-    "title": "Hair Saloon App",
-    "type": "react",
-    "slug": "HairSaloonApp",
-    "category": "React/Next",
-    "description": "Professional services delivered with precision and care"
-  },
-  {
-    "id": "react-HarmonyColors",
-    "title": "Color Harmony",
-    "type": "react",
-    "slug": "HarmonyColors",
-    "category": "React/Next",
-    "description": "Craft stunning color palettes here only"
-  },
-  {
-    "id": "react-HealthHabitTracker",
-    "title": "Health Habit Tracker",
-    "type": "react",
-    "slug": "HealthHabitTracker",
-    "category": "React/Next",
-    "description": "A robust management system for monitoring progress, resources, and performance metrics over time."
-  },
-  {
-    "id": "react-Hobby",
-    "title": "Hobby",
-    "type": "react",
-    "slug": "Hobby",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-HospitalDashboard",
-    "title": "Hospital Dashboard",
-    "type": "react",
-    "slug": "HospitalDashboard",
-    "category": "React/Next",
-    "description": "Supply Chain & Patient Analytics"
-  },
-  {
-    "id": "react-InfluencerMatchmaker",
-    "title": "Influencer Matchmaker",
-    "type": "react",
-    "slug": "InfluencerMatchmaker",
-    "category": "React/Next",
-    "description": "Find the perfect influencers for your brand campaigns"
-  },
-  {
-    "id": "react-InstaChatMessage",
-    "title": "Messages",
-    "type": "react",
-    "slug": "InstaChatMessage",
-    "category": "React/Next",
-    "description": "Chat with our AI assistant"
-  },
-  {
-    "id": "react-Instagram",
-    "title": "Photogram",
-    "type": "react",
-    "slug": "Instagram",
-    "category": "React/Next",
-    "description": "This is a demonstration. Your post won't actually be saved since there is no database connected."
-  },
-  {
-    "id": "react-InterestHub",
-    "title": "InterestHub",
-    "type": "react",
-    "slug": "InterestHub",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-LanguageLearningPlatform",
-    "title": "Grammar Master",
-    "type": "react",
-    "slug": "LanguageLearningPlatform",
-    "category": "React/Next",
-    "description": "Our system automatically adjusts to your performance, unlocking more challenging exercises as you improve."
-  },
-  {
-    "id": "react-LearnHub",
-    "title": "Learn Hub",
-    "type": "react",
-    "slug": "LearnHub",
-    "category": "React/Next",
-    "description": "Transform your team with our powerful educational platform. Deliver engaging courses, track progress, and elevate skills to the next level."
-  },
-  {
-    "id": "react-Learning",
-    "title": "LinguaLearn Pro",
-    "type": "react",
-    "slug": "Learning",
-    "category": "React/Next",
-    "description": "Master new languages with interactive lessons, personalized practice, and AI-powered feedback."
-  },
-  {
-    "id": "react-LearningAnalytics",
-    "title": "Learning Analytics",
-    "type": "react",
-    "slug": "LearningAnalytics",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-LearningApp",
-    "title": "Learning App",
-    "type": "react",
-    "slug": "LearningApp",
-    "category": "React/Next",
-    "description": "Master any subject with personalized learning tools. Create custom flashcards, take quizzes, and track your progress."
-  },
-  {
-    "id": "react-LearningPortal",
-    "title": "LearnHub",
-    "type": "react",
-    "slug": "LearningPortal",
-    "category": "React/Next",
-    "description": "Access cutting-edge courses and resources that help you grow professionally and personally."
-  },
-  {
-    "id": "react-LinguaLearn",
-    "title": "LinguaLearn",
-    "type": "react",
-    "slug": "LinguaLearn",
-    "category": "React/Next",
-    "description": "This feature needs microphone access to record your voice"
-  },
-  {
-    "id": "react-LinkRepository",
-    "title": "Link Repository",
-    "type": "react",
-    "slug": "LinkRepository",
-    "category": "React/Next",
-    "description": "Manage and organize your team's knowledge base"
-  },
-  {
-    "id": "react-Lms",
-    "title": "LearnHub Pro",
-    "type": "react",
-    "slug": "Lms",
-    "category": "React/Next",
-    "description": "Each learning path provides a structured curriculum designed by industry experts to help you achieve specific career goals."
-  },
-  {
-    "id": "react-LogisticTracker",
-    "title": "LogiFlow",
-    "type": "react",
-    "slug": "LogisticTracker",
-    "category": "React/Next",
-    "description": "Initializing your logistics dashboard..."
-  },
-  {
-    "id": "react-MasonryPortfolio",
-    "title": "Share Your Technical Knowledge",
-    "type": "react",
-    "slug": "MasonryPortfolio",
-    "category": "React/Next",
-    "description": "In the rapidly evolving landscape of technology, keeping up with best practices and emerging trends is essential. This article explores the key concepts and imp"
-  },
-  {
-    "id": "react-MeetupHub",
-    "title": "MeetupHub",
-    "type": "react",
-    "slug": "MeetupHub",
-    "category": "React/Next",
-    "description": "Connect with like-minded people, explore interests, and create unforgettable memories in your community."
-  },
-  {
-    "id": "react-MobileNotes",
-    "title": "NotesApp",
-    "type": "react",
-    "slug": "MobileNotes",
-    "category": "React/Next",
-    "description": "You're offline. Changes will be synced when you reconnect."
-  },
-  {
-    "id": "react-ModelResponse",
-    "title": "Model Response",
-    "type": "react",
-    "slug": "ModelResponse",
-    "category": "React/Next",
-    "description": "Try adjusting your search or filter criteria."
-  },
-  {
-    "id": "react-MoodZest",
-    "title": "Mood Zest",
-    "type": "react",
-    "slug": "MoodZest",
-    "category": "React/Next",
-    "description": "Intuitive interface for effortless creativity"
-  },
-  {
-    "id": "react-MotionPhysics",
-    "title": "Motion Physics",
-    "type": "react",
-    "slug": "MotionPhysics",
-    "category": "React/Next",
-    "description": "(light) const presetIdx, setPresetIdx  useState(0) const params, setParams  useState"
-  },
-  {
-    "id": "react-MotorInterface",
-    "title": "DC Motor Control Interface",
-    "type": "react",
-    "slug": "MotorInterface",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-MysteriousExplorer",
-    "title": "ColorQuest",
-    "type": "react",
-    "slug": "MysteriousExplorer",
-    "category": "React/Next",
-    "description": "Challenge Your Color Perception"
-  },
-  {
-    "id": "react-Netflix",
-    "title": "Netflix",
-    "type": "react",
-    "slug": "Netflix",
-    "category": "React/Next",
-    "description": "Skipping to Next Episode..."
-  },
-  {
-    "id": "react-NetflixClone",
-    "title": "NETFLUX",
-    "type": "react",
-    "slug": "NetflixClone",
-    "category": "React/Next",
-    "description": "Cast information would appear here"
-  },
-  {
-    "id": "react-NewsDebunking",
-    "title": "News Debunking",
-    "type": "react",
-    "slug": "NewsDebunking",
-    "category": "React/Next",
-    "description": "No comments yet. Be the first to comment!"
-  },
-  {
-    "id": "react-NewsLetterArchive",
-    "title": "TimeNews",
-    "type": "react",
-    "slug": "NewsLetterArchive",
-    "category": "React/Next",
-    "description": "Loading your timeline experience..."
-  },
-  {
-    "id": "react-NonoGram",
-    "title": "NONOGRAM",
-    "type": "react",
-    "slug": "NonoGram",
-    "category": "React/Next",
-    "description": "Master the Art of Logic & Pattern Recognition"
-  },
-  {
-    "id": "react-NoteSharingApp",
-    "title": "TeamNotes",
-    "type": "react",
-    "slug": "NoteSharingApp",
-    "category": "React/Next",
-    "description": "No documents match your search"
-  },
-  {
-    "id": "react-NotificationSystem",
-    "title": "Notification System",
-    "type": "react",
-    "slug": "NotificationSystem",
-    "category": "React/Next",
-    "description": "When you get notifications, they'll show up here"
-  },
-  {
-    "id": "react-Numero",
-    "title": "Numero",
-    "type": "react",
-    "slug": "Numero",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-OSLabSImulator",
-    "title": "CPU Scheduling Simulator",
-    "type": "react",
-    "slug": "OSLabSImulator",
-    "category": "React/Next",
-    "description": "Explore and understand OS scheduling algorithms with interactive simulation"
-  },
-  {
-    "id": "react-OfficeTracker",
-    "title": "WorkPulse",
-    "type": "react",
-    "slug": "OfficeTracker",
-    "category": "React/Next",
-    "description": "Your longest streak this month! Keep it up."
-  },
-  {
-    "id": "react-OpticsLab",
-    "title": "Optics Lab",
-    "type": "react",
-    "slug": "OpticsLab",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-OrbitalMechanicsSimulator",
-    "title": "Solar System Simulator",
-    "type": "react",
-    "slug": "OrbitalMechanicsSimulator",
-    "category": "React/Next",
-    "description": "(5) const showOrbits, setShowOrbits  useState"
-  },
-  {
-    "id": "react-PMS",
-    "title": "PMS",
-    "type": "react",
-    "slug": "PMS",
-    "category": "React/Next",
-    "description": "View and manage your scheduled appointments"
-  },
-  {
-    "id": "react-PalindromeGame",
-    "title": "Palindrome Game",
-    "type": "react",
-    "slug": "PalindromeGame",
-    "category": "React/Next",
-    "description": "Test your skills with palindrome numbers!"
-  },
-  {
-    "id": "react-PhotoBooth",
-    "title": "Photo Booth",
-    "type": "react",
-    "slug": "PhotoBooth",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-PhotographyBooking",
-    "title": "Capture Your Special Moments",
-    "type": "react",
-    "slug": "PhotographyBooking",
-    "category": "React/Next",
-    "description": "Professional photography services for every occasion. Book your session today and preserve your memories forever."
-  },
-  {
-    "id": "react-PlanetaryCollision",
-    "title": "Planetary Collision",
-    "type": "react",
-    "slug": "PlanetaryCollision",
-    "category": "React/Next",
-    "description": "Explore gravitational interactions between planets in this educational simulation. Perfect for 6th-grade science classes to visualize physics concepts in a fun,"
-  },
-  {
-    "id": "react-Portfolio",
-    "title": "John Doe",
-    "type": "react",
-    "slug": "Portfolio",
-    "category": "React/Next",
-    "description": "Creative Developer & Digital Artist"
-  },
-  {
-    "id": "react-PortfolioGPT",
-    "title": "Jane Doe",
-    "type": "react",
-    "slug": "PortfolioGPT",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-PortfolioLayout",
-    "title": "Portfolio Layout",
-    "type": "react",
-    "slug": "PortfolioLayout",
-    "category": "React/Next",
-    "description": "The web development landscape is evolving at an unprecedented pace, with new technologies and methodologies emerging constantly. As we move forward, several key"
-  },
-  {
-    "id": "react-ProductivityTracker",
-    "title": "ProductivityTracker",
-    "type": "react",
-    "slug": "ProductivityTracker",
-    "category": "React/Next",
-    "description": "API Integration for the mobile app"
-  },
-  {
-    "id": "react-ProductivityTracler",
-    "title": "Productivity Tracler",
-    "type": "react",
-    "slug": "ProductivityTracler",
-    "category": "React/Next",
-    "description": "No events for this day. Click the Add Event button to create one."
-  },
-  {
-    "id": "react-Profile",
-    "title": "Profile",
-    "type": "react",
-    "slug": "Profile",
-    "category": "React/Next",
-    "description": "No comments yet. Be the first to comment!"
-  },
-  {
-    "id": "react-ProfileEditor",
-    "title": "Profile Editor",
-    "type": "react",
-    "slug": "ProfileEditor",
-    "category": "React/Next",
-    "description": "This profile customization experience is optimized for mobile devices. Please switch to mobile view for the best experience."
-  },
-  {
-    "id": "react-ProjectManager",
-    "title": "Project Manager",
-    "type": "react",
-    "slug": "ProjectManager",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-ProjectMapping",
-    "title": "DependencyGraph",
-    "type": "react",
-    "slug": "ProjectMapping",
-    "category": "React/Next",
-    "description": "Create interactive dependency graphs to understand your project architecture, track component relationships, and identify critical services."
-  },
-  {
-    "id": "react-PublicIssue",
-    "title": "Public Issue",
-    "type": "react",
-    "slug": "PublicIssue",
-    "category": "React/Next",
-    "description": "No comments yet. Be the first to comment!"
-  },
-  {
-    "id": "react-PulseTrack",
-    "title": "PulseTrack",
-    "type": "react",
-    "slug": "PulseTrack",
-    "category": "React/Next",
-    "description": "Consistency is key for quality rest"
-  },
-  {
-    "id": "react-Quoura",
-    "title": "Quoura",
-    "type": "react",
-    "slug": "Quoura",
-    "category": "React/Next",
-    "description": "What do you want to ask or share?"
-  },
-  {
-    "id": "react-Recipeblog",
-    "title": "Globites",
-    "type": "react",
-    "slug": "Recipeblog",
-    "category": "React/Next",
-    "description": "Traditional Roman pasta dish with eggs, cheese, pancetta, and pepper. A true taste of Italy in just 30 minutes."
-  },
-  {
-    "id": "react-SignInPage",
-    "title": "Sign In Page",
-    "type": "react",
-    "slug": "SignInPage",
-    "category": "React/Next",
-    "description": "Please enter the verification code from your authenticator app"
-  },
-  {
-    "id": "react-SimonGame",
-    "title": "Simon Game",
-    "type": "react",
-    "slug": "SimonGame",
-    "category": "React/Next",
-    "description": "Test your memory with this classic game reimagined"
-  },
-  {
-    "id": "react-Snippet",
-    "title": "Website Title",
-    "type": "react",
-    "slug": "Snippet",
-    "category": "React/Next",
-    "description": "Unlock unlimited snippets, advanced features, and cloud backup"
-  },
-  {
-    "id": "react-Social",
-    "title": "Andromeda",
-    "type": "react",
-    "slug": "Social",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-SocialFeed",
-    "title": "HobbyHub",
-    "type": "react",
-    "slug": "SocialFeed",
-    "category": "React/Next",
-    "description": "No messages yet. Start a conversation!"
-  },
-  {
-    "id": "react-SocialMediaSentiment",
-    "title": "Social Media Sentiment",
-    "type": "react",
-    "slug": "SocialMediaSentiment",
-    "category": "React/Next",
-    "description": "No trending topics in selected range."
-  },
-  {
-    "id": "react-SolarSystemSimulator",
-    "title": "Solar System Simulator",
-    "type": "react",
-    "slug": "SolarSystemSimulator",
-    "category": "React/Next",
-    "description": "INTERACTIVE SOLAR SYSTEM SIMULATOR"
-  },
-  {
-    "id": "react-Spa",
-    "title": "Spa",
-    "type": "react",
-    "slug": "Spa",
-    "category": "React/Next",
-    "description": "Rejuvenate your body and mind with our premium spa services"
-  },
-  {
-    "id": "react-Spotify",
-    "title": "768 ? \"hidden\" : \"\"\n\t\t\t\t\t\t}`}\n\t\t\t\t\t>\n\t\t\t\t\t\tSpotify",
-    "type": "react",
-    "slug": "Spotify",
-    "category": "React/Next",
-    "description": "Try searching for something else"
-  },
-  {
-    "id": "react-SpringAnimation",
-    "title": "Spring Animation",
-    "type": "react",
-    "slug": "SpringAnimation",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-StockExplorationApp",
-    "title": "StockChart Pro",
-    "type": "react",
-    "slug": "StockExplorationApp",
-    "category": "React/Next",
-    "description": "Professional trading platform providing real-time market data and advanced charting tools."
-  },
-  {
-    "id": "react-StockMarket",
-    "title": "Market Dashboard",
-    "type": "react",
-    "slug": "StockMarket",
-    "category": "React/Next",
-    "description": "Real-time market data and analysis"
-  },
-  {
-    "id": "react-StockMarketApp",
-    "title": "Stock Market App",
-    "type": "react",
-    "slug": "StockMarketApp",
-    "category": "React/Next",
-    "description": "currentMarketPrice in s ? s.currentMarketPrice : s.currentPrice const currentPrice  getCurrentPrice(stock) return ("
-  },
-  {
-    "id": "react-Storefrontpage",
-    "title": "Winter Flash Sale",
-    "type": "react",
-    "slug": "Storefrontpage",
-    "category": "React/Next",
-    "description": "You've been added to our mailing list. Get ready for exclusive deals and updates!"
-  },
-  {
-    "id": "react-StoryBoard",
-    "title": "Comic Storyboard Studio",
-    "type": "react",
-    "slug": "StoryBoard",
-    "category": "React/Next",
-    "description": "Select a panel to edit properties"
-  },
-  {
-    "id": "react-StoryCreator",
-    "title": "Story Weavers",
-    "type": "react",
-    "slug": "StoryCreator",
-    "category": "React/Next",
-    "description": "Collaborative Story Adventures"
-  },
-  {
-    "id": "react-StyleGuideBuilder",
-    "title": "Style Guide Builder",
-    "type": "react",
-    "slug": "StyleGuideBuilder",
-    "category": "React/Next",
-    "description": "Create beautiful, consistent UI components for your projects"
-  },
-  {
-    "id": "react-SubscriptionManagerApp",
-    "title": "Team Management",
-    "type": "react",
-    "slug": "SubscriptionManagerApp",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-SurveyDashboard",
-    "title": "Survey Analytics",
-    "type": "react",
-    "slug": "SurveyDashboard",
-    "category": "React/Next",
-    "description": "Segment your insights by audience demographics"
-  },
-  {
-    "id": "react-Suspense",
-    "title": "SuspensionLab Pro",
-    "type": "react",
-    "slug": "Suspense",
-    "category": "React/Next",
-    "description": "Advanced Vehicle Dynamics Simulator"
-  },
-  {
-    "id": "react-TaskApp",
-    "title": "Task App",
-    "type": "react",
-    "slug": "TaskApp",
-    "category": "React/Next",
-    "description": "Please wait while we prepare your dashboard..."
-  },
-  {
-    "id": "react-TaskFLow",
-    "title": "TaskFlow",
-    "type": "react",
-    "slug": "TaskFLow",
-    "category": "React/Next",
-    "description": "Manage your account and preferences"
-  },
-  {
-    "id": "react-TaskFeedbackScheduler",
-    "title": "Task Feedback Scheduler",
-    "type": "react",
-    "slug": "TaskFeedbackScheduler",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-TaskFlowScreening",
-    "title": "Project Dashboard",
-    "type": "react",
-    "slug": "TaskFlowScreening",
-    "category": "React/Next",
-    "description": "Are you sure you want to delete this task? This action cannot be undone."
-  },
-  {
-    "id": "react-TaskManagementApp",
-    "title": "Task Manager",
-    "type": "react",
-    "slug": "TaskManagementApp",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-TechnicalWritingDashboard",
-    "title": "Technical Writing Dashboard",
-    "type": "react",
-    "slug": "TechnicalWritingDashboard",
-    "category": "React/Next",
-    "description": "Your document API Authentication has been approved and published."
-  },
-  {
-    "id": "react-TimeBlocker",
-    "title": "Time Blocker",
-    "type": "react",
-    "slug": "TimeBlocker",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-TimelineScheduler",
-    "title": "Timeline Pro",
-    "type": "react",
-    "slug": "TimelineScheduler",
-    "category": "React/Next",
-    "description": "Preparing your project dashboard..."
-  },
-  {
-    "id": "react-Travel",
-    "title": "Travel",
-    "type": "react",
-    "slug": "Travel",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-TravelBlog",
-    "title": "Travel Blog",
-    "type": "react",
-    "slug": "TravelBlog",
-    "category": "React/Next",
-    "description": "Travel writer, photographer, and full-time nomad since 2018. I've explored 47 countries across 6 continents, always seeking the stories and moments that make ea"
-  },
-  {
-    "id": "react-TravelGPT",
-    "title": "Travel GPT",
-    "type": "react",
-    "slug": "TravelGPT",
-    "category": "React/Next",
-    "description": "We bring your ideas to life with stunning design and cutting-edge technology"
-  },
-  {
-    "id": "react-TravelSite",
-    "title": "TravelDiscover",
-    "type": "react",
-    "slug": "TravelSite",
-    "category": "React/Next",
-    "description": "Loading amazing destinations..."
-  },
-  {
-    "id": "react-Trello",
-    "title": "Trello Clone",
-    "type": "react",
-    "slug": "Trello",
-    "category": "React/Next",
-    "description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
-  },
-  {
-    "id": "react-TrendNews",
-    "title": "Trend News",
-    "type": "react",
-    "slug": "TrendNews",
-    "category": "React/Next",
-    "description": "Full article content isn't available here. View the original source for the complete story."
-  },
-  {
-    "id": "react-Typing",
-    "title": "Typing Speed Challenge",
-    "type": "react",
-    "slug": "Typing",
-    "category": "React/Next",
-    "description": "Custom text will be used for your typing test."
-  },
-  {
-    "id": "react-TypingGame",
-    "title": "Word Sprint",
-    "type": "react",
-    "slug": "TypingGame",
-    "category": "React/Next",
-    "description": "Designed with 💙 for typing enthusiasts!"
-  },
-  {
-    "id": "react-VehicleSuspensionSImulator",
-    "title": "Vehicle Suspension Simulator",
-    "type": "react",
-    "slug": "VehicleSuspensionSImulator",
-    "category": "React/Next",
-    "description": "Explore how different suspension setups affect vehicle stability and comfort over various road conditions."
-  },
-  {
-    "id": "react-VideoPlayer",
-    "title": "Video Player",
-    "type": "react",
-    "slug": "VideoPlayer",
-    "category": "React/Next",
-    "description": "Your premier destination for amazing video content from creators around the world."
-  },
-  {
-    "id": "react-VocavularyApp",
-    "title": "Vocavulary App",
-    "type": "react",
-    "slug": "VocavularyApp",
-    "category": "React/Next",
-    "description": "Improve your language skills with our engaging vocabulary matching games. Learn at your own pace or challenge yourself with timed exercises."
-  },
-  {
-    "id": "react-WaterUsageSimulation",
-    "title": "Water Usage Simulation",
-    "type": "react",
-    "slug": "WaterUsageSimulation",
-    "category": "React/Next",
-    "description": "Our interactive simulator helps you visualize your household water usage and discover personalized ways to conserve this precious resource."
-  },
-  {
-    "id": "react-WaveInterfaceSim",
-    "title": "Wave Interface Sim",
-    "type": "react",
-    "slug": "WaveInterfaceSim",
-    "category": "React/Next",
-    "description": "• Adjust sliders to modify wave properties"
-  },
-  {
-    "id": "react-WeatherAnomaly",
-    "title": "Weather Anomaly Analysis",
-    "type": "react",
-    "slug": "WeatherAnomaly",
-    "category": "React/Next",
-    "description": "Your chart is ready! Use the download button or browser menu to save:"
-  },
-  {
-    "id": "react-WebsiteTraffic",
-    "title": "Website Analytics Dashboard",
-    "type": "react",
-    "slug": "WebsiteTraffic",
-    "category": "React/Next",
-    "description": "(Today) const activeMetric, setActiveMetric  useState"
-  },
-  {
-    "id": "react-WishlistPage",
-    "title": "My Wishlists",
-    "type": "react",
-    "slug": "WishlistPage",
-    "category": "React/Next",
-    "description": "Looks like you haven't added any items to your cart yet."
-  },
-  {
-    "id": "react-WordCrossGame",
-    "title": "WordCraft Pro",
-    "type": "react",
-    "slug": "WordCrossGame",
-    "category": "React/Next",
-    "description": "An immersive, high-performance interactive game experience with optimized animations and responsive gameplay mechanics."
-  },
-  {
-    "id": "react-WritingAassistant",
-    "title": "Writing Aassistant",
-    "type": "react",
-    "slug": "WritingAassistant",
-    "category": "React/Next",
-    "description": "No content yet. Start writing to see a preview."
-  }
+	{
+		"id": "react-HarmonyColors",
+		"title": "Color Harmony",
+		"type": "react",
+		"slug": "HarmonyColors",
+		"category": "React/Next",
+		"description": "Craft stunning color palettes here only"
+	},
+	{
+		"id": "react-Hobby",
+		"title": "Hobby",
+		"type": "react",
+		"slug": "Hobby",
+		"category": "React/Next",
+		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
+	},
+	{
+		"id": "react-HospitalDashboard",
+		"title": "Hospital Dashboard",
+		"type": "react",
+		"slug": "HospitalDashboard",
+		"category": "React/Next",
+		"description": "Supply Chain & Patient Analytics"
+	},
+	{
+		"id": "react-InfluencerMatchmaker",
+		"title": "Influencer Matchmaker",
+		"type": "react",
+		"slug": "InfluencerMatchmaker",
+		"category": "React/Next",
+		"description": "Find the perfect influencers for your brand campaigns"
+	},
+	{
+		"id": "react-InstaChatMessage",
+		"title": "Messages",
+		"type": "react",
+		"slug": "InstaChatMessage",
+		"category": "React/Next",
+		"description": "Chat with our AI assistant"
+	},
+	{
+		"id": "react-Instagram",
+		"title": "Photogram",
+		"type": "react",
+		"slug": "Instagram",
+		"category": "React/Next",
+		"description": "This is a demonstration. Your post won't actually be saved since there is no database connected."
+	},
+	{
+		"id": "react-InterestHub",
+		"title": "InterestHub",
+		"type": "react",
+		"slug": "InterestHub",
+		"category": "React/Next",
+		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
+	},
+	{
+		"id": "react-LanguageLearningPlatform",
+		"title": "Grammar Master",
+		"type": "react",
+		"slug": "LanguageLearningPlatform",
+		"category": "React/Next",
+		"description": "Our system automatically adjusts to your performance, unlocking more challenging exercises as you improve."
+	},
+	{
+		"id": "react-LearnHub",
+		"title": "Learn Hub",
+		"type": "react",
+		"slug": "LearnHub",
+		"category": "React/Next",
+		"description": "Transform your team with our powerful educational platform. Deliver engaging courses, track progress, and elevate skills to the next level."
+	},
+	{
+		"id": "react-Learning",
+		"title": "LinguaLearn Pro",
+		"type": "react",
+		"slug": "Learning",
+		"category": "React/Next",
+		"description": "Master new languages with interactive lessons, personalized practice, and AI-powered feedback."
+	},
+	{
+		"id": "react-LearningApp",
+		"title": "Learning App",
+		"type": "react",
+		"slug": "LearningApp",
+		"category": "React/Next",
+		"description": "Master any subject with personalized learning tools. Create custom flashcards, take quizzes, and track your progress."
+	},
+	{
+		"id": "react-LearningPortal",
+		"title": "LearnHub",
+		"type": "react",
+		"slug": "LearningPortal",
+		"category": "React/Next",
+		"description": "Access cutting-edge courses and resources that help you grow professionally and personally."
+	},
+	{
+		"id": "react-LinguaLearn",
+		"title": "LinguaLearn",
+		"type": "react",
+		"slug": "LinguaLearn",
+		"category": "React/Next",
+		"description": "This feature needs microphone access to record your voice"
+	},
+	{
+		"id": "react-LinkRepository",
+		"title": "Link Repository",
+		"type": "react",
+		"slug": "LinkRepository",
+		"category": "React/Next",
+		"description": "Manage and organize your team's knowledge base"
+	},
+	{
+		"id": "react-Lms",
+		"title": "LearnHub Pro",
+		"type": "react",
+		"slug": "Lms",
+		"category": "React/Next",
+		"description": "Each learning path provides a structured curriculum designed by industry experts to help you achieve specific career goals."
+	},
+	{
+		"id": "react-LogisticTracker",
+		"title": "LogiFlow",
+		"type": "react",
+		"slug": "LogisticTracker",
+		"category": "React/Next",
+		"description": "Initializing your logistics dashboard..."
+	},
+	{
+		"id": "react-MasonryPortfolio",
+		"title": "Share Your Technical Knowledge",
+		"type": "react",
+		"slug": "MasonryPortfolio",
+		"category": "React/Next",
+		"description": "In the rapidly evolving landscape of technology, keeping up with best practices and emerging trends is essential. This article explores the key concepts and imp"
+	},
+	{
+		"id": "react-MeetupHub",
+		"title": "MeetupHub",
+		"type": "react",
+		"slug": "MeetupHub",
+		"category": "React/Next",
+		"description": "Connect with like-minded people, explore interests, and create unforgettable memories in your community."
+	},
+	{
+		"id": "react-MobileNotes",
+		"title": "NotesApp",
+		"type": "react",
+		"slug": "MobileNotes",
+		"category": "React/Next",
+		"description": "You're offline. Changes will be synced when you reconnect."
+	},
+	{
+		"id": "react-MoodZest",
+		"title": "Mood Zest",
+		"type": "react",
+		"slug": "MoodZest",
+		"category": "React/Next",
+		"description": "Intuitive interface for effortless creativity"
+	},
+	{
+		"id": "react-MotionPhysics",
+		"title": "Motion Physics",
+		"type": "react",
+		"slug": "MotionPhysics",
+		"category": "React/Next",
+		"description": "(light) const presetIdx, setPresetIdx  useState(0) const params, setParams  useState"
+	},
+	{
+		"id": "react-MotorInterface",
+		"title": "DC Motor Control Interface",
+		"type": "react",
+		"slug": "MotorInterface",
+		"category": "React/Next",
+		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
+	},
+	{
+		"id": "react-MysteriousExplorer",
+		"title": "ColorQuest",
+		"type": "react",
+		"slug": "MysteriousExplorer",
+		"category": "React/Next",
+		"description": "Challenge Your Color Perception"
+	},
+	{
+		"id": "react-Netflix",
+		"title": "Netflix",
+		"type": "react",
+		"slug": "Netflix",
+		"category": "React/Next",
+		"description": "Skipping to Next Episode..."
+	},
+	{
+		"id": "react-NetflixClone",
+		"title": "NETFLUX",
+		"type": "react",
+		"slug": "NetflixClone",
+		"category": "React/Next",
+		"description": "Cast information would appear here"
+	},
+	{
+		"id": "react-NewsDebunking",
+		"title": "News Debunking",
+		"type": "react",
+		"slug": "NewsDebunking",
+		"category": "React/Next",
+		"description": "No comments yet. Be the first to comment!"
+	},
+	{
+		"id": "react-NewsLetterArchive",
+		"title": "TimeNews",
+		"type": "react",
+		"slug": "NewsLetterArchive",
+		"category": "React/Next",
+		"description": "Loading your timeline experience..."
+	},
+	{
+		"id": "react-NonoGram",
+		"title": "NONOGRAM",
+		"type": "react",
+		"slug": "NonoGram",
+		"category": "React/Next",
+		"description": "Master the Art of Logic & Pattern Recognition"
+	},
+	{
+		"id": "react-NoteSharingApp",
+		"title": "TeamNotes",
+		"type": "react",
+		"slug": "NoteSharingApp",
+		"category": "React/Next",
+		"description": "No documents match your search"
+	},
+	{
+		"id": "react-NotificationSystem",
+		"title": "Notification System",
+		"type": "react",
+		"slug": "NotificationSystem",
+		"category": "React/Next",
+		"description": "When you get notifications, they'll show up here"
+	},
+	{
+		"id": "react-Numero",
+		"title": "Numero",
+		"type": "react",
+		"slug": "Numero",
+		"category": "React/Next",
+		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
+	},
+	{
+		"id": "react-OSLabSImulator",
+		"title": "CPU Scheduling Simulator",
+		"type": "react",
+		"slug": "OSLabSImulator",
+		"category": "React/Next",
+		"description": "Explore and understand OS scheduling algorithms with interactive simulation"
+	},
+	{
+		"id": "react-OfficeTracker",
+		"title": "WorkPulse",
+		"type": "react",
+		"slug": "OfficeTracker",
+		"category": "React/Next",
+		"description": "Your longest streak this month! Keep it up."
+	},
+	{
+		"id": "react-OpticsLab",
+		"title": "Optics Lab",
+		"type": "react",
+		"slug": "OpticsLab",
+		"category": "React/Next",
+		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
+	},
+	{
+		"id": "react-PMS",
+		"title": "PMS",
+		"type": "react",
+		"slug": "PMS",
+		"category": "React/Next",
+		"description": "View and manage your scheduled appointments"
+	},
+	{
+		"id": "react-PalindromeGame",
+		"title": "Palindrome Game",
+		"type": "react",
+		"slug": "PalindromeGame",
+		"category": "React/Next",
+		"description": "Test your skills with palindrome numbers!"
+	},
+	{
+		"id": "react-PhotoBooth",
+		"title": "Photo Booth",
+		"type": "react",
+		"slug": "PhotoBooth",
+		"category": "React/Next",
+		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
+	},
+	{
+		"id": "react-PhotographyBooking",
+		"title": "Capture Your Special Moments",
+		"type": "react",
+		"slug": "PhotographyBooking",
+		"category": "React/Next",
+		"description": "Professional photography services for every occasion. Book your session today and preserve your memories forever."
+	},
+	{
+		"id": "react-PlanetaryCollision",
+		"title": "Planetary Collision",
+		"type": "react",
+		"slug": "PlanetaryCollision",
+		"category": "React/Next",
+		"description": "Explore gravitational interactions between planets in this educational simulation. Perfect for 6th-grade science classes to visualize physics concepts in a fun,"
+	}
 ]

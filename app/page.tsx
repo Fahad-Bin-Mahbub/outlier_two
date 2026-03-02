@@ -215,6 +215,27 @@ function StatsBar({ total }: { total: number }) {
 
 // ─── Footer ────────────────────────────────────────────────────────
 function Footer() {
+	const EMAIL = "fahadbm3234@gmail.com";
+	const [copied, setCopied] = useState(false);
+
+	const copyEmail = async () => {
+		try {
+			await navigator.clipboard.writeText(EMAIL);
+		} catch {
+			// fallback (older browsers)
+			const ta = document.createElement("textarea");
+			ta.value = EMAIL;
+			ta.style.position = "fixed";
+			ta.style.opacity = "0";
+			document.body.appendChild(ta);
+			ta.focus();
+			ta.select();
+			document.execCommand("copy");
+			document.body.removeChild(ta);
+		}
+		setCopied(true);
+		window.setTimeout(() => setCopied(false), 1500);
+	};
 	return (
 		<motion.footer
 			initial={{ opacity: 0 }}
@@ -242,7 +263,7 @@ function Footer() {
 					{[
 						{
 							name: "GitHub",
-							href: "#",
+							href: "https://github.com/Fahad-Bin-Mahbub",
 							icon: (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -258,7 +279,7 @@ function Footer() {
 						},
 						{
 							name: "Portfolio",
-							href: "#",
+							href: "https://fahad-bin-mahbub.github.io/",
 							icon: (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -280,7 +301,7 @@ function Footer() {
 						},
 						{
 							name: "LinkedIn",
-							href: "#",
+							href: "https://www.linkedin.com/in/fahad-bin-mahbub-650151212/",
 							icon: (
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -294,32 +315,11 @@ function Footer() {
 							),
 							color: "hover:text-blue-400 hover:border-blue-500/30",
 						},
-						{
-							name: "Email",
-							href: "mailto:your@email.com",
-							icon: (
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="20"
-									height="20"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								>
-									<rect width="20" height="16" x="2" y="4" rx="2" />
-									<path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-								</svg>
-							),
-							color: "hover:text-emerald-400 hover:border-emerald-500/30",
-						},
 					].map(({ name, href, icon, color }) => (
 						<a
 							key={name}
 							href={href}
-							target={href.startsWith("mailto") ? undefined : "_blank"}
+							target="_blank"
 							rel="noopener noreferrer"
 							className={`group flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/10 text-neutral-400 text-sm font-medium transition-all duration-300 ${color}`}
 						>
@@ -327,6 +327,31 @@ function Footer() {
 							{name}
 						</a>
 					))}
+
+					{/* Email: copy to clipboard */}
+					<button
+						type="button"
+						onClick={copyEmail}
+						className="group flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/10 text-neutral-400 text-sm font-medium transition-all duration-300 hover:text-emerald-400 hover:border-emerald-500/30"
+						aria-label="Copy email address"
+						title={copied ? "Copied!" : "Copy email"}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="20"
+							height="20"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							<rect x="9" y="9" width="13" height="13" rx="2" />
+							<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+						</svg>
+						{copied ? "Copied!" : "Email"}
+					</button>
 				</div>
 
 				{/* Divider */}
@@ -334,21 +359,7 @@ function Footer() {
 
 				{/* Bottom line */}
 				<div className="flex flex-col md:flex-row items-center justify-between w-full gap-2 text-xs text-neutral-600">
-					<span>© 2026 Your Name · All Rights Reserved</span>
-					<span className="flex items-center gap-1.5">
-						Built with
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="12"
-							height="12"
-							viewBox="0 0 24 24"
-							fill="currentColor"
-							className="text-neutral-500"
-						>
-							<path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" />
-						</svg>
-						Next.js &amp; Framer Motion
-					</span>
+					<span>© 2026 Fahad Bin Mahbub · All Rights Reserved</span>
 				</div>
 			</div>
 		</motion.footer>
@@ -525,7 +536,7 @@ function DashboardContent() {
 				>
 					<div className="w-8 h-[1px] bg-white/20" />
 					<span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-400">
-						All Projects
+						Continued Projects
 					</span>
 					<div className="flex-1 h-[1px] bg-white/5" />
 				</motion.div>

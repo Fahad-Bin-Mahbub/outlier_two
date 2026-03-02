@@ -1,9 +1,0 @@
-function renderRecipes() {
-    let filteredRecipes = [...recipes]; // Remove all filtering logic temporarily
-    const paginatedRecipes = getPaginatedRecipes(filteredRecipes);
-    currentView === "grid"
-        ? renderGridView(paginatedRecipes)
-        : renderListView(paginatedRecipes);
-    updatePagination(filteredRecipes.length);
-    document.getElementById("no-results").classList.toggle("hidden", filteredRecipes.length > 0);
-}
