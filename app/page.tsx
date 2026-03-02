@@ -194,13 +194,6 @@ function HeroSection() {
 
 // ─── Stats Bar ─────────────────────────────────────────────────────
 function StatsBar({ total }: { total: number }) {
-	const reactCount = (projectsData as any[]).filter(
-		(p) => p.type === "react"
-	).length;
-	const htmlCount = (projectsData as any[]).filter(
-		(p) => p.type === "html"
-	).length;
-
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
@@ -208,24 +201,14 @@ function StatsBar({ total }: { total: number }) {
 			transition={{ duration: 0.6, delay: 0.6 }}
 			className="w-full flex items-center justify-center gap-6 md:gap-12 mb-16 flex-wrap"
 		>
-			{[
-				{ label: "Total Projects", value: total },
-				{ label: "React Apps", value: reactCount, color: "text-blue-400" },
-				{ label: "HTML Projects", value: htmlCount, color: "text-orange-400" },
-			].map(({ label, value, color }) => (
-				<div key={label} className="flex flex-col items-center gap-1">
-					<span
-						className={`text-3xl md:text-4xl font-bold tabular-nums ${
-							color || "text-white"
-						}`}
-					>
-						{value}
-					</span>
-					<span className="text-xs text-neutral-500 uppercase tracking-widest font-medium">
-						{label}
-					</span>
-				</div>
-			))}
+			<div className="flex flex-col items-center gap-1">
+				<span className="text-3xl md:text-4xl font-bold tabular-nums text-white">
+					{total}
+				</span>
+				<span className="text-xs text-neutral-500 uppercase tracking-widest font-medium">
+					Total Projects
+				</span>
+			</div>
 		</motion.div>
 	);
 }
@@ -377,21 +360,12 @@ function DashboardContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	const filter = (searchParams.get("filter") || "all") as
-		| "all"
-		| "html"
-		| "react";
 	const currentPage = parseInt(searchParams.get("page") || "1");
-	const searchQuery = searchParams.get("search") || "";
 
 	const updateParams = (updates: Record<string, string | number | null>) => {
 		const params = new URLSearchParams(searchParams.toString());
 		Object.entries(updates).forEach(([key, value]) => {
-			if (
-				value === null ||
-				value === "all" ||
-				(key === "page" && value === 1)
-			) {
+			if (value === null || (key === "page" && value === 1)) {
 				params.delete(key);
 			} else {
 				params.set(key, value.toString());
@@ -399,14 +373,6 @@ function DashboardContent() {
 		});
 		const queryString = params.toString();
 		router.replace(queryString ? `?${queryString}` : "/", { scroll: false });
-	};
-
-	const handleFilterChange = (type: string) => {
-		updateParams({ filter: type, page: 1 });
-	};
-
-	const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		updateParams({ search: e.target.value, page: 1 });
 	};
 
 	const handlePageChange = (page: number) => {
@@ -418,18 +384,7 @@ function DashboardContent() {
 		return (projectsData as any[]).filter((p: any) => p.featured === true);
 	}, []);
 
-	const filteredProjects = useMemo(() => {
-		return (projectsData as any[]).filter((project: any) => {
-			const matchesFilter = filter === "all" || project.type === filter;
-			const matchesSearch =
-				project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				(project.description &&
-					project.description
-						.toLowerCase()
-						.includes(searchQuery.toLowerCase()));
-			return matchesFilter && matchesSearch;
-		});
-	}, [filter, searchQuery]);
+	const filteredProjects = projectsData as any[];
 
 	const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
 	const paginatedProjects = filteredProjects.slice(
@@ -514,9 +469,7 @@ function DashboardContent() {
 				<StatsBar total={projectsData.length} />
 
 				{/* Featured Section */}
-				{featuredProjects.length > 0 &&
-					searchQuery === "" &&
-					filter === "all" && (
+				{featuredProjects.length > 0 && (
 						<motion.div
 							initial={{ opacity: 0, y: 24 }}
 							animate={{ opacity: 1, y: 0 }}
@@ -539,26 +492,13 @@ function DashboardContent() {
 										transition={{ duration: 0.5, delay: i * 0.1 }}
 									>
 										<Link
-											href={
-												project.type === "react"
-													? `/r/${project.slug}`
-													: `/project/html/${project.slug}`
-											}
+											href={`/r/${project.slug}`}
 											className="group relative block"
 										>
 											<div className="relative aspect-[16/9] rounded-2xl overflow-hidden border border-white/10 bg-white/5 shadow-2xl transition-all duration-500 group-hover:border-purple-500/40 group-hover:shadow-purple-500/10 group-hover:scale-[1.02]">
 												<div className="absolute inset-0 bg-gradient-to-br from-purple-700/20 via-blue-600/10 to-transparent opacity-60 group-hover:opacity-90 transition-opacity" />
 												<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
 												<div className="absolute inset-0 flex flex-col justify-end p-7 z-20">
-													<span
-														className={`self-start px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-3 border ${
-															project.type === "react"
-																? "bg-blue-500/15 text-blue-300 border-blue-500/25"
-																: "bg-orange-500/15 text-orange-300 border-orange-500/25"
-														}`}
-													>
-														{project.type}
-													</span>
 													<h3 className="text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors leading-tight">
 														{project.title}
 													</h3>
@@ -590,57 +530,7 @@ function DashboardContent() {
 					<div className="flex-1 h-[1px] bg-white/5" />
 				</motion.div>
 
-				{/* Controls */}
-				<motion.div
-					initial={{ opacity: 0, y: 16 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.7, delay: 0.35 }}
-					className="w-full flex flex-col md:flex-row justify-between items-center bg-white/[0.04] border border-white/[0.08] p-2 md:p-2.5 rounded-2xl md:rounded-full backdrop-blur-2xl mb-12 shadow-2xl space-y-3 md:space-y-0"
-				>
-					<div className="flex bg-black/40 rounded-full p-1 border border-white/5">
-						{["all", "react", "html"].map((type) => (
-							<button
-								key={type}
-								onClick={() => handleFilterChange(type)}
-								className={`px-5 py-2 rounded-full text-sm font-semibold capitalize transition-all duration-300 ${
-									filter === type
-										? "bg-white text-black shadow-lg"
-										: "text-neutral-500 hover:text-white hover:bg-white/5"
-								}`}
-							>
-								{type}
-							</button>
-						))}
-					</div>
-
-					<div className="relative w-full md:w-auto px-2 flex items-center gap-3">
-						<div className="relative w-full md:w-64">
-							<svg
-								className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-600"
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-							>
-								<circle cx="11" cy="11" r="8" />
-								<path d="m21 21-4.3-4.3" />
-							</svg>
-							<input
-								type="text"
-								placeholder="Search projects..."
-								value={searchQuery}
-								onChange={handleSearchChange}
-								className="w-full bg-black/50 border border-white/[0.08] rounded-full pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-white/20 transition-all text-white placeholder-neutral-600"
-							/>
-						</div>
-						<div className="text-xs text-neutral-600 whitespace-nowrap hidden md:block font-medium tabular-nums">
-							{filteredProjects.length} results
-						</div>
-					</div>
-				</motion.div>
+				{/* Controls Layout Removed */}
 
 				{/* Grid */}
 				<motion.div
@@ -661,70 +551,43 @@ function DashboardContent() {
 								key={project.id}
 								className="h-full"
 							>
-								<Link
-									href={
-										project.type === "react"
-											? `/r/${project.slug}`
-											: `/project/html/${project.slug}`
-									}
-									className="block h-full"
-								>
+								<Link href={`/r/${project.slug}`} className="block h-full">
 									<div className="group relative h-full min-h-[220px] rounded-2xl bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/[0.08] overflow-hidden cursor-pointer hover:border-white/20 transition-all duration-500 hover:shadow-[0_0_30px_-8px_rgba(139,92,246,0.15)] flex flex-col">
 										{/* Hover gradient */}
 										<div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.05] via-transparent to-blue-500/[0.05] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
 										<div className="p-6 flex flex-col flex-1 relative z-10">
 											<div className="flex-1">
-												{project.type === "react" ? (
-													<div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center mb-5 border border-blue-500/20 group-hover:scale-110 group-hover:bg-blue-500/25 transition-all duration-300">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="18"
-															height="18"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															strokeWidth="2"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-														>
-															<ellipse cx="12" cy="12" rx="10" ry="4" />
-															<ellipse
-																cx="12"
-																cy="12"
-																rx="10"
-																ry="4"
-																transform="rotate(60 12 12)"
-															/>
-															<ellipse
-																cx="12"
-																cy="12"
-																rx="10"
-																ry="4"
-																transform="rotate(120 12 12)"
-															/>
-															<circle cx="12" cy="12" r="2" />
-														</svg>
-													</div>
-												) : (
-													<div className="w-10 h-10 rounded-xl bg-orange-500/15 text-orange-400 flex items-center justify-center mb-5 border border-orange-500/20 group-hover:scale-110 group-hover:bg-orange-500/25 transition-all duration-300">
-														<svg
-															xmlns="http://www.w3.org/2000/svg"
-															width="18"
-															height="18"
-															viewBox="0 0 24 24"
-															fill="none"
-															stroke="currentColor"
-															strokeWidth="2"
-															strokeLinecap="round"
-															strokeLinejoin="round"
-														>
-															<path d="m18 16 4-4-4-4" />
-															<path d="m6 8-4 4 4 4" />
-															<path d="m14.5 4-5 16" />
-														</svg>
-													</div>
-												)}
+												<div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center mb-5 border border-blue-500/20 group-hover:scale-110 group-hover:bg-blue-500/25 transition-all duration-300">
+													<svg
+														xmlns="http://www.w3.org/2000/svg"
+														width="18"
+														height="18"
+														viewBox="0 0 24 24"
+														fill="none"
+														stroke="currentColor"
+														strokeWidth="2"
+														strokeLinecap="round"
+														strokeLinejoin="round"
+													>
+														<ellipse cx="12" cy="12" rx="10" ry="4" />
+														<ellipse
+															cx="12"
+															cy="12"
+															rx="10"
+															ry="4"
+															transform="rotate(60 12 12)"
+														/>
+														<ellipse
+															cx="12"
+															cy="12"
+															rx="10"
+															ry="4"
+															transform="rotate(120 12 12)"
+														/>
+														<circle cx="12" cy="12" r="2" />
+													</svg>
+												</div>
 												<h2 className="text-lg font-bold text-white/90 group-hover:text-white transition-colors line-clamp-2 leading-tight mb-2.5">
 													{project.title}
 												</h2>
@@ -733,16 +596,7 @@ function DashboardContent() {
 												</p>
 											</div>
 
-											<div className="mt-5 flex items-center justify-between">
-												<span
-													className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-														project.type === "react"
-															? "text-blue-400/70 bg-blue-500/10 border-blue-500/15"
-															: "text-orange-400/70 bg-orange-500/10 border-orange-500/15"
-													}`}
-												>
-													{project.type}
-												</span>
+											<div className="mt-5 flex items-center justify-end">
 												<div className="flex items-center text-xs text-neutral-600 group-hover:text-white transition-colors font-semibold">
 													View
 													<svg
@@ -784,7 +638,7 @@ function DashboardContent() {
 								/>
 							</svg>
 							<p className="text-base">
-								No projects found for &ldquo;{searchQuery}&rdquo;
+								No projects found
 							</p>
 						</div>
 					)}

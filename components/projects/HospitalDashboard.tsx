@@ -86,7 +86,7 @@ const hospitals: Hospital[] = [
 	{
 		id: 1,
 		name: "Apollo Care Hospital",
-		location: "Mumbai, Maharashtra",
+		location: "Dhaka, Bangladesh",
 		revenue: 12000000,
 		patientCount: 15000,
 		doctorCount: 120,

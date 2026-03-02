@@ -114,7 +114,7 @@ const mockInfluencers: Influencer[] = [
 		name: "Emma Rodriguez",
 		handle: "@emmabeauty",
 		avatar:
-			"https://images.unsplash.com/photo-1494790108755-2616b612b15f?w=150&h=150&fit=crop&crop=face",
+			"https://plus.unsplash.com/premium_photo-1690086519096-0594592709d3?q=80&w=1471&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 		followers: 2500000,
 		engagementRate: 4.8,
 		category: "Beauty",
