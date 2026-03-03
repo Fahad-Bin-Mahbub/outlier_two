@@ -19,7 +19,7 @@ export const componentMap: Record<string, any> = {
   LinkRepository: dynamic(() => import("@/components/projects/LinkRepository"), { loading: LoadingSpinner, ssr: false }),
   Lms: dynamic(() => import("@/components/projects/Lms"), { loading: LoadingSpinner, ssr: false }),
   // LogisticTracker: dynamic(() => import("@/components/projects/LogisticTracker"), { loading: LoadingSpinner, ssr: false }),
-  // MasonryPortfolio: dynamic(() => import("@/components/projects/MasonryPortfolio"), { loading: LoadingSpinner, ssr: false }),
+  MasonryPortfolio: dynamic(() => import("@/components/projects/MasonryPortfolio"), { loading: LoadingSpinner, ssr: false }),
   // MeetupHub: dynamic(() => import("@/components/projects/MeetupHub"), { loading: LoadingSpinner, ssr: false }),
   // MobileNotes: dynamic(() => import("@/components/projects/MobileNotes"), { loading: LoadingSpinner, ssr: false }),
 
@@ -39,7 +39,7 @@ export const componentMap: Record<string, any> = {
   OfficeTracker: dynamic(() => import("@/components/projects/OfficeTracker"), { loading: LoadingSpinner, ssr: false }),
   OpticsLab: dynamic(() => import("@/components/projects/OpticsLab"), { loading: LoadingSpinner, ssr: false }),
   PMS: dynamic(() => import("@/components/projects/PMS"), { loading: LoadingSpinner, ssr: false }),
-  // PalindromeGame: dynamic(() => import("@/components/projects/PalindromeGame"), { loading: LoadingSpinner, ssr: false }),
+  PalindromeGame: dynamic(() => import("@/components/projects/PalindromeGame"), { loading: LoadingSpinner, ssr: false }),
   // PhotoBooth: dynamic(() => import("@/components/projects/PhotoBooth"), { loading: LoadingSpinner, ssr: false }),
   PhotographyBooking: dynamic(() => import("@/components/projects/PhotographyBooking"), { loading: LoadingSpinner, ssr: false }),
   PlanetaryCollision: dynamic(() => import("@/components/projects/PlanetaryCollision"), { loading: LoadingSpinner, ssr: false }),
