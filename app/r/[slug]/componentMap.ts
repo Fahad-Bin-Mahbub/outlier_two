@@ -25,8 +25,8 @@ export const componentMap: Record<string, any> = {
 
   MoodZest: dynamic(() => import("@/components/projects/MoodZest"), { loading: LoadingSpinner, ssr: false }),
   MotionPhysics: dynamic(() => import("@/components/projects/MotionPhysics"), { loading: LoadingSpinner, ssr: false }),
-  // MotorInterface: dynamic(() => import("@/components/projects/MotorInterface"), { loading: LoadingSpinner, ssr: false }),
-  // MysteriousExplorer: dynamic(() => import("@/components/projects/MysteriousExplorer"), { loading: LoadingSpinner, ssr: false }),
+  MotorInterface: dynamic(() => import("@/components/projects/MotorInterface"), { loading: LoadingSpinner, ssr: false }),
+  MysteriousExplorer: dynamic(() => import("@/components/projects/MysteriousExplorer"), { loading: LoadingSpinner, ssr: false }),
   // Netflix: dynamic(() => import("@/components/projects/Netflix"), { loading: LoadingSpinner, ssr: false }),
   // NetflixClone: dynamic(() => import("@/components/projects/NetflixClone"), { loading: LoadingSpinner, ssr: false }),
   // NewsDebunking: dynamic(() => import("@/components/projects/NewsDebunking"), { loading: LoadingSpinner, ssr: false }),
