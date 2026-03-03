@@ -128,14 +128,6 @@
 		"description": "Initializing your logistics dashboard..."
 	},
 	{
-		"id": "react-MasonryPortfolio",
-		"title": "Share Your Technical Knowledge",
-		"type": "react",
-		"slug": "MasonryPortfolio",
-		"category": "React/Next",
-		"description": "In the rapidly evolving landscape of technology, keeping up with best practices and emerging trends is essential. This article explores the key concepts and imp"
-	},
-	{
 		"id": "react-MeetupHub",
 		"title": "MeetupHub",
 		"type": "react",
@@ -286,14 +278,6 @@
 		"slug": "PalindromeGame",
 		"category": "React/Next",
 		"description": "Test your skills with palindrome numbers!"
-	},
-	{
-		"id": "react-PhotoBooth",
-		"title": "Photo Booth",
-		"type": "react",
-		"slug": "PhotoBooth",
-		"category": "React/Next",
-		"description": "A premium React application built with modular components, dynamic state handling, and a sleek, modern user interface."
 	},
 	{
 		"id": "react-PhotographyBooking",

@@ -40,7 +40,7 @@ export const componentMap: Record<string, any> = {
   OpticsLab: dynamic(() => import("@/components/projects/OpticsLab"), { loading: LoadingSpinner, ssr: false }),
   PMS: dynamic(() => import("@/components/projects/PMS"), { loading: LoadingSpinner, ssr: false }),
   PalindromeGame: dynamic(() => import("@/components/projects/PalindromeGame"), { loading: LoadingSpinner, ssr: false }),
-  PhotoBooth: dynamic(() => import("@/components/projects/PhotoBooth"), { loading: LoadingSpinner, ssr: false }),
+  // PhotoBooth: dynamic(() => import("@/components/projects/PhotoBooth"), { loading: LoadingSpinner, ssr: false }),
   PhotographyBooking: dynamic(() => import("@/components/projects/PhotographyBooking"), { loading: LoadingSpinner, ssr: false }),
   PlanetaryCollision: dynamic(() => import("@/components/projects/PlanetaryCollision"), { loading: LoadingSpinner, ssr: false }),
 };
