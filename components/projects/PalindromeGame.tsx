@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect, useRef } from "react";
 import {
 	Moon,
@@ -18,6 +19,7 @@ import {
 	Home,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import type confetti from "canvas-confetti";
 
 enum GameLevel {
 	EASY = "Easy",
@@ -75,21 +77,20 @@ const PalindromeGame: React.FC = () => {
 		setIsClient(true);
 	}, []);
 
-	const confettiRef = useRef<any>(null);
+	// Confetti (safe dynamic import for Vercel/Next builds)
+	const confettiRef = useRef<typeof confetti | null>(null);
 
 	useEffect(() => {
 		const loadConfetti = async () => {
 			try {
-				const confettiModule = await import("canvas-confetti");
-				confettiRef.current = confettiModule.default;
+				const mod = await import("canvas-confetti");
+				confettiRef.current = (mod.default ?? (mod as any)) as typeof confetti;
 			} catch (error) {
 				console.error("Failed to load confetti:", error);
 			}
 		};
 
-		if (isClient) {
-			loadConfetti();
-		}
+		if (isClient) loadConfetti();
 	}, [isClient]);
 
 	const [stats, setStats] = useState<GameStats>({
@@ -132,26 +133,27 @@ const PalindromeGame: React.FC = () => {
 	const [showAchievement, setShowAchievement] = useState<boolean>(false);
 	const [achievementMessage, setAchievementMessage] = useState<string>("");
 
-	const timerRef = useRef<NodeJS.Timeout | null>(null);
-	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+	// Client-safe timer types
+	const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+	const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 	const inputRef = useRef<HTMLInputElement>(null);
 	const animationRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (isClient) {
-			const handleResize = () => {
-				setWindowSize({
-					width: window.innerWidth,
-					height: window.innerHeight,
-				});
-			};
+		if (!isClient) return;
 
-			handleResize();
+		const handleResize = () => {
+			setWindowSize({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		};
 
-			window.addEventListener("resize", handleResize);
+		handleResize();
+		window.addEventListener("resize", handleResize);
 
-			return () => window.removeEventListener("resize", handleResize);
-		}
+		return () => window.removeEventListener("resize", handleResize);
 	}, [isClient]);
 
 	const notesRef = useRef({
@@ -165,49 +167,49 @@ const PalindromeGame: React.FC = () => {
 	});
 
 	useEffect(() => {
-		if (isClient) {
-			try {
-				const savedHighScore = localStorage.getItem("palindromeHighScore");
-				if (savedHighScore) {
-					setStats((prev) => ({
-						...prev,
-						highScore: parseInt(savedHighScore, 10),
-					}));
-				}
+		if (!isClient) return;
 
-				const savedTheme = localStorage.getItem("palindromeTheme");
-				if (savedTheme) {
-					setSettings((prev) => ({ ...prev, theme: savedTheme as Theme }));
-				}
-
-				document.body.className =
-					savedTheme === Theme.DARK ? "bg-gray-900" : "bg-blue-50";
-			} catch (error) {
-				console.error("Error accessing localStorage:", error);
+		try {
+			const savedHighScore = localStorage.getItem("palindromeHighScore");
+			if (savedHighScore) {
+				setStats((prev) => ({
+					...prev,
+					highScore: parseInt(savedHighScore, 10),
+				}));
 			}
+
+			const savedTheme = localStorage.getItem("palindromeTheme");
+			if (savedTheme) {
+				setSettings((prev) => ({ ...prev, theme: savedTheme as Theme }));
+			}
+
+			document.body.className =
+				savedTheme === Theme.DARK ? "bg-gray-900" : "bg-blue-50";
+		} catch (error) {
+			console.error("Error accessing localStorage:", error);
 		}
 	}, [isClient]);
 
 	useEffect(() => {
-		if (isClient) {
-			try {
-				localStorage.setItem("palindromeHighScore", stats.highScore.toString());
-			} catch (error) {
-				console.error("Error saving to localStorage:", error);
-			}
+		if (!isClient) return;
+
+		try {
+			localStorage.setItem("palindromeHighScore", stats.highScore.toString());
+		} catch (error) {
+			console.error("Error saving to localStorage:", error);
 		}
 	}, [stats.highScore, isClient]);
 
 	useEffect(() => {
-		if (isClient) {
-			try {
-				localStorage.setItem("palindromeTheme", settings.theme);
+		if (!isClient) return;
 
-				document.body.className =
-					settings.theme === Theme.DARK ? "bg-gray-900" : "bg-blue-50";
-			} catch (error) {
-				console.error("Error saving theme to localStorage:", error);
-			}
+		try {
+			localStorage.setItem("palindromeTheme", settings.theme);
+
+			document.body.className =
+				settings.theme === Theme.DARK ? "bg-gray-900" : "bg-blue-50";
+		} catch (error) {
+			console.error("Error saving theme to localStorage:", error);
 		}
 	}, [settings.theme, isClient]);
 
@@ -374,11 +376,9 @@ const PalindromeGame: React.FC = () => {
 				setGameState(GameState.PRACTICE_ROUND);
 			} else if (inputValue !== "") {
 				setGameState(GameState.INPUT_PHASE);
-
 				startInputTimer();
 			} else {
 				setGameState(GameState.QUESTION_PHASE);
-
 				startQuestionTimer();
 			}
 			playSound("click");
@@ -553,27 +553,28 @@ const PalindromeGame: React.FC = () => {
 	};
 
 	const triggerConfetti = (): void => {
-		if (isClient && confettiRef.current) {
-			const canvasConfetti = confettiRef.current.create(undefined, {
-				resize: true,
-				useWorker: true,
-			});
+		const conf = confettiRef.current;
+		if (!isClient || !conf) return;
 
-			canvasConfetti({
-				particleCount: 100,
-				spread: 70,
-				origin: { y: 0.6 },
-				colors: [
-					"#26ccff",
-					"#a25afd",
-					"#ff5e7e",
-					"#88ff5a",
-					"#fcff42",
-					"#ffa62d",
-					"#ff36ff",
-				],
-			});
-		}
+		const fire =
+			typeof (conf as any).create === "function"
+				? (conf as any).create(undefined, { resize: true, useWorker: true })
+				: conf;
+
+		fire({
+			particleCount: 100,
+			spread: 70,
+			origin: { y: 0.6 },
+			colors: [
+				"#26ccff",
+				"#a25afd",
+				"#ff5e7e",
+				"#88ff5a",
+				"#fcff42",
+				"#ffa62d",
+				"#ff36ff",
+			],
+		});
 	};
 
 	const handleTimeUp = (): void => {
@@ -585,7 +586,6 @@ const PalindromeGame: React.FC = () => {
 		playSound("wrong");
 
 		timeoutRef.current = setTimeout(() => {
-			console.log("Starting new round after timeout");
 			startNewRound();
 		}, 1500);
 	};
@@ -922,15 +922,10 @@ const PalindromeGame: React.FC = () => {
 
 		const digits = num.toString().length;
 
-		if (digits <= 2) {
-			return "from-blue-500 to-indigo-500";
-		} else if (digits === 3) {
-			return "from-indigo-500 to-purple-500";
-		} else if (digits === 4) {
-			return "from-purple-500 to-pink-500";
-		} else {
-			return "from-pink-500 to-rose-500";
-		}
+		if (digits <= 2) return "from-blue-500 to-indigo-500";
+		if (digits === 3) return "from-indigo-500 to-purple-500";
+		if (digits === 4) return "from-purple-500 to-pink-500";
+		return "from-pink-500 to-rose-500";
 	};
 
 	if (!isClient) {
@@ -948,7 +943,7 @@ const PalindromeGame: React.FC = () => {
 			className={`flex justify-center items-center min-h-screen ${themeClasses.background} px-4 py-8 font-sans relative overflow-hidden`}
 			ref={animationRef}
 		>
-			{}
+			{/* Ambient background blobs */}
 			<div className="absolute inset-0 overflow-hidden pointer-events-none">
 				{isClient &&
 					Array.from({ length: 20 }).map((_, i) => {
@@ -984,7 +979,7 @@ const PalindromeGame: React.FC = () => {
 					})}
 			</div>
 
-			{}
+			{/* Achievement Banner */}
 			<AnimatePresence>
 				{showAchievement && (
 					<motion.div
@@ -1005,7 +1000,7 @@ const PalindromeGame: React.FC = () => {
 				)}
 			</AnimatePresence>
 
-			{}
+			{/* Hint Modal */}
 			<AnimatePresence>
 				{feedback.showHintModal && (
 					<motion.div
@@ -1039,14 +1034,14 @@ const PalindromeGame: React.FC = () => {
 				)}
 			</AnimatePresence>
 
-			{}
+			{/* Main Card */}
 			<motion.div
 				initial={{ opacity: 0, scale: 0.95 }}
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.6 }}
 				className={`w-full max-w-2xl p-6 sm:p-8 ${themeClasses.container} rounded-2xl text-center relative overflow-hidden`}
 			>
-				{}
+				{/* Top right controls */}
 				<div className="absolute right-4 top-4 flex gap-2">
 					<motion.button
 						className={`p-2 rounded-full ${
@@ -1095,7 +1090,7 @@ const PalindromeGame: React.FC = () => {
 					</motion.button>
 				</div>
 
-				{}
+				{/* Header */}
 				<motion.div
 					className="flex flex-col items-center justify-center mb-6"
 					initial={{ y: -20 }}
@@ -1123,7 +1118,7 @@ const PalindromeGame: React.FC = () => {
 						>
 							<div
 								className={`absolute inset-0 ${themeClasses.accentGradient} rounded-full blur-md`}
-							></div>
+							/>
 						</motion.div>
 					</div>
 
@@ -1145,7 +1140,7 @@ const PalindromeGame: React.FC = () => {
 					</p>
 				</motion.div>
 
-				{}
+				{/* Stats bar */}
 				{gameState !== GameState.NOT_STARTED &&
 					gameState !== GameState.GAME_OVER && (
 						<div className="flex justify-between mb-6 items-center px-2">
@@ -1196,7 +1191,7 @@ const PalindromeGame: React.FC = () => {
 						</div>
 					)}
 
-				{}
+				{/* Menu */}
 				{gameState === GameState.NOT_STARTED && (
 					<motion.div
 						initial={{ y: 20, opacity: 0 }}
@@ -1268,7 +1263,6 @@ const PalindromeGame: React.FC = () => {
 							<ArrowRight size={18} />
 						</motion.button>
 
-						{}
 						{stats.highScore > 0 && (
 							<motion.div
 								className="mt-6 flex items-center gap-2"
@@ -1285,7 +1279,7 @@ const PalindromeGame: React.FC = () => {
 					</motion.div>
 				)}
 
-				{}
+				{/* Countdown */}
 				{gameState === GameState.COUNTDOWN && (
 					<motion.div
 						className="flex flex-col items-center justify-center py-10"
@@ -1312,13 +1306,12 @@ const PalindromeGame: React.FC = () => {
 					</motion.div>
 				)}
 
-				{}
+				{/* Game area */}
 				{(gameState === GameState.PRACTICE_ROUND ||
 					gameState === GameState.QUESTION_PHASE ||
 					gameState === GameState.INPUT_PHASE ||
 					gameState === GameState.PAUSED) && (
 					<div className="game-area">
-						{}
 						<div className="flex justify-center gap-3 mb-4">
 							<motion.button
 								className={`p-2 rounded-full ${themeClasses.controlButton} cursor-pointer transition-transform`}
@@ -1346,7 +1339,6 @@ const PalindromeGame: React.FC = () => {
 							</motion.button>
 						</div>
 
-						{}
 						{gameState === GameState.PAUSED && (
 							<motion.div
 								initial={{ opacity: 0 }}
@@ -1410,7 +1402,6 @@ const PalindromeGame: React.FC = () => {
 									</div>
 								</div>
 
-								{}
 								<motion.div
 									initial={{ scale: 0.5, opacity: 0 }}
 									animate={{ scale: 1, opacity: 1 }}
@@ -1460,7 +1451,7 @@ const PalindromeGame: React.FC = () => {
 										</div>
 										<div className="flex justify-center gap-4">
 											<motion.button
-												className={`py-3 px-8 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-all cursor-pointer shadow-lg flex items-center gap-2`}
+												className="py-3 px-8 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 transition-all cursor-pointer shadow-lg flex items-center gap-2"
 												onClick={() => handleAnswer(true)}
 												whileHover={{ scale: 1.05 }}
 												whileTap={{ scale: 0.95 }}
@@ -1468,7 +1459,7 @@ const PalindromeGame: React.FC = () => {
 												<span>Yes</span>
 											</motion.button>
 											<motion.button
-												className={`py-3 px-8 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all cursor-pointer shadow-lg flex items-center gap-2`}
+												className="py-3 px-8 bg-red-500 text-white rounded-lg font-medium hover:bg-red-600 transition-all cursor-pointer shadow-lg flex items-center gap-2"
 												onClick={() => handleAnswer(false)}
 												whileHover={{ scale: 1.05 }}
 												whileTap={{ scale: 0.95 }}
@@ -1547,7 +1538,7 @@ const PalindromeGame: React.FC = () => {
 					</div>
 				)}
 
-				{}
+				{/* Game over */}
 				{gameState === GameState.GAME_OVER && (
 					<motion.div
 						initial={{ opacity: 0, y: 20 }}
@@ -1583,7 +1574,7 @@ const PalindromeGame: React.FC = () => {
 								>
 									<div
 										className={`absolute inset-0 ${themeClasses.accentGradient} rounded-full blur-md`}
-									></div>
+									/>
 								</motion.div>
 							</div>
 						</motion.div>
@@ -1632,7 +1623,7 @@ const PalindromeGame: React.FC = () => {
 					</motion.div>
 				)}
 
-				{}
+				{/* How to Play */}
 				{gameState === GameState.NOT_STARTED && (
 					<motion.div
 						initial={{ opacity: 0 }}
