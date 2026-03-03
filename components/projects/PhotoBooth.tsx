@@ -1,5 +1,5 @@
 "use client";
-import Head from "next/head";
+
 import React, {
 	useState,
 	useEffect,
@@ -7,6 +7,36 @@ import React, {
 	useCallback,
 	useMemo,
 } from "react";
+
+import {
+	Eye,
+	Brush,
+	Filter,
+	ScanFace,
+	X,
+	Upload,
+	Columns2,
+	Info,
+	Undo,
+	Sparkles,
+	LoaderCircle,
+	Sun,
+	Moon,
+	Menu,
+	Twitter,
+	Instagram,
+	Github,
+	Camera,
+	Images,
+	Trophy,
+	Glasses,
+	Heart,
+	Star,
+	PartyPopper,
+	BrainCircuit,
+	ChevronsUpDown,
+} from "lucide-react";
+import type { LucideProps } from "lucide-react";
 
 interface ExifData {
 	Make?: string;
@@ -34,184 +64,56 @@ interface ARStickerConfig {
 	defaultStyle: React.CSSProperties;
 }
 
-const IconArSunglasses = (): JSX.Element => (
-	<svg
-		viewBox="0 0 100 50"
-		xmlns="http://www.w3.org/2000/svg"
-		width="48"
-		height="24"
-	>
-		<defs>
-			<linearGradient id="lensGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-				<stop
-					offset="0%"
-					style={{ stopColor: "rgba(100, 100, 150, 0.7)", stopOpacity: 1 }}
-				/>
-				<stop
-					offset="100%"
-					style={{ stopColor: "rgba(50, 50, 100, 0.8)", stopOpacity: 1 }}
-				/>
-			</linearGradient>
-		</defs>
-		<rect
-			x="5"
-			y="10"
-			width="35"
-			height="25"
-			rx="12"
-			fill="url(#lensGradient)"
-			stroke="#1A202C"
-			strokeWidth="2.5"
-		/>
-		<rect
-			x="60"
-			y="10"
-			width="35"
-			height="25"
-			rx="12"
-			fill="url(#lensGradient)"
-			stroke="#1A202C"
-			strokeWidth="2.5"
-		/>
-		<path d="M40 22.5 H60" stroke="#2D3748" strokeWidth="3.5" />
-		<path
-			d="M22.5 10 Q0 15 0 20 L5 20"
-			fill="none"
-			stroke="#2D3748"
-			strokeWidth="3"
-		/>
-		<path
-			d="M77.5 10 Q100 15 100 20 L95 20"
-			fill="none"
-			stroke="#2D3748"
-			strokeWidth="3"
-		/>
-	</svg>
+/** Lucide helpers */
+const Spinner = (props: LucideProps) => (
+	<LoaderCircle
+		{...props}
+		className={`animate-spin ${props.className ?? ""}`.trim()}
+	/>
 );
 
-const IconArHeartEyes = (): JSX.Element => (
-	<svg
-		viewBox="0 0 100 50"
-		xmlns="http://www.w3.org/2000/svg"
-		width="48"
-		height="24"
-	>
-		<path
-			d="M25,35 C0,15 15,-5 30,10 C30,10 28,25 25,35 Z"
-			fill="#E53E3E"
-			stroke="#9B2C2C"
-			strokeWidth="2.5"
-		/>
-		<path
-			d="M75,35 C100,15 85,-5 70,10 C70,10 72,25 75,35 Z"
-			fill="#E53E3E"
-			stroke="#9B2C2C"
-			strokeWidth="2.5"
-		/>
-	</svg>
+const StickerGlasses = (props: LucideProps) => (
+	<Glasses
+		{...props}
+		className={`text-slate-900 ${props.className ?? ""}`.trim()}
+	/>
 );
 
-const IconArStarStruck = (): JSX.Element => (
-	<svg
-		viewBox="0 0 100 50"
-		xmlns="http://www.w3.org/2000/svg"
-		width="48"
-		height="24"
-	>
-		<polygon
-			points="25,5 30,20 45,20 32,30 35,45 25,35 15,45 18,30 5,20 20,20"
-			fill="#F6E05E"
-			stroke="#B7791F"
-			strokeWidth="2"
-		/>
-		<polygon
-			points="75,5 80,20 95,20 82,30 85,45 75,35 65,45 68,30 55,20 70,20"
-			fill="#F6E05E"
-			stroke="#B7791F"
-			strokeWidth="2"
-		/>
-	</svg>
+const StickerHeart = (props: LucideProps) => (
+	<Heart
+		{...props}
+		fill="currentColor"
+		className={`text-rose-500 ${props.className ?? ""}`.trim()}
+	/>
 );
 
-const IconArPartyPopper = (): JSX.Element => (
-	<svg
-		viewBox="0 0 50 50"
-		xmlns="http://www.w3.org/2000/svg"
-		width="40"
-		height="40"
-	>
-		<polygon
-			points="10,45 22,5 34,45"
-			fill="#4299E1"
-			stroke="#2B6CB0"
-			strokeWidth="2"
-		/>
-		<circle cx="18" cy="10" r="3.5" fill="#F6E05E" />
-		<circle cx="28" cy="6" r="2.5" fill="#E53E3E" />
-		<circle cx="23" cy="16" r="3" fill="#48BB78" />
-		<rect
-			x="15"
-			y="3"
-			width="5"
-			height="5"
-			fill="#ED64A6"
-			transform="rotate(45 17.5 5.5)"
-		/>
-		<polygon points="30,9 32,3 34,9" fill="#ED8936" />
-	</svg>
+const StickerStar = (props: LucideProps) => (
+	<Star
+		{...props}
+		fill="currentColor"
+		className={`text-amber-400 ${props.className ?? ""}`.trim()}
+	/>
 );
 
-const IconArThinkingFace = (): JSX.Element => (
-	<svg
-		viewBox="0 0 50 50"
-		xmlns="http://www.w3.org/2000/svg"
-		width="40"
-		height="40"
-	>
-		<path
-			d="M5,12 C5,2 15,0 22,6 Q42,17 37,32 Q32,47 17,42 Q2,32 5,12 Z"
-			fill="#63B3ED"
-			stroke="#2C5282"
-			strokeWidth="2"
-		/>
-		<circle cx="16" cy="32" r="3.5" fill="#1A202C" />
-		<circle cx="23" cy="35" r="3" fill="#1A202C" />
-		<circle cx="29" cy="37" r="2.5" fill="#1A202C" />
-	</svg>
+const StickerParty = (props: LucideProps) => (
+	<PartyPopper
+		{...props}
+		className={`text-indigo-500 ${props.className ?? ""}`.trim()}
+	/>
 );
 
-const IconArSpeechBubble = (): JSX.Element => (
-	<svg
-		viewBox="0 0 50 35"
-		xmlns="http://www.w3.org/2000/svg"
-		width="48"
-		height="28"
-	>
-		<path
-			d="M2,2 H48 C49,2 49,3 48,3 V25 C49,25 49,26 48,26 H15 L7,33 V26 H2 C1,26 1,25 2,25 V3 C1,3 1,2 2,2 Z"
-			fill="#48BB78"
-			stroke="#2F855A"
-			strokeWidth="2"
-		/>
-		<text
-			x="25"
-			y="19"
-			fontFamily="Poppins, sans-serif"
-			fontWeight="600"
-			fontSize="11"
-			fill="#1A202C"
-			textAnchor="middle"
-		>
-			HEY!
-		</text>
-	</svg>
+const StickerThinking = (props: LucideProps) => (
+	<BrainCircuit
+		{...props}
+		className={`text-sky-500 ${props.className ?? ""}`.trim()}
+	/>
 );
 
 const AVAILABLE_AR_STICKERS: ARStickerConfig[] = [
 	{
 		id: "sunglasses",
 		name: "Cool Shades",
-		icon: <IconArSunglasses />,
+		icon: <StickerGlasses />,
 		defaultStyle: {
 			top: "25%",
 			left: "50%",
@@ -223,7 +125,7 @@ const AVAILABLE_AR_STICKERS: ARStickerConfig[] = [
 	{
 		id: "heart_eyes",
 		name: "Love It!",
-		icon: <IconArHeartEyes />,
+		icon: <StickerHeart />,
 		defaultStyle: {
 			top: "15%",
 			right: "15%",
@@ -234,7 +136,7 @@ const AVAILABLE_AR_STICKERS: ARStickerConfig[] = [
 	{
 		id: "star_struck",
 		name: "Wow!",
-		icon: <IconArStarStruck />,
+		icon: <StickerStar />,
 		defaultStyle: {
 			bottom: "20%",
 			left: "20%",
@@ -245,7 +147,7 @@ const AVAILABLE_AR_STICKERS: ARStickerConfig[] = [
 	{
 		id: "party_popper",
 		name: "Celebrate!",
-		icon: <IconArPartyPopper />,
+		icon: <StickerParty />,
 		defaultStyle: {
 			bottom: "15%",
 			right: "50%",
@@ -257,7 +159,7 @@ const AVAILABLE_AR_STICKERS: ARStickerConfig[] = [
 	{
 		id: "thinking_face",
 		name: "Hmm...",
-		icon: <IconArThinkingFace />,
+		icon: <StickerThinking />,
 		defaultStyle: {
 			top: "50%",
 			left: "10%",
@@ -422,180 +324,6 @@ const generateStaticSubmissions = (): ImageSubmission[] => {
 	}));
 };
 
-const IconEye = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-	</svg>
-);
-const IconBrush = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M13.22 2.3L3.93 11.59c-.39.39-.39 1.02 0 1.41l2.12 2.12c.39.39 1.02.39 1.41 0L17.75 4.83c-.39-.39.39-1.02 0-1.41L15.63.3c-.39-.39-1.03-.39-1.41 0l-1 1zm-2.12 3.54L3 14.06V17h2.94l8.12-8.12-2.94-2.94zM7.5 19H4c-1.1 0-2 .9-2 2s.9 2 2 2h16c1.1 0 2-.9 2-2s-.9-2-2-2H7.5z" />
-	</svg>
-);
-const IconFilter = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z" />
-	</svg>
-);
-const IconAR = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M19.94,10A8.85,8.85,0,0,0,12,2.06,8.85,8.85,0,0,0,4.06,10H2v4H4.06A8.85,8.85,0,0,0,12,21.94,8.85,8.85,0,0,0,19.94,14H22V10ZM12,20a8,8,0,1,1,8-8A8,8,0,0,1,12,20Z" />
-		<circle cx="12" cy="12" r="3" />
-		<path d="M12,7a5,5,0,1,0,5,5A5,5,0,0,0,12,7Zm0,8a3,3,0,1,1,3-3A3,3,0,0,1,12,15Z" />
-	</svg>
-);
-const IconClose = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
-	<svg
-		viewBox="0 0 24 24"
-		width="24"
-		height="24"
-		fill="currentColor"
-		{...props}
-	>
-		<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-	</svg>
-);
-const IconUpload = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z" />
-	</svg>
-);
-const IconCompare = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M10 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h5v2h2V1h-2v2zm0 15H5l5-6v6zm9-15h-5v2h5v13l-5-6v9h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
-	</svg>
-);
-const IconInfo = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
-	</svg>
-);
-const IconUndo = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-		<path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C20.08 11.03 16.63 8 12.5 8z" />
-	</svg>
-);
-const IconSparkles = (): JSX.Element => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		fill="currentColor"
-		viewBox="0 0 16 16"
-	>
-		<path d="M5.05.316a.5.5 0 0 1 .487.023L6.5 1.5l1.006-1.161a.5.5 0 0 1 .684-.01L8.5 1.5l.507-1.161a.5.5 0 0 1 .87.404l-.253 1.153L10.5 3.5l.646-.646a.5.5 0 0 1 .708 0l.5.5a.5.5 0 0 1 0 .708L11.5 5.5l.253 1.153a.5.5 0 0 1-.87.404l-.507-1.161L9.5 4.5l-1.006 1.161a.5.5 0 0 1-.684.01L6.5 4.5l-.507 1.161a.5.5 0 0 1-.87-.404l.253-1.153L3.5 3.5l-.646.646a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 0-.708L2.5 2.5l-.253-1.153a.5.5 0 0 1 .487-.404L3.5 1.5l1.006-1.161ZM10 8.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5ZM8.5 10a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5ZM12 10.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5ZM10.5 12a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5ZM8.5 12a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 0 1h-1a.5.5 0 0 1-.5-.5ZM10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0Z" />
-	</svg>
-);
-const IconSpinner = (): JSX.Element => (
-	<svg
-		className="animate-spin h-5 w-5 text-white"
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-	>
-		<circle
-			className="opacity-25"
-			cx="12"
-			cy="12"
-			r="10"
-			stroke="currentColor"
-			strokeWidth="4"
-		></circle>
-		<path
-			className="opacity-75"
-			fill="currentColor"
-			d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-		></path>
-	</svg>
-);
-const IconSun = (): JSX.Element => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		fill="currentColor"
-		viewBox="0 0 16 16"
-	>
-		<path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z" />
-	</svg>
-);
-const IconMoon = (): JSX.Element => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		fill="currentColor"
-		viewBox="0 0 16 16"
-	>
-		<path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278zM4.858 1.311A7.269 7.269 0 0 0 1.025 7.71c0 4.021 3.278 7.277 7.318 7.277a7.316 7.316 0 0 0 5.205-2.149A8.507 8.507 0 0 1 8.344 15C4.229 15 1 11.777 1 7.71c0-2.931 1.162-5.643 3.038-7.545A.758.758 0 0 1 4.858 1.311z" />
-	</svg>
-);
-const IconMenu = (): JSX.Element => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		fill="currentColor"
-		viewBox="0 0 16 16"
-	>
-		<path
-			fillRule="evenodd"
-			d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-		/>
-	</svg>
-);
-const IconX = (): JSX.Element => (
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="24"
-		height="24"
-		fill="currentColor"
-		viewBox="0 0 16 16"
-	>
-		<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-	</svg>
-);
-const IconDummySocial1 = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-		<path d="M12 2.04C6.5 2.04 2 6.53 2 12s4.5 9.96 10 9.96c5.5 0 10-4.47 10-9.96S17.5 2.04 12 2.04zm0 17.92c-4.41 0-8-3.59-8-7.96s3.59-8 8-8 8 3.6 8 8-3.59 7.96-8 7.96zm2-8.96H10v2h4v-2zm-6 0H6v2h2v-2zm8 0h-2v2h2v-2z" />
-	</svg>
-);
-const IconDummySocial2 = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-		<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z" />
-	</svg>
-);
-const IconDummySocial3 = (): JSX.Element => (
-	<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-		<path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 18H6v-8h2v8zm4 0h-2V8h2v10zm4 0h-2V8h2v10z" />
-	</svg>
-);
-
-const IconCameraSolid = (): JSX.Element => (
-	<svg viewBox="0 0 20 20" fill="currentColor" width="24" height="24">
-		<path
-			fillRule="evenodd"
-			d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586A2 2 0 0113.414 4H6.586A2 2 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
-			clipRule="evenodd"
-		/>
-		<path d="M2 7a1 1 0 011-1h.586A1 1 0 014.586 5H10a1 1 0 011 1v.01A.997.997 0 0110 7H2z" />
-	</svg>
-);
-const IconImageSolid = (): JSX.Element => (
-	<svg viewBox="0 0 20 20" fill="currentColor" width="24" height="24">
-		<path
-			fillRule="evenodd"
-			d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-			clipRule="evenodd"
-		/>
-	</svg>
-);
-const IconTrophySolid = (): JSX.Element => (
-	<svg viewBox="0 0 20 20" fill="currentColor" width="24" height="24">
-		<path d="M2 9.5A4.5 4.5 0 016.5 5H8V4a1 1 0 011-1h2a1 1 0 011 1v1h1.5A4.5 4.5 0 0118 9.5V14a1 1 0 01-1 1H3a1 1 0 01-1-1V9.5zM6 13h8V9.5A2.5 2.5 0 0011.5 7H11V6H9v1H8.5A2.5 2.5 0 006 9.5V13zM5 16.5A1.5 1.5 0 016.5 15h7a1.5 1.5 0 010 3h-7A1.5 1.5 0 015 16.5z" />
-	</svg>
-);
-
 type ModalTabId =
 	| "view"
 	| "draw"
@@ -628,6 +356,7 @@ const HomePage: React.FC = () => {
 	const imageRef = useRef<HTMLImageElement>(null);
 	const imageContainerRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+
 	const [isDrawing, setIsDrawing] = useState(false);
 	const [drawingColor, setDrawingColor] = useState("#FF3B30");
 	const [drawingStrokeWidth, setDrawingStrokeWidth] = useState(5);
@@ -661,6 +390,7 @@ const HomePage: React.FC = () => {
 		x: number;
 		y: number;
 	} | null>(null);
+
 	const [calculatedImgStyle, setCalculatedImgStyle] = useState({
 		width: "0px",
 		height: "0px",
@@ -1014,7 +744,10 @@ const HomePage: React.FC = () => {
 			canvas.style.left = `${offsetX}px`;
 			canvas.style.top = `${offsetY}px`;
 
-			ctx.resetTransform();
+			// reset transform safely (older browsers)
+			if ((ctx as any).resetTransform) (ctx as any).resetTransform();
+			else ctx.setTransform(1, 0, 0, 1, 0, 0);
+
 			ctx.scale(dpr, dpr);
 			ctx.clearRect(0, 0, displayWidth, displayHeight);
 
@@ -1079,17 +812,13 @@ const HomePage: React.FC = () => {
 		}
 
 		const resizeObserver = new ResizeObserver(resizeAndDrawCanvas);
-		if (imageContainer) {
-			resizeObserver.observe(imageContainer);
-		}
+		resizeObserver.observe(imageContainer);
 		window.addEventListener("resize", resizeAndDrawCanvas);
 
 		return () => {
 			window.removeEventListener("resize", resizeAndDrawCanvas);
-			if (imageContainer) {
-				resizeObserver.unobserve(imageContainer);
-			}
-			if (image) image.onload = null;
+			resizeObserver.unobserve(imageContainer);
+			image.onload = null;
 		};
 	}, [selectedImage, selectedImage?.drawings, activeTabInModal]);
 
@@ -1137,7 +866,7 @@ const HomePage: React.FC = () => {
 				id: `img_local_${Date.now()}`,
 				userId: `user_local_${Date.now()}`,
 				userName: "You (Uploaded)",
-				imageUrl: imageUrl,
+				imageUrl,
 				originalImageUrl: imageUrl,
 				exif: {
 					DateTaken: new Date().toISOString().split("T")[0],
@@ -1177,8 +906,9 @@ const HomePage: React.FC = () => {
 		setSelectedImage((prev) => {
 			if (!prev) return null;
 			const newVotesOnThisImage = new Set(prev.userVotedFilters);
-			let newTotalVotes = { ...prev.filterVotes };
+			const newTotalVotes = { ...prev.filterVotes };
 			let voteChange = 0;
+
 			if (newVotesOnThisImage.has(filterId)) {
 				newVotesOnThisImage.delete(filterId);
 				voteChange = -1;
@@ -1188,10 +918,12 @@ const HomePage: React.FC = () => {
 				voteChange = 1;
 				addToast("Vote counted!", "success");
 			}
+
 			newTotalVotes[filterId] = Math.max(
 				0,
 				(newTotalVotes[filterId] || 0) + voteChange
 			);
+
 			return {
 				...prev,
 				userVotedFilters: newVotesOnThisImage,
@@ -1362,7 +1094,8 @@ const HomePage: React.FC = () => {
 		(e: React.MouseEvent | React.TouchEvent) => {
 			e.preventDefault();
 			setIsSwipingBeforeAfter(true);
-			const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+			const clientX =
+				"touches" in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
 
 			if (imageRef.current) {
 				const imageRect = imageRef.current.getBoundingClientRect();
@@ -1379,10 +1112,10 @@ const HomePage: React.FC = () => {
 		(e: MouseEvent | TouchEvent) => {
 			if (!isSwipingBeforeAfter || !imageRef.current) return;
 			e.preventDefault();
-			const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+			const clientX =
+				"touches" in e ? e.touches[0].clientX : (e as MouseEvent).clientX;
 
 			const imageRect = imageRef.current.getBoundingClientRect();
-
 			const relativeX = clientX - imageRect.left;
 			let newPercentage = (relativeX / imageRect.width) * 100;
 
@@ -1407,7 +1140,10 @@ const HomePage: React.FC = () => {
 		}
 		return () => {
 			document.removeEventListener("mousemove", handleBeforeAfterSwipeMove);
-			document.removeEventListener("touchmove", handleBeforeAfterSwipeMove);
+			document.removeEventListener(
+				"touchmove",
+				handleBeforeAfterSwipeMove as any
+			);
 			document.removeEventListener("mouseup", handleBeforeAfterSwipeEnd);
 			document.removeEventListener("touchend", handleBeforeAfterSwipeEnd);
 		};
@@ -1447,12 +1183,12 @@ const HomePage: React.FC = () => {
 	}
 
 	const modalTabs: { id: ModalTabId; label: string; icon: JSX.Element }[] = [
-		{ id: "view", label: "View", icon: <IconEye /> },
-		{ id: "draw", label: "Draw", icon: <IconBrush /> },
-		{ id: "filter", label: "Filters", icon: <IconFilter /> },
-		{ id: "ar_tools", label: "AR Booth", icon: <IconSparkles /> },
-		{ id: "exif", label: "EXIF", icon: <IconInfo /> },
-		{ id: "beforeAfter", label: "Compare", icon: <IconCompare /> },
+		{ id: "view", label: "View", icon: <Eye /> },
+		{ id: "draw", label: "Draw", icon: <Brush /> },
+		{ id: "filter", label: "Filters", icon: <Filter /> },
+		{ id: "ar_tools", label: "AR Booth", icon: <Sparkles /> },
+		{ id: "exif", label: "EXIF", icon: <Info /> },
+		{ id: "beforeAfter", label: "Compare", icon: <Columns2 /> },
 	];
 
 	const navLinks = [
@@ -1509,7 +1245,7 @@ const HomePage: React.FC = () => {
 						className="p-2.5 rounded-full themed-button-text themed-button-hover-bg transition-colors cursor-pointer"
 						title="Toggle Theme Mode"
 					>
-						{themeMode === "dark" ? <IconSun /> : <IconMoon />}
+						{themeMode === "dark" ? <Sun /> : <Moon />}
 					</button>
 				</div>
 				<p className="text-xs sm:text-sm themed-secondary-text mt-1 font-manrope">
@@ -1517,7 +1253,6 @@ const HomePage: React.FC = () => {
 				</p>
 			</header>
 
-			{}
 			{showExifHelp && submissions.length > 0 && (
 				<div className="fixed top-20 sm:top-24 left-0 right-0 z-30 mx-auto max-w-md px-4">
 					<div
@@ -1527,7 +1262,7 @@ const HomePage: React.FC = () => {
 					>
 						<div className="flex items-start justify-between">
 							<div className="flex items-center">
-								<IconCompare className="w-5 h-5 mr-2 flex-shrink-0" />
+								<Columns2 className="w-5 h-5 mr-2 flex-shrink-0" />
 								<p className="text-sm">
 									Tap the{" "}
 									<span className="font-bold">blue comparison button</span> on
@@ -1538,7 +1273,7 @@ const HomePage: React.FC = () => {
 								onClick={dismissExifHelp}
 								className="text-white p-1 rounded-full hover:bg-white/20"
 							>
-								<IconX className="w-4 h-4" />
+								<X className="w-4 h-4" />
 							</button>
 						</div>
 					</div>
@@ -1569,18 +1304,18 @@ const HomePage: React.FC = () => {
 							</div>
 							<button
 								className={`absolute top-2 right-2 sm:top-3 sm:right-3 p-2 sm:p-2.5 rounded-full text-white transition-all duration-200 z-10 cursor-pointer flex items-center justify-center
-                    ${
-											compareSlot1?.id === sub.id || compareSlot2?.id === sub.id
-												? "bg-blue-500 scale-110 ring-2 ring-white/50 shadow-md"
-												: "bg-blue-500/80 group-hover:bg-blue-500 hover:scale-105 hover:shadow-sm"
-										}`}
+                  ${
+										compareSlot1?.id === sub.id || compareSlot2?.id === sub.id
+											? "bg-blue-500 scale-110 ring-2 ring-white/50 shadow-md"
+											: "bg-blue-500/80 group-hover:bg-blue-500 hover:scale-105 hover:shadow-sm"
+									}`}
 								onClick={(e) => {
 									e.stopPropagation();
 									handleExifCompareSelect(sub);
 								}}
 								title="Select for EXIF comparison"
 							>
-								<IconCompare />
+								<Columns2 />
 								{!compareSlot1 && !compareSlot2 && (
 									<span className="absolute -bottom-1 right-0 w-3 h-3 rounded-full bg-red-500 border border-white animate-ping"></span>
 								)}
@@ -1599,7 +1334,8 @@ const HomePage: React.FC = () => {
 								onClick={triggerFileUpload}
 								className="mt-6 px-5 py-2.5 themed-primary-button text-white font-semibold rounded-lg shadow-md flex items-center gap-2 mx-auto text-sm sm:text-base cursor-pointer font-manrope"
 							>
-								{isUploading ? <IconSpinner /> : <IconUpload />} Upload Photo
+								{isUploading ? <Spinner className="h-5 w-5" /> : <Upload />}{" "}
+								Upload Photo
 							</button>
 						</div>
 					)}
@@ -1615,13 +1351,13 @@ const HomePage: React.FC = () => {
 					{[
 						{
 							label: "Upload",
-							icon: isUploading ? <IconSpinner /> : <IconUpload />,
+							icon: isUploading ? <Spinner className="h-5 w-5" /> : <Upload />,
 							action: triggerFileUpload,
 							disabled: isUploading,
 						},
 						{
 							label: "AR Booth",
-							icon: <IconAR />,
+							icon: <ScanFace />,
 							action: toggleArEffect,
 							active: arEffectActive,
 							disabled: false,
@@ -1651,30 +1387,7 @@ const HomePage: React.FC = () => {
 
 	return (
 		<div className={themeMode === "dark" ? "dark-theme" : "light-theme"}>
-			<Head>
-				<title>HixcelQuest Challenge - Daily Creativity</title>
-				<meta
-					name="description"
-					content="Join daily photo challenges, edit, draw, and share with HixcelQuest!"
-				/>
-				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<link
-					rel="icon"
-					href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234F46E5'/><circle cx='50' cy='50' r='30' fill='white'/><circle cx='50' cy='50' r='15' fill='%23A5B4FC'/></svg>"
-				/>
-				<script src="https://cdn.tailwindcss.com"></script>
-				<link rel="preconnect" href="https://fonts.googleapis.com" />
-				<link
-					rel="preconnect"
-					href="https://fonts.gstatic.com"
-					crossOrigin="anonymous"
-				/>
-				<link
-					href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap"
-					rel="stylesheet"
-				/>
-			</Head>
-
+			{/* NOTE: In Next.js App Router, put title/meta/fonts in app/layout.tsx or app/head.tsx */}
 			<style jsx global>{`
 				:root {
 					--bg-gradient-start-light: #f0f9ff;
@@ -1737,8 +1450,6 @@ const HomePage: React.FC = () => {
 
 					--highlight-accent-light: #6366f1;
 					--highlight-accent-dark: #a78bfa;
-					--highlight-accent-bg-light: var(--highlight-accent-light);
-					--highlight-accent-bg-dark: var(--highlight-accent-dark);
 
 					--primary-button-bg-light: #4f46e5;
 					--primary-button-hover-bg-light: #4338ca;
@@ -2091,30 +1802,6 @@ const HomePage: React.FC = () => {
 					border-color: var(--input-border-dark);
 					color: var(--input-text-dark);
 				}
-				.themed-range::-webkit-slider-thumb {
-					background: var(--range-thumb-light);
-				}
-				.dark-theme .themed-range::-webkit-slider-thumb {
-					background: var(--range-thumb-dark);
-				}
-				.themed-range::-moz-range-thumb {
-					background: var(--range-thumb-light);
-				}
-				.dark-theme .themed-range::-moz-range-thumb {
-					background: var(--range-thumb-dark);
-				}
-				.themed-range::-webkit-slider-runnable-track {
-					background: var(--range-track-light);
-				}
-				.dark-theme .themed-range::-webkit-slider-runnable-track {
-					background: var(--range-track-dark);
-				}
-				.themed-range::-moz-range-track {
-					background: var(--range-track-light);
-				}
-				.dark-theme .themed-range::-moz-range-track {
-					background: var(--range-track-dark);
-				}
 				.photo-item-themed-bg {
 					background-color: var(--gallery-item-bg-light);
 				}
@@ -2145,12 +1832,6 @@ const HomePage: React.FC = () => {
 				}
 				.dark-theme .themed-highlight-accent-text {
 					color: var(--highlight-accent-dark);
-				}
-				.themed-highlight-accent-bg {
-					background-color: var(--highlight-accent-bg-light);
-				}
-				.dark-theme .themed-highlight-accent-bg {
-					background-color: var(--highlight-accent-dark);
 				}
 
 				.themed-primary-button {
@@ -2196,20 +1877,6 @@ const HomePage: React.FC = () => {
 				}
 				.dark-theme .themed-modal-text-highlight {
 					color: var(--modal-text-highlight-dark);
-				}
-
-				.themed-ring-accent {
-					ring-color: var(--ring-accent-light);
-				}
-				.dark-theme .themed-ring-accent {
-					ring-color: var(--ring-accent-dark);
-				}
-
-				.themed-ring-subtle {
-					ring-color: var(--ring-subtle-light);
-				}
-				.dark-theme .themed-ring-subtle {
-					ring-color: var(--ring-subtle-dark);
 				}
 
 				.themed-filter-apply-button-default {
@@ -2262,18 +1929,10 @@ const HomePage: React.FC = () => {
 				.themed-ar-sticker-active {
 					background-color: var(--ar-sticker-active-bg-light);
 					color: var(--ar-sticker-active-text-light);
-					ring-color: var(--ar-sticker-active-ring-light);
-				}
-				.themed-ar-sticker-active svg {
-					fill: var(--ar-sticker-active-text-light) !important;
 				}
 				.dark-theme .themed-ar-sticker-active {
 					background-color: var(--ar-sticker-active-bg-dark);
 					color: var(--ar-sticker-active-text-dark);
-					ring-color: var(--ar-sticker-active-ring-dark);
-				}
-				.dark-theme .themed-ar-sticker-active svg {
-					fill: var(--ar-sticker-active-text-dark) !important;
 				}
 
 				.themed-ar-sticker-default {
@@ -2338,6 +1997,7 @@ const HomePage: React.FC = () => {
 					border-color: var(--color-input-border-dark);
 				}
 			`}</style>
+
 			<style jsx>{`
 				@keyframes toast-in {
 					from {
@@ -2431,7 +2091,7 @@ const HomePage: React.FC = () => {
 							}`}
 							aria-label="Close notification"
 						>
-							<IconClose
+							<X
 								className={`w-4 h-4 ${
 									toast.type === "warning"
 										? themeMode === "dark"
@@ -2474,14 +2134,14 @@ const HomePage: React.FC = () => {
 									}}
 									className="flex items-center gap-2 font-poppins text-xl sm:text-2xl font-bold themed-header-text cursor-pointer"
 								>
-									<IconSparkles /> HixcelQuest
+									<Sparkles className="w-5 h-5" /> HixcelQuest
 								</a>
 								<nav className="hidden md:flex space-x-6">
 									{navLinks.map((link) =>
-										link.action ? (
+										(link as any).action ? (
 											<button
 												key={link.name}
-												onClick={link.action}
+												onClick={(link as any).action}
 												className="font-medium themed-secondary-text themed-button-hover-bg px-3 py-1.5 rounded-md text-sm cursor-pointer font-manrope"
 											>
 												{link.name}
@@ -2489,7 +2149,7 @@ const HomePage: React.FC = () => {
 										) : (
 											<a
 												key={link.name}
-												href={link.href}
+												href={(link as any).href}
 												className="font-medium themed-secondary-text themed-button-hover-bg px-3 py-1.5 rounded-md text-sm cursor-pointer font-manrope"
 											>
 												{link.name}
@@ -2500,7 +2160,7 @@ const HomePage: React.FC = () => {
 								<div className="hidden md:flex items-center space-x-3">
 									<button
 										onClick={() => setShowAppView(true)}
-										className={`px-4 py-2 text-sm font-medium rounded-md text-white themed-primary-button cursor-pointer font-manrope`}
+										className="px-4 py-2 text-sm font-medium rounded-md text-white themed-primary-button cursor-pointer font-manrope"
 									>
 										Join Challenge
 									</button>
@@ -2509,7 +2169,7 @@ const HomePage: React.FC = () => {
 										className="p-2.5 rounded-full themed-button-text themed-button-hover-bg transition-colors cursor-pointer"
 										title="Toggle Theme Mode"
 									>
-										{themeMode === "dark" ? <IconSun /> : <IconMoon />}
+										{themeMode === "dark" ? <Sun /> : <Moon />}
 									</button>
 								</div>
 								<div className="md:hidden flex items-center">
@@ -2518,13 +2178,13 @@ const HomePage: React.FC = () => {
 										className="p-2 rounded-full themed-button-text themed-button-hover-bg transition-colors mr-1.5 cursor-pointer"
 										title="Toggle Theme Mode"
 									>
-										{themeMode === "dark" ? <IconSun /> : <IconMoon />}
+										{themeMode === "dark" ? <Sun /> : <Moon />}
 									</button>
 									<button
 										onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 										className="p-2 rounded-md themed-button-text themed-button-hover-bg cursor-pointer"
 									>
-										{mobileMenuOpen ? <IconX /> : <IconMenu />}
+										{mobileMenuOpen ? <X /> : <Menu />}
 									</button>
 								</div>
 							</div>
@@ -2539,11 +2199,11 @@ const HomePage: React.FC = () => {
 							>
 								<nav className="flex flex-col space-y-1 px-3">
 									{navLinks.map((link) =>
-										link.action ? (
+										(link as any).action ? (
 											<button
 												key={link.name}
 												onClick={() => {
-													link.action();
+													(link as any).action();
 													setMobileMenuOpen(false);
 												}}
 												className="block px-3 py-2 rounded-md text-base font-medium themed-secondary-text themed-button-hover-bg text-left cursor-pointer font-manrope"
@@ -2553,7 +2213,7 @@ const HomePage: React.FC = () => {
 										) : (
 											<a
 												key={link.name}
-												href={link.href}
+												href={(link as any).href}
 												onClick={() => setMobileMenuOpen(false)}
 												className="block px-3 py-2 rounded-md text-base font-medium themed-secondary-text themed-button-hover-bg cursor-pointer font-manrope"
 											>
@@ -2566,7 +2226,7 @@ const HomePage: React.FC = () => {
 											setShowAppView(true);
 											setMobileMenuOpen(false);
 										}}
-										className={`block w-full mt-1 px-3 py-2.5 rounded-md text-base font-medium text-white themed-primary-button text-center cursor-pointer font-manrope`}
+										className="block w-full mt-1 px-3 py-2.5 rounded-md text-base font-medium text-white themed-primary-button text-center cursor-pointer font-manrope"
 									>
 										Join Challenge
 									</button>
@@ -2578,12 +2238,12 @@ const HomePage: React.FC = () => {
 					<main className="flex-grow">
 						<section
 							id="hero"
-							className={`themed-section-bg-primary py-16 sm:py-24 lg:py-32`}
+							className="themed-section-bg-primary py-16 sm:py-24 lg:py-32"
 						>
 							<div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
 								<h1 className="font-poppins text-3xl sm:text-5xl lg:text-6xl font-extrabold themed-primary-text tracking-tight">
 									Snap, Edit,{" "}
-									<span className={`themed-highlight-accent-text`}>Share.</span>
+									<span className="themed-highlight-accent-text">Share.</span>
 								</h1>
 								<h2 className="font-poppins text-2xl sm:text-4xl lg:text-5xl font-bold themed-primary-text tracking-tight mt-1 sm:mt-2">
 									Daily Photo Fun.
@@ -2595,13 +2255,13 @@ const HomePage: React.FC = () => {
 								<div className="mt-8 sm:mt-10 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
 									<button
 										onClick={() => setShowAppView(true)}
-										className={`px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold rounded-lg text-white themed-primary-button shadow-lg cursor-pointer font-manrope`}
+										className="px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold rounded-lg text-white themed-primary-button shadow-lg cursor-pointer font-manrope"
 									>
 										Join Today's Challenge
 									</button>
 									<a
 										href="#how-it-works"
-										className={`px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold rounded-lg themed-secondary-text themed-secondary-button shadow-md cursor-pointer font-manrope`}
+										className="px-6 py-2.5 sm:px-8 sm:py-3 text-sm sm:text-lg font-semibold rounded-lg themed-secondary-text themed-secondary-button shadow-md cursor-pointer font-manrope"
 									>
 										Learn More
 									</a>
@@ -2611,7 +2271,7 @@ const HomePage: React.FC = () => {
 
 						<section
 							id="how-it-works"
-							className={`themed-section-bg-secondary py-12 sm:py-20`}
+							className="themed-section-bg-secondary py-12 sm:py-20"
 						>
 							<div className="container mx-auto px-4 sm:px-6 lg:px-8">
 								<h2 className="text-2xl sm:text-3xl font-poppins font-bold themed-primary-text text-center mb-10 sm:mb-14">
@@ -2620,19 +2280,19 @@ const HomePage: React.FC = () => {
 								<div className="grid md:grid-cols-3 gap-6 sm:gap-10">
 									{[
 										{
-											icon: <IconCameraSolid />,
+											icon: <Camera />,
 											title: "Get the Theme",
 											description:
 												"Check daily for a new, inspiring photo theme to spark your creativity.",
 										},
 										{
-											icon: <IconImageSolid />,
+											icon: <Images />,
 											title: "Snap & Upload",
 											description:
 												"Take your best shot and upload it. Edit with our tools if you like!",
 										},
 										{
-											icon: <IconTrophySolid />,
+											icon: <Trophy />,
 											title: "Share & Engage",
 											description:
 												"View others' work, vote, draw, and see who tops the leaderboard.",
@@ -2640,7 +2300,7 @@ const HomePage: React.FC = () => {
 									].map((step, index) => (
 										<div
 											key={index}
-											className={`p-6 sm:p-8 rounded-xl shadow-lg themed-modal-section-bg text-center transition-all hover:shadow-2xl hover:scale-[1.03] flex flex-col items-center`}
+											className="p-6 sm:p-8 rounded-xl shadow-lg themed-modal-section-bg text-center transition-all hover:shadow-2xl hover:scale-[1.03] flex flex-col items-center"
 										>
 											<div className="p-3 sm:p-4 rounded-full bg-indigo-500 text-white  mb-4 sm:mb-6 inline-block shadow-md">
 												{React.cloneElement(step.icon, {
@@ -2661,7 +2321,7 @@ const HomePage: React.FC = () => {
 
 						<section
 							id="about-us"
-							className={`themed-section-bg-primary py-12 sm:py-20`}
+							className="themed-section-bg-primary py-12 sm:py-20"
 						>
 							<div className="container mx-auto px-4 sm:px-6 lg:px-8">
 								<div className="grid lg:grid-cols-2 gap-10 sm:gap-12 items-center">
@@ -2698,9 +2358,7 @@ const HomePage: React.FC = () => {
 						</section>
 					</main>
 
-					<footer
-						className={`pt-12 sm:pt-16 pb-6 sm:pb-8 themed-main-footer-bg border-t`}
-					>
+					<footer className="pt-12 sm:pt-16 pb-6 sm:pb-8 themed-main-footer-bg border-t">
 						<div className="container mx-auto px-4 sm:px-6 lg:px-8">
 							<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
 								<div className="col-span-2 lg:col-span-1">
@@ -2712,7 +2370,7 @@ const HomePage: React.FC = () => {
 										}}
 										className="flex items-center gap-2 font-poppins text-xl sm:text-2xl font-bold themed-primary-text cursor-pointer"
 									>
-										<IconSparkles /> HixcelQuest
+										<Sparkles className="w-5 h-5" /> HixcelQuest
 									</a>
 									<p className="mt-3 sm:mt-4 text-xs sm:text-sm themed-secondary-text font-manrope">
 										Creative photo challenges, daily.
@@ -2724,7 +2382,7 @@ const HomePage: React.FC = () => {
 											rel="noopener noreferrer"
 											className="themed-secondary-text themed-accent-hover-text cursor-pointer"
 										>
-											<IconDummySocial1 />
+											<Twitter className="w-5 h-5" />
 										</a>
 										<a
 											href="https://example.com/"
@@ -2732,7 +2390,7 @@ const HomePage: React.FC = () => {
 											rel="noopener noreferrer"
 											className="themed-secondary-text themed-accent-hover-text cursor-pointer"
 										>
-											<IconDummySocial2 />
+											<Instagram className="w-5 h-5" />
 										</a>
 										<a
 											href="https://example.com/"
@@ -2740,10 +2398,11 @@ const HomePage: React.FC = () => {
 											rel="noopener noreferrer"
 											className="themed-secondary-text themed-accent-hover-text cursor-pointer"
 										>
-											<IconDummySocial3 />
+											<Github className="w-5 h-5" />
 										</a>
 									</div>
 								</div>
+
 								{Object.entries(footerLinks).map(([category, links]) => (
 									<div key={category}>
 										<h3 className="text-xs sm:text-sm font-semibold themed-primary-text tracking-wider uppercase font-poppins">
@@ -2753,7 +2412,7 @@ const HomePage: React.FC = () => {
 											role="list"
 											className="mt-3 sm:mt-4 space-y-1.5 sm:space-y-2"
 										>
-											{links.map((link) => (
+											{(links as any[]).map((link) => (
 												<li key={link.name}>
 													{link.action ? (
 														<button
@@ -2776,6 +2435,7 @@ const HomePage: React.FC = () => {
 									</div>
 								))}
 							</div>
+
 							<div
 								className={`mt-8 pt-6 sm:pt-8 border-t ${
 									themeMode === "dark" ? "border-slate-700" : "border-slate-200"
@@ -2788,6 +2448,7 @@ const HomePage: React.FC = () => {
 				</div>
 			)}
 
+			{/* MODALS (unchanged except icons) */}
 			{selectedImage && (
 				<div
 					className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[100] p-2 sm:p-4 transition-opacity duration-300 animate-fade-in"
@@ -2802,24 +2463,23 @@ const HomePage: React.FC = () => {
 							onClick={handleCloseModal}
 							title="Close Modal"
 						>
-							<IconClose />
+							<X />
 						</button>
 
 						<div
 							ref={imageContainerRef}
-							className={`relative w-full h-[40vh] sm:h-[50vh] md:h-[55vh] themed-modal-image-bg flex items-center justify-center overflow-hidden p-2 sm:p-4`}
+							className="relative w-full h-[40vh] sm:h-[50vh] md:h-[55vh] themed-modal-image-bg flex items-center justify-center overflow-hidden p-2 sm:p-4"
 						>
 							<img
 								ref={imageRef}
 								src={imageForModalDisplay}
 								alt={`Selected: ${selectedImage.caption || "Image"}`}
 								className={`block max-w-full max-h-full object-contain rounded-md sm:rounded-lg transition-all duration-300 
-                      ${
-												arEffectActive && activeTabInModal === "ar_tools"
-													? "ar-image-effect-active"
-													: ""
-											}
-                    `}
+                  ${
+										arEffectActive && activeTabInModal === "ar_tools"
+											? "ar-image-effect-active"
+											: ""
+									}`}
 								style={{
 									filter:
 										(activeTabInModal === "beforeAfter"
@@ -2853,6 +2513,7 @@ const HomePage: React.FC = () => {
 								onTouchMove={draw}
 								onTouchEnd={stopDrawing}
 							/>
+
 							{activeTabInModal === "beforeAfter" &&
 								selectedImage.originalImageUrl &&
 								imageRef.current && (
@@ -2897,23 +2558,14 @@ const HomePage: React.FC = () => {
 													themeMode === "dark" ? "bg-white/50" : "bg-black/40"
 												} flex items-center justify-center shadow-md`}
 											>
-												<svg
-													className={`w-2 h-4 ${
+												<ChevronsUpDown
+													className={`w-3 h-3 ${
 														themeMode === "dark"
 															? "text-gray-800"
 															: "text-white"
 													}`}
-													fill="none"
-													stroke="currentColor"
-													viewBox="0 0 24 24"
-												>
-													<path
-														strokeLinecap="round"
-														strokeLinejoin="round"
-														strokeWidth="3"
-														d="M8 9l4-4 4 4m0 6l-4 4-4-4"
-													></path>
-												</svg>
+													strokeWidth={3}
+												/>
 											</div>
 										</div>
 									</>
@@ -2967,7 +2619,7 @@ const HomePage: React.FC = () => {
 							)}
 						</div>
 
-						<div className={`p-3 sm:p-3.5 themed-modal-border-top border-t`}>
+						<div className="p-3 sm:p-3.5 themed-modal-border-top border-t">
 							<div className="sm:hidden flex justify-center w-full">
 								<div className="inline-flex flex-nowrap space-x-1.5 overflow-x-auto pb-1 no-scrollbar px-1">
 									{modalTabs.map((tab) => (
@@ -2999,6 +2651,7 @@ const HomePage: React.FC = () => {
 									))}
 								</div>
 							</div>
+
 							<div className="hidden sm:flex w-full justify-center">
 								<div className="inline-flex flex-nowrap justify-start space-x-2 overflow-x-auto pb-1 no-scrollbar px-2">
 									{modalTabs.map((tab) => (
@@ -3033,6 +2686,7 @@ const HomePage: React.FC = () => {
 							</div>
 						</div>
 
+						{/* Content area below kept same as your original except icons (Undo, etc.) */}
 						<div className="p-3 sm:p-4 md:p-5 overflow-y-auto flex-grow no-scrollbar themed-modal-text-primary font-manrope">
 							{activeTabInModal === "view" && (
 								<div className="space-y-3 sm:space-y-4 animate-fade-in-slow">
@@ -3046,9 +2700,7 @@ const HomePage: React.FC = () => {
 									</p>
 									<p className="text-sm themed-modal-text-secondary">
 										By:{" "}
-										<span
-											className={`font-semibold themed-modal-text-highlight`}
-										>
+										<span className="font-semibold themed-modal-text-highlight">
 											{selectedImage.userName}
 										</span>
 									</p>
@@ -3060,20 +2712,18 @@ const HomePage: React.FC = () => {
 									<h3 className="font-poppins text-xl sm:text-2xl font-bold themed-modal-text-primary">
 										Draw on Image
 									</h3>
-									<div
-										className={`flex flex-col sm:flex-row items-center gap-3 sm:gap-4 p-3 sm:p-4 themed-modal-section-bg rounded-xl sm:rounded-2xl shadow-inner`}
-									>
+									<div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 p-3 sm:p-4 themed-modal-section-bg rounded-xl sm:rounded-2xl shadow-inner">
 										<input
 											type="color"
 											value={drawingColor}
 											onChange={(e) => setDrawingColor(e.target.value)}
 											title="Select Color"
-											className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 themed-color-input-border shadow-md cursor-pointer`}
+											className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 themed-color-input-border shadow-md cursor-pointer"
 										/>
 										<div className="flex-grow w-full sm:w-auto flex items-center gap-2 sm:gap-3">
 											<label
 												htmlFor="strokeWidthRange"
-												className={`text-xs sm:text-sm font-medium themed-modal-text-secondary shrink-0`}
+												className="text-xs sm:text-sm font-medium themed-modal-text-secondary shrink-0"
 											>
 												Size:
 											</label>
@@ -3087,20 +2737,18 @@ const HomePage: React.FC = () => {
 													setDrawingStrokeWidth(parseInt(e.target.value))
 												}
 												title="Stroke Width"
-												className={`w-full themed-range h-2.5 sm:h-3 rounded-lg appearance-none cursor-pointer`}
+												className="w-full themed-range h-2.5 sm:h-3 rounded-lg appearance-none cursor-pointer"
 											/>
-											<span
-												className={`text-sm themed-modal-text-primary w-10 text-right font-semibold tabular-nums shrink-0`}
-											>
+											<span className="text-sm themed-modal-text-primary w-10 text-right font-semibold tabular-nums shrink-0">
 												{drawingStrokeWidth}px
 											</span>
 										</div>
 										<button
 											onClick={handleUndoDrawing}
 											title="Undo"
-											className={`px-3 py-2 sm:px-4 sm:py-2.5 themed-primary-button text-white rounded-md sm:rounded-lg focus:ring-1 focus:ring-indigo-300 transition-all duration-200 shadow-md flex items-center gap-1.5 text-xs sm:text-sm font-medium cursor-pointer`}
+											className="px-3 py-2 sm:px-4 sm:py-2.5 themed-primary-button text-white rounded-md sm:rounded-lg focus:ring-1 focus:ring-indigo-300 transition-all duration-200 shadow-md flex items-center gap-1.5 text-xs sm:text-sm font-medium cursor-pointer"
 										>
-											<IconUndo />{" "}
+											<Undo className="w-4 h-4" />{" "}
 											<span className="hidden sm:inline">Undo</span>
 										</button>
 									</div>
@@ -3134,13 +2782,11 @@ const HomePage: React.FC = () => {
 														key={sticker.id}
 														onClick={() => toggleArSticker(sticker.id)}
 														className={`p-3 sm:p-4 rounded-xl flex flex-col items-center justify-center text-center gap-2 transition-all duration-200 aspect-square cursor-pointer shadow-md hover:shadow-lg
-                                                  ${
-																										selectedImage.activeArStickerIds.has(
-																											sticker.id
-																										)
-																											? "themed-ar-sticker-active ring-2"
-																											: "themed-ar-sticker-default"
-																									}`}
+                              ${
+																selectedImage.activeArStickerIds.has(sticker.id)
+																	? "themed-ar-sticker-active ring-2"
+																	: "themed-ar-sticker-default"
+															}`}
 													>
 														<span className="h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center">
 															{React.cloneElement(sticker.icon, {
@@ -3164,67 +2810,69 @@ const HomePage: React.FC = () => {
 										Apply Filters
 									</h3>
 									<div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-										{AVAILABLE_FILTERS.map((filter) => (
+										{AVAILABLE_FILTERS.map((filterItem) => (
 											<div
-												key={filter.id}
-												className={`text-center p-2 sm:p-3 themed-modal-section-bg rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between`}
+												key={filterItem.id}
+												className="text-center p-2 sm:p-3 themed-modal-section-bg rounded-xl sm:rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col justify-between"
 											>
 												<div
-													className={`w-full aspect-[16/10] bg-cover bg-center rounded-md sm:rounded-lg mb-2 cursor-pointer border border-transparent themed-ring-accent themed-ring-subtle transition-all duration-200 ring-1`}
+													className="w-full aspect-[16/10] bg-cover bg-center rounded-md sm:rounded-lg mb-2 cursor-pointer border border-transparent themed-ring-accent themed-ring-subtle transition-all duration-200 ring-1"
 													style={{
 														backgroundImage: `url(${selectedImage.originalImageUrl})`,
-														filter: filter.css,
+														filter: filterItem.css,
 													}}
 													onClick={() =>
 														handleApplyFilter(
-															filter.id === "none" ? null : filter.css,
-															filter.name
+															filterItem.id === "none" ? null : filterItem.css,
+															filterItem.name
 														)
 													}
 												></div>
 												<div>
 													<p
 														className="text-xs sm:text-sm font-semibold themed-modal-text-primary mb-1.5 sm:mb-2 truncate"
-														title={filter.name}
+														title={filterItem.name}
 													>
-														{filter.name}
+														{filterItem.name}
 													</p>
 													<div className="flex flex-col sm:flex-row gap-1 sm:gap-1.5 justify-center">
 														<button
 															onClick={() =>
 																handleApplyFilter(
-																	filter.id === "none" ? null : filter.css,
-																	filter.name
+																	filterItem.id === "none"
+																		? null
+																		: filterItem.css,
+																	filterItem.name
 																)
 															}
 															className={`text-[10px] sm:text-xs w-full px-2 py-1.5 sm:px-3 sm:py-2 rounded-md font-semibold ${
-																selectedImage.appliedFilterCss === filter.css ||
+																selectedImage.appliedFilterCss ===
+																	filterItem.css ||
 																(selectedImage.appliedFilterCss === null &&
-																	filter.id === "none")
+																	filterItem.id === "none")
 																	? "themed-primary-button shadow-md"
 																	: "themed-filter-apply-button-default"
 															} transition-all duration-200 cursor-pointer`}
-															title={`Apply ${filter.name}`}
+															title={`Apply ${filterItem.name}`}
 														>
-															{" "}
-															Apply{" "}
+															Apply
 														</button>
 														<button
-															onClick={() => handleVoteForFilter(filter.id)}
-															title={`Vote for ${filter.name}`}
+															onClick={() => handleVoteForFilter(filterItem.id)}
+															title={`Vote for ${filterItem.name}`}
 															className={`text-[10px] sm:text-xs w-full px-2 py-1.5 sm:px-3 sm:py-2 rounded-md font-semibold flex items-center justify-center gap-1 cursor-pointer
-                                    ${
-																			selectedImage.userVotedFilters.has(
-																				filter.id
-																			)
-																				? "themed-filter-vote-button-voted shadow-sm"
-																				: "themed-filter-vote-button-default"
-																		} transition-all duration-200`}
+                                ${
+																	selectedImage.userVotedFilters.has(
+																		filterItem.id
+																	)
+																		? "themed-filter-vote-button-voted shadow-sm"
+																		: "themed-filter-vote-button-default"
+																} transition-all duration-200`}
 														>
-															{selectedImage.userVotedFilters.has(filter.id)
+															{selectedImage.userVotedFilters.has(filterItem.id)
 																? "Voted"
 																: "Vote"}{" "}
-															({selectedImage.filterVotes[filter.id] || 0})
+															({selectedImage.filterVotes[filterItem.id] || 0})
 														</button>
 													</div>
 												</div>
@@ -3239,18 +2887,14 @@ const HomePage: React.FC = () => {
 									<h3 className="font-poppins text-xl sm:text-2xl font-bold themed-modal-text-primary">
 										EXIF Data
 									</h3>
-									<dl
-										className={`grid grid-cols-[auto_1fr] gap-x-3 sm:gap-x-4 gap-y-2 sm:gap-y-2.5 text-xs sm:text-sm p-3 sm:p-4 themed-modal-section-bg rounded-xl sm:rounded-2xl shadow-inner`}
-									>
+									<dl className="grid grid-cols-[auto_1fr] gap-x-3 sm:gap-x-4 gap-y-2 sm:gap-y-2.5 text-xs sm:text-sm p-3 sm:p-4 themed-modal-section-bg rounded-xl sm:rounded-2xl shadow-inner">
 										{Object.entries(selectedImage.exif).filter(
 											([_, value]) => value
 										).length > 0 ? (
 											Object.entries(selectedImage.exif).map(([key, value]) =>
 												value ? (
 													<React.Fragment key={key}>
-														<dt
-															className={`font-medium themed-modal-text-highlight`}
-														>
+														<dt className="font-medium themed-modal-text-highlight">
 															{key.replace(/([A-Z])/g, " $1").trim()}:
 														</dt>
 														<dd className="themed-modal-text-primary break-all">
@@ -3275,15 +2919,13 @@ const HomePage: React.FC = () => {
 									</h3>
 									<p className="text-sm themed-modal-text-secondary">
 										Swipe the handle to compare original (left) with filtered
-										(right). <br />{" "}
-										<span className={`text-xs themed-subtle-text`}>
+										(right). <br />
+										<span className="text-xs themed-subtle-text">
 											(Drawings not shown. Active AR stickers will overlay both
 											images.)
 										</span>
 									</p>
-									<div
-										className={`flex justify-between text-xs sm:text-sm themed-subtle-text font-medium max-w-md mx-auto px-1 pt-4`}
-									>
+									<div className="flex justify-between text-xs sm:text-sm themed-subtle-text font-medium max-w-md mx-auto px-1 pt-4">
 										<span>Original</span>
 										<span>Filtered</span>
 									</div>
@@ -3308,11 +2950,9 @@ const HomePage: React.FC = () => {
 							onClick={resetExifCompare}
 							title="Close Comparison"
 						>
-							<IconClose />
+							<X />
 						</button>
-						<h2
-							className={`font-poppins text-xl sm:text-2xl font-bold themed-modal-text-primary text-center p-4 sm:p-5 border-b themed-modal-border-top`}
-						>
+						<h2 className="font-poppins text-xl sm:text-2xl font-bold themed-modal-text-primary text-center p-4 sm:p-5 border-b themed-modal-border-top">
 							Compare EXIF Data
 						</h2>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-5 overflow-y-auto no-scrollbar font-manrope">
@@ -3321,16 +2961,14 @@ const HomePage: React.FC = () => {
 									img && (
 										<div
 											key={index}
-											className={`themed-modal-section-bg p-3 sm:p-4 rounded-xl sm:rounded-2xl space-y-2.5 sm:space-y-3 shadow-lg`}
+											className="themed-modal-section-bg p-3 sm:p-4 rounded-xl sm:rounded-2xl space-y-2.5 sm:space-y-3 shadow-lg"
 										>
 											<img
 												src={img.imageUrl}
 												alt={`Image by ${img.userName}`}
 												className="w-full h-40 sm:h-52 object-cover rounded-lg sm:rounded-xl shadow-md mb-2.5 sm:mb-3"
 											/>
-											<h4
-												className={`font-poppins text-lg sm:text-xl font-semibold themed-modal-text-highlight`}
-											>
+											<h4 className="font-poppins text-lg sm:text-xl font-semibold themed-modal-text-highlight">
 												{img.userName}'s Photo
 											</h4>
 											<dl className="grid grid-cols-[auto_1fr] gap-x-3 sm:gap-x-4 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
@@ -3339,9 +2977,7 @@ const HomePage: React.FC = () => {
 													Object.entries(img.exif).map(([key, value]) =>
 														value ? (
 															<React.Fragment key={`${img.id}-${key}`}>
-																<dt
-																	className={`font-medium themed-modal-text-highlight`}
-																>
+																<dt className="font-medium themed-modal-text-highlight">
 																	{key.replace(/([A-Z])/g, " $1").trim()}:
 																</dt>
 																<dd className="themed-modal-text-primary break-all">
@@ -3360,12 +2996,10 @@ const HomePage: React.FC = () => {
 									)
 							)}
 						</div>
-						<div
-							className={`p-4 sm:p-5 border-t themed-modal-border-top text-center`}
-						>
+						<div className="p-4 sm:p-5 border-t themed-modal-border-top text-center">
 							<button
 								onClick={resetExifCompare}
-								className={`px-5 py-2.5 sm:px-6 sm:py-3 themed-primary-button text-white rounded-lg focus:ring-1 focus:ring-indigo-300 transition-all duration-200 shadow-md text-sm sm:text-base font-semibold cursor-pointer font-manrope`}
+								className="px-5 py-2.5 sm:px-6 sm:py-3 themed-primary-button text-white rounded-lg focus:ring-1 focus:ring-indigo-300 transition-all duration-200 shadow-md text-sm sm:text-base font-semibold cursor-pointer font-manrope"
 							>
 								Close
 							</button>
@@ -3387,9 +3021,7 @@ const HomePage: React.FC = () => {
 						className="frosted-glass themed-modal-content-bg rounded-xl sm:rounded-2xl w-full max-w-2xl max-h-[85vh] sm:max-h-[80vh] overflow-hidden flex flex-col shadow-2xl animate-slide-up"
 						onClick={(e) => e.stopPropagation()}
 					>
-						<div
-							className={`flex justify-between items-center p-4 sm:p-5 border-b themed-modal-border-top`}
-						>
+						<div className="flex justify-between items-center p-4 sm:p-5 border-b themed-modal-border-top">
 							<h2 className="font-poppins text-lg sm:text-xl font-bold themed-modal-text-primary">
 								{showPrivacyModal
 									? "Privacy Policy"
@@ -3405,7 +3037,7 @@ const HomePage: React.FC = () => {
 								onClick={closeAllInfoModals}
 								className="p-2 rounded-full themed-button-text themed-button-hover-bg cursor-pointer"
 							>
-								<IconClose />
+								<X />
 							</button>
 						</div>
 						<div className="p-4 sm:p-6 overflow-y-auto space-y-3 sm:space-y-4 themed-modal-text-secondary text-xs sm:text-sm leading-relaxed font-manrope">
@@ -3432,18 +3064,6 @@ const HomePage: React.FC = () => {
 										We collect info you provide (email, username, photos) and
 										usage data to improve our service.
 									</p>
-									<p>
-										Full details on our{" "}
-										<a
-											href="#"
-											target="_blank"
-											rel="noopener noreferrer"
-											className={`font-semibold themed-modal-text-highlight themed-accent-hover-text cursor-pointer`}
-										>
-											Privacy Page
-										</a>
-										.
-									</p>
 								</>
 							)}
 							{showTermsModal && (
@@ -3459,18 +3079,6 @@ const HomePage: React.FC = () => {
 										You are responsible for your account activity and keeping
 										your password secure.
 									</p>
-									<p>
-										Full details on our{" "}
-										<a
-											href="#"
-											target="_blank"
-											rel="noopener noreferrer"
-											className={`font-semibold themed-modal-text-highlight themed-accent-hover-text cursor-pointer`}
-										>
-											Terms Page
-										</a>
-										.
-									</p>
 								</>
 							)}
 							{showCareersModal && (
@@ -3483,21 +3091,10 @@ const HomePage: React.FC = () => {
 										experiences. Check current openings:
 									</p>
 									<ul className="list-disc list-inside space-y-1 pl-3">
-										<li>React Developer</li> <li>Backend Engineer</li>{" "}
+										<li>React Developer</li>
+										<li>Backend Engineer</li>
 										<li>UX/UI Designer</li>
 									</ul>
-									<p>
-										Email: careers@hixcelquest.dev or see{" "}
-										<a
-											href="#"
-											target="_blank"
-											rel="noopener noreferrer"
-											className={`font-semibold themed-modal-text-highlight themed-accent-hover-text cursor-pointer`}
-										>
-											Careers Page
-										</a>
-										.
-									</p>
 								</>
 							)}
 							{showSupportModal && (
@@ -3509,25 +3106,6 @@ const HomePage: React.FC = () => {
 										Check our FAQ for common questions about uploads, AR
 										features, and challenges.
 									</p>
-									<p>
-										<strong>Common Questions:</strong>
-									</p>
-									<ul className="list-disc list-inside space-y-1 pl-3">
-										<li>How do I upload?</li> <li>AR Booth guide?</li>{" "}
-										<li>Challenge rules?</li>
-									</ul>
-									<p>
-										Contact: support@hixcelquest.dev or visit{" "}
-										<a
-											href="#"
-											target="_blank"
-											rel="noopener noreferrer"
-											className={`font-semibold themed-modal-text-highlight themed-accent-hover-text cursor-pointer`}
-										>
-											Support Portal
-										</a>
-										.
-									</p>
 								</>
 							)}
 							{showBlogModal && (
@@ -3537,9 +3115,7 @@ const HomePage: React.FC = () => {
 									</h3>
 									<div className="space-y-3">
 										<div>
-											<h4
-												className={`font-semibold themed-modal-text-highlight font-poppins`}
-											>
+											<h4 className="font-semibold themed-modal-text-highlight font-poppins">
 												Mastering Golden Hour Shots
 											</h4>
 											<p className="text-xs">
@@ -3549,9 +3125,7 @@ const HomePage: React.FC = () => {
 											</p>
 										</div>
 										<div>
-											<h4
-												className={`font-semibold themed-modal-text-highlight font-poppins`}
-											>
+											<h4 className="font-semibold themed-modal-text-highlight font-poppins">
 												Creative Uses of AR Stickers
 											</h4>
 											<p className="text-xs">
@@ -3560,27 +3134,13 @@ const HomePage: React.FC = () => {
 											</p>
 										</div>
 									</div>
-									<p className="mt-3">
-										Visit our full{" "}
-										<a
-											href="#"
-											target="_blank"
-											rel="noopener noreferrer"
-											className={`font-semibold themed-modal-text-highlight themed-accent-hover-text cursor-pointer`}
-										>
-											Blog Page
-										</a>{" "}
-										for more articles.
-									</p>
 								</>
 							)}
 						</div>
-						<div
-							className={`p-3 sm:p-4 border-t themed-modal-border-top text-right`}
-						>
+						<div className="p-3 sm:p-4 border-t themed-modal-border-top text-right">
 							<button
 								onClick={closeAllInfoModals}
-								className={`px-4 py-2 sm:px-5 themed-primary-button text-white rounded-md sm:rounded-lg text-xs sm:text-sm font-medium cursor-pointer font-manrope`}
+								className="px-4 py-2 sm:px-5 themed-primary-button text-white rounded-md sm:rounded-lg text-xs sm:text-sm font-medium cursor-pointer font-manrope"
 							>
 								Close
 							</button>
