@@ -570,7 +570,7 @@ export default function OSLabSImulatorExport() {
                 <h3 className="text-lg font-semibold text-blue-400">How to Use</h3>
                 <ol className="list-decimal pl-5 text-gray-300 space-y-2">
                   <li><strong className="text-white">Input Process Data</strong>: Edit the table to set Process ID, AT, and BT. Add or delete processes as needed.</li>
-                  <li><strong className="text-white">Run Simulation</strong>: Click "Run" or press Enter to start. The simulator validates inputs (e.g., BT > 0).</li>
+                  <li><strong className="text-white">Run Simulation</strong>: Click "Run" or press Enter to start. The simulator validates inputs (e.g., BT greater than 0).</li>
                   <li><strong className="text-white">Navigate Steps</strong>: Use "Next"/"Prev" buttons or Arrow keys to step through the simulation. View CPU, Queue, and Completed states, along with informative messages.</li>
                   <li><strong className="text-white">View Gantt Chart</strong>: The Gantt chart shows process execution with colored blocks. Hover for detailed tooltips.</li>
                   <li><strong className="text-white">View Results</strong>: At the end (or click "Show Final Result"), see pie charts for TAT/WT and average values.</li>
