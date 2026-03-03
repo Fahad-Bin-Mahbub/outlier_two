@@ -19,7 +19,7 @@ export const componentMap: Record<string, any> = {
   LinkRepository: dynamic(() => import("@/components/projects/LinkRepository"), { loading: LoadingSpinner, ssr: false }),
   Lms: dynamic(() => import("@/components/projects/Lms"), { loading: LoadingSpinner, ssr: false }),
   LogisticTracker: dynamic(() => import("@/components/projects/LogisticTracker"), { loading: LoadingSpinner, ssr: false }),
-  MasonryPortfolio: dynamic(() => import("@/components/projects/MasonryPortfolio"), { loading: LoadingSpinner, ssr: false }),
+  // MasonryPortfolio: dynamic(() => import("@/components/projects/MasonryPortfolio"), { loading: LoadingSpinner, ssr: false }),
   MeetupHub: dynamic(() => import("@/components/projects/MeetupHub"), { loading: LoadingSpinner, ssr: false }),
   MobileNotes: dynamic(() => import("@/components/projects/MobileNotes"), { loading: LoadingSpinner, ssr: false }),
 
