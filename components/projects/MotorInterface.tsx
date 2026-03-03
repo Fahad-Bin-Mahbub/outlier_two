@@ -813,7 +813,7 @@ const MotorControlInterface: React.FC = () => {
                         </h3>
                         <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
                             <li>Control signals above 800 can damage the motor over time</li>
-                            <li>For high RPM targets (>500), reduce Kp to avoid instability</li>
+                            <li>For high RPM targets (greater than 500), reduce Kp to avoid instability</li>
                             <li>High Kp + high Ki combinations can cause dangerous oscillations</li>
                             <li>The maximum recommended control signal depends on your motor's specifications</li>
                         </ul>
