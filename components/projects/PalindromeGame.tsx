@@ -1,9 +1,3 @@
-// I would like to create a brain game based on palindrome numbers using Next.js and TypeScript. When the game starts, a random number will appear on the screen. The player has to decide if the number is a palindrome or not. If the number is not a palindrome, the player will input the nearest palindrome number. The game should have a practice round at the start.
-// For each correct answer, the player will get 10 points, and for each wrong answer, the player will get -5 points.
-// Introduce some features like lives and streaks.
-// There should be different levels with different numbers of digits, with different timers in the game.
-// The solution has to be self-contained in a single .tsx file.
-
 "use client";
 import { useState, useEffect, useRef } from "react";
 import {
